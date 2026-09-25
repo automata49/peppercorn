@@ -1,0 +1,27 @@
+import type { LeaderRow } from '../types'
+
+export const demoRows: LeaderRow[] = [
+  {id:'us-aapl',market:'US',ticker:'AAPL',name:'Apple',asset_class:'Equity',sector:'Information Technology',industry:'Consumer Electronics',price:341.07,verdict:'1. 주도',stage:'▲ 돌파 매수권',action_guide:'피벗 돌파와 거래량 확인',return_1w:.015,return_1m:.088,return_3m:.202,return_6m:.349,return_12m:.352,rs_1w:.002,rs_1m:.081,rs_3m:.144,rs_6m:.153,rs_12m:.185,rs_rank:75,high_52w_distance:-.012,volume_ratio:.68,adr20_pct:.022,rsi14:74,atr_multiple:2.7,ma50:321.83,ma200:287.77,leader_tt:true},
+  {id:'us-adi',market:'US',ticker:'ADI',name:'Analog Devices',asset_class:'Equity',sector:'Information Technology',industry:'Semiconductors',price:393.60,verdict:'2. 강세 전환',stage:'↻ 넥스트 리더',action_guide:'RS순위 70 이상과 정배열 확인',return_1w:.048,return_1m:.059,return_3m:.017,return_6m:.256,return_12m:.583,rs_1w:.035,rs_1m:.052,rs_3m:-.041,rs_6m:.060,rs_12m:.416,rs_rank:69,high_52w_distance:-.117,volume_ratio:.68,adr20_pct:.026,rsi14:67,atr_multiple:2.1,ma50:373.19,ma200:356.48,leader_tt:false},
+  {id:'us-aem',market:'US',ticker:'AEM',name:'Agnico Eagle Mines',asset_class:'Equity',sector:'Materials',industry:'Gold Mining',price:194.48,verdict:'중립',stage:'○ 관찰',action_guide:'추세·RS 개선 대기',return_1w:-.025,return_1m:-.091,return_3m:.237,return_6m:.037,return_12m:.231,rs_1w:-.038,rs_1m:-.098,rs_3m:.179,rs_6m:-.159,rs_12m:.065,rs_rank:58,high_52w_distance:-.238,volume_ratio:.54,adr20_pct:.031,rsi14:38,atr_multiple:1.9,ma50:183.56,ma200:188.68,leader_tt:false},
+  {id:'kr-000660',market:'KR',ticker:'000660',name:'SK하이닉스',asset_class:'Equity',sector:'Information Technology',industry:'Semiconductors',price:298000,verdict:'1. 주도',stage:'● 눌림 매수권',action_guide:'MA50 지지와 거래량 확인',return_1w:.021,return_1m:.094,return_3m:.181,return_6m:.312,return_12m:.552,rs_1w:.018,rs_1m:.071,rs_3m:.126,rs_6m:.221,rs_12m:.301,rs_rank:91,high_52w_distance:-.073,volume_ratio:1.18,adr20_pct:.031,rsi14:62,atr_multiple:1.4,ma50:286000,ma200:237000,leader_tt:true},
+  {id:'kr-005930',market:'KR',ticker:'005930',name:'삼성전자',asset_class:'Equity',sector:'Information Technology',industry:'Semiconductors',price:84500,verdict:'2. 강세 전환',stage:'■ 베이스 형성',action_guide:'베이스 상단 돌파 확인',return_1w:.009,return_1m:.042,return_3m:.082,return_6m:.141,return_12m:.194,rs_1w:.006,rs_1m:.019,rs_3m:.027,rs_6m:.050,rs_12m:.061,rs_rank:72,high_52w_distance:-.112,volume_ratio:.93,adr20_pct:.021,rsi14:58,atr_multiple:1.8,ma50:81800,ma200:75500,leader_tt:false}
+]
+
+export const initialWatchlist = demoRows.slice(0,4).map((r,i)=>({
+  id:r.id,market:r.market,ticker:r.ticker,name:r.name,stage:r.stage,rs_rank:r.rs_rank,
+  interest_price:r.price,stop_pct:i===0?-5.5:-7,priority:i<2?'A':'B',note:''
+}))
+
+export const initialPortfolio = [
+  {id:'p1',market:'US',ticker:'MSTR',name:'Strategy',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''},
+  {id:'p2',market:'US',ticker:'BMNR',name:'BMNR',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''}
+]
+
+export const initialResearch = [
+  {id:1,date:'2026-09-26',type:'산업',target:'AI Semiconductors',title:'',fact:'',interpretation:'',source:'',importance:4,status:'관찰중'}
+]
+
+export const initialJournal = [
+  {id:1,date:'2026-09-26',account:'해외',ticker:'',name:'',buy_price:0,thesis:'',confidence:3,target_price:0,stop_price:0,status:'계획'}
+]

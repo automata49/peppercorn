@@ -1,0 +1,27 @@
+name: Refresh market analysis
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 21 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r analysis/requirements.txt
+      - run: python analysis/fetch_prices.py
+        env:
+          SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
+      - run: python analysis/analyze.py
+        env:
+          SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
