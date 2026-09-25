@@ -41,7 +41,7 @@ h1{font-size:21px;font-weight:900}h1 small{font-size:12.5px;color:var(--sub);fon
 .mk{display:flex;justify-content:space-between;align-items:center;padding:5px 0;gap:10px}
 .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap}
 .pg{background:var(--gbg);color:var(--g)}.py{background:var(--ybg);color:var(--y)}.pr{background:var(--rbg);color:var(--up)}
-.pb{background:var(--bbg);color:var(--dn)}.pn{background:#F1F3F5;color:#5F6B7A}.pv{background:#EEE8FA;color:#5B3FB5}
+.pb{background:var(--bbg);color:var(--dn)}.pt{background:#D9F0EC;color:#0F766E}.pn{background:#F1F3F5;color:#5F6B7A}.pv{background:#EEE8FA;color:#5B3FB5}
 .bar{height:7px;border-radius:9px;background:#EDF0F4;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px}
 .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:14px;align-items:start}
 .side{position:sticky;top:68px}.sl{max-height:calc(100vh - 150px);overflow:auto}.sl th{position:sticky;top:0;background:#fff;z-index:1}
@@ -138,7 +138,7 @@ const inM = r => S.mkt === 'ALL' || r.m === S.mkt;
 
 function stagePill(s) {
   const c = s[0] === '▲' || s[0] === '●' ? 'pg' : s[0] === '◆' ? 'pb' : s[0] === '■' ? 'pv' :
-            s[0] === '⛔' ? 'pr' : s[0] === '↻' ? 'py' : 'pn';
+            s[0] === '⛔' ? 'pr' : s[0] === '↻' ? 'py' : s[0] === '◇' ? 'pt' : 'pn';
   return `<span class="pill ${c}">${esc(s)}</span>`;
 }
 function verdictPill(v) {
@@ -182,7 +182,7 @@ function render() {
    <div class="card"><div class="kl">시장 상태 (벤치마크 추세)</div>
      ${ms.map(m => `<div class="mk"><span>${flag(m)}${esc(M[m].bench)}</span>${statePill(M[m].state)}</div>`).join('')}</div>
    <div class="card"><div class="kl">1. 주도주 (리더 TT = Y)</div><div class="kv">${sum('leaders')}<small>/ ${sum('total')} 종목</small></div>
-     <div class="ks">${ms.map(m => `<span>${m === 'KR' ? '한국' : '미국'} <b>${M[m].leaders}</b></span>`).join('')}<span>돌파 매수권 <b>${stageSum('▲ 돌파 매수권')}</b></span></div></div>
+     <div class="ks">${ms.map(m => `<span>${m === 'KR' ? '한국' : '미국'} <b>${M[m].leaders}</b></span>`).join('')}<span>돌파 매수권 <b>${stageSum('▲ 돌파 매수권')}</b></span><span>◇ 조정 중 <b>${stageSum('◇ 조정 중 주도주')}</b></span></div></div>
    <div class="card"><div class="kl">2. 강세(매수세) 전환</div><div class="kv">${sum('turns')}<small>종목</small></div>
      <div class="ks">${ms.map(m => `<span>${m === 'KR' ? '한국' : '미국'} <b>${M[m].turns}</b></span>`).join('')}<span>넥스트 리더 <b>${stageSum('↻ 넥스트 리더')}</b></span></div></div>
    <div class="card"><div class="kl">MA50 위 비율 (시장 참여도)</div>
@@ -219,8 +219,9 @@ function render() {
 
   const q = S.q.trim().toLowerCase();
   const scope = r => inM(r) && (!S.filt || (r[S.filt.key] === S.filt.name && r.m === S.filt.m)) && (!q || (r.name + ' ' + r.t).toLowerCase().includes(q));
-  const nL = d.leaders.filter(scope).length, nT = d.turns.filter(scope).length;
-  let list = (S.tab === 'leaders' ? d.leaders : d.turns).filter(scope);
+  const corr = d.corrections || [];
+  const nL = d.leaders.filter(scope).length, nT = d.turns.filter(scope).length, nC = corr.filter(scope).length;
+  let list = (S.tab === 'leaders' ? d.leaders : S.tab === 'corr' ? corr : d.turns).filter(scope);
   if (S.sort) {
     const { k, dir } = S.sort;
     list = list.slice().sort((a, b) => {
@@ -233,10 +234,11 @@ function render() {
                 ['rs1w', 'RS 1W', ''], ['rs1m', 'RS 1M', 'hm'], ['ret1w', '등락률 1W', ''], ['ret1m', '등락률 1M', 'hm']];
   const arrow = k => S.sort && S.sort.k === k ? (S.sort.dir > 0 ? ' ▲' : ' ▼') : '';
   const title = S.filt ? `<span class="chip">${flag(S.filt.m)}${esc(S.filt.name)} <button id="clr" title="선택 해제">✕</button></span>`
-                       : `<span>전체 · ${S.tab === 'leaders' ? 'RS순위 높은 순' : 'RS 1W 높은 순'}</span>`;
+                       : `<span>전체 · ${S.tab === 'turns' ? 'RS 1W 높은 순' : 'RS순위 높은 순'}</span>`;
   const listHtml = `<div class="card side" id="side"><div class="ct">
      <div class="tabs"><button data-tab="leaders" class="${S.tab === 'leaders' ? 'on' : ''}">1. 주도주 ${nL}</button>
-       <button data-tab="turns" class="${S.tab === 'turns' ? 'on' : ''}">2. 강세 전환 ${nT}</button></div>${title}</div>
+       <button data-tab="turns" class="${S.tab === 'turns' ? 'on' : ''}">2. 강세 전환 ${nT}</button>
+       <button data-tab="corr" class="${S.tab === 'corr' ? 'on' : ''}" title="RS순위·추세 유지, 고점 대비 25~40% 조정">◇ 조정 중 ${nC}</button></div>${title}</div>
     <div class="tw sl"><table><tr>${cols.map(c => `<th class="s ${c[2]}" data-k="${c[0]}">${c[1]}${arrow(c[0])}</th>`).join('')}</tr>
     ${list.map(r => {
       const id = r.m + r.t, op = S.open === id;
@@ -251,7 +253,7 @@ function render() {
          <span>RS 1M <b>${pct(r.rs1m, true)}</b></span><span>등락률 1W·1M <b>${pct(r.ret1w, true)} · ${pct(r.ret1m, true)}</b></span><span>거래량 <b>${num(r.vol) ? r.vol.toFixed(2) + 'x' : '–'}</b></span></div>
          <div style="margin-top:8px"><a target="_blank" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.m === 'KR' ? 'KRX:' + r.t : r.t)}">차트 (TradingView) ↗</a>
          <a target="_blank" href="${esc(d.sheetUrl)}">시트에서 보기 ↗</a></div></td></tr>` : ''}`; }).join('') ||
-      `<tr><td class="l empty" colspan="7">${S.filt ? '이 그룹에는 ' + (S.tab === 'leaders' ? '주도주가' : '강세 전환 종목이') + ' 없습니다' : '조건에 맞는 종목이 없습니다'}</td></tr>`}
+      `<tr><td class="l empty" colspan="7">${S.filt ? '이 그룹에는 ' + (S.tab === 'leaders' ? '주도주가' : S.tab === 'corr' ? '조정 중 주도주가' : '강세 전환 종목이') + ' 없습니다' : '조건에 맞는 종목이 없습니다'}</td></tr>`}
     </table></div></div>`;
   h += `<div class="row2">${secHtml}${listHtml}</div>`;
 
@@ -264,6 +266,7 @@ function render() {
   h += `<div class="card" style="margin-top:14px"><div class="ct"><h3>용어 · 판정 기준</h3></div><div class="defs">
     <div><b>1. 주도주</b> — 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 -25% 이내, RS순위 ≥ 70</div>
     <div><b>2. 강세(매수세) 전환</b> — 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
+    <div><b>◇ 조정 중 주도주</b> — RS순위 ≥ 70, 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 −25% ~ −40% → 새 베이스·재돌파 대기</div>
     <div><b>등락률 1W / 1M</b> — 최근 5 / 21거래일 가격 등락률 · <b>RS</b> = 종목 등락률 − 벤치마크(US: SPY, KR: 069500) 등락률</div>
     <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — 주도주 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
     <div><b>강세 전환 산업</b> — (주도+전환) 비율 ≥ ${Math.round(d.dash.turnShare * 100)}%, MA50 위 ≥ ${Math.round(d.dash.turnBreadth * 100)}%, RS 1W 중앙값 &gt; 0</div>
