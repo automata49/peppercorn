@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peppercorn Capital</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0E0D0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Peppercorn">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F6FA;--card:#fff;--ink:#1B2433;--sub:#6B7686;--line:#E6EAF0;--navy:#1F3864;
+  --up:#D93025;--dn:#1A66D2;--g:#1E8E3E;--gbg:#E6F4EA;--y:#B45F06;--ybg:#FFF4D6;--rbg:#FDECEA;--bbg:#E8F0FE;--kr:#3B6FD8;--us:#9FB8EE}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;background:var(--bg);color:var(--ink);font-size:13px}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input{font:inherit}
+.top{background:linear-gradient(90deg,#0E0D0B 0%,#1A1712 100%);color:#F3E9D2;border-bottom:1px solid #3A3122;display:flex;align-items:center;padding:0 24px;height:56px;gap:18px;position:sticky;top:0;z-index:5}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:18px;white-space:nowrap}.logo img{height:38px;width:auto;margin:0;filter:drop-shadow(0 0 6px rgba(227,178,92,.35))}.logo .ln{color:#F3E9D2;letter-spacing:.3px}.logo .ln span{color:#E3B25C;font-weight:800}
+.sp{flex:1}.upd{color:#B9A57C;font-size:12px}
+.tbtn{background:linear-gradient(180deg,#E9C46A,#C9973F);color:#15130F;font-weight:700;padding:7px 12px;border-radius:8px;font-size:12px;text-decoration:none}
+.tbtn.ghost{background:rgba(255,255,255,.06);color:#F3E9D2;border:1px solid #4A3E2A}
+.wrap{max-width:1440px;margin:0 auto;padding:20px 24px 32px}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+h1{font-size:21px;font-weight:900}h1 small{font-size:12.5px;color:var(--sub);font-weight:500;margin-left:8px}
+.ctrl{display:flex;gap:10px;align-items:center}
+.seg{display:flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{padding:6px 16px;border-radius:8px;font-weight:600;color:var(--sub)}.seg button.on{background:var(--navy);color:#fff}
+.search{border:1px solid var(--line);border-radius:10px;padding:8px 12px;width:210px;background:#fff}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;min-width:0}
+.kl{color:var(--sub);font-size:12px;font-weight:600;margin-bottom:8px}
+.kv{font-size:30px;font-weight:900;line-height:1}.kv small{font-size:13px;color:var(--sub);font-weight:600;margin-left:6px}
+.ks{margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;color:var(--sub);font-size:12px}.ks b{color:var(--ink)}
+.mk{display:flex;justify-content:space-between;align-items:center;padding:5px 0;gap:10px}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.pg{background:var(--gbg);color:var(--g)}.py{background:var(--ybg);color:var(--y)}.pr{background:var(--rbg);color:var(--up)}
+.pb{background:var(--bbg);color:var(--dn)}.pn{background:#F1F3F5;color:#5F6B7A}.pv{background:#EEE8FA;color:#5B3FB5}
+.bar{height:7px;border-radius:9px;background:#EDF0F4;overflow:hidden}.bar i{display:block;height:100%;border-radius:9px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:14px;align-items:start}
+.side{position:sticky;top:68px}.sl{max-height:calc(100vh - 150px);overflow:auto}.sl th{position:sticky;top:0;background:#fff;z-index:1}
+td.sn{max-width:190px;overflow:hidden;text-overflow:ellipsis}
+.sl td.nm{max-width:165px;overflow:hidden;text-overflow:ellipsis}.sl .tk{display:none}
+.row2 td,.row2 th{padding:7px 4px;font-size:12.5px}.row2 th{font-size:11px}.row2 .mini .bar{width:28px}.row2 .pill{font-size:11px;padding:2px 7px}
+.row2 td.sn{max-width:150px}.row2 .heat{min-width:28px;padding:2px 4px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.sc{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:12px;font-weight:600;color:#3D4756}
+.sc i{width:8px;height:8px;border-radius:50%;display:inline-block}.sc small{font-size:10px;color:#8A94A3;font-weight:800}
+.sc b{background:#FFF4D6;color:var(--y);border-radius:99px;padding:0 6px;font-size:11px}
+.sc.on{background:var(--ink);color:#fff;border-color:var(--ink)}.sc.on small{color:#C9D6EA}
+.tog{display:flex;background:#F1F3F5;border-radius:8px;padding:2px}.tog button{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;color:var(--sub)}.tog button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.stag{font-size:10.5px;color:#8A94A3;font-weight:500;margin-top:1px;overflow:hidden;text-overflow:ellipsis}.gx{color:#8A94A3;font-weight:500;font-size:11px}
+.stgs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 24px}
+.ct{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.ct h3{font-size:15px;font-weight:800}.ct span{color:var(--sub);font-size:12px}
+.stg{display:grid;grid-template-columns:118px 1fr 36px;align-items:center;gap:10px;padding:5px 0}
+.stg .sb{display:flex;height:15px;border-radius:5px;overflow:hidden;background:#F1F3F5}.stg .sb i{display:block;height:100%}
+.kr{background:var(--kr)}.us{background:var(--us)}
+.lg{display:flex;gap:12px;color:var(--sub);font-size:11.5px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11.5px;color:var(--sub);font-weight:600;text-align:right;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
+th.s{cursor:pointer}th.s:hover{color:var(--ink)}th.l,td.l{text-align:left}
+td{padding:8px 6px;border-bottom:1px solid #F0F2F5;text-align:right;white-space:nowrap}
+tr.click{cursor:pointer}tr.click:hover td{background:#F8FAFD}tr.sel td{background:#EEF3FC}
+td.nm{font-weight:700}td.tr{max-width:260px;overflow:hidden;text-overflow:ellipsis}.tk{color:#8A94A3;font-weight:500;font-size:11px;margin-left:4px}
+.up{color:var(--up);font-weight:700}.dn{color:var(--dn);font-weight:700}
+.heat{display:inline-block;min-width:34px;text-align:center;padding:2px 6px;border-radius:6px;font-weight:700}
+.mini{display:flex;align-items:center;gap:8px;justify-content:flex-end}.mini .bar{width:44px}
+.flag{font-size:10.5px;font-weight:800;color:#fff;border-radius:5px;padding:1px 5px;margin-right:6px}
+.fk{background:var(--kr)}.fu{background:#7A8699}
+.inds{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ind{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#FCFDFE;cursor:pointer}
+.ind:hover{border-color:#B4C6E7}.ind.sel{border-color:var(--navy);box-shadow:0 0 0 1px var(--navy) inset}
+.ind .t{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:6px}.ind .t b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ind .m{display:flex;gap:10px;flex-wrap:wrap;color:var(--sub);font-size:11.5px;margin:6px 0}.ind .m b{font-size:12px;color:var(--ink)}
+.ind .s{color:#3D4756;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs{display:flex;gap:6px}.tabs button{padding:6px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);font-weight:700;color:var(--sub)}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--bbg);color:var(--dn);font-weight:700;border-radius:99px;padding:3px 10px;font-size:12px}
+.chip button{font-weight:900}
+.det td{background:#FAFBFD;white-space:normal;text-align:left;padding:10px 14px}
+.det .dg{display:flex;flex-wrap:wrap;gap:8px 22px;color:var(--sub)}.det .dg b{color:var(--ink)}
+.det a{color:var(--dn);font-weight:700;text-decoration:none;margin-right:14px}
+.foot{margin-top:14px;color:var(--sub);font-size:11.5px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.defs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 18px;color:#3D4756;font-size:12px}.defs b{color:var(--navy)}
+.empty{color:var(--sub);padding:14px 4px}
+.sk{animation:pl 1.2s infinite;background:#E9EDF3;border-radius:10px;height:110px}
+@keyframes pl{50%{opacity:.5}}
+.err{background:var(--rbg);color:var(--up);padding:14px;border-radius:12px;font-weight:700}
+@media (max-width:1100px){.row2{grid-template-columns:1fr}.side{position:static}.sl{max-height:none}.stgs{grid-template-columns:1fr}.inds{grid-template-columns:repeat(2,minmax(0,1fr))}.defs{grid-template-columns:1fr}}
+@media (max-width:720px){
+  .top{padding:0 14px;height:52px}.logo{font-size:15px}.logo img{height:32px}.upd,.tbtn.ghost{display:none}
+  .wrap{padding:12px 12px 24px}h1{font-size:17px}h1 small{display:none}
+  .ctrl{width:100%}.seg{flex:1}.seg button{flex:1;padding:6px 0}.search{width:120px}
+  .grid4{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{padding:13px 14px}.kv{font-size:24px}
+  .inds{grid-template-columns:1fr}.hm{display:none}
+  td.nm{max-width:120px;overflow:hidden;text-overflow:ellipsis}.tk{display:none}td,th{padding:8px 3px}td.nm .flag{display:none}.pill{font-size:10.5px;padding:2px 6px}
+}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="logo"><img src="logo.webp" alt=""><span class="ln">Peppercorn <span>Capital</span></span></div>
+  <div class="sp"></div>
+  <div class="upd" id="upd">불러오는 중…</div>
+  <a class="tbtn ghost" id="sheetLink" href="#" target="_blank">시트 열기</a>
+  <button class="tbtn" id="refresh">⟳ 새로고침</button>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <h1>주도주 · 강세 전환 대시보드<small>Minervini Trend Template · 벤치마크 대비 RS</small></h1>
+    <div class="ctrl">
+      <div class="seg" id="mkt"><button data-m="ALL" class="on">전체</button><button data-m="KR">한국</button><button data-m="US">미국</button></div>
+      <input class="search" id="q" placeholder="종목·티커 검색">
+    </div>
+  </div>
+  <div id="app"><div class="grid4"><div class="sk"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div><div class="sk" style="height:320px"></div></div>
+</div>
+
+<script>
+const S = { data: null, mkt: 'ALL', tab: 'leaders', q: '', filt: null, sort: null, open: null, indAll: false, sec: null };
+const VORD = { '1. 주도': 0, '2. 강세 전환': 1, '중립': 2, '약세': 3, '— 표본 부족': 4 };
+const $ = s => document.querySelector(s);
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = v => typeof v === 'number' && isFinite(v);
+const pct = (v, sign) => num(v) ? (sign && v > 0 ? '+' : '') + (v * 100).toFixed(1) + '%' : '–';
+const sgn = v => num(v) ? `<span class="${v > 0 ? 'up' : v < 0 ? 'dn' : ''}">${pct(v, true)}</span>` : '–';
+const flag = m => `<span class="flag ${m === 'KR' ? 'fk' : 'fu'}">${m}</span>`;
+const inM = r => S.mkt === 'ALL' || r.m === S.mkt;
+
+function stagePill(s) {
+  const c = s[0] === '▲' || s[0] === '●' ? 'pg' : s[0] === '◆' ? 'pb' : s[0] === '■' ? 'pv' :
+            s[0] === '⛔' ? 'pr' : s[0] === '↻' ? 'py' : 'pn';
+  return `<span class="pill ${c}">${esc(s)}</span>`;
+}
+function verdictPill(v) {
+  const c = v === '1. 주도' ? 'pg' : v === '2. 강세 전환' ? 'py' : 'pn';
+  return `<span class="pill ${c}">${esc(v)}</span>`;
+}
+function statePill(s) {
+  const c = s === '상승추세' ? 'pg' : s === '조정' ? 'py' : s === '하락추세' ? 'pr' : 'pn';
+  return `<span class="pill ${c}">● ${esc(s || '–')}</span>`;
+}
+function heat(v) {
+  if (!num(v)) return '–';
+  const t = Math.max(0, Math.min(1, (v - 1) / 98));
+  const bg = t >= .5 ? `rgba(87,187,138,${(t - .5) * 1.1})` : `rgba(234,153,153,${(.5 - t) * 1.1})`;
+  return `<span class="heat" style="background:${bg}">${Math.round(v)}</span>`;
+}
+
+/* ▼ Apps Script 웹앱 주소 (배포 ▸ 배포 관리의 /exec 주소) */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzjmgSqS6gPej7abvB4vu5ndG8otXEESSc1VyIeGPbeeLOXkddQo7GBzpSgbU2GrQLk/exec';
+
+function load(force) {
+  $('#upd').textContent = '불러오는 중…';
+  fetch(API_URL + '?api=data' + (force ? '&force=1' : '') + '&t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(d => { if (d.error) throw new Error(d.error); S.data = d; render(); })
+    .catch(e => { $('#app').innerHTML = `<div class="err">데이터를 불러오지 못했습니다: ${esc(e.message || e)}<br>웹앱 배포의 액세스 권한이 '모든 사용자'인지 확인하세요.</div>`; });
+}
+
+function render() {
+  const d = S.data; if (!d) return;
+  const ri = d.rsInfo;
+  $('#upd').textContent = `갱신 ${d.updated} · RS순위: ` + (ri && ri.asof ? `지수 전체 기준 ${ri.asof} (미국 ${ri.US} · 한국 ${ri.KR})` : '관심 종목 기준');
+  $('#sheetLink').href = d.sheetUrl;
+  const ms = S.mkt === 'ALL' ? ['KR', 'US'] : [S.mkt];
+  const M = d.markets;
+  const sum = k => ms.reduce((a, m) => a + (M[m][k] || 0), 0);
+  const stageSum = lab => ms.reduce((a, m) => a + (d.stages.find(s => s.label === lab) || {})[m], 0);
+
+  // KPI
+  let h = `<div class="grid4">
+   <div class="card"><div class="kl">시장 상태 (벤치마크 추세)</div>
+     ${ms.map(m => `<div class="mk"><span>${flag(m)}${esc(M[m].bench)}</span>${statePill(M[m].state)}</div>`).join('')}</div>
+   <div class="card"><div class="kl">1. 주도주 (리더 TT = Y)</div><div class="kv">${sum('leaders')}<small>/ ${sum('total')} 종목</small></div>
+     <div class="ks">${ms.map(m => `<span>${m === 'KR' ? '한국' : '미국'} <b>${M[m].leaders}</b></span>`).join('')}<span>돌파 매수권 <b>${stageSum('▲ 돌파 매수권')}</b></span></div></div>
+   <div class="card"><div class="kl">2. 강세(매수세) 전환</div><div class="kv">${sum('turns')}<small>종목</small></div>
+     <div class="ks">${ms.map(m => `<span>${m === 'KR' ? '한국' : '미국'} <b>${M[m].turns}</b></span>`).join('')}<span>넥스트 리더 <b>${stageSum('↻ 넥스트 리더')}</b></span></div></div>
+   <div class="card"><div class="kl">MA50 위 비율 (시장 참여도)</div>
+     ${ms.map(m => `<div class="mk"><span>${m === 'KR' ? '한국' : '미국'} <b>${pct(M[m].breadth)}</b></span><div class="bar" style="width:45%"><i style="width:${(M[m].breadth || 0) * 100}%;background:var(--${m.toLowerCase()})"></i></div></div>`).join('')}
+     <div class="ks"><span>RS 1W 중앙값 ${ms.map(m => `${m === 'KR' ? '한국' : '미국'} ${sgn(M[m].medRs1w)}`).join(' · ')}</span></div></div>
+  </div>`;
+
+  // ── 산업 요약(왼쪽, 섹터는 태그·필터) + 주도주·강세 전환(오른쪽) ──
+  const secs = d.sectors.filter(inM);
+  const secOn = S.sec;
+  const vcol = v => v === '1. 주도' ? 'var(--g)' : v === '2. 강세 전환' ? '#E3A008' : v === '약세' ? '#C9CFD8' : '#9AA5B4';
+  const chips = `<div class="chips"><button class="sc ${secOn ? '' : 'on'}" id="secAll">전체 섹터</button>${secs.map(s => {
+      const on = secOn && secOn.name === s.name && secOn.m === s.m;
+      const hot = d.industries.filter(g => g.m === s.m && g.sector === s.name && VORD[g.verdict] <= 1).length;
+      return `<button class="sc ${on ? 'on' : ''}" data-sec="1" data-m="${s.m}" data-n="${esc(s.name)}" title="섹터 판정: ${esc(s.verdict)} · 주도주 비율 ${pct(s.leadShare)}">
+        <i style="background:${vcol(s.verdict)}"></i>${S.mkt === 'ALL' ? `<small>${s.m}</small>` : ''}${esc(s.name)}${hot ? `<b>${hot}</b>` : ''}</button>`; }).join('')}</div>`;
+  let inds = d.industries.filter(inM).filter(g => !secOn || (g.sector === secOn.name && g.m === secOn.m));
+  const hidden = S.indAll ? 0 : inds.filter(g => VORD[g.verdict] > 1).length;
+  if (!S.indAll) inds = inds.filter(g => VORD[g.verdict] <= 1);
+  const indName = g => g.generic ? `기타 <span class="gx">(세부 미분류)</span>` : esc(g.name);
+  const secHtml = `<div class="card"><div class="ct"><h3>산업 요약</h3>
+      <div class="tog"><button data-ind="lead" class="${S.indAll ? '' : 'on'}">주도·전환 산업</button><button data-ind="all" class="${S.indAll ? 'on' : ''}">전체 산업</button></div></div>
+    ${chips}
+    <div class="tw sl"><table><tr><th class="l">산업 <span class="gx">· 섹터</span></th><th class="l">판정</th><th>종목</th><th>주도주 비율</th><th>MA50 위</th><th class="hm">RS순위</th><th>RS 1W</th><th>등락률 1W</th><th class="hm">등락률 1M</th></tr>
+    ${inds.map(g => {
+      const on = S.filt && S.filt.key === 'ind' && S.filt.name === g.name && S.filt.m === g.m;
+      return `<tr class="click ${on ? 'sel' : ''}" data-f="ind" data-m="${g.m}" data-n="${esc(g.name)}" title="대표 종목: ${esc(g.top)}">
+       <td class="l nm sn">${flag(g.m)}${indName(g)}<div class="stag">${esc(g.sector)}</div></td><td class="l">${verdictPill(g.verdict)}</td><td>${g.n}</td>
+       <td><div class="mini">${pct(g.leadShare)}<div class="bar"><i style="width:${g.leadShare * 100}%;background:${vcol(g.verdict)}"></i></div></div></td>
+       <td>${pct(g.breadth)}</td><td class="hm">${heat(g.medRank)}</td><td>${sgn(g.medRs1w)}</td><td>${sgn(g.medRet1w)}</td><td class="hm">${sgn(g.medRet1m)}</td></tr>`; }).join('') ||
+      `<tr><td class="l empty" colspan="9">${secOn ? '이 섹터에는 ' + (S.indAll ? '산업이' : '주도·강세 전환 산업이') + ' 없습니다' : '해당 없음'}</td></tr>`}
+    </table></div>
+    <div class="foot" style="margin-top:8px"><span>산업을 누르면 오른쪽에 해당 종목 · ETF 제외 · ${d.dash.minIndustry}종목 미만은 표본 부족</span>${hidden ? `<span>중립·약세 ${hidden}개 숨김</span>` : ''}</div></div>`;
+
+  const q = S.q.trim().toLowerCase();
+  const scope = r => inM(r) && (!S.filt || (r[S.filt.key] === S.filt.name && r.m === S.filt.m)) && (!q || (r.name + ' ' + r.t).toLowerCase().includes(q));
+  const nL = d.leaders.filter(scope).length, nT = d.turns.filter(scope).length;
+  let list = (S.tab === 'leaders' ? d.leaders : d.turns).filter(scope);
+  if (S.sort) {
+    const { k, dir } = S.sort;
+    list = list.slice().sort((a, b) => {
+      const x = a[k], y = b[k];
+      if (num(x) || num(y)) return ((num(x) ? x : -1e9) - (num(y) ? y : -1e9)) * dir;
+      return String(x).localeCompare(String(y), 'ko') * dir;
+    });
+  }
+  const cols = [['name', '종목', 'l'], ['stage', '모멘텀 단계', 'l'], ['rank', 'RS순위', ''],
+                ['rs1w', 'RS 1W', ''], ['rs1m', 'RS 1M', 'hm'], ['ret1w', '등락률 1W', ''], ['ret1m', '등락률 1M', 'hm']];
+  const arrow = k => S.sort && S.sort.k === k ? (S.sort.dir > 0 ? ' ▲' : ' ▼') : '';
+  const title = S.filt ? `<span class="chip">${flag(S.filt.m)}${esc(S.filt.name)} <button id="clr" title="선택 해제">✕</button></span>`
+                       : `<span>전체 · ${S.tab === 'leaders' ? 'RS순위 높은 순' : 'RS 1W 높은 순'}</span>`;
+  const listHtml = `<div class="card side" id="side"><div class="ct">
+     <div class="tabs"><button data-tab="leaders" class="${S.tab === 'leaders' ? 'on' : ''}">1. 주도주 ${nL}</button>
+       <button data-tab="turns" class="${S.tab === 'turns' ? 'on' : ''}">2. 강세 전환 ${nT}</button></div>${title}</div>
+    <div class="tw sl"><table><tr>${cols.map(c => `<th class="s ${c[2]}" data-k="${c[0]}">${c[1]}${arrow(c[0])}</th>`).join('')}</tr>
+    ${list.map(r => {
+      const id = r.m + r.t, op = S.open === id;
+      return `<tr class="click" data-id="${esc(id)}">
+       <td class="l nm">${flag(r.m)}${esc(r.name)}<span class="tk">${esc(r.t)}</span></td><td class="l">${stagePill(r.stage)}</td>
+       <td>${heat(r.rank)}</td><td>${sgn(r.rs1w)}</td><td class="hm">${sgn(r.rs1m)}</td><td>${sgn(r.ret1w)}</td><td class="hm">${sgn(r.ret1m)}</td></tr>
+       ${op ? `<tr class="det"><td colspan="7"><div class="dg">
+         <span>최종 판단 <b>${esc(r.verdict)}</b></span><span>섹터 <b>${esc(r.sector)}</b></span><span>산업 <b>${esc(r.ind)}</b></span>
+         <span>유형 <b>${esc(r.type)}</b></span><span>RSI <b>${num(r.rsi) ? r.rsi.toFixed(0) : '–'}</b></span>
+         <span>ATR배수 <b>${num(r.atr) ? r.atr.toFixed(1) + 'x' : '–'}</b></span><span>MA50 이격 <b>${pct(r.ext, true)}</b></span>
+         <span>200일선 <b>${esc(r.ma200 || '–')}</b></span><span>52주 고점 대비 <b>${pct(r.fromHigh, true)}</b></span>
+         <span>RS 1M <b>${pct(r.rs1m, true)}</b></span><span>등락률 1W·1M <b>${pct(r.ret1w, true)} · ${pct(r.ret1m, true)}</b></span><span>거래량 <b>${num(r.vol) ? r.vol.toFixed(2) + 'x' : '–'}</b></span></div>
+         <div style="margin-top:8px"><a target="_blank" href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(r.m === 'KR' ? 'KRX:' + r.t : r.t)}">차트 (TradingView) ↗</a>
+         <a target="_blank" href="${esc(d.sheetUrl)}">시트에서 보기 ↗</a></div></td></tr>` : ''}`; }).join('') ||
+      `<tr><td class="l empty" colspan="7">${S.filt ? '이 그룹에는 ' + (S.tab === 'leaders' ? '주도주가' : '강세 전환 종목이') + ' 없습니다' : '조건에 맞는 종목이 없습니다'}</td></tr>`}
+    </table></div></div>`;
+  h += `<div class="row2">${secHtml}${listHtml}</div>`;
+
+  // ── 모멘텀 단계 분포 (하단) ──
+  const maxStage = Math.max(1, ...d.stages.map(s => ms.reduce((a, m) => a + s[m], 0)));
+  h += `<div class="card"><div class="ct"><h3>모멘텀 단계 분포</h3><div class="lg">${ms.map(m => `<span><i class="${m.toLowerCase()}"></i>${m === 'KR' ? '한국' : '미국'}</span>`).join('')}</div></div>
+    <div class="stgs">${d.stages.map(s => `<div class="stg">${stagePill(s.label)}<div class="sb">${ms.map(m => `<i class="${m.toLowerCase()}" style="width:${s[m] / maxStage * 100}%"></i>`).join('')}</div><b>${ms.reduce((a, m) => a + s[m], 0)}</b></div>`).join('')}</div>
+   </div>`;
+
+  h += `<div class="card" style="margin-top:14px"><div class="ct"><h3>용어 · 판정 기준</h3></div><div class="defs">
+    <div><b>1. 주도주</b> — 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 -25% 이내, RS순위 ≥ 70</div>
+    <div><b>2. 강세(매수세) 전환</b> — 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
+    <div><b>등락률 1W / 1M</b> — 최근 5 / 21거래일 가격 등락률 · <b>RS</b> = 종목 등락률 − 벤치마크(US: SPY, KR: 069500) 등락률</div>
+    <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — 주도주 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
+    <div><b>강세 전환 산업</b> — (주도+전환) 비율 ≥ ${Math.round(d.dash.turnShare * 100)}%, MA50 위 ≥ ${Math.round(d.dash.turnBreadth * 100)}%, RS 1W 중앙값 &gt; 0</div>
+    <div><b>색</b> — 상승 <span class="up">빨강</span> · 하락 <span class="dn">파랑</span> (한국식)</div></div></div>
+    <div class="foot"><span>데이터: Google Sheets 리더보드 (GOOGLEFINANCE, 지연 가능) · RS순위: Pepper 지수 전체 계산(RS_Rank)</span><span>투자 판단의 참고 자료이며 매매 권유가 아닙니다</span></div>`;
+
+  $('#app').innerHTML = h;
+}
+
+// 이벤트 (위임)
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-sec],[data-m],[data-tab],[data-k],[data-f],[data-id],[data-ind],#clr,#secAll,#refresh');
+  if (!t) return;
+  if (t.id === 'refresh') return load(true);
+  if (t.id === 'secAll') { S.sec = null; S.filt = null; return render(); }
+  if (t.id === 'clr') { S.filt = S.sec && S.filt && S.filt.key === 'ind' ? { key: 'sector', m: S.sec.m, name: S.sec.name } : null; if (!S.filt) S.sec = null; return render(); }
+  if (t.dataset.sec) {
+    const f = { key: 'sector', m: t.dataset.m, name: t.dataset.n };
+    const same = S.sec && S.sec.m === f.m && S.sec.name === f.name;
+    S.sec = same ? null : { m: f.m, name: f.name }; S.filt = same ? null : f; S.open = null; return render();
+  }
+  if (t.parentElement && t.parentElement.id === 'mkt') {
+    document.querySelectorAll('#mkt button').forEach(b => b.classList.toggle('on', b === t));
+    S.mkt = t.dataset.m; S.filt = null; S.sec = null; return render();
+  }
+  if (t.dataset.ind) { S.indAll = t.dataset.ind === 'all'; return render(); }
+  if (t.dataset.tab) { S.tab = t.dataset.tab; S.sort = null; S.open = null; return render(); }
+  if (t.dataset.k) { const k = t.dataset.k; S.sort = S.sort && S.sort.k === k ? { k, dir: -S.sort.dir } : { k, dir: -1 }; return render(); }
+  if (t.dataset.f) {
+    const f = { key: t.dataset.f, m: t.dataset.m, name: t.dataset.n };
+    const same = S.filt && S.filt.key === f.key && S.filt.name === f.name && S.filt.m === f.m;
+    S.filt = same ? (S.sec ? { key: 'sector', m: S.sec.m, name: S.sec.name } : null) : f;
+    S.open = null; render(); const sd = $('#side');
+    if (S.filt && sd && (window.innerWidth <= 1100 || t.dataset.f === 'ind')) sd.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
+  }
+  if (t.dataset.id) { S.open = S.open === t.dataset.id ? null : t.dataset.id; return render(); }
+});
+let qt; $('#q').addEventListener('input', e => { clearTimeout(qt); qt = setTimeout(() => { S.q = e.target.value; render(); }, 150); });
+load(false);
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
