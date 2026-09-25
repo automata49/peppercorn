@@ -265,7 +265,7 @@ function render() {
 
   h += `<div class="card" style="margin-top:14px"><div class="ct"><h3>용어 · 판정 기준</h3></div><div class="defs">
     <div><b>1. 주도주</b> — 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 -25% 이내, RS순위 ≥ 70</div>
-    <div><b>2. 강세(매수세) 전환</b> — 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
+    <div><b>2. 강세(매수세) 전환</b> — 주도주·조정 중 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
     <div><b>◇ 조정 중 주도주</b> — RS순위 ≥ 70, 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 −25% ~ −40% → 새 베이스·재돌파 대기</div>
     <div><b>등락률 1W / 1M</b> — 최근 5 / 21거래일 가격 등락률 · <b>RS</b> = 종목 등락률 − 벤치마크(US: SPY, KR: 069500) 등락률</div>
     <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — 주도주 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
