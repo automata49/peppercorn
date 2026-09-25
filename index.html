@@ -206,10 +206,10 @@ function render() {
   const secHtml = `<div class="card"><div class="ct"><h3>산업 요약</h3>
       <div class="tog"><button data-ind="lead" class="${S.indAll ? '' : 'on'}">주도·전환 산업</button><button data-ind="all" class="${S.indAll ? 'on' : ''}">전체 산업</button></div></div>
     ${chips}
-    <div class="tw sl"><table><tr><th class="l">산업 <span class="gx">· 섹터</span></th><th class="l">판정</th><th>종목</th><th>주도주 비율</th><th>MA50 위</th><th class="hm">RS순위</th><th>RS 1W</th><th>등락률 1W</th><th class="hm">등락률 1M</th></tr>
+    <div class="tw sl"><table><tr><th class="l">산업 <span class="gx">· 섹터</span></th><th class="l">판정</th><th>종목</th><th title="(주도주 + 조정 중 주도주) ÷ 종목 수">주도 비율</th><th>MA50 위</th><th class="hm">RS순위</th><th>RS 1W</th><th>등락률 1W</th><th class="hm">등락률 1M</th></tr>
     ${inds.map(g => {
       const on = S.filt && S.filt.key === 'ind' && S.filt.name === g.name && S.filt.m === g.m;
-      return `<tr class="click ${on ? 'sel' : ''}" data-f="ind" data-m="${g.m}" data-n="${esc(g.name)}" title="대표 종목: ${esc(g.top)}">
+      return `<tr class="click ${on ? 'sel' : ''}" data-f="ind" data-m="${g.m}" data-n="${esc(g.name)}" title="주도 ${g.lead} · 조정 중 ${g.corr || 0} · 전환 ${g.turn} / ${g.n}종목 — 대표: ${esc(g.top)}">
        <td class="l nm sn">${flag(g.m)}${indName(g)}<div class="stag">${esc(g.sector)}</div></td><td class="l">${verdictPill(g.verdict)}</td><td>${g.n}</td>
        <td><div class="mini">${pct(g.leadShare)}<div class="bar"><i style="width:${g.leadShare * 100}%;background:${vcol(g.verdict)}"></i></div></div></td>
        <td>${pct(g.breadth)}</td><td class="hm">${heat(g.medRank)}</td><td>${sgn(g.medRs1w)}</td><td>${sgn(g.medRet1w)}</td><td class="hm">${sgn(g.medRet1m)}</td></tr>`; }).join('') ||
@@ -246,7 +246,7 @@ function render() {
        <td class="l nm">${flag(r.m)}${esc(r.name)}<span class="tk">${esc(r.t)}</span></td><td class="l">${stagePill(r.stage)}</td>
        <td>${heat(r.rank)}</td><td>${sgn(r.rs1w)}</td><td class="hm">${sgn(r.rs1m)}</td><td>${sgn(r.ret1w)}</td><td class="hm">${sgn(r.ret1m)}</td></tr>
        ${op ? `<tr class="det"><td colspan="7"><div class="dg">
-         <span>최종 판단 <b>${esc(r.verdict)}</b></span><span>섹터 <b>${esc(r.sector)}</b></span><span>산업 <b>${esc(r.ind)}</b></span>
+         <span>최종 판단 <b>${esc(r.verdict)}</b></span><span>섹터 <b>${esc(r.sector)}</b></span><span>산업 <b>${esc(r.ind)}</b>${r.sub && r.sub !== r.ind ? ` · ${esc(r.sub)}` : ''}</span>
          <span>유형 <b>${esc(r.type)}</b></span><span>RSI <b>${num(r.rsi) ? r.rsi.toFixed(0) : '–'}</b></span>
          <span>ATR배수 <b>${num(r.atr) ? r.atr.toFixed(1) + 'x' : '–'}</b></span><span>MA50 이격 <b>${pct(r.ext, true)}</b></span>
          <span>200일선 <b>${esc(r.ma200 || '–')}</b></span><span>52주 고점 대비 <b>${pct(r.fromHigh, true)}</b></span>
@@ -268,8 +268,8 @@ function render() {
     <div><b>2. 강세(매수세) 전환</b> — 주도주·조정 중 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
     <div><b>◇ 조정 중 주도주</b> — RS순위 ≥ 70, 현재가 &gt; MA200 · MA50 &gt; MA200 (50일선 이탈 허용), 52주 고점 대비 −25% ~ −40% → 새 베이스·재돌파 대기</div>
     <div><b>등락률 1W / 1M</b> — 최근 5 / 21거래일 가격 등락률 · <b>RS</b> = 종목 등락률 − 벤치마크(US: SPY, KR: 069500) 등락률</div>
-    <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — 주도주 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
-    <div><b>강세 전환 산업</b> — (주도+전환) 비율 ≥ ${Math.round(d.dash.turnShare * 100)}%, MA50 위 ≥ ${Math.round(d.dash.turnBreadth * 100)}%, RS 1W 중앙값 &gt; 0</div>
+    <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — (주도주+조정 중 주도주) 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
+    <div><b>강세 전환 산업</b> — (주도+조정 중+전환) 비율 ≥ ${Math.round(d.dash.turnShare * 100)}%, MA50 위 ≥ ${Math.round(d.dash.turnBreadth * 100)}%, RS 1W 중앙값 &gt; 0</div>
     <div><b>색</b> — 상승 <span class="up">빨강</span> · 하락 <span class="dn">파랑</span> (한국식)</div></div></div>
     <div class="foot"><span>데이터: Google Sheets 리더보드 (GOOGLEFINANCE, 지연 가능) · RS순위: Pepper 지수 전체 계산(RS_Rank)</span><span>투자 판단의 참고 자료이며 매매 권유가 아닙니다</span></div>`;
 
