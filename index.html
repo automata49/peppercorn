@@ -238,7 +238,7 @@ function render() {
   const listHtml = `<div class="card side" id="side"><div class="ct">
      <div class="tabs"><button data-tab="leaders" class="${S.tab === 'leaders' ? 'on' : ''}">1. 주도주 ${nL}</button>
        <button data-tab="turns" class="${S.tab === 'turns' ? 'on' : ''}">2. 강세 전환 ${nT}</button>
-       <button data-tab="corr" class="${S.tab === 'corr' ? 'on' : ''}" title="RS순위·추세 유지, 고점 대비 25~40% 조정">◇ 조정 중 ${nC}</button></div>${title}</div>
+       <button data-tab="corr" class="${S.tab === 'corr' ? 'on' : ''}" title="RS순위·장기 추세 유지, 고점 대비 25~40% 조정">◇ 조정 중 ${nC}</button></div>${title}</div>
     <div class="tw sl"><table><tr>${cols.map(c => `<th class="s ${c[2]}" data-k="${c[0]}">${c[1]}${arrow(c[0])}</th>`).join('')}</tr>
     ${list.map(r => {
       const id = r.m + r.t, op = S.open === id;
@@ -266,7 +266,7 @@ function render() {
   h += `<div class="card" style="margin-top:14px"><div class="ct"><h3>용어 · 판정 기준</h3></div><div class="defs">
     <div><b>1. 주도주</b> — 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 -25% 이내, RS순위 ≥ 70</div>
     <div><b>2. 강세(매수세) 전환</b> — 주도주·조정 중 주도주 아님 + 현재가 &gt; MA50 + RS 1W &gt; 0 + RS 1M &gt; 0</div>
-    <div><b>◇ 조정 중 주도주</b> — RS순위 ≥ 70, 현재가 &gt; MA50 &gt; MA200, 52주 고점 대비 −25% ~ −40% → 새 베이스·재돌파 대기</div>
+    <div><b>◇ 조정 중 주도주</b> — RS순위 ≥ 70, 현재가 &gt; MA200 · MA50 &gt; MA200 (50일선 이탈 허용), 52주 고점 대비 −25% ~ −40% → 새 베이스·재돌파 대기</div>
     <div><b>등락률 1W / 1M</b> — 최근 5 / 21거래일 가격 등락률 · <b>RS</b> = 종목 등락률 − 벤치마크(US: SPY, KR: 069500) 등락률</div>
     <div><b>산업 판정</b> — 산업별로 묶어 판정하고, 산업이 속한 섹터는 태그·필터로 표시 · <b>주도 산업</b> — 주도주 비율 ≥ ${Math.round(d.dash.leadShare * 100)}%, RS순위 중앙값 ≥ ${d.dash.leadRank}</div>
     <div><b>강세 전환 산업</b> — (주도+전환) 비율 ≥ ${Math.round(d.dash.turnShare * 100)}%, MA50 위 ≥ ${Math.round(d.dash.turnBreadth * 100)}%, RS 1W 중앙값 &gt; 0</div>
