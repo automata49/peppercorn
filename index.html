@@ -206,13 +206,13 @@ function render() {
   const secHtml = `<div class="card"><div class="ct"><h3>산업 요약</h3>
       <div class="tog"><button data-ind="lead" class="${S.indAll ? '' : 'on'}">주도·전환 산업</button><button data-ind="all" class="${S.indAll ? 'on' : ''}">전체 산업</button></div></div>
     ${chips}
-    <div class="tw sl"><table><tr><th class="l">산업 <span class="gx">· 섹터</span></th><th class="l">판정</th><th>종목</th><th title="(주도주 + 조정 중 주도주) ÷ 종목 수">주도 비율</th><th>MA50 위</th><th class="hm">RS순위</th><th>RS 1W</th><th>등락률 1W</th><th class="hm">등락률 1M</th></tr>
+    <div class="tw sl"><table><tr><th class="l">산업 <span class="gx">· 섹터</span></th><th class="l">판정</th><th>종목</th><th title="(주도주 + 조정 중 주도주) ÷ 종목 수">주도 비율</th><th>MA50 위</th><th title="RS순위 중앙값 높은 순으로 정렬">RS순위 ▼</th><th>RS 1W</th><th>등락률 1W</th><th class="hm">등락률 1M</th></tr>
     ${inds.map(g => {
       const on = S.filt && S.filt.key === 'ind' && S.filt.name === g.name && S.filt.m === g.m;
       return `<tr class="click ${on ? 'sel' : ''}" data-f="ind" data-m="${g.m}" data-n="${esc(g.name)}" title="주도 ${g.lead} · 조정 중 ${g.corr || 0} · 전환 ${g.turn} / ${g.n}종목 — 대표: ${esc(g.top)}">
        <td class="l nm sn">${flag(g.m)}${indName(g)}<div class="stag">${esc(g.sector)}</div></td><td class="l">${verdictPill(g.verdict)}</td><td>${g.n}</td>
        <td><div class="mini">${pct(g.leadShare)}<div class="bar"><i style="width:${g.leadShare * 100}%;background:${vcol(g.verdict)}"></i></div></div></td>
-       <td>${pct(g.breadth)}</td><td class="hm">${heat(g.medRank)}</td><td>${sgn(g.medRs1w)}</td><td>${sgn(g.medRet1w)}</td><td class="hm">${sgn(g.medRet1m)}</td></tr>`; }).join('') ||
+       <td>${pct(g.breadth)}</td><td>${heat(g.medRank)}</td><td>${sgn(g.medRs1w)}</td><td>${sgn(g.medRet1w)}</td><td class="hm">${sgn(g.medRet1m)}</td></tr>`; }).join('') ||
       `<tr><td class="l empty" colspan="9">${secOn ? '이 섹터에는 ' + (S.indAll ? '산업이' : '주도·강세 전환 산업이') + ' 없습니다' : '해당 없음'}</td></tr>`}
     </table></div>
     <div class="foot" style="margin-top:8px"><span>산업을 누르면 오른쪽에 해당 종목 · ETF 제외 · ${d.dash.minIndustry}종목 미만은 표본 부족</span>${hidden ? `<span>중립·약세 ${hidden}개 숨김</span>` : ''}</div></div>`;
