@@ -19,9 +19,9 @@ jobs:
       - run: pip install -r analysis/requirements.txt
       - run: python analysis/fetch_prices.py
         env:
-          SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
       - run: python analysis/analyze.py
         env:
-          SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: \${{ secrets.SUPABASE_SECRET_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
