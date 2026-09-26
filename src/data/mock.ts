@@ -7,21 +7,8 @@ export const demoRows: LeaderRow[] = [
   {id:'kr-000660',market:'KR',ticker:'000660',name:'SK하이닉스',asset_class:'Equity',sector:'Information Technology',industry:'Semiconductors',price:298000,verdict:'1. 주도',stage:'● 눌림 매수권',action_guide:'MA50 지지와 거래량 확인',return_1w:.021,return_1m:.094,return_3m:.181,return_6m:.312,return_12m:.552,rs_1w:.018,rs_1m:.071,rs_3m:.126,rs_6m:.221,rs_12m:.301,rs_rank:91,high_52w_distance:-.073,volume_ratio:1.18,adr20_pct:.031,rsi14:62,atr_multiple:1.4,ma50:286000,ma200:237000,leader_tt:true},
   {id:'kr-005930',market:'KR',ticker:'005930',name:'삼성전자',asset_class:'Equity',sector:'Information Technology',industry:'Semiconductors',price:84500,verdict:'2. 강세 전환',stage:'■ 베이스 형성',action_guide:'베이스 상단 돌파 확인',return_1w:.009,return_1m:.042,return_3m:.082,return_6m:.141,return_12m:.194,rs_1w:.006,rs_1m:.019,rs_3m:.027,rs_6m:.050,rs_12m:.061,rs_rank:72,high_52w_distance:-.112,volume_ratio:.93,adr20_pct:.021,rsi14:58,atr_multiple:1.8,ma50:81800,ma200:75500,leader_tt:false}
 ]
-
-export const initialWatchlist = demoRows.slice(0,4).map((r,i)=>({
-  id:r.id,market:r.market,ticker:r.ticker,name:r.name,stage:r.stage,rs_rank:r.rs_rank,
-  interest_price:r.price,stop_pct:i===0?-5.5:-7,priority:i<2?'A':'B',note:''
-}))
-
-export const initialPortfolio = [
-  {id:'p1',market:'US',ticker:'MSTR',name:'Strategy',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''},
-  {id:'p2',market:'US',ticker:'BMNR',name:'BMNR',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''}
-]
-
-export const initialResearch = [
-  {id:1,date:'2026-09-26',type:'산업',target:'AI Semiconductors',title:'',fact:'',interpretation:'',source:'',importance:4,status:'관찰중'}
-]
-
-export const initialJournal = [
-  {id:1,date:'2026-09-26',account:'해외',ticker:'',name:'',buy_price:0,thesis:'',confidence:3,target_price:0,stop_price:0,status:'계획'}
-]
+export const initialWatchlist=demoRows.slice(0,4).map((r,i)=>({id:r.id,market:r.market,ticker:r.ticker,name:r.name,sector:r.sector,industry:r.industry,stage:r.stage,rs_rank:r.rs_rank,interest_price:r.price,stop_pct:i===0?-5.5:-7,priority:i<2?'A':'B',note:''}))
+export const initialPortfolio=[{id:'p1',market:'US',ticker:'MSTR',name:'Strategy',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''},{id:'p2',market:'US',ticker:'BMNR',name:'BMNR',account:'해외',shares:0,avg_price:0,current_price:0,stop_price:0,thesis:''}]
+export const initialResearch=[{id:1,date:'2026-09-26',type:'산업',target:'AI Semiconductors',title:'',fact:'',interpretation:'',source:'',source_type:'',verified:null,market_impact:'',related_assets:'',importance:4,next_review_date:'',status:'관찰중'}]
+export const initialAnalysis=[{id:1,date:'2026-09-26',market:'US',ticker:'AAPL',name:'Apple',eps_growth_q:null,sales_growth_q:null,eps_growth_3y:null,roe:null,operating_margin:null,debt_ratio:null,operating_cashflow_positive:null,pe:null,peg:null,moat:'',growth_driver:'',key_risk:'',auto_grade:'',conclusion:''}]
+export const initialJournal=[{id:1,date:'2026-09-26',account:'해외',ticker:'',name:'',tranche:'1차',buy_price:0,currency:'USD',thesis:'',evidence_type:'',confidence:3,target_price:0,stop_price:0,review_condition:'',review_date:'',status:'계획',exit_date:'',sell_price:null,realized_return:null,review_note:'',lesson:''}]
