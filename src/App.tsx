@@ -200,6 +200,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
   const ma200Gap=gapPct(row.price,row.ma200)
   const ma200Status=row.price!=null&&row.ma200!=null?(Number(row.price)>=Number(row.ma200)?'위 ':'아래 ')+ma200Gap:'—'
   const indexes=row.index_memberships?.length?row.index_memberships.join(' · '):'—'
+  const indexStatus=row.index_statuses?.length?row.index_statuses.join(' · '):'—'
   const rsItems=[['1W',row.rs_1w],['1M',row.rs_1m],['3M',row.rs_3m],['6M',row.rs_6m],['12M',row.rs_12m]] as const
   const retItems=[['1W',row.return_1w],['1M',row.return_1m],['3M',row.return_3m],['6M',row.return_6m],['12M',row.return_12m]] as const
   return <div className="stock-snapshot">
@@ -211,6 +212,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
       </div>
       <div className="snapshot-grid classification-grid">
         <SnapshotItem label="지수 · 유니버스" wide>{indexes}</SnapshotItem>
+        <SnapshotItem label="구성 상태">{indexStatus}</SnapshotItem>
         <SnapshotItem label="섹터">{row.sector||'—'}</SnapshotItem>
         <SnapshotItem label="산업" wide>{row.industry||'—'}</SnapshotItem>
         <SnapshotItem label="거래소">{row.exchange||row.market}</SnapshotItem>
@@ -457,7 +459,7 @@ export default function App(){
   }else if(page==='journal'){
     content=<><div className="page-note"><b>Trading Journal</b><span>매수 당시 가설과 리더보드 상태를 함께 기록하고, 결과 복기까지 한 행에서 추적합니다.</span></div><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
   }else if(page==='universe'){
-    const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
+    const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     content=<><div className="page-note"><b>Universe</b><span>S&P500 · NASDAQ_CORE · KOSPI200 · KOSDAQ150 구성과 분류 출처를 자동 동기화합니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
   }else{
     content=<div className="settings-grid"><div className="panel"><h2>Analysis Thresholds</h2><div className="setting"><span>Leader RS Rank</span><b>≥ 70</b></div><div className="setting"><span>Leader 52W High</span><b>≥ -25%</b></div><div className="setting"><span>Breakout Zone</span><b>≥ -5%</b></div><div className="setting"><span>Breakout Volume</span><b>≥ 1.4x</b></div><div className="setting"><span>Max Stop</span><b>8%</b></div><div className="setting"><span>Next Leader 52W High</span><b>≥ -30%</b></div></div>
