@@ -258,6 +258,7 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        m.high_52w_distance,m.volume_ratio,m.adr20_pct,m.rsi14,m.atr_multiple,
        m.ma50,m.ma200,m.leader_tt,
        case
+         when m.instrument_id is null then '데이터 준비중'
          when m.leader_tt
           and coalesce(m.rs_rank,0)>=95
           and coalesce(m.high_52w_distance,-1)>=-0.15
@@ -275,9 +276,10 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        end as leadership_class,
        i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
        coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
-       coalesce(u.index_statuses,'{}'::text[]) as index_statuses
+       coalesce(u.index_statuses,'{}'::text[]) as index_statuses,
+       case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status
 from public.instruments i
-join lateral (
+left join lateral (
   select mm.* from public.market_metrics mm
   where mm.instrument_id=i.id
   order by mm.as_of desc
