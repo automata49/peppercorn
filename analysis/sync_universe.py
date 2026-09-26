@@ -8,6 +8,7 @@ from io import BytesIO, StringIO
 import FinanceDataReader as fdr
 import pandas as pd
 import requests
+from pykrx import stock as pykrx_stock
 
 TODAY=date.today().isoformat()
 NOW=datetime.now(timezone.utc).isoformat()
@@ -193,13 +194,33 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     return df
 
 
+def fetch_kr_index_pykrx(code,minimum):
+    # pykrx follows the KRX index-composition interface and is maintained for
+    # KRX website changes. It is the preferred adapter fallback when our direct
+    # MDC call is rejected by the exchange edge.
+    tickers=pykrx_stock.get_index_portfolio_deposit_file(code,alternative=True) or []
+    tickers=[norm_kr(x) for x in tickers if norm_kr(x)]
+    tickers=list(dict.fromkeys(tickers))
+    if len(tickers)<minimum:
+        raise RuntimeError(f"pykrx index {code} returned only {len(tickers)} constituents")
+    df=pd.DataFrame({"Code":tickers})
+    df.attrs.update({
+        "composition_status":"OFFICIAL_KRX_ADAPTER",
+        "source":"KRX index constituent interface via pykrx 1.2.8"
+    })
+    return df
+
 def fetch_kr_index_with_fallback(code,minimum,proxy_fn):
     try:
         df=fetch_kr_index(code,minimum)
         df.attrs.update({"composition_status":"OFFICIAL_KRX","source":"KRX Data System MDCSTAT00601 official index constituents"})
         return df
-    except Exception as exc:
-        print(f"WARNING: official KRX {code} unavailable ({exc}); using validated market proxy")
+    except Exception as direct_exc:
+        print(f"WARNING: direct KRX {code} unavailable ({direct_exc}); trying pykrx adapter")
+    try:
+        return fetch_kr_index_pykrx(code,minimum)
+    except Exception as adapter_exc:
+        print(f"WARNING: pykrx KRX {code} unavailable ({adapter_exc}); using validated market proxy")
         return proxy_fn()
 
 def records(df): return df.where(pd.notna(df),None).to_dict("records")

@@ -29,7 +29,7 @@ def main():
     if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
     if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
     if nas<700:fail(f"NASDAQ coverage unexpectedly small: {nas}")
-    allowed_kr={"OFFICIAL_KRX","PROXY_VALIDATED"}
+    allowed_kr={"OFFICIAL_KRX","OFFICIAL_KRX_ADAPTER","PROXY_VALIDATED"}
     for group in ("KOSPI200","KOSDAQ150"):
         status=statuses.get(group) or set()
         if len(status)!=1 or not status.issubset(allowed_kr):fail(f"{group} invalid composition status: {status}")
