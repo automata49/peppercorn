@@ -25,8 +25,9 @@ function calcRsi(c:number[],n=14){
   if(loss===0)return 100;
   const rs=gain/loss;return 100-100/(1+rs)
 }
+const YAHOO_US_ALIASES:Record<string,string>={"BFB":"BF-B","BRKB":"BRK-B"};
 function symbol(i:Instrument){
-  if(i.market!=="KR")return i.ticker;
+  if(i.market!=="KR")return YAHOO_US_ALIASES[i.ticker]||i.ticker;
   return i.ticker+(((i.exchange||"").toUpperCase().includes("KOSDAQ"))?".KQ":".KS");
 }
 function safe(n:number|null){return n==null||!Number.isFinite(n)?null:n}
