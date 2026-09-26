@@ -22,13 +22,13 @@ def main():
         statuses.setdefault(m["theme_group"],set()).add(m.get("composition_status"))
         member_keys.add((m["market"],m["ticker"]))
 
-    sp=groups.get("S&P500",0);k200=groups.get("KOSPI200",0);k150=groups.get("KOSDAQ150",0);nas=groups.get("NASDAQ_CORE",0)
+    sp=groups.get("S&P500",0);k200=groups.get("KOSPI200",0);k150=groups.get("KOSDAQ150",0);nas=groups.get("NASDAQ",0)
     total=len(by_key)
     if not 490<=sp<=520:fail(f"S&P500 count out of range: {sp}")
     if not 190<=k200<=210:fail(f"KOSPI200 count out of range: {k200}")
     if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
     if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
-    if nas<700:fail(f"NASDAQ_CORE coverage unexpectedly small: {nas}")
+    if nas<700:fail(f"NASDAQ coverage unexpectedly small: {nas}")
     allowed_kr={"OFFICIAL_KRX","PROXY_VALIDATED"}
     for group in ("KOSPI200","KOSDAQ150"):
         status=statuses.get(group) or set()
