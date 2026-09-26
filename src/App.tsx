@@ -127,8 +127,8 @@ export default function App(){
     return marketOk&&(!q||(r.ticker+' '+r.name+' '+r.sector+' '+r.industry).toLowerCase().includes(q))
   }),[leaders,market,query])
 
-  const leadCount=filtered.filter(r=>r.verdict==='1. 주도').length
-  const turnCount=filtered.filter(r=>r.verdict==='2. 강세 전환').length
+  const leadCount=filtered.filter(r=>r.leadership_class==='1. 주도').length
+  const turnCount=filtered.filter(r=>r.leadership_class==='2. 강세 전환').length
   const avgRank=filtered.length?Math.round(filtered.reduce((a,r)=>a+(r.rs_rank??0),0)/filtered.length):0
   const breadth=filtered.length?filtered.filter(r=>r.price&&r.ma50&&r.price>r.ma50).length/filtered.length:0
 
