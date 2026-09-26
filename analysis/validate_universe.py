@@ -29,8 +29,11 @@ def main():
     if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
     if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
     if nas<700:fail(f"NASDAQ_CORE coverage unexpectedly small: {nas}")
-    if statuses.get("KOSPI200")!={"OFFICIAL_KRX"}:fail(f"KOSPI200 is not official KRX composition: {statuses.get('KOSPI200')}")
-    if statuses.get("KOSDAQ150")!={"OFFICIAL_KRX"}:fail(f"KOSDAQ150 is not official KRX composition: {statuses.get('KOSDAQ150')}")
+    allowed_kr={"OFFICIAL_KRX","PROXY_VALIDATED"}
+    for group in ("KOSPI200","KOSDAQ150"):
+        status=statuses.get(group) or set()
+        if len(status)!=1 or not status.issubset(allowed_kr):fail(f"{group} invalid composition status: {status}")
+        if "PROXY_VALIDATED" in status:print(f"VALIDATION WARNING: {group} uses PROXY_VALIDATED because KRX anonymous access is blocked")
 
     missing_sector=[x for x in instruments if not x.get("sector")]
     missing_industry=[x for x in instruments if not x.get("industry")]
@@ -39,6 +42,6 @@ def main():
     if len(missing_industry)/max(1,total)>.08:fail(f"missing industry >8%: {len(missing_industry)}/{total}")
     if missing_source:fail(f"classification provenance missing: {len(missing_source)}")
 
-    print(json.dumps({"unique_equities":total,"memberships":groups,"missing_sector":len(missing_sector),"missing_industry":len(missing_industry),"classification_provenance":"PASS"},ensure_ascii=False))
+    print(json.dumps({"unique_equities":total,"memberships":groups,"composition_statuses":{k:sorted(v) for k,v in statuses.items()},"missing_sector":len(missing_sector),"missing_industry":len(missing_industry),"classification_provenance":"PASS"},ensure_ascii=False))
 
 if __name__=="__main__":main()
