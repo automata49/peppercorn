@@ -152,30 +152,13 @@ def main():
         add_instrument(item,3)
         add_membership("US",ticker,"S&P500",SOURCES["S&P500"],rank)
 
-    # Nasdaq market universe: direct Nasdaq screener provides SIC-mapped market sector/industry.
-    nasdaq_selected=[]
+    # Nasdaq market data is used to confirm exchange for S&P members first.
+    # The broader Nasdaq coverage set is added only after mandatory KR benchmarks,
+    # so the final union stays close to TARGET_EQUITIES.
     for r in nasdaq:
-        ticker=norm_us(r.get("symbol"))
-        if not ticker:continue
-        key=("US",ticker)
-        if key not in instruments and len(instruments)>=TARGET_EQUITIES:
-            break
-        nasdaq_selected.append(r)
-        item={
-            "market":"US","ticker":ticker,"name":str(r.get("name") or ticker).strip(),
-            "asset_class":"Equity","exchange":"NASDAQ",
-            "sector":str(r.get("sector") or "").strip() or None,
-            "industry":str(r.get("industry") or "").strip() or None,
-            "benchmark_ticker":"SPY","currency":"USD","active":True,
-            "classification_scheme":"Nasdaq SIC mapped sector/industry",
-            "classification_source":"AUTO:Nasdaq Stock Screener / Quotemedia SIC mapping",
-            "classification_as_of":TODAY,"universe_updated_at":NOW,
-        }
-        # Preserve S&P's GICS-compatible classification when already present, but improve exchange.
-        if key in instruments:
+        ticker=norm_us(r.get("symbol"));key=("US",ticker)
+        if ticker and key in instruments:
             instruments[key]["exchange"]="NASDAQ"
-        else:
-            add_instrument(item,2)
 
     # KRX benchmark constituents and KRX market listing classifications.
     def add_kr_index(df,group,market_name):
