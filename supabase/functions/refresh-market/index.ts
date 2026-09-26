@@ -1,4 +1,15 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import * as jose from "jsr:@panva/jose@6";
+
+const GITHUB_JWKS=jose.createRemoteJWKSet(new URL("https://token.actions.githubusercontent.com/.well-known/jwks"));
+async function githubAuthorized(req:Request){
+  const auth=req.headers.get("authorization")||"";
+  if(!auth.startsWith("Bearer "))return false;
+  try{
+    const {payload}=await jose.jwtVerify(auth.slice(7),GITHUB_JWKS,{issuer:"https://token.actions.githubusercontent.com",audience:"peppercorn-supabase"});
+    return payload.repository==="automata49/peppercorn" && payload.ref==="refs/heads/main";
+  }catch{return false}
+}
 
 type Instrument={id:string;market:"US"|"KR";ticker:string;exchange?:string|null};
 
@@ -59,10 +70,14 @@ Deno.serve(async(req:Request)=>{
   if(!base||!secret)return Response.json({error:"server_not_configured"},{status:500});
   const dbHeaders={apikey:secret,Authorization:"Bearer "+secret,"Content-Type":"application/json"};
 
-  const auth=await fetch(base+"/rest/v1/rpc/check_refresh_token",{
-    method:"POST",headers:dbHeaders,body:JSON.stringify({p_token:String(body?.token||"")})
-  });
-  if(!auth.ok || await auth.json()!==true)return Response.json({error:"unauthorized"},{status:401});
+  let isAuthorized=await githubAuthorized(req);
+  if(!isAuthorized && body?.token){
+    const auth=await fetch(base+"/rest/v1/rpc/check_refresh_token",{
+      method:"POST",headers:dbHeaders,body:JSON.stringify({p_token:String(body.token)})
+    });
+    isAuthorized=auth.ok && await auth.json()===true;
+  }
+  if(!isAuthorized)return Response.json({error:"unauthorized"},{status:401});
 
   const offset=Math.max(0,Number(body?.offset||0));
   const limit=Math.min(120,Math.max(1,Number(body?.limit||80)));
