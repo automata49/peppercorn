@@ -266,7 +266,7 @@ export default function App(){
     const root=drillRef.current
     const compact=window.matchMedia('(max-width: 1180px)').matches
     const tween=gsap.fromTo(root,compact?{y:44,opacity:0}:{x:44,opacity:0},{x:0,y:0,opacity:1,duration:.4,ease:'power3.out'})
-    return()=>tween.kill()
+    return()=>{tween.kill()}
   },[drillOpen])
 
   useEffect(()=>{
