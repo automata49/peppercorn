@@ -137,22 +137,12 @@ def fetch_kr_index(code,minimum):
     return df
 
 def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
-    # KG ZeroIn publishes the full ETF portfolio table, sourced from issuer/exchange
-    # disclosures. This is used only when KRX blocks anonymous constituent access.
+    # KG ZeroIn exposes a full holdings page derived from issuer/exchange disclosures.
+    # KRX official composition remains the first choice; this path is fallback-only.
     url=f"https://etf.zeroin.co.kr/etf/{etf_code}/holdings"
     r=requests.get(url,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
     r.raise_for_status()
-    tables=pd.read_html(StringIO(r.text))
-    holding_table=None
-    for table in tables:
-        cols=[str(c).strip() for c in table.columns]
-        if any("종목코드" in c for c in cols) and len(table)>=expected-10:
-            holding_table=table
-            break
-    if holding_table is None:
-        raise RuntimeError(f"ZeroIn {index_name} full holdings table not found")
-    code_col=next(c for c in holding_table.columns if "종목코드" in str(c))
-    name_col=next((c for c in holding_table.columns if "종목명" in str(c)),None)
+    html=r.text
 
     krx_codes={}
     for row in records(krx_df):
@@ -161,14 +151,25 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
         if code and (market_name.upper() in market or (market_name=="KOSPI" and market=="STK") or (market_name=="KOSDAQ" and market=="KSQ")):
             krx_codes[code]=pick(row,"Name","종목명","한글 종목명",default=code)
 
-    found=[]
-    seen=set()
-    for _,row in holding_table.iterrows():
-        code=norm_kr(row.get(code_col))
+    candidates=[]
+    try:
+        for table in pd.read_html(StringIO(html)):
+            code_col=next((c for c in table.columns if "종목코드" in str(c)),None)
+            if code_col is None:continue
+            for value in table[code_col].tolist():
+                candidates.append(norm_kr(value))
+    except Exception:
+        pass
+
+    # Some responses serialize the holdings table instead of rendering <table>.
+    # Capture all standalone 6-digit codes, then restrict to known equities in the
+    # correct KRX market so dates, ETF codes, and other numeric IDs are discarded.
+    candidates.extend(re.findall(r'(?<!\d)(\d{6})(?!\d)',html))
+    found=[];seen=set()
+    for raw in candidates:
+        code=norm_kr(raw)
         if code in krx_codes and code not in seen:
-            seen.add(code)
-            fallback_name=str(row.get(name_col) if name_col is not None else "").strip()
-            found.append({"Code":code,"Name":krx_codes.get(code) or fallback_name or code})
+            seen.add(code);found.append({"Code":code,"Name":krx_codes[code]})
 
     lower=max(expected-10,1);upper=expected+10
     if not lower<=len(found)<=upper:
