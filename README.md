@@ -1,8 +1,8 @@
 # Peppercorn Capital
 
-Peppercorn Capital is being rebuilt from a Google Sheets + Apps Script dashboard into a dedicated investment workspace.
+Peppercorn Capital is a dedicated investment workspace replacing the legacy Google Sheets + Apps Script dashboard.
 
-## Target architecture
+## Architecture
 
 GitHub → Python analysis engine → Supabase → Peppercorn Web App
 
@@ -21,39 +21,47 @@ Included:
 - Universe
 - Supabase schema + RLS
 - Python RS / MA / ATR / RSI / stage engine
-- GitHub Pages workflow
-- scheduled market-analysis workflow
+- GitHub Pages deployment
+- scheduled market-analysis workflow scaffold
 
-Until Supabase is connected the UI uses Demo data, and editable tables persist in browser localStorage.
+## Live Supabase
+
+Project: `Peppercorn Capital`
+Region: Seoul (`ap-northeast-2`)
+
+Migrated on 2026-09-26:
+- 656 unique instruments
+- 1,337 Universe membership rows
+- 600 leaderboard metric snapshots as of 2026-09-25
+- 739 ETF membership links
+
+The browser does not contain a Supabase database key. It reads the public market workspace through the `leaderboard` Edge Function. Database access remains server-side.
+
+Editable Watchlist / Portfolio / Research / Journal currently use browser localStorage until Supabase Auth persistence is enabled.
 
 ## Local development
 
 Node.js 22+
 
     npm install
-    cp .env.example .env.local
     npm run dev
 
-## Supabase setup
+## Server-side analysis
 
-1. Create a dedicated Peppercorn Supabase project.
-2. Run supabase/schema.sql.
-3. Add public deployment variables:
-   - VITE_SUPABASE_URL
-   - VITE_SUPABASE_PUBLISHABLE_KEY
-4. Add server-only Actions secrets:
-   - SUPABASE_URL
-   - SUPABASE_SECRET_KEY
-5. Import the existing Google Sheet Universe into public.instruments.
-6. Run the Refresh market analysis workflow.
+The Python engine lives under `analysis/`.
 
-The frontend sends the publishable key only in the apikey header. Never expose the secret key in VITE_ variables.
+The scheduled GitHub Actions analysis job still requires server-only values:
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+
+Secret/service keys must never be exposed in frontend code.
 
 ## Backup
 
-Legacy snapshot before the rebuild:
-- GitHub branch: backup/pre-webapp-rebuild-2026-09-26
-- Google Sheet: Peppercorn Capital - Backup 2026-09-26
+Legacy snapshot before rebuild:
+- GitHub branch: `backup/pre-webapp-rebuild-2026-09-26`
+- Google Sheet: `Peppercorn Capital - Backup 2026-09-26`
+- Universe snapshot: `migration/universe_snapshot_2026-09-26.csv`
 
 ## Rules carried over
 
@@ -66,4 +74,4 @@ Legacy snapshot before the rebuild:
 - Next Leader within 30% of 52-week high
 - Correction Leader floor -40%
 
-The next milestone moves these thresholds from code into user_thresholds and adds authenticated persistence for Watchlist, Portfolio, Research and Journal.
+Next milestone: Supabase Auth + persistent editable tables, followed by fully automated Python market refresh.
