@@ -12,6 +12,7 @@ export type LeaderRow = {
   verdict: string
   stage: string
   action_guide: string
+  leadership_class?: string
   return_1w: number | null
   return_1m: number | null
   return_3m: number | null
