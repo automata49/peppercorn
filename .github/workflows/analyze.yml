@@ -7,21 +7,35 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+
+env:
+  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
+  OIDC_AUDIENCE: peppercorn-supabase
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-      - run: pip install -r analysis/requirements.txt
-      - run: python analysis/fetch_prices.py
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-      - run: python analysis/analyze.py
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      - name: Refresh all active instruments
+        shell: bash
+        run: |
+          set -euo pipefail
+          get_token() {
+            curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
+          }
+          for OFFSET in $(seq 0 120 1920); do
+            TOKEN=$(get_token); echo "::add-mask::$TOKEN"
+            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "{"offset":$OFFSET,"limit":120}")
+            echo "$RESP"
+            REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
+            [ "$REQUESTED" -eq 0 ] && break
+          done
+      - name: Recalculate RS and leadership
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])')
+          echo "::add-mask::$TOKEN"
+          curl -fsS -X POST "$FUNCTIONS_URL/recalculate-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
