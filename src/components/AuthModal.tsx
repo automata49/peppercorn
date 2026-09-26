@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { login, signup, type Session } from '../lib/session'
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './ui/dialog'
 
 export function AuthModal({
   open,
@@ -16,8 +17,6 @@ export function AuthModal({
   const [setupCode,setSetupCode]=useState('')
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
-
-  if(!open) return null
 
   const submit=async()=>{
     setBusy(true);setError('')
@@ -39,11 +38,11 @@ export function AuthModal({
     }finally{setBusy(false)}
   }
 
-  return <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}>
-    <div className="auth-card">
+  return <Dialog open={open} onOpenChange={next=>{if(!next)onClose()}}>
+    <DialogContent className="auth-card">
       <div className="auth-head">
-        <div><span>Peppercorn Capital</span><h2>{mode==='login'?'로그인':'최초 계정 생성'}</h2></div>
-        <button onClick={onClose}>×</button>
+        <div><span>Peppercorn Capital</span><DialogTitle>{mode==='login'?'로그인':'최초 계정 생성'}</DialogTitle></div>
+        <DialogClose asChild><button aria-label="닫기">×</button></DialogClose>
       </div>
       <div className="auth-tabs">
         <button className={mode==='login'?'on':''} onClick={()=>setMode('login')}>로그인</button>
@@ -54,7 +53,7 @@ export function AuthModal({
       {mode==='signup'&&<label>Setup Code<input value={setupCode} onChange={e=>setSetupCode(e.target.value.toUpperCase())} placeholder="PC-XXXX-XXXX-XXXX" /></label>}
       {error&&<div className="auth-error">{error}</div>}
       <button className="auth-submit" disabled={busy||!email||password.length<8} onClick={submit}>{busy?'처리 중…':mode==='login'?'로그인':'계정 생성'}</button>
-      <p>로그인하면 Watchlist · Portfolio · Research · Journal이 Supabase에 저장됩니다.</p>
-    </div>
-  </div>
+      <DialogDescription className="auth-description">로그인하면 Watchlist · Portfolio · Research · 종목 분석 · Journal이 Supabase에 저장됩니다.</DialogDescription>
+    </DialogContent>
+  </Dialog>
 }
