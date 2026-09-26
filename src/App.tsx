@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
 import { GridTable } from './components/GridTable'
+import { AuthModal } from './components/AuthModal'
 import { initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
+import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
 const pct=(v:number|null|undefined)=>v==null?'—':(v>=0?'+':'')+(v*100).toFixed(1)+'%'
@@ -78,8 +80,46 @@ export default function App(){
   const [portfolio,setPortfolio]=useLocalRows<EditableRow>('peppercorn-portfolio',initialPortfolio)
   const [research,setResearch]=useLocalRows<EditableRow>('peppercorn-research',initialResearch)
   const [journal,setJournal]=useLocalRows<EditableRow>('peppercorn-journal',initialJournal)
+  const [session,setSessionState]=useState<Session|null>(()=>loadStoredSession())
+  const [authOpen,setAuthOpen]=useState(false)
+  const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
+
+  const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
 
   useEffect(()=>{loadLeaderboard().then(r=>{setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)})},[])
+
+  useEffect(()=>{
+    if(!session) return
+    let cancelled=false
+    setSyncState('loading')
+    Promise.all([
+      loadWorkspace(session,'watchlist'),
+      loadWorkspace(session,'portfolio'),
+      loadWorkspace(session,'research'),
+      loadWorkspace(session,'journal')
+    ]).then(([w,p,r,j])=>{
+      if(cancelled) return
+      setWatch(w.rows);setPortfolio(p.rows);setResearch(r.rows);setJournal(j.rows)
+      if(w.session.access_token!==session.access_token) updateSession(w.session)
+      setSyncState('saved')
+    }).catch(()=>{if(!cancelled)setSyncState('error')})
+    return()=>{cancelled=true}
+  },[session?.user?.id])
+
+  const syncRows=async(resource:WorkspaceResource,rows:EditableRow[])=>{
+    if(!session){setSyncState('local');return}
+    setSyncState('saving')
+    try{
+      const result=await saveWorkspace(session,resource,rows)
+      if(result.session.access_token!==session.access_token) updateSession(result.session)
+      setSyncState('saved')
+    }catch{setSyncState('error')}
+  }
+
+  const updateWatch=(rows:EditableRow[])=>{setWatch(rows);void syncRows('watchlist',rows)}
+  const updatePortfolio=(rows:EditableRow[])=>{setPortfolio(rows);void syncRows('portfolio',rows)}
+  const updateResearch=(rows:EditableRow[])=>{setResearch(rows);void syncRows('research',rows)}
+  const updateJournal=(rows:EditableRow[])=>{setJournal(rows);void syncRows('journal',rows)}
 
   const filtered=useMemo(()=>leaders.filter(r=>{
     const marketOk=market==='ALL'||r.market===market
@@ -119,9 +159,9 @@ export default function App(){
   }else if(page==='leaderboard'){
     content=<><div className="page-note"><b>자동 계산 영역</b><span>RS · MA · ATR · 52W · Stage는 Python Engine이 계산합니다.</span></div>{filters}<div className="panel"><GridTable rows={filtered} columns={leaderCols} height={650}/></div></>
   }else if(page==='watchlist'){
-    content=<><div className="page-note"><b>직접 편집 가능</b><span>관심가 · 손절 · 우선순위 · 메모를 셀에서 수정합니다.</span></div><div className="panel"><GridTable rows={watch} columns={watchCols} editable onChange={setWatch} height={650}/></div></>
+    content=<><div className="page-note"><b>직접 편집 가능</b><span>관심가 · 손절 · 우선순위 · 메모를 셀에서 수정합니다.</span></div><div className="panel"><GridTable rows={watch} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
   }else if(page==='portfolio'){
-    content=<><div className="page-note"><b>Portfolio Workspace</b><span>수량 · 평단 · Stop · 투자 가설을 직접 관리합니다.</span></div><div className="panel"><GridTable rows={portfolio} columns={portfolioCols} editable onChange={setPortfolio} height={650}/></div></>
+    content=<><div className="page-note"><b>Portfolio Workspace</b><span>수량 · 평단 · Stop · 투자 가설을 직접 관리합니다.</span></div><div className="panel"><GridTable rows={portfolio} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
     content=<div className="analysis-layout">
       <div className="panel stock-list"><h2>종목 선택</h2>{filtered.map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}</b><span>{r.name}</span><em>{r.stage}</em></button>)}</div>
@@ -143,9 +183,9 @@ export default function App(){
       </>:<p>종목을 선택하세요.</p>}</div>
     </div>
   }else if(page==='research'){
-    content=<><div className="page-note"><b>Research Notes</b><span>팩트와 해석을 분리해 기록합니다.</span></div><div className="panel"><GridTable rows={research} columns={researchCols} editable onChange={setResearch} height={650}/></div></>
+    content=<><div className="page-note"><b>Research Notes</b><span>팩트와 해석을 분리해 기록합니다.</span></div><div className="panel"><GridTable rows={research} columns={researchCols} editable onChange={updateResearch} height={650}/></div></>
   }else if(page==='journal'){
-    content=<><div className="page-note"><b>Trading Journal</b><span>매수 가설 · 목표 · Stop · 결과 복기를 관리합니다.</span></div><div className="panel"><GridTable rows={journal} columns={journalCols} editable onChange={setJournal} height={650}/></div></>
+    content=<><div className="page-note"><b>Trading Journal</b><span>매수 가설 · 목표 · Stop · 결과 복기를 관리합니다.</span></div><div className="panel"><GridTable rows={journal} columns={journalCols} editable onChange={updateJournal} height={650}/></div></>
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[
       {field:'market',headerName:'시장'},{field:'asset_class',headerName:'Asset'},
@@ -163,12 +203,13 @@ export default function App(){
         <div className="setting"><span>Max Stop</span><b>8%</b></div>
         <div className="setting"><span>Next Leader 52W High</span><b>≥ -30%</b></div>
       </div>
-      <div className="panel"><h2>Connection</h2><p className="note">Supabase URL과 Publishable Key를 배포 환경변수로 설정하면 Demo에서 Live로 전환됩니다.</p><code>VITE_SUPABASE_URL<br/>VITE_SUPABASE_PUBLISHABLE_KEY</code></div>
+      <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / Research / Journal은 Supabase에 영구 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div>
     </div>
   }
 
   return <div className="shell"><Sidebar page={page} setPage={setPage}/><main>
-    <header className="topbar"><div><h1>{page==='dashboard'?'Investment Dashboard':page}</h1><p>Theme → ETF → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><button onClick={()=>setPage('settings')}>환경 설정</button></div></header>
+    <header className="topbar"><div><h1>{page==='dashboard'?'Investment Dashboard':page}</h1><p>Theme → ETF → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header>
     <div className="content">{content}</div>
+    <AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/>
   </main></div>
 }
