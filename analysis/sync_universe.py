@@ -136,14 +136,19 @@ def fetch_kr_index(code,minimum):
     df.attrs["as_of"]=trd_dd
     return df
 
-def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
-    # KG ZeroIn exposes a full holdings page derived from issuer/exchange disclosures.
-    # KRX official composition remains the first choice; this path is fallback-only.
-    url=f"https://etf.zeroin.co.kr/etf/{etf_code}/holdings"
-    r=requests.get(url,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
-    r.raise_for_status()
-    html=r.text
+def _collect_six_digit_codes(value,out):
+    if isinstance(value,dict):
+        for v in value.values():_collect_six_digit_codes(v,out)
+    elif isinstance(value,list):
+        for v in value:_collect_six_digit_codes(v,out)
+    elif isinstance(value,(str,int)):
+        text=str(value)
+        if re.fullmatch(r"\\d{6}",text):out.append(text)
 
+def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
+    # KG ZeroIn documents machine-readable JSON by appending .json to page URLs.
+    # KRX official composition remains first choice; this path is fallback-only.
+    base_url=f"https://etf.zeroin.co.kr/etf/{etf_code}/holdings"
     krx_codes={}
     for row in records(krx_df):
         code=norm_kr(pick(row,"Code","Symbol","단축코드","종목코드"))
@@ -152,19 +157,25 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
             krx_codes[code]=pick(row,"Name","종목명","한글 종목명",default=code)
 
     candidates=[]
-    try:
-        for table in pd.read_html(StringIO(html)):
-            code_col=next((c for c in table.columns if "종목코드" in str(c)),None)
-            if code_col is None:continue
-            for value in table[code_col].tolist():
-                candidates.append(norm_kr(value))
-    except Exception:
-        pass
+    jr=requests.get(base_url+".json",headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0","Accept":"application/json"},timeout=45)
+    if jr.ok:
+        try:_collect_six_digit_codes(jr.json(),candidates)
+        except Exception:pass
 
-    # Some responses serialize the holdings table instead of rendering <table>.
-    # Capture all standalone 6-digit codes, then restrict to known equities in the
-    # correct KRX market so dates, ETF codes, and other numeric IDs are discarded.
-    candidates.extend(re.findall(r'(?<!\d)(\d{6})(?!\d)',html))
+    # Fallback for deployments that serve holdings only in rendered/serialized HTML.
+    if len(set(candidates))<expected-10:
+        r=requests.get(base_url,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
+        r.raise_for_status()
+        html=r.text
+        try:
+            for table in pd.read_html(StringIO(html)):
+                code_col=next((c for c in table.columns if "종목코드" in str(c)),None)
+                if code_col is not None:
+                    candidates.extend(norm_kr(v) for v in table[code_col].tolist())
+        except Exception:
+            pass
+        candidates.extend(re.findall(r'(?<!\\d)(\\d{6})(?!\\d)',html))
+
     found=[];seen=set()
     for raw in candidates:
         code=norm_kr(raw)
@@ -177,7 +188,7 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     df=pd.DataFrame(found)
     df.attrs.update({
         "composition_status":"PROXY_VALIDATED",
-        "source":f"KG ZeroIn {etf_code} full ETF holdings; issuer/exchange disclosure based; benchmark owner KRX"
+        "source":f"KG ZeroIn {etf_code} full holdings JSON/page; issuer/exchange disclosure based; benchmark owner KRX"
     })
     return df
 
