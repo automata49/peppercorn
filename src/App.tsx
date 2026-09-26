@@ -477,7 +477,6 @@ export default function App(){
           <StockRows rows={tabStocks} onSelect={r=>{setSelected(r);setDrillSectorKey(sectorKey(r));setDrillStock(r)}}/>
         </div>
       </section>
-      <section className="panel"><div className="panel-head"><div><h2>전체 리더보드 미리보기</h2><p>섹터 흐름을 본 뒤 종목 수준 지표를 검증합니다.</p></div><button className="text-button" onClick={()=>setPage('leaderboard')}>전체 보기 →</button></div><GridTable rows={visible.slice(0,20)} columns={leaderCols.slice(0,13)} height={470}/></section>
     </>
   }else if(page==='leaderboard'){
     content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
