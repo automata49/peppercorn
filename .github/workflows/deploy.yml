@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,25 @@ jobs:
           node-version: 22
       - run: npm install --ignore-scripts
       - run: npm run build
+      - name: Keep branch Pages source deployable
+        run: |
+          cp dist/index.html index.html
+          rm -rf assets
+          cp -R dist/assets assets
+          cp dist/manifest.webmanifest manifest.webmanifest
+          cp dist/logo.webp logo.webp
+          cp dist/apple-touch-icon.png apple-touch-icon.png
+          cp dist/icon-192.png icon-192.png
+          cp dist/icon-512.png icon-512.png
+          cp dist/icon-512-maskable.png icon-512-maskable.png
+          touch .nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets manifest.webmanifest logo.webp apple-touch-icon.png icon-192.png icon-512.png icon-512-maskable.png .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync built Pages output [skip ci]"
+            git push
+          fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
