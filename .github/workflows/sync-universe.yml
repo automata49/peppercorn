@@ -32,6 +32,11 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           PEPPERCORN_TARGET_EQUITIES: '1500'
+      - name: Validate universe and classifications
+        run: python analysis/validate_universe.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
       - name: Bootstrap or refresh prices
         run: python analysis/fetch_prices.py
         env:
