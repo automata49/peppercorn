@@ -25,11 +25,21 @@ export type LeaderRow = {
   return_3m: number | null
   return_6m: number | null
   return_12m: number | null
+  return_5d?: number | null
+  return_20d?: number | null
+  return_50d?: number | null
+  return_120d?: number | null
+  return_200d?: number | null
   rs_1w: number | null
   rs_1m: number | null
   rs_3m: number | null
   rs_6m: number | null
   rs_12m: number | null
+  rs_5d?: number | null
+  rs_20d?: number | null
+  rs_50d?: number | null
+  rs_120d?: number | null
+  rs_200d?: number | null
   rs_rank: number | null
   high_52w_distance: number | null
   volume_ratio: number | null

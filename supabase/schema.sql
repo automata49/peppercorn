@@ -85,6 +85,16 @@ create table if not exists public.market_metrics (
   stage text,
   action_guide text,
   data_days integer,
+  return_5d numeric,
+  rs_5d numeric,
+  return_20d numeric,
+  rs_20d numeric,
+  return_50d numeric,
+  rs_50d numeric,
+  return_120d numeric,
+  rs_120d numeric,
+  return_200d numeric,
+  rs_200d numeric,
   updated_at timestamptz not null default now(),
   primary key (instrument_id,as_of)
 );
@@ -277,7 +287,8 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
        coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
        coalesce(u.index_statuses,'{}'::text[]) as index_statuses,
-       case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status
+       case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status,
+       m.return_5d,m.rs_5d,m.return_20d,m.rs_20d,m.return_50d,m.rs_50d,m.return_120d,m.rs_120d,m.return_200d,m.rs_200d
 from public.instruments i
 left join lateral (
   select mm.* from public.market_metrics mm
@@ -390,11 +401,11 @@ declare updated_rows integer:=0; core_rows integer:=0; candidate_rows integer:=0
 begin
   with latest as (
     select distinct on (mm.instrument_id)
-      mm.instrument_id,mm.as_of,mm.return_1w,mm.return_1m,mm.return_3m,mm.return_6m,mm.return_12m
+      mm.instrument_id,mm.as_of,mm.return_1w,mm.return_1m,mm.return_3m,mm.return_6m,mm.return_12m,mm.return_5d,mm.return_20d,mm.return_50d,mm.return_120d,mm.return_200d
     from public.market_metrics mm join public.instruments i on i.id=mm.instrument_id
     where i.active=true order by mm.instrument_id,mm.as_of desc
   ), bench as (
-    select i.market,l.return_1w,l.return_1m,l.return_3m,l.return_6m,l.return_12m
+    select i.market,l.return_1w,l.return_1m,l.return_3m,l.return_6m,l.return_12m,l.return_5d,l.return_20d,l.return_50d,l.return_120d,l.return_200d
     from latest l join public.instruments i on i.id=l.instrument_id
     where (i.market='US' and i.ticker='SPY') or (i.market='KR' and i.ticker='069500')
   ), rs_base as (
@@ -403,7 +414,12 @@ begin
       case when l.return_1m is not null and b.return_1m is not null then l.return_1m-b.return_1m end rs_1m,
       case when l.return_3m is not null and b.return_3m is not null then l.return_3m-b.return_3m end rs_3m,
       case when l.return_6m is not null and b.return_6m is not null then l.return_6m-b.return_6m end rs_6m,
-      case when l.return_12m is not null and b.return_12m is not null then l.return_12m-b.return_12m end rs_12m
+      case when l.return_12m is not null and b.return_12m is not null then l.return_12m-b.return_12m end rs_12m,
+      case when l.return_5d is not null and b.return_5d is not null then l.return_5d-b.return_5d end rs_5d,
+      case when l.return_20d is not null and b.return_20d is not null then l.return_20d-b.return_20d end rs_20d,
+      case when l.return_50d is not null and b.return_50d is not null then l.return_50d-b.return_50d end rs_50d,
+      case when l.return_120d is not null and b.return_120d is not null then l.return_120d-b.return_120d end rs_120d,
+      case when l.return_200d is not null and b.return_200d is not null then l.return_200d-b.return_200d end rs_200d
     from latest l join public.instruments i on i.id=l.instrument_id left join bench b on b.market=i.market
   ), scored as (
     select r.*,
@@ -411,12 +427,12 @@ begin
       / nullif((case when r.rs_1m is not null then .30 else 0 end)+(case when r.rs_3m is not null then .30 else 0 end)+(case when r.rs_6m is not null then .20 else 0 end)+(case when r.rs_12m is not null then .20 else 0 end),0) score
     from rs_base r
   ), ranked as (
-    select s.instrument_id,s.as_of,s.rs_1w,s.rs_1m,s.rs_3m,s.rs_6m,s.rs_12m,
+    select s.instrument_id,s.as_of,s.rs_1w,s.rs_1m,s.rs_3m,s.rs_6m,s.rs_12m,s.rs_5d,s.rs_20d,s.rs_50d,s.rs_120d,s.rs_200d,
       round(1+98*cume_dist() over(partition by s.market order by s.score))::int rs_rank
     from scored s where s.asset_class='Equity' and s.score is not null
   )
   update public.market_metrics mm set
-    rs_1w=r.rs_1w,rs_1m=r.rs_1m,rs_3m=r.rs_3m,rs_6m=r.rs_6m,rs_12m=r.rs_12m,rs_rank=r.rs_rank,updated_at=now()
+    rs_1w=r.rs_1w,rs_1m=r.rs_1m,rs_3m=r.rs_3m,rs_6m=r.rs_6m,rs_12m=r.rs_12m,rs_5d=r.rs_5d,rs_20d=r.rs_20d,rs_50d=r.rs_50d,rs_120d=r.rs_120d,rs_200d=r.rs_200d,rs_rank=r.rs_rank,updated_at=now()
   from ranked r where mm.instrument_id=r.instrument_id and mm.as_of=r.as_of;
 
   with latest as (

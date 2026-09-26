@@ -6,7 +6,9 @@ const endpoint =
 
 const numericFields = [
   'price','return_1w','return_1m','return_3m','return_6m','return_12m',
+  'return_5d','return_20d','return_50d','return_120d','return_200d',
   'rs_1w','rs_1m','rs_3m','rs_6m','rs_12m','rs_rank',
+  'rs_5d','rs_20d','rs_50d','rs_120d','rs_200d',
   'high_52w_distance','volume_ratio','adr20_pct','rsi14','atr_multiple',
   'ma50','ma200'
 ] as const

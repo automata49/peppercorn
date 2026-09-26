@@ -18,7 +18,7 @@ const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wp
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
 const med=(values:unknown[])=>{
-  const a=values.map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
+  const a=values.filter(v=>v!=null&&v!=='').map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
   if(!a.length) return null
   const m=Math.floor(a.length/2)
   return a.length%2?a[m]:(a[m-1]+a[m])/2
@@ -33,7 +33,7 @@ const leadership=(r:LeaderRow)=>{
 }
 const isCorrection=(r:LeaderRow)=>String(r.stage||'').includes('조정 중')
 const stageTone=(value:unknown)=>{const s=String(value||'');return s.startsWith('▲')?'green':s.startsWith('●')?'green-soft':s.startsWith('◆')?'blue':s.startsWith('■')?'violet':s.startsWith('◇')?'teal':s.startsWith('↻')?'amber':s.startsWith('⛔')?'red':s.startsWith('❌')?'gray':'gray'}
-const leadTone=(s:string)=>['핵심 주도','강한 산업'].includes(s)?'green':s==='주도 후보'?'blue':['강세 전환','개선 산업'].includes(s)?'amber':s==='약세'?'red':'gray'
+const leadTone=(s:string)=>['핵심 주도','강한 섹터'].includes(s)?'green':s==='주도 후보'?'blue':['강세 전환','개선 섹터'].includes(s)?'amber':s==='약세'?'red':'gray'
 const selectEditor=(values:(string|number|boolean)[])=>({cellEditor:'agSelectCellEditor',cellEditorParams:{values}})
 const rowNo={headerName:'No',width:62,flex:0,editable:false,valueGetter:(p:any)=>(p.node?.rowIndex??0)+1}
 
@@ -45,18 +45,20 @@ function useLocalRows<T>(key:string,initial:T[]){
   return [rows,update] as const
 }
 
-type IndustrySummary={
-  key:string;market:Market;industry:string;sector:string;n:number;core:number;candidate:number;turn:number;correction:number;
-  coreShare:number;breadth:number;medRank:number|null;medRs1w:number|null;medRs1m:number|null;medRs3m:number|null;
-  medRet1w:number|null;medRet1m:number|null;medRet3m:number|null;verdict:string;smallSample:boolean;top:string[]
+type SectorSummary={
+  key:string;market:Market;sector:string;n:number;core:number;candidate:number;turn:number;correction:number;
+  coreShare:number;breadth:number;medRank:number|null;
+  medRs5d:number|null;medRs20d:number|null;medRs50d:number|null;
+  medRet5d:number|null;medRet20d:number|null;medRet50d:number|null;
+  verdict:string;smallSample:boolean;top:string[]
 }
 
-function buildIndustries(rows:LeaderRow[]):IndustrySummary[]{
+const sectorKey=(r:LeaderRow)=>`${r.market}|${r.sector||'분류 확인'}`
+function buildSectors(rows:LeaderRow[]):SectorSummary[]{
   const groups=new Map<string,LeaderRow[]>()
   for(const r of rows){
     if(r.asset_class!=='Equity')continue
-    const industry=String(r.industry||'분류 확인').trim()||'분류 확인'
-    const key=`${r.market}|${r.sector||'분류 확인'}|${industry}`
+    const key=sectorKey(r)
     const list=groups.get(key)||[];list.push(r);groups.set(key,list)
   }
   return [...groups.entries()].map(([key,list])=>{
@@ -68,21 +70,21 @@ function buildIndustries(rows:LeaderRow[]):IndustrySummary[]{
     const coreShare=n?core/n:0
     const breadth=n?list.filter(r=>r.price!=null&&r.ma50!=null&&Number(r.price)>Number(r.ma50)).length/n:0
     const medRank=med(list.map(r=>r.rs_rank))
-    const medRs1w=med(list.map(r=>r.rs_1w)),medRs1m=med(list.map(r=>r.rs_1m)),medRs3m=med(list.map(r=>r.rs_3m))
-    const medRet1w=med(list.map(r=>r.return_1w)),medRet1m=med(list.map(r=>r.return_1m)),medRet3m=med(list.map(r=>r.return_3m))
+    const medRs5d=med(list.map(r=>r.rs_5d)),medRs20d=med(list.map(r=>r.rs_20d)),medRs50d=med(list.map(r=>r.rs_50d))
+    const medRet5d=med(list.map(r=>r.return_5d)),medRet20d=med(list.map(r=>r.return_20d)),medRet50d=med(list.map(r=>r.return_50d))
     const smallSample=n<3
     const strongShare=n?(core+candidate)/n:0
     const improvingShare=n?(candidate+turn+correction)/n:0
     let verdict='중립'
     if(smallSample){
-      if(core>0&&(medRank??0)>=90&&(medRs3m??-1)>0)verdict='강한 산업'
-      else if((candidate+turn)>0&&(medRank??0)>=70&&(medRs1m??-1)>0)verdict='개선 산업'
+      if(core>0&&(medRank??0)>=90&&(medRs50d??-1)>0)verdict='강한 섹터'
+      else if((candidate+turn)>0&&(medRank??0)>=70&&(medRs20d??-1)>0)verdict='개선 섹터'
       else if(breadth<.35&&(medRank??50)<40)verdict='약세'
-    }else if(strongShare>=.25&&(medRank??0)>=75&&breadth>=.55&&(medRs3m??-1)>0)verdict='강한 산업'
-    else if(improvingShare>=.35&&(medRank??0)>=55&&breadth>=.45&&(medRs1m??-1)>0)verdict='개선 산업'
+    }else if(strongShare>=.25&&(medRank??0)>=75&&breadth>=.55&&(medRs50d??-1)>0)verdict='강한 섹터'
+    else if(improvingShare>=.35&&(medRank??0)>=55&&breadth>=.45&&(medRs20d??-1)>0)verdict='개선 섹터'
     else if(breadth<.35&&(medRank??50)<45)verdict='약세'
     const ranked=list.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).slice(0,3).map(r=>r.name)
-    return {key,market:list[0].market,industry:list[0].industry||'분류 확인',sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs1w,medRs1m,medRs3m,medRet1w,medRet1m,medRet3m,verdict,smallSample,top:ranked}
+    return {key,market:list[0].market,sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs5d,medRs20d,medRs50d,medRet5d,medRet20d,medRet50d,verdict,smallSample,top:ranked}
   }).sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.coreShare-a.coreShare)
 }
 
@@ -112,13 +114,19 @@ const leaderCols:ColDef<LeaderRow>[]=[
   {field:'verdict',headerName:'최종 판단',minWidth:135},
   {field:'price',headerName:'현재가',valueFormatter:p=>num(p.value)},
   {field:'rs_rank',headerName:'RS순위',cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
-  {field:'rs_1w',headerName:'RS 1W',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'rs_1m',headerName:'RS 1M',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'return_1w',headerName:'등락 1W',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'return_1m',headerName:'등락 1M',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_5d',headerName:'RS 5D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_20d',headerName:'RS 20D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_50d',headerName:'RS 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_120d',headerName:'RS 120D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_200d',headerName:'RS 200D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'return_5d',headerName:'등락 5D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'return_20d',headerName:'등락 20D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'return_50d',headerName:'등락 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'return_120d',headerName:'등락 120D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'return_200d',headerName:'등락 200D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'high_52w_distance',headerName:'52W High',valueFormatter:p=>pct(p.value)},
   {field:'volume_ratio',headerName:'거래량 배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(2)+'x'},
-  {field:'rsi14',headerName:'RSI'},
+  {field:'rsi14',headerName:'RSI',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(0)},
   {field:'atr_multiple',headerName:'ATR배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(1)+'x'},
   {field:'action_guide',headerName:'액션 가이드',minWidth:280}
 ]
@@ -186,11 +194,19 @@ const journalCols:ColDef<EditableRow>[]=[
   {field:'analysis_no',headerName:'종목분석 No(자동)',editable:false,width:125,flex:0},{field:'research_no',headerName:'리서치노트 No(자동)',editable:false,width:135,flex:0}
 ]
 
-function Kpi({label,value,sub}:{label:string;value:string|number;sub?:string}){
-  return <div className="kpi"><span>{label}</span><strong>{value}</strong>{sub&&<small>{sub}</small>}</div>
+function Kpi({label,value,sub,onClick}:{label:string;value:string|number;sub?:string;onClick?:()=>void}){
+  const content=<><span>{label}</span><strong>{value}</strong>{sub&&<small>{sub}</small>}</>
+  return onClick?<button type="button" className="kpi kpi-action" onClick={onClick} aria-label={`${label} ${value}종목 보기`}>{content}</button>:<div className="kpi">{content}</div>
 }
 
 function ValuePill({children,tone='gray'}:{children:any;tone?:string}){return <span className={'pill '+tone}>{children}</span>}
+
+function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
+  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>단계</span><span>RS</span><span>RS 5D</span><span>RS 20D</span><span>RS 50D</span><span>등락 5D</span><span>등락 20D</span><span>등락 50D</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+    <div className="stock-id"><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong>
+    {([r.rs_5d,r.rs_20d,r.rs_50d,r.return_5d,r.return_20d,r.return_50d] as const).map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
+  </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
+}
 
 function SnapshotItem({label,children,wide=false}:{label:string;children:any;wide?:boolean}){
   return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong>{children}</strong></div>
@@ -258,11 +274,12 @@ export default function App(){
   const [market,setMarket]=useState<'ALL'|Market>('ALL')
   const [query,setQuery]=useState('')
   const [sector,setSector]=useState<string|null>(null)
-  const [industryKey,setIndustryKey]=useState<string|null>(null)
-  const [industryMode,setIndustryMode]=useState<'HOT'|'ALL'>('ALL')
+  const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
+  const [sectorMode,setSectorMode]=useState<'HOT'|'ALL'>('ALL')
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
+  const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|null>(null)
   const [selected,setSelected]=useState<LeaderRow|null>(null)
-  const [drillIndustryKey,setDrillIndustryKey]=useState<string|null>(null)
+  const [drillSectorKey,setDrillSectorKey]=useState<string|null>(null)
   const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [analysisDeleteTarget,setAnalysisDeleteTarget]=useState<EditableRow|null>(null)
   const drillRef=useRef<HTMLDivElement|null>(null)
@@ -274,12 +291,12 @@ export default function App(){
   const [session,setSessionState]=useState<Session|null>(()=>loadStoredSession())
   const [authOpen,setAuthOpen]=useState(false)
   const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
-  const drillOpen=!!drillIndustryKey||!!drillStock
+  const drillOpen=!!summaryTab||!!drillSectorKey||!!drillStock
 
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
 
   useEffect(()=>{loadLeaderboard().then(r=>{setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)})},[])
-  useEffect(()=>{setSector(null);setIndustryKey(null);setDrillIndustryKey(null);setDrillStock(null)},[market])
+  useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
   useEffect(()=>{
     if(!drillOpen||!drillRef.current||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
     const root=drillRef.current
@@ -295,7 +312,7 @@ export default function App(){
       gsap.fromTo('.drill-content .drill-animate',{y:9,opacity:0},{y:0,opacity:1,duration:.3,stagger:.045,ease:'power2.out'})
     },root)
     return()=>ctx.revert()
-  },[drillOpen,drillStock?.id,drillIndustryKey])
+  },[drillOpen,drillStock?.id,drillSectorKey,summaryTab])
 
   useEffect(()=>{
     if(!session) return
@@ -333,19 +350,36 @@ export default function App(){
     return marketRows.filter(r=>!q||[r.ticker,r.name,r.sector,r.industry].map(v=>String(v||'')).join(' ').toLowerCase().includes(q))
   },[marketRows,query])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
-  const leadCount=stockRows.filter(r=>leadership(r)==='핵심 주도').length
-  const candidateCount=stockRows.filter(r=>leadership(r)==='주도 후보').length
-  const turnCount=stockRows.filter(r=>leadership(r)==='강세 전환').length
+  const summaryGroups={
+    core:stockRows.filter(r=>leadership(r)==='핵심 주도'),
+    candidates:stockRows.filter(r=>leadership(r)==='주도 후보'),
+    turns:stockRows.filter(r=>leadership(r)==='강세 전환')
+  }
+  const leadCount=summaryGroups.core.length
+  const candidateCount=summaryGroups.candidates.length
+  const turnCount=summaryGroups.turns.length
   const breadth=stockRows.length?stockRows.filter(r=>r.price&&r.ma50&&r.price>r.ma50).length/stockRows.length:0
 
   const sectorNames=useMemo<string[]>(()=>Array.from(new Set<string>(marketRows.map(r=>r.sector||'분류 확인'))).sort((a,b)=>a.localeCompare(b,'ko')),[marketRows])
-  const industryRows=useMemo(()=>buildIndustries(marketRows.filter(r=>!sector||r.sector===sector)),[marketRows,sector])
-  const shownIndustries=industryMode==='ALL'?industryRows:industryRows.filter(g=>g.verdict==='강한 산업'||g.verdict==='개선 산업')
-  const chosenIndustry=industryRows.find(g=>g.key===industryKey)||null
-  const drillIndustry=buildIndustries(marketRows).find(g=>g.key===drillIndustryKey)||null
-  const drillIndustryStocks=visible.filter(r=>!drillIndustry||(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'))===drillIndustry.key).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
-  const scopedStocks=visible.filter(r=>r.asset_class==='Equity'&&(!sector||r.sector===sector)&&(!chosenIndustry||(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'))===chosenIndustry.key))
-  const tabStocks=scopedStocks.filter(r=>stockTab==='core'?leadership(r)==='핵심 주도':stockTab==='candidates'?leadership(r)==='주도 후보':stockTab==='turns'?leadership(r)==='강세 전환':isCorrection(r)).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
+  const sectorRows=useMemo(()=>buildSectors(marketRows.filter(r=>!sector||r.sector===sector)),[marketRows,sector])
+  const shownSectors=sectorMode==='ALL'?sectorRows:sectorRows.filter(g=>g.verdict==='강한 섹터'||g.verdict==='개선 섹터')
+  const chosenSector=sectorRows.find(g=>g.key===sectorKeySelected)||null
+  const drillSector=buildSectors(marketRows).find(g=>g.key===drillSectorKey)||null
+  const drillSectorStocks=visible.filter(r=>r.asset_class==='Equity'&&(!drillSector||sectorKey(r)===drillSector.key)).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
+  const drillStockGroups={
+    core:drillSectorStocks.filter(r=>leadership(r)==='핵심 주도'),
+    candidates:drillSectorStocks.filter(r=>leadership(r)==='주도 후보'),
+    turns:drillSectorStocks.filter(r=>leadership(r)==='강세 전환'),
+    corrections:drillSectorStocks.filter(isCorrection)
+  }
+  const scopedStocks=visible.filter(r=>r.asset_class==='Equity'&&(!sector||r.sector===sector)&&(!chosenSector||sectorKey(r)===chosenSector.key))
+  const stockGroups={
+    core:scopedStocks.filter(r=>leadership(r)==='핵심 주도'),
+    candidates:scopedStocks.filter(r=>leadership(r)==='주도 후보'),
+    turns:scopedStocks.filter(r=>leadership(r)==='강세 전환'),
+    corrections:scopedStocks.filter(isCorrection)
+  }
+  const tabStocks=stockGroups[stockTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
 
   const leaderMap=useMemo(()=>{
     const m=new Map<string,LeaderRow>()
@@ -412,37 +446,36 @@ export default function App(){
   if(page==='dashboard'){
     content=<>{filters}
       <section className="kpis">
-        <Kpi label="핵심 주도" value={leadCount} sub="RS≥95 · 3M/6M 상대강도 양호"/>
-        <Kpi label="주도 후보" value={candidateCount} sub="Trend Template 통과 중 상위 후보"/>
-        <Kpi label="강세 전환" value={turnCount} sub="Next Leader"/>
+        <Kpi label="핵심 주도" value={leadCount} sub="RS≥95 · 3M/6M 상대강도 양호" onClick={()=>{setSummaryTab('core');setDrillSectorKey(null);setDrillStock(null)}}/>
+        <Kpi label="주도 후보" value={candidateCount} sub="Trend Template 통과 중 상위 후보" onClick={()=>{setSummaryTab('candidates');setDrillSectorKey(null);setDrillStock(null)}}/>
+        <Kpi label="강세 전환" value={turnCount} sub="Next Leader" onClick={()=>{setSummaryTab('turns');setDrillSectorKey(null);setDrillStock(null)}}/>
         <Kpi label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+stockRows.length+' 종목'}/>
       </section>
       <section className="sector-strip panel compact-panel">
-        <div className="panel-head"><div><h2>섹터 필터</h2><p>섹터는 보조 필터입니다. 아래 산업 흐름을 먼저 확인하세요.</p></div></div>
-        <div className="chips"><button className={!sector?'chip on':'chip'} onClick={()=>{setSector(null);setIndustryKey(null)}}>전체 섹터</button>{sectorNames.map(s=><button key={s} className={sector===s?'chip on':'chip'} onClick={()=>{setSector(sector===s?null:s);setIndustryKey(null)}}>{s}</button>)}</div>
+        <div className="panel-head"><div><h2>섹터 필터</h2><p>시장과 섹터를 선택해 주도 종목을 좁혀보세요.</p></div></div>
+        <div className="chips"><button className={!sector?'chip on':'chip'} onClick={()=>{setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체 섹터</button>{sectorNames.map(name=><button key={name} className={sector===name?'chip on':'chip'} onClick={()=>{setSector(sector===name?null:name);setSectorKeySelected(null);setDrillSectorKey(null)}}>{name}</button>)}</div>
       </section>
       <section className="industry-layout">
         <div className="panel industry-panel">
-          <div className="panel-head"><div><h2>산업 요약</h2><p>산업명 + RS · 등락률만 압축 표시</p></div><div className="mini-segment"><button className={industryMode==='HOT'?'on':''} onClick={()=>setIndustryMode('HOT')}>강한·개선</button><button className={industryMode==='ALL'?'on':''} onClick={()=>setIndustryMode('ALL')}>전체</button></div></div>
-          <div className="industry-table-wrap"><table className="industry-table compact-industry-table"><thead><tr><th>산업</th><th>판정</th><th>RS</th><th>RS 1W</th><th>RS 1M</th><th>RS 3M</th><th>1W</th><th>1M</th><th>3M</th></tr></thead><tbody>
-            {shownIndustries.map(g=><tr key={g.key} className={industryKey===g.key?'selected':''} onClick={()=>{setIndustryKey(g.key);setDrillIndustryKey(g.key);setDrillStock(null)}}>
-              <td className="industry-name-cell" title={g.industry+' · '+g.sector}><b>{g.industry}</b><small>{g.market}</small></td><td><ValuePill tone={leadTone(g.verdict)}>{g.verdict}</ValuePill>{g.smallSample&&<small className="sample-note">n={g.n}</small>}</td><td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td><td className={(g.medRs1w??0)>0?'pos':(g.medRs1w??0)<0?'neg':''}>{pct(g.medRs1w)}</td><td className={(g.medRs1m??0)>0?'pos':(g.medRs1m??0)<0?'neg':''}>{pct(g.medRs1m)}</td><td className={(g.medRs3m??0)>0?'pos':(g.medRs3m??0)<0?'neg':''}>{pct(g.medRs3m)}</td><td className={(g.medRet1w??0)>0?'pos':(g.medRet1w??0)<0?'neg':''}>{pct(g.medRet1w)}</td><td className={(g.medRet1m??0)>0?'pos':(g.medRet1m??0)<0?'neg':''}>{pct(g.medRet1m)}</td><td className={(g.medRet3m??0)>0?'pos':(g.medRet3m??0)<0?'neg':''}>{pct(g.medRet3m)}</td>
+          <div className="panel-head"><div><h2>섹터 요약</h2><p>섹터별 RS · 등락률 중앙값</p></div><div className="mini-segment"><button className={sectorMode==='HOT'?'on':''} onClick={()=>setSectorMode('HOT')}>강한·개선</button><button className={sectorMode==='ALL'?'on':''} onClick={()=>setSectorMode('ALL')}>전체</button></div></div>
+          <div className="industry-table-wrap"><table className="industry-table compact-industry-table"><thead><tr><th>섹터</th><th>판정</th><th>RS</th><th>RS 5D</th><th>RS 20D</th><th>RS 50D</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th></tr></thead><tbody>
+            {shownSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} onClick={()=>{setSectorKeySelected(g.key);setDrillStock(null);setDrillSectorKey(window.matchMedia('(max-width: 1180px)').matches?g.key:null)}}>
+              <td className="industry-name-cell" title={g.sector}><b>{g.sector}</b><small>{g.market} · {g.n}종목</small></td><td><ValuePill tone={leadTone(g.verdict)}>{g.verdict}</ValuePill>{g.smallSample&&<small className="sample-note">n={g.n}</small>}</td><td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
+              {([g.medRs5d,g.medRs20d,g.medRs50d,g.medRet5d,g.medRet20d,g.medRet50d] as const).map((value,i)=><td key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</td>)}
             </tr>)}
-            {!shownIndustries.length&&<tr><td colSpan={9} className="empty">조건에 맞는 산업이 없습니다.</td></tr>}
+            {!shownSectors.length&&<tr><td colSpan={9} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
           </tbody></table></div>
         </div>
         <div className="panel stock-panel">
-          <div className="panel-head"><div><h2>{chosenIndustry?chosenIndustry.industry:'주도 종목'}</h2><p>{chosenIndustry?`${chosenIndustry.sector} · 대표 ${chosenIndustry.top.join(', ')}`:'산업을 선택하면 해당 종목만 표시합니다.'}</p></div>{chosenIndustry&&<button className="text-button" onClick={()=>setIndustryKey(null)}>선택 해제</button>}</div>
-          <div className="tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도</button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보</button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환</button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중</button></div>
-          <div className="stock-rows">{tabStocks.slice(0,24).map(r=><button key={r.id} className="stock-row" onClick={()=>{setSelected(r);setDrillIndustryKey(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'));setDrillStock(r)}}>
-            <div className="stock-id"><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><span className={(r.rs_1w??0)>0?'pos':(r.rs_1w??0)<0?'neg':''}>{pct(r.rs_1w)}</span><span className={(r.return_1w??0)>0?'pos':(r.return_1w??0)<0?'neg':''}>{pct(r.return_1w)}</span>
-          </button>)}{!tabStocks.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
+          <div className="panel-head"><div><h2>주도 종목{chosenSector?' · '+chosenSector.sector:''}</h2><p>{chosenSector?`대표 ${chosenSector.top.join(', ')}`:'섹터를 선택하면 해당 종목만 표시합니다.'}</p></div>{chosenSector&&<button className="text-button" onClick={()=>setSectorKeySelected(null)}>선택 해제</button>}</div>
+          <div className="tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도 <b>{stockGroups.core.length}</b></button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보 <b>{stockGroups.candidates.length}</b></button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환 <b>{stockGroups.turns.length}</b></button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중 <b>{stockGroups.corrections.length}</b></button></div>
+          <StockRows rows={tabStocks} onSelect={r=>{setSelected(r);setDrillSectorKey(sectorKey(r));setDrillStock(r)}}/>
         </div>
       </section>
-      <section className="panel"><div className="panel-head"><div><h2>전체 리더보드 미리보기</h2><p>산업 중심 탐색 후 종목 수준 지표를 검증합니다.</p></div><button className="text-button" onClick={()=>setPage('leaderboard')}>전체 보기 →</button></div><GridTable rows={visible.slice(0,20)} columns={leaderCols.slice(0,14)} height={470}/></section>
+      <section className="panel"><div className="panel-head"><div><h2>전체 리더보드 미리보기</h2><p>섹터 흐름을 본 뒤 종목 수준 지표를 검증합니다.</p></div><button className="text-button" onClick={()=>setPage('leaderboard')}>전체 보기 →</button></div><GridTable rows={visible.slice(0,20)} columns={leaderCols.slice(0,13)} height={470}/></section>
     </>
   }else if(page==='leaderboard'){
-    content=<><div className="page-note"><b>읽는 순서</b><span>산업 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
+    content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
     content=<><div className="page-note"><b>Watchlist</b><span>산업·섹터·리더보드 단계는 시장 데이터와 연결하고, 관심가·손절·우선순위를 직접 관리합니다.</span></div><div className="panel"><GridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
   }else if(page==='portfolio'){
@@ -468,12 +501,12 @@ export default function App(){
   }
 
   const pageTitle:Record<string,string>={dashboard:'Investment Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
-  const closeDrill=()=>{setDrillStock(null);setDrillIndustryKey(null)}
+  const closeDrill=()=>{setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   const drillOverlay=<Dialog open={drillOpen} onOpenChange={open=>{if(!open)closeDrill()}}>
     <DialogContent ref={drillRef} className="drill-sheet">
       <div className="drill-handle"/>
       <div className="drill-head">
-        <div>{drillStock&&<button className="drill-back" onClick={()=>setDrillStock(null)}>← 산업</button>}<small>{drillStock?drillStock.sector:(drillIndustry?.sector||'Industry')}</small><DialogTitle>{drillStock?drillStock.name:(drillIndustry?.industry||'산업 상세')}</DialogTitle><DialogDescription className="sr-only">산업 및 종목의 상세 리더십 지표</DialogDescription></div>
+        <div>{drillStock&&<button className="drill-back" onClick={()=>{if(summaryTab||window.matchMedia('(max-width: 1180px)').matches)setDrillStock(null);else closeDrill()}}>← {summaryTab?'목록':'섹터'}</button>}<small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?drillStock.sector:(drillSector?.market||'Sector')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환'}[summaryTab]}`:(drillSector?.sector||'섹터 상세')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
@@ -482,13 +515,17 @@ export default function App(){
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
         <button className="primary-action" onClick={()=>{const r=drillStock!;setSelected(r);const next=[{id:'new-'+Date.now(),date:new Date().toISOString().slice(0,10),market:r.market,ticker:r.ticker,name:r.name,sector:r.sector,industry:r.industry,stage:r.stage,leadership_class:leadership(r),rs_rank:r.rs_rank,lynch_category:'',eps_growth_q:null,sales_growth_q:null,eps_growth_3y:null,roe:null,operating_margin:null,debt_ratio:null,operating_cashflow_positive:null,pe:null,peg:null,moat:'',growth_driver:'',key_risk:'',auto_grade:'',conclusion:'',research_note_no:'',journal_no:''},...analysis];updateAnalysis(next)}}>종목분석에 기록 추가</button>
+      </div>:summaryTab?<div className="drill-content drill-summary-list">
+        <p className="drill-note">{market==='ALL'?'전체 시장':market} · {summaryGroups[summaryTab].length}종목 · RS순위 높은 순</p>
+        <StockRows rows={summaryGroups[summaryTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>:<div className="drill-industry-detail drill-content">
-        <div className="drill-summary"><Kpi label="판정" value={drillIndustry?.verdict??'—'}/><Kpi label="종목 수" value={drillIndustry?.n??0}/><Kpi label="핵심 주도 비율" value={drillIndustry?pct(drillIndustry.coreShare):'—'}/><Kpi label="MA50 위" value={drillIndustry?pct(drillIndustry.breadth):'—'}/><Kpi label="RS순위 중앙값" value={drillIndustry?.medRank==null?'—':Math.round(drillIndustry.medRank)}/><Kpi label="RS 3M" value={drillIndustry?pct(drillIndustry.medRs3m):'—'}/></div>
-        {drillIndustry?.smallSample&&<p className="sample-explainer">소표본 산업입니다. 종목 수를 별도 표시하고 더 엄격한 판정 기준을 적용합니다.</p>}
-        <p className="drill-note">종목을 누르면 페이지 이동 없이 같은 패널에서 상세 지표를 확인합니다.</p>
-        <div className="drill-stock-list">{drillIndustryStocks.map(r=><button key={r.id} onClick={()=>{setSelected(r);setDrillStock(r)}}>
+        <div className="drill-summary"><Kpi label="판정" value={drillSector?.verdict??'—'}/><Kpi label="종목 수" value={drillSector?.n??0}/><Kpi label="핵심 주도 비율" value={drillSector?pct(drillSector.coreShare):'—'}/><Kpi label="MA50 위" value={drillSector?pct(drillSector.breadth):'—'}/><Kpi label="RS순위 중앙값" value={drillSector?.medRank==null?'—':Math.round(drillSector.medRank)}/><Kpi label="RS 50D" value={drillSector?pct(drillSector.medRs50d):'—'}/></div>
+        {drillSector?.smallSample&&<p className="sample-explainer">소표본 섹터입니다. 종목 수를 별도 표시하고 더 엄격한 판정 기준을 적용합니다.</p>}
+        <div className="tabs drill-tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도 <b>{drillStockGroups.core.length}</b></button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보 <b>{drillStockGroups.candidates.length}</b></button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환 <b>{drillStockGroups.turns.length}</b></button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중 <b>{drillStockGroups.corrections.length}</b></button></div>
+        <p className="drill-note">종목을 누르면 상세 지표를 확인합니다.</p>
+        <div className="drill-stock-list">{drillStockGroups[stockTab].map(r=><button key={r.id} onClick={()=>{setSelected(r);setDrillStock(r)}}>
           <span><b>{r.name}</b><small>{r.market} · {r.ticker}</small></span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><em className={(r.rs_1w??0)>0?'pos':(r.rs_1w??0)<0?'neg':''}>{pct(r.rs_1w)}</em>
-        </button>)}</div>
+        </button>)}{!drillStockGroups[stockTab].length&&<div className="empty">해당 분류의 종목이 없습니다.</div>}</div>
       </div>}
     </DialogContent>
   </Dialog>

@@ -56,6 +56,7 @@ function metrics(rows:any[]){
     as_of:valid.at(-1)!.date,
     price:safe(price),ma50:safe(ma50),ma200:safe(ma200),high_52w:safe(hi),low_52w:safe(lo),
     return_1w:safe(ret(c,5)),return_1m:safe(ret(c,21)),return_3m:safe(ret(c,63)),return_6m:safe(ret(c,126)),return_12m:safe(ret(c,252)),
+    return_5d:safe(ret(c,5)),return_20d:safe(ret(c,20)),return_50d:safe(ret(c,50)),return_120d:safe(ret(c,120)),return_200d:safe(ret(c,200)),
     volume_ratio:safe(vol20&&vol20>0?v.at(-1)!/vol20:null),adr20_pct:safe(adr),rsi14:safe(calcRsi(c)),
     atr20_pct:safe(atr&&price?atr/price:null),high_52w_distance:safe(hi?price/hi-1:null),
     atr_multiple:safe(atr&&ma50?Math.abs(price-ma50)/atr:null),data_days:valid.length

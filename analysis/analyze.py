@@ -51,6 +51,7 @@ def metric(frame):
       "as_of":str(frame["trade_date"].iloc[-1]),"price":p,"ma50":ma50,"ma200":ma200,
       "high_52w":hi,"low_52w":lo,"return_1w":ret(c,5),"return_1m":ret(c,21),
       "return_3m":ret(c,63),"return_6m":ret(c,126),"return_12m":ret(c,252),
+      **{"return_"+str(n)+"d":ret(c,n) for n in (5,20,50,120,200)},
       "volume_ratio":float(v.iloc[-1]/vol20) if vol20 and vol20>0 else None,
       "adr20_pct":adr,"rsi14":rsi(c),"atr20_pct":float(atr/p) if atr and p else None,
       "high_52w_distance":float(p/hi-1) if hi else None,
@@ -74,6 +75,10 @@ def main():
         if iid not in result:continue
         m=result[iid];b=bench.get(item["market"],{})
         for h in ["1w","1m","3m","6m","12m"]:
+            a=m.get("return_"+h);bb=b.get("return_"+h)
+            m["rs_"+h]=(a-bb) if a is not None and bb is not None else None
+        for n in (5,20,50,120,200):
+            h=str(n)+"d"
             a=m.get("return_"+h);bb=b.get("return_"+h)
             m["rs_"+h]=(a-bb) if a is not None and bb is not None else None
 

@@ -55,3 +55,29 @@
 .boot-fallback{gap:7px;align-content:center}.boot-fallback strong{font-size:18px}.boot-fallback span{font-size:12px;color:#7a8797}
 .fatal-error{padding:24px}.fatal-error>div{max-width:420px;background:#fff;border:1px solid #dfe5ec;border-radius:14px;padding:22px;box-shadow:0 12px 36px rgba(37,54,74,.08)}
 .fatal-error strong{font-size:12px;color:#6e7f92}.fatal-error h1{font-size:20px;margin:8px 0}.fatal-error p{font-size:12px;line-height:1.6;color:#6f7d8c}.fatal-error button{margin-top:14px;border:0;border-radius:9px;background:#314e73;color:#fff;padding:9px 14px;font-weight:700;cursor:pointer}
+
+/* Sector overview and stock list share compact, aligned numeric columns. */
+.industry-layout{grid-template-columns:minmax(0,1fr)}
+.industry-panel,.stock-panel{min-height:0;max-width:none!important}
+.compact-industry-table{width:100%;min-width:790px;table-layout:fixed}
+.compact-industry-table th:first-child,.compact-industry-table td:first-child{width:190px}
+.compact-industry-table th:nth-child(2),.compact-industry-table td:nth-child(2){width:100px}
+.compact-industry-table th:nth-child(3),.compact-industry-table td:nth-child(3){width:62px}
+.compact-industry-table th:nth-child(n+4),.compact-industry-table td:nth-child(n+4){width:76px}
+.compact-industry-table .industry-name-cell{max-width:none}
+.compact-industry-table .industry-name-cell b,.compact-industry-table .industry-name-cell small{max-width:178px}
+.tabs{flex-wrap:wrap}
+.tabs b{margin-left:3px;font-variant-numeric:tabular-nums}
+.stock-rows{overflow-x:auto}
+.stock-rows-head,.stock-row{min-width:885px;display:grid;grid-template-columns:minmax(205px,1fr) 145px 55px repeat(6,75px);gap:8px;align-items:center}
+.stock-rows-head{padding:8px 4px;background:#f2f5f8;color:#68778a;font-size:10.5px;font-weight:700;text-align:right;white-space:nowrap}
+.stock-rows-head span:first-child,.stock-rows-head span:nth-child(2){text-align:left}
+.stock-row>span,.stock-row>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
+.stock-rows{max-height:600px;overflow-y:auto}
+.stock-rows-head{position:sticky;top:0;z-index:1}
+.drill-tabs{margin-top:14px}
+.kpi-action{width:100%;text-align:left;font:inherit;cursor:pointer}
+.kpi-action:hover{border-color:#9ab0c9;background:#f8fbff}
+.kpi-action:focus-visible{outline:2px solid #315a83;outline-offset:2px}
+.drill-summary-list .stock-rows{margin-top:12px;max-height:none}
+@media(max-width:650px){.stock-row{grid-template-columns:minmax(205px,1fr) 145px 55px repeat(6,75px)}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
