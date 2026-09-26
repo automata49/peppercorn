@@ -1,10 +1,10 @@
 const pages=[
   ['dashboard','◫','Dashboard'],
   ['leaderboard','↗','Leaderboard'],
-  ['watchlist','◎','Watchlist'],
-  ['portfolio','◆','Portfolio'],
   ['analysis','▦','종목 분석'],
   ['research','⌕','Research'],
+  ['watchlist','◎','Watchlist'],
+  ['portfolio','◆','Portfolio'],
   ['journal','✎','Journal'],
   ['universe','⊙','Universe'],
   ['settings','⚙','Settings']

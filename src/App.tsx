@@ -148,12 +148,13 @@ const watchCols:ColDef<EditableRow>[]=[
   {field:'market',headerName:'시장',editable:false,width:78,flex:0},{field:'ticker',headerName:'Ticker',editable:false,pinned:'left',width:95,flex:0},
   {field:'name',headerName:'종목명',editable:false,minWidth:140},{field:'industry',headerName:'산업',editable:false,minWidth:150},{field:'sector',headerName:'섹터',editable:false,minWidth:130},
   {field:'stage',headerName:'단계',editable:false,minWidth:145,cellClassRules:stageRules},{field:'rs_rank',headerName:'RS순위',editable:false},
+  {field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
   {field:'interest_price',headerName:'관심가'},{field:'stop_pct',headerName:'손절 %'},{field:'priority',headerName:'우선순위'},{field:'note',headerName:'메모',minWidth:260}
 ]
 const portfolioCols:ColDef<EditableRow>[]=[
   {field:'market',headerName:'시장',width:78,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:95,flex:0},
   {field:'name',headerName:'종목명',minWidth:140},{field:'industry',headerName:'산업',editable:false,minWidth:150},{field:'sector',headerName:'섹터',editable:false,minWidth:130},
-  {field:'account',headerName:'계좌'},{field:'shares',headerName:'수량'},{field:'avg_price',headerName:'평단'},{field:'current_price',headerName:'현재가'},
+  {field:'account',headerName:'계좌'},{field:'shares',headerName:'수량'},{field:'avg_price',headerName:'평단'},{field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
   {field:'stop_price',headerName:'Stop'},{field:'thesis',headerName:'투자 가설',minWidth:300}
 ]
 const researchCols:ColDef<EditableRow>[]=[
@@ -167,6 +168,7 @@ const researchCols:ColDef<EditableRow>[]=[
   {field:'next_review_date',headerName:'다음 확인일',width:120,flex:0},{field:'status',headerName:'상태',width:110,flex:0,...selectEditor(['관찰중','매매연결','완료','폐기'])},
   {field:'journal_no',headerName:'투자일지 No',width:105,flex:0},{field:'elapsed_days',headerName:'경과일(자동)',editable:false,width:100,flex:0},{field:'alert',headerName:'알림(자동)',editable:false,width:100,flex:0},
   {field:'market',headerName:'시장(자동)',editable:false,width:98,flex:0},{field:'ticker',headerName:'종목코드(자동)',editable:false,width:120,flex:0},
+  {field:'name',headerName:'종목명(자동)',editable:false,minWidth:145},{field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
   {field:'sector',headerName:'섹터(자동)',editable:false,minWidth:135},{field:'industry',headerName:'산업(자동)',editable:false,minWidth:150},
   {field:'stage',headerName:'모멘텀 단계(자동)',editable:false,minWidth:150,cellClassRules:stageRules},{field:'verdict',headerName:'최종 판단(자동)',editable:false,minWidth:135},
   {field:'rs_rank',headerName:'RS순위(자동)',editable:false,width:100,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
@@ -202,6 +204,7 @@ const journalCols:ColDef<EditableRow>[]=[
   {field:'exit_date',headerName:'결과일',width:110,flex:0},{field:'sell_price',headerName:'매도가'},{field:'realized_return',headerName:'실현수익률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'thesis_hit',headerName:'가설 적중',width:105,flex:0,...selectEditor(['적중','부분적중','빗나감'])},{field:'review_note',headerName:'결과 복기',minWidth:250},{field:'lesson',headerName:'교훈',minWidth:250},
   {field:'stage',headerName:'리더보드 단계(자동)',editable:false,minWidth:150,cellClassRules:stageRules},{field:'market',headerName:'시장(자동)',editable:false,width:98,flex:0},
+  {field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
   {field:'sector',headerName:'섹터(자동)',editable:false,minWidth:135},{field:'industry',headerName:'산업(자동)',editable:false,minWidth:150},{field:'verdict',headerName:'최종 판단(자동)',editable:false,minWidth:135},
   {field:'rs_rank',headerName:'RS순위(자동)',editable:false,width:100,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
   {field:'analysis_no',headerName:'종목분석 No(자동)',editable:false,width:125,flex:0},{field:'research_no',headerName:'리서치노트 No(자동)',editable:false,width:135,flex:0}
@@ -270,6 +273,22 @@ function StockSnapshot({row}:{row:LeaderRow}){
   </div>
 }
 
+function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
+  const [ticker,setTicker]=useState('')
+  const [error,setError]=useState('')
+  return <form className="ticker-entry" onSubmit={event=>{
+    event.preventDefault()
+    const message=onAdd(ticker)
+    setError(message||'')
+    if(!message)setTicker('')
+  }}>
+    <label htmlFor="new-ticker">종목코드로 기록 추가</label>
+    <input id="new-ticker" value={ticker} onChange={event=>{setTicker(event.target.value);setError('')}} placeholder="예: AAPL · 005930 · KR:005930" aria-invalid={!!error}/>
+    <button type="submit">추가</button>
+    {error&&<span className="ticker-entry-error" role="alert">{error}</span>}
+  </form>
+}
+
 export default function App(){
   const [page,setPage]=useState('dashboard')
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
@@ -286,6 +305,8 @@ export default function App(){
   const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [analysisDeleteTarget,setAnalysisDeleteTarget]=useState<EditableRow|null>(null)
   const drillRef=useRef<HTMLDivElement|null>(null)
+  const analysisRecordsRef=useRef<HTMLDivElement|null>(null)
+  const [scrollToAnalysis,setScrollToAnalysis]=useState(false)
   const [watch,setWatch]=useLocalRows<EditableRow>('peppercorn-watchlist',initialWatchlist)
   const [portfolio,setPortfolio]=useLocalRows<EditableRow>('peppercorn-portfolio',initialPortfolio)
   const [research,setResearch]=useLocalRows<EditableRow>('peppercorn-research',initialResearch)
@@ -316,6 +337,10 @@ export default function App(){
     },root)
     return()=>ctx.revert()
   },[drillOpen,drillStock?.id,drillSectorKey,summaryTab])
+
+  useEffect(()=>{
+    if(page==='analysis'&&scrollToAnalysis){analysisRecordsRef.current?.scrollIntoView({behavior:'smooth',block:'start'});setScrollToAnalysis(false)}
+  },[page,scrollToAnalysis])
 
   useEffect(()=>{
     if(!session) return
@@ -392,14 +417,15 @@ export default function App(){
     return m
   },[leaders])
   const matchLeader=(row:EditableRow)=>{
-    const marketKey=row.market&&row.ticker?`${row.market}|${row.ticker}`:''
-    const candidates=[marketKey,String(row.ticker||''),String(row.target||'').toLowerCase(),String(row.related_assets||'').split(/[ ,/]/)[0].toLowerCase()]
+    const ticker=String(row.ticker||'').trim().toUpperCase()
+    const marketKey=row.market&&ticker?`${row.market}|${ticker}`:''
+    const candidates=[marketKey,ticker,String(row.related_assets||'').split(/[ ,/]/)[0].toUpperCase(),String(row.target||'').trim().toLowerCase()]
     for(const k of candidates){if(k&&leaderMap.has(k))return leaderMap.get(k)||null}
     return null
   }
-  const enrich=(rows:EditableRow[])=>rows.map(r=>{
+  const enrich=(rows:EditableRow[]):EditableRow[]=>rows.map(r=>{
     const l=matchLeader(r);if(!l)return r
-    return {...r,market:l.market,ticker:l.ticker,name:l.name,sector:l.sector,industry:l.industry,stage:l.stage,leadership_class:leadership(l),verdict:l.verdict,rs_rank:l.rs_rank,current_price:l.price,price:l.price,ma50:l.ma50,ma200:l.ma200,high_52w_distance:l.high_52w_distance}
+    return {...r,market:l.market,ticker:l.ticker,name:l.name,sector:l.sector,industry:l.industry,stage:l.stage,leadership_class:leadership(l),verdict:l.verdict,rs_rank:l.rs_rank,current_price:l.price,price:l.price,ma50:l.ma50,ma200:l.ma200,high_52w_distance:l.high_52w_distance,volume_ratio:l.volume_ratio,rsi14:l.rsi14,rs_5d:l.rs_5d??null,rs_20d:l.rs_20d??null,rs_50d:l.rs_50d??null,rs_120d:l.rs_120d??null,rs_200d:l.rs_200d??null,return_5d:l.return_5d??null,return_20d:l.return_20d??null,return_50d:l.return_50d??null,return_120d:l.return_120d??null,return_200d:l.return_200d??null}
   })
   const baseResearch=enrich(research)
   const baseAnalysis=enrich(analysis)
@@ -433,11 +459,39 @@ export default function App(){
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ticker · 종목 · 산업 · 섹터 검색"/>
   </div>
 
-  const addSelectedAnalysis=()=>{
-    if(!selected)return
-    const next=[{id:`new-${Date.now()}`,date:new Date().toISOString().slice(0,10),market:selected.market,ticker:selected.ticker,name:selected.name,sector:selected.sector,industry:selected.industry,stage:selected.stage,leadership_class:leadership(selected),rs_rank:selected.rs_rank,eps_growth_q:null,sales_growth_q:null,eps_growth_3y:null,roe:null,operating_margin:null,debt_ratio:null,operating_cashflow_positive:null,pe:null,peg:null,moat:'',growth_driver:'',key_risk:'',auto_grade:'',conclusion:''},...analysis]
-    updateAnalysis(next)
+  const recordAnalysis=(row:LeaderRow,navigate=false)=>{
+    setSelected(row)
+    updateAnalysis([{id:crypto.randomUUID(),date:new Date().toISOString().slice(0,10),market:row.market,ticker:row.ticker,name:row.name},...analysis])
+    if(navigate){setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null);setPage('analysis')}
+    setScrollToAnalysis(true)
   }
+  const addTickerRecord=(resource:WorkspaceResource,input:string):string|null=>{
+    const raw=input.trim().toUpperCase()
+    if(!raw)return '종목코드를 입력해 주세요.'
+    const prefix=raw.match(/^(US|KR)[:\s-]+(.+)$/)
+    const requestedMarket=prefix?prefix[1]:null
+    const symbol=(prefix?prefix[2]:raw).trim()
+    const ticker=/^\d{1,6}$/.test(symbol)?symbol.padStart(6,'0'):symbol
+    const candidates=leaders.filter(r=>r.asset_class==='Equity'&&r.ticker.toUpperCase()===ticker&&(!requestedMarket||r.market===requestedMarket))
+    const matches=!requestedMarket&&candidates.length>1&&market!=='ALL'?candidates.filter(r=>r.market===market):candidates
+    if(!matches.length)return '리더보드에 없는 종목코드입니다. 시장 데이터가 연결된 종목을 입력해 주세요.'
+    if(matches.length>1)return '동일한 코드가 여러 시장에 있습니다. US: 또는 KR:을 붙여 주세요.'
+    const row=matches[0]
+    if(resource==='analysis'){recordAnalysis(row);return null}
+    const common={id:crypto.randomUUID(),market:row.market,ticker:row.ticker,name:row.name}
+    if(resource==='research')updateResearch([{...common,date:new Date().toISOString().slice(0,10),type:'종목',target:row.name,related_assets:row.ticker,verification:'미검증',status:'관찰중'},...research])
+    if(resource==='watchlist'){
+      if(watch.some(r=>r.market===row.market&&r.ticker===row.ticker))return '이미 Watchlist에 등록된 종목입니다.'
+      updateWatch([{...common,priority:'B'},...watch])
+    }
+    if(resource==='portfolio'){
+      if(portfolio.some(r=>r.market===row.market&&r.ticker===row.ticker))return '이미 Portfolio에 등록된 종목입니다.'
+      updatePortfolio([{...common,shares:0,currency:row.market==='KR'?'KRW':'USD'},...portfolio])
+    }
+    if(resource==='journal')updateJournal([{...common,date:new Date().toISOString().slice(0,10),currency:row.market==='KR'?'KRW':'USD',status:'보유중'},...journal])
+    return null
+  }
+  const addSelectedAnalysis=()=>{if(selected)recordAnalysis(selected)}
   const confirmDeleteAnalysis=()=>{
     if(!analysisDeleteTarget)return
     const target=analysisDeleteTarget
@@ -481,9 +535,9 @@ export default function App(){
   }else if(page==='leaderboard'){
     content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
-    content=<><div className="page-note"><b>Watchlist</b><span>산업·섹터·리더보드 단계는 시장 데이터와 연결하고, 관심가·손절·우선순위를 직접 관리합니다.</span></div><div className="panel"><GridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
+    content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><GridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
   }else if(page==='portfolio'){
-    content=<><div className="page-note"><b>Portfolio</b><span>포지션을 산업/섹터 맥락과 함께 보고 수량·평단·Stop·투자 가설을 관리합니다.</span></div><div className="panel"><GridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
+    content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><GridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
     content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>산업·RS가 강한 순</p></div></div>{visible.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}</b><span>{r.name}</span><em>{r.industry} · {r.stage}</em></button>)}</div>
       <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
@@ -491,11 +545,11 @@ export default function App(){
         <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{(selected.rs_rank??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
         <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div><button className="primary-action" onClick={addSelectedAnalysis}>이 종목 분석행 추가</button>
       </>:<p>종목을 선택하세요.</p>}</div></div>
-      <div className="page-note"><b>종목분석 기록</b><span>성장·수익성·밸류·질적 분석은 직접 입력하고, 산업·섹터·모멘텀·RS는 리더보드와 자동 연결합니다.</span></div><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></>
+      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. 재무 및 질적 분석은 직접 입력하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
   }else if(page==='research'){
-    content=<><div className="page-note"><b>Research Notes</b><span>팩트 → 해석 → 영향 → 다음 확인 순서. 종목 대상이면 리더보드의 산업·섹터·단계·RS를 연결합니다.</span></div><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
+    content=<><div className="page-note"><b>Research Notes</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·단계·RS가 연결됩니다. 팩트 → 해석 → 영향 → 다음 확인 순서로 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
   }else if(page==='journal'){
-    content=<><div className="page-note"><b>Trading Journal</b><span>매수 당시 가설과 리더보드 상태를 함께 기록하고, 결과 복기까지 한 행에서 추적합니다.</span></div><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
+    content=<><div className="page-note"><b>Trading Journal</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·RS가 연결됩니다. 매수 가설과 결과 복기를 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     content=<><div className="page-note"><b>Universe</b><span>S&P500 · NASDAQ · KOSPI200 · KOSDAQ150 구성과 분류 출처를 자동 동기화합니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
@@ -518,7 +572,7 @@ export default function App(){
         <StockSnapshot row={drillStock}/>
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
-        <button className="primary-action" onClick={()=>{const r=drillStock!;setSelected(r);const next=[{id:'new-'+Date.now(),date:new Date().toISOString().slice(0,10),market:r.market,ticker:r.ticker,name:r.name,sector:r.sector,industry:r.industry,stage:r.stage,leadership_class:leadership(r),rs_rank:r.rs_rank,lynch_category:'',eps_growth_q:null,sales_growth_q:null,eps_growth_3y:null,roe:null,operating_margin:null,debt_ratio:null,operating_cashflow_positive:null,pe:null,peg:null,moat:'',growth_driver:'',key_risk:'',auto_grade:'',conclusion:'',research_note_no:'',journal_no:''},...analysis];updateAnalysis(next)}}>종목분석에 기록 추가</button>
+        <button className="primary-action" onClick={()=>recordAnalysis(drillStock,true)}>종목분석 기록 작성 →</button>
       </div>:summaryTab?<div className="drill-content drill-summary-list">
         <p className="drill-note">{market==='ALL'?'전체 시장':market} · {summaryGroups[summaryTab].length}종목 · RS순위 높은 순</p>
         <StockRows rows={summaryGroups[summaryTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>

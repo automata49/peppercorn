@@ -59,6 +59,7 @@
 /* Sector overview and stock list share compact, aligned numeric columns. */
 .industry-layout{grid-template-columns:minmax(0,1fr)}
 .industry-panel,.stock-panel{min-height:0;max-width:none!important}
+.ticker-entry{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:0 0 14px;padding:12px 14px;border:1px solid #dbe3ec;border-radius:10px;background:#fff}.ticker-entry label{font-weight:700;font-size:12px;color:#42526a}.ticker-entry input{min-width:210px;flex:0 1 280px;border:1px solid #d7dee7;border-radius:8px;padding:8px 10px;color:#2a3545}.ticker-entry input:focus{outline:2px solid #c5d8ef;outline-offset:1px}.ticker-entry input[aria-invalid=true]{border-color:#bb4b42}.ticker-entry button{border:0;border-radius:8px;padding:9px 14px;background:#28486f;color:#fff;cursor:pointer;font-weight:700}.ticker-entry-error{color:#b43d35;font-size:12px;width:100%}.records-anchor{scroll-margin-top:100px}
 .compact-industry-table{width:730px;min-width:730px;table-layout:fixed}
 .compact-industry-table th:first-child,.compact-industry-table td:first-child{width:170px}
 .compact-industry-table th:nth-child(n+2),.compact-industry-table td:nth-child(n+2){width:70px}
