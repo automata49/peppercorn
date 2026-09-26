@@ -92,9 +92,9 @@ def fetch_sp500():
     return df
 
 def fetch_krx_listing():
-    # FinanceDataReader's KRX-DESC cache is generated from KRX/KIND and includes
-    # KRX Market + company 업종(Sector) + 주요제품(Industry). Reading the cache
-    # directly avoids the fragile KRX resource-bundle call made by the adapter.
+    # FinanceDataReader's KRX-DESC cache is generated from KRX/KIND. Its Industry
+    # column is the company industry; Sector is a listing-board classification
+    # (especially on KOSDAQ), and Products is the major-product description.
     base="https://raw.githubusercontent.com/FinanceData/fdr_krx_data_cache/master/data/listing/desc"
     for days_back in range(0,15):
         d=(pd.Timestamp.today()-pd.Timedelta(days=days_back)).strftime("%Y-%m-%d")
