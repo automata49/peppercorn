@@ -98,9 +98,9 @@ def main():
         atrx=m.get("atr_multiple");vol=m.get("volume_ratio")
         tt=sum([bool(p and ma50 and p>ma50),bool(ma50 and ma200 and ma50>ma200),bool(p and ma200 and p>ma200),bool(dist is not None and dist>=-.25),bool(rank>=70),bool(m.get("low_52w") and p>=m["low_52w"]*1.30)])
         structural=bool(p and ma50 and ma200 and p>ma50>ma200 and dist is not None and dist>=-.25 and rank>=70)
-        core=bool(structural and rank>=90 and dist is not None and dist>=-.15 and (rs3m or -1)>0 and (rs6m or -1)>0)
-        candidate=bool(structural and rank>=80 and dist is not None and dist>=-.20 and (rs3m or -1)>0)
-        correction=bool(p and ma50 and ma200 and p>ma200 and ma50>ma200 and rank>=80 and dist is not None and -.40<=dist<-.20)
+        core=bool(structural and rank>=95 and dist is not None and dist>=-.15 and (rs3m or -1)>0 and (rs6m or -1)>0)
+        candidate=bool(structural and rank>=85 and dist is not None and dist>=-.20 and (rs3m or -1)>0)
+        correction=bool(p and ma50 and ma200 and p>ma200 and ma50>ma200 and rank>=85 and dist is not None and -.40<=dist<-.20)
         next_leader=bool(not structural and not correction and p and ma50 and p>ma50 and dist is not None and dist>=-.30 and rank>=70 and (rs1w or -1)>0 and (rs1m or -1)>0)
         if structural and dist is not None and dist>=-.05:
             stage="▲ 돌파 매수권"
