@@ -20,6 +20,8 @@ const leadership=(r:LeaderRow)=>r.leadership_class||((r.leader_tt||r.verdict==='
 const isCorrection=(r:LeaderRow)=>String(r.stage).includes('조정 중')
 const stageTone=(s:string)=>s.startsWith('▲')?'green':s.startsWith('●')?'green-soft':s.startsWith('◆')?'blue':s.startsWith('■')?'violet':s.startsWith('◇')?'teal':s.startsWith('↻')?'amber':s.startsWith('⛔')?'red':s.startsWith('❌')?'gray':'gray'
 const leadTone=(s:string)=>s==='1. 주도'?'green':s==='2. 강세 전환'?'amber':s==='약세'?'red':'gray'
+const selectEditor=(values:(string|number|boolean)[])=>({cellEditor:'agSelectCellEditor',cellEditorParams:{values}})
+const rowNo={headerName:'No',width:62,flex:0,editable:false,valueGetter:(p:any)=>(p.node?.rowIndex??0)+1}
 
 function useLocalRows<T>(key:string,initial:T[]){
   const [rows,setRows]=useState<T[]>(()=>{
@@ -112,39 +114,54 @@ const portfolioCols:ColDef<EditableRow>[]=[
   {field:'stop_price',headerName:'Stop'},{field:'thesis',headerName:'투자 가설',minWidth:300}
 ]
 const researchCols:ColDef<EditableRow>[]=[
-  {field:'date',headerName:'작성일',width:112,flex:0},{field:'type',headerName:'구분',width:95,flex:0},{field:'target',headerName:'대상',minWidth:150},
-  {field:'market',headerName:'시장(연결)',editable:false,width:98,flex:0},{field:'ticker',headerName:'Ticker(연결)',editable:false,width:115,flex:0},
-  {field:'industry',headerName:'산업(연결)',editable:false,minWidth:150},{field:'sector',headerName:'섹터(연결)',editable:false,minWidth:135},
-  {field:'title',headerName:'제목',minWidth:210},{field:'fact',headerName:'핵심 사실',minWidth:280},{field:'interpretation',headerName:'내 해석',minWidth:280},
-  {field:'source',headerName:'출처',minWidth:170},{field:'source_type',headerName:'출처 유형',minWidth:115},{field:'verified',headerName:'검증',width:90,flex:0,valueFormatter:p=>p.value===true?'확인됨':p.value===false?'미검증':'—'},
-  {field:'market_impact',headerName:'시장 영향',width:100,flex:0},{field:'related_assets',headerName:'관련 종목·섹터',minWidth:180},
-  {field:'importance',headerName:'중요도',width:90,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=4}},
-  {field:'next_review_date',headerName:'다음 확인일',width:120,flex:0},{field:'status',headerName:'상태',width:110,flex:0},
-  {field:'stage',headerName:'리더보드 단계',editable:false,minWidth:145,cellClassRules:stageRules},{field:'leadership_class',headerName:'주도 분류',editable:false,minWidth:110},
-  {field:'rs_rank',headerName:'RS순위',editable:false,width:90,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}}
+  rowNo,
+  {field:'date',headerName:'작성일',width:112,flex:0},{field:'type',headerName:'구분',width:95,flex:0,...selectEditor(['매크로','산업','섹터','종목'])},{field:'target',headerName:'대상',minWidth:150},
+  {field:'title',headerName:'제목',minWidth:210},{field:'fact',headerName:'핵심 사실 (숫자·팩트)',minWidth:300},{field:'interpretation',headerName:'내 해석',minWidth:300},
+  {field:'source',headerName:'출처',minWidth:170},{field:'source_type',headerName:'출처 유형',minWidth:120,...selectEditor(['공시','정부·통계','기업발표','증권사리포트','뉴스','기타'])},
+  {field:'verification',headerName:'검증',width:95,flex:0,...selectEditor(['확인됨','미검증','반박됨'])},
+  {field:'market_impact',headerName:'시장 영향',width:100,flex:0,...selectEditor(['긍정','중립','부정'])},{field:'related_assets',headerName:'관련 종목·섹터',minWidth:190},
+  {field:'importance',headerName:'중요도(1~5)',width:105,flex:0,...selectEditor([1,2,3,4,5]),cellClassRules:{'rank-high':p=>Number(p.value)>=4}},
+  {field:'next_review_date',headerName:'다음 확인일',width:120,flex:0},{field:'status',headerName:'상태',width:110,flex:0,...selectEditor(['관찰중','매매연결','완료','폐기'])},
+  {field:'journal_no',headerName:'투자일지 No',width:105,flex:0},{field:'elapsed_days',headerName:'경과일(자동)',editable:false,width:100,flex:0},{field:'alert',headerName:'알림(자동)',editable:false,width:100,flex:0},
+  {field:'market',headerName:'시장(자동)',editable:false,width:98,flex:0},{field:'ticker',headerName:'종목코드(자동)',editable:false,width:120,flex:0},
+  {field:'sector',headerName:'섹터(자동)',editable:false,minWidth:135},{field:'industry',headerName:'산업(자동)',editable:false,minWidth:150},
+  {field:'stage',headerName:'모멘텀 단계(자동)',editable:false,minWidth:150,cellClassRules:stageRules},{field:'verdict',headerName:'최종 판단(자동)',editable:false,minWidth:135},
+  {field:'rs_rank',headerName:'RS순위(자동)',editable:false,width:100,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
+  {field:'analysis_no',headerName:'종목분석 No(자동)',editable:false,width:125,flex:0}
 ]
 const analysisCols:ColDef<EditableRow>[]=[
-  {field:'date',headerName:'분석일',width:110,flex:0},{field:'market',headerName:'시장',editable:false,width:78,flex:0},{field:'ticker',headerName:'Ticker',editable:false,pinned:'left',width:98,flex:0},
-  {field:'name',headerName:'종목명',editable:false,minWidth:145},{field:'industry',headerName:'산업',editable:false,minWidth:150},{field:'sector',headerName:'섹터',editable:false,minWidth:130},
-  {field:'stage',headerName:'단계(자동)',editable:false,minWidth:145,cellClassRules:stageRules},{field:'leadership_class',headerName:'주도 분류',editable:false,minWidth:110},
-  {field:'rs_rank',headerName:'RS순위',editable:false,width:90,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
-  {field:'eps_growth_q',headerName:'EPS YoY',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'sales_growth_q',headerName:'매출 YoY',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'eps_growth_3y',headerName:'EPS 3Y',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'roe',headerName:'ROE',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  rowNo,
+  {field:'date',headerName:'분석일',width:110,flex:0},{field:'ticker',headerName:'종목코드',pinned:'left',width:105,flex:0},{field:'name',headerName:'종목명',editable:false,minWidth:145},
+  {field:'market',headerName:'시장',editable:false,width:78,flex:0},{field:'sector',headerName:'섹터(자동)',editable:false,minWidth:130},
+  {field:'lynch_category',headerName:'린치 분류',minWidth:120,...selectEditor(['저성장','대형우량','고성장','경기순환','회생','자산주'])},
+  {field:'eps_growth_q',headerName:'분기 EPS 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'sales_growth_q',headerName:'분기 매출 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'eps_growth_3y',headerName:'연간 EPS 성장률(3년 평균)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'roe',headerName:'ROE',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'operating_margin',headerName:'영업이익률',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'debt_ratio',headerName:'부채비율',valueFormatter:p=>pct(p.value)},
-  {field:'operating_cashflow_positive',headerName:'영업CF +',width:95,flex:0},{field:'pe',headerName:'PER'},{field:'peg',headerName:'PEG'},
-  {field:'moat',headerName:'경쟁우위(해자)',minWidth:220},{field:'growth_driver',headerName:'성장 동력',minWidth:220},{field:'key_risk',headerName:'핵심 리스크',minWidth:220},
-  {field:'auto_grade',headerName:'자동 판정',width:110,flex:0},{field:'conclusion',headerName:'내 결론',minWidth:180}
+  {field:'operating_cashflow_positive',headerName:'영업현금흐름',width:110,flex:0,...selectEditor([true,false]),valueFormatter:p=>p.value===true?'양수':p.value===false?'음수':'—'},
+  {field:'pe',headerName:'PER'},{field:'peg',headerName:'PEG'},{field:'above_ma50',headerName:'50일선 위(자동)',editable:false,width:115,flex:0},{field:'above_ma200',headerName:'200일선 위(자동)',editable:false,width:120,flex:0},
+  {field:'high_52w_distance',headerName:'52주 고점 대비(자동)',editable:false,width:135,flex:0,valueFormatter:p=>pct(p.value)},
+  {field:'moat',headerName:'경쟁우위(해자)',minWidth:230},{field:'growth_driver',headerName:'성장 동력',minWidth:230},{field:'key_risk',headerName:'핵심 리스크',minWidth:230},
+  {field:'pass_count',headerName:'통과 수(자동)',editable:false,width:105,flex:0},{field:'auto_grade',headerName:'자동 판정',editable:false,width:110,flex:0},{field:'conclusion',headerName:'내 결론',minWidth:150},
+  {field:'research_note_no',headerName:'리서치노트 No',width:120,flex:0},{field:'journal_no',headerName:'투자일지 No',width:105,flex:0},
+  {field:'stage',headerName:'리더보드 단계(자동)',editable:false,minWidth:150,cellClassRules:stageRules},{field:'industry',headerName:'산업(자동)',editable:false,minWidth:150},
+  {field:'verdict',headerName:'최종 판단(자동)',editable:false,minWidth:135},{field:'rs_rank',headerName:'RS순위(자동)',editable:false,width:100,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
+  {field:'price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)}
 ]
 const journalCols:ColDef<EditableRow>[]=[
-  {field:'date',headerName:'날짜',width:110,flex:0},{field:'account',headerName:'계좌',width:95,flex:0},{field:'market',headerName:'시장(연결)',editable:false,width:98,flex:0},
-  {field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',editable:false,minWidth:140},{field:'industry',headerName:'산업(연결)',editable:false,minWidth:150},{field:'sector',headerName:'섹터(연결)',editable:false,minWidth:130},
-  {field:'stage',headerName:'단계(자동)',editable:false,minWidth:145,cellClassRules:stageRules},{field:'leadership_class',headerName:'주도 분류',editable:false,minWidth:110},
-  {field:'rs_rank',headerName:'RS순위',editable:false,width:90,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
-  {field:'tranche',headerName:'분할차수',width:95,flex:0},{field:'buy_price',headerName:'매수가'},{field:'currency',headerName:'통화',width:80,flex:0},
-  {field:'thesis',headerName:'매수 이유(가설)',minWidth:300},{field:'evidence_type',headerName:'근거 유형',minWidth:110},{field:'confidence',headerName:'확신도',width:85,flex:0},
-  {field:'target_price',headerName:'목표가'},{field:'stop_price',headerName:'손절가'},{field:'review_condition',headerName:'재검토 조건',minWidth:240},{field:'review_date',headerName:'재검토일',width:118,flex:0},
-  {field:'status',headerName:'상태',width:110,flex:0},{field:'exit_date',headerName:'결과일',width:110,flex:0},{field:'sell_price',headerName:'매도가'},
-  {field:'realized_return',headerName:'실현수익률',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'review_note',headerName:'결과 복기',minWidth:240},{field:'lesson',headerName:'교훈',minWidth:240}
+  rowNo,
+  {field:'date',headerName:'날짜',width:110,flex:0},{field:'account',headerName:'계좌',width:95,flex:0,...selectEditor(['해외','키움','DC','ISA','연금'])},
+  {field:'ticker',headerName:'종목코드',pinned:'left',width:105,flex:0},{field:'name',headerName:'종목명',editable:false,minWidth:140},{field:'tranche',headerName:'분할차수',width:95,flex:0,...selectEditor(['1차','2차','3차'])},
+  {field:'buy_price',headerName:'매수가'},{field:'currency',headerName:'통화',width:80,flex:0,...selectEditor(['KRW','USD'])},{field:'thesis',headerName:'매수 이유(가설)',minWidth:300},
+  {field:'evidence_type',headerName:'근거 유형',minWidth:110,...selectEditor(['펀더멘털','기술적','이벤트','매크로'])},{field:'confidence',headerName:'확신도(1~5)',width:100,flex:0,...selectEditor([1,2,3,4,5])},
+  {field:'target_price',headerName:'목표가'},{field:'target_return',headerName:'목표수익률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'stop_price',headerName:'손절가'},{field:'stop_return',headerName:'손절률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'review_condition',headerName:'재검토 조건',minWidth:250},{field:'review_date',headerName:'재검토일',width:118,flex:0},{field:'status',headerName:'상태',width:110,flex:0,...selectEditor(['보유중','재검토중','목표달성','손절','청산'])},
+  {field:'exit_date',headerName:'결과일',width:110,flex:0},{field:'sell_price',headerName:'매도가'},{field:'realized_return',headerName:'실현수익률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'thesis_hit',headerName:'가설 적중',width:105,flex:0,...selectEditor(['적중','부분적중','빗나감'])},{field:'review_note',headerName:'결과 복기',minWidth:250},{field:'lesson',headerName:'교훈',minWidth:250},
+  {field:'stage',headerName:'리더보드 단계(자동)',editable:false,minWidth:150,cellClassRules:stageRules},{field:'market',headerName:'시장(자동)',editable:false,width:98,flex:0},
+  {field:'sector',headerName:'섹터(자동)',editable:false,minWidth:135},{field:'industry',headerName:'산업(자동)',editable:false,minWidth:150},{field:'verdict',headerName:'최종 판단(자동)',editable:false,minWidth:135},
+  {field:'rs_rank',headerName:'RS순위(자동)',editable:false,width:100,flex:0,cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
+  {field:'analysis_no',headerName:'종목분석 No(자동)',editable:false,width:125,flex:0},{field:'research_no',headerName:'리서치노트 No(자동)',editable:false,width:135,flex:0}
 ]
 
 function Kpi({label,value,sub}:{label:string;value:string|number;sub?:string}){
@@ -164,6 +181,8 @@ export default function App(){
   const [industryMode,setIndustryMode]=useState<'HOT'|'ALL'>('ALL')
   const [stockTab,setStockTab]=useState<'leaders'|'turns'|'corrections'>('leaders')
   const [selected,setSelected]=useState<LeaderRow|null>(null)
+  const [drillIndustryKey,setDrillIndustryKey]=useState<string|null>(null)
+  const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [watch,setWatch]=useLocalRows<EditableRow>('peppercorn-watchlist',initialWatchlist)
   const [portfolio,setPortfolio]=useLocalRows<EditableRow>('peppercorn-portfolio',initialPortfolio)
   const [research,setResearch]=useLocalRows<EditableRow>('peppercorn-research',initialResearch)
@@ -176,7 +195,13 @@ export default function App(){
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
 
   useEffect(()=>{loadLeaderboard().then(r=>{setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)})},[])
-  useEffect(()=>{setSector(null);setIndustryKey(null)},[market])
+  useEffect(()=>{setSector(null);setIndustryKey(null);setDrillIndustryKey(null);setDrillStock(null)},[market])
+  useEffect(()=>{
+    if(!drillIndustryKey&&!drillStock)return
+    const previous=document.body.style.overflow
+    document.body.style.overflow='hidden'
+    return()=>{document.body.style.overflow=previous}
+  },[drillIndustryKey,drillStock])
 
   useEffect(()=>{
     if(!session) return
@@ -222,7 +247,9 @@ export default function App(){
   const industryRows=useMemo(()=>buildIndustries(marketRows.filter(r=>!sector||r.sector===sector)),[marketRows,sector])
   const shownIndustries=industryMode==='ALL'?industryRows:industryRows.filter(g=>g.verdict==='1. 주도'||g.verdict==='2. 강세 전환')
   const chosenIndustry=industryRows.find(g=>g.key===industryKey)||null
-  const scopedStocks=visible.filter(r=>(!sector||r.sector===sector)&&(!chosenIndustry||`${r.market}|${r.sector||'분류 확인'}|${r.industry||'분류 확인'}`===chosenIndustry.key))
+  const drillIndustry=buildIndustries(marketRows).find(g=>g.key===drillIndustryKey)||null
+  const drillIndustryStocks=visible.filter(r=>!drillIndustry||(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'))===drillIndustry.key).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
+  const scopedStocks=visible.filter(r=>(!sector||r.sector===sector)&&(!chosenIndustry||(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'))===chosenIndustry.key))
   const tabStocks=scopedStocks.filter(r=>stockTab==='leaders'?leadership(r)==='1. 주도':stockTab==='turns'?leadership(r)==='2. 강세 전환':isCorrection(r)).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
 
   const leaderMap=useMemo(()=>{
@@ -238,11 +265,30 @@ export default function App(){
   }
   const enrich=(rows:EditableRow[])=>rows.map(r=>{
     const l=matchLeader(r);if(!l)return r
-    return {...r,market:l.market,ticker:l.ticker,name:l.name,sector:l.sector,industry:l.industry,stage:l.stage,leadership_class:leadership(l),rs_rank:l.rs_rank,current_price:l.price}
+    return {...r,market:l.market,ticker:l.ticker,name:l.name,sector:l.sector,industry:l.industry,stage:l.stage,leadership_class:leadership(l),verdict:l.verdict,rs_rank:l.rs_rank,current_price:l.price,price:l.price,ma50:l.ma50,ma200:l.ma200,high_52w_distance:l.high_52w_distance}
   })
-  const enrichedResearch=enrich(research)
-  const enrichedAnalysis=enrich(analysis)
-  const enrichedJournal=enrich(journal)
+  const baseResearch=enrich(research)
+  const baseAnalysis=enrich(analysis)
+  const analysisNoByTicker=new Map(baseAnalysis.filter(r=>r.ticker).map((r,i)=>[String(r.ticker),i+1]))
+  const researchNoByTicker=new Map(baseResearch.filter(r=>r.ticker).map((r,i)=>[String(r.ticker),i+1]))
+  const today=new Date();today.setHours(0,0,0,0)
+  const enrichedResearch=baseResearch.map((r,i)=>{
+    const d=r.date?new Date(String(r.date)):null
+    const elapsed=d&&!Number.isNaN(d.getTime())?Math.floor((today.getTime()-d.getTime())/86400000):null
+    const review=r.next_review_date?new Date(String(r.next_review_date)):null
+    const alert=review&&!Number.isNaN(review.getTime())&&review<today&&!['완료','폐기'].includes(String(r.status||''))?'⚠ 확인':''
+    return {...r,no:i+1,verification:r.verification||(r.verified===true?'확인됨':r.verified===false?'반박됨':'미검증'),elapsed_days:elapsed==null?'':elapsed+'일',alert,analysis_no:analysisNoByTicker.get(String(r.ticker||''))||''}
+  })
+  const enrichedAnalysis=baseAnalysis.map((r,i)=>{
+    const yes50=Number(r.price)>Number(r.ma50),yes200=Number(r.price)>Number(r.ma200)
+    const score=(Number(r.eps_growth_q)>=.25?1:0)+(Number(r.sales_growth_q)>=.20?1:0)+(Number(r.eps_growth_3y)>=.25?1:0)+(Number(r.roe)>=.17?1:0)+(Number(r.operating_margin)>=.10?1:0)+(Number(r.debt_ratio)<=1&&r.debt_ratio!==null&&r.debt_ratio!==''?1:0)+(r.operating_cashflow_positive===true?1:0)+(Number(r.peg)<=1&&r.peg!==null&&r.peg!==''?1:0)+(yes50&&yes200?1:0)+(Number(r.high_52w_distance)>=-.25?1:0)
+    return {...r,no:i+1,above_ma50:r.ticker?(yes50?'Y':'N'):'',above_ma200:r.ticker?(yes200?'Y':'N'):'',pass_count:r.ticker?score+'/10':'',auto_grade:r.ticker?(score>=8?'매수후보':score>=5?'관찰':'제외'):'',research_note_no:r.research_note_no||researchNoByTicker.get(String(r.ticker||''))||''}
+  })
+  const enrichedJournal=enrich(journal).map((r,i)=>{
+    const buy=Number(r.buy_price),target=Number(r.target_price),stop=Number(r.stop_price),sell=Number(r.sell_price)
+    const validBuy=Number.isFinite(buy)&&buy!==0
+    return {...r,no:i+1,target_return:validBuy&&Number.isFinite(target)&&target!==0?target/buy-1:null,stop_return:validBuy&&Number.isFinite(stop)&&stop!==0?stop/buy-1:null,realized_return:validBuy&&Number.isFinite(sell)&&sell!==0?sell/buy-1:r.realized_return,analysis_no:analysisNoByTicker.get(String(r.ticker||''))||'',research_no:researchNoByTicker.get(String(r.ticker||''))||''}
+  })
 
   const filters=<div className="toolbar">
     <div className="segment">{(['ALL','KR','US'] as const).map(m=><button key={m} className={market===m?'on':''} onClick={()=>setMarket(m)}>{m==='ALL'?'전체':m}</button>)}</div>
@@ -272,7 +318,7 @@ export default function App(){
         <div className="panel industry-panel">
           <div className="panel-head"><div><h2>산업 요약</h2><p>Industry 우선 · RS순위와 주도 비율로 강한 그룹을 빠르게 확인</p></div><div className="mini-segment"><button className={industryMode==='HOT'?'on':''} onClick={()=>setIndustryMode('HOT')}>주도·전환</button><button className={industryMode==='ALL'?'on':''} onClick={()=>setIndustryMode('ALL')}>전체</button></div></div>
           <div className="industry-table-wrap"><table className="industry-table"><thead><tr><th>산업 · 섹터</th><th>판정</th><th>종목</th><th>주도 비율</th><th>MA50 위</th><th>RS순위</th><th>RS 1W</th></tr></thead><tbody>
-            {shownIndustries.map(g=><tr key={g.key} className={industryKey===g.key?'selected':''} onClick={()=>setIndustryKey(industryKey===g.key?null:g.key)}>
+            {shownIndustries.map(g=><tr key={g.key} className={industryKey===g.key?'selected':''} onClick={()=>{setIndustryKey(g.key);setDrillIndustryKey(g.key);setDrillStock(null)}}>
               <td><b>{g.industry}</b><small>{g.market} · {g.sector}</small></td><td><ValuePill tone={leadTone(g.verdict)}>{g.verdict}</ValuePill></td><td>{g.n}</td><td>{(g.leadShare*100).toFixed(0)}%</td><td>{(g.breadth*100).toFixed(0)}%</td><td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td><td className={(g.medRs1w??0)>0?'pos':(g.medRs1w??0)<0?'neg':''}>{pct(g.medRs1w)}</td>
             </tr>)}
             {!shownIndustries.length&&<tr><td colSpan={7} className="empty">조건에 맞는 산업이 없습니다.</td></tr>}
@@ -281,7 +327,7 @@ export default function App(){
         <div className="panel stock-panel">
           <div className="panel-head"><div><h2>{chosenIndustry?chosenIndustry.industry:'주도 종목'}</h2><p>{chosenIndustry?`${chosenIndustry.sector} · 대표 ${chosenIndustry.top.join(', ')}`:'산업을 선택하면 해당 종목만 표시합니다.'}</p></div>{chosenIndustry&&<button className="text-button" onClick={()=>setIndustryKey(null)}>선택 해제</button>}</div>
           <div className="tabs"><button className={stockTab==='leaders'?'on':''} onClick={()=>setStockTab('leaders')}>1. 주도주</button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>2. 강세 전환</button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>◇ 조정 중</button></div>
-          <div className="stock-rows">{tabStocks.slice(0,24).map(r=><button key={r.id} className="stock-row" onClick={()=>{setSelected(r);setPage('analysis')}}>
+          <div className="stock-rows">{tabStocks.slice(0,24).map(r=><button key={r.id} className="stock-row" onClick={()=>{setSelected(r);setDrillIndustryKey(r.market+'|'+(r.sector||'분류 확인')+'|'+(r.industry||'분류 확인'));setDrillStock(r)}}>
             <div className="stock-id"><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><span className={(r.rs_1w??0)>0?'pos':(r.rs_1w??0)<0?'neg':''}>{pct(r.rs_1w)}</span><span className={(r.return_1w??0)>0?'pos':(r.return_1w??0)<0?'neg':''}>{pct(r.return_1w)}</span>
           </button>)}{!tabStocks.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
         </div>
@@ -315,5 +361,30 @@ export default function App(){
   }
 
   const pageTitle:Record<string,string>={dashboard:'Investment Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'Stock Analysis',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
-  return <div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Industry → Stock · Sector as context · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main></div>
+  const drillOpen=!!drillIndustryKey||!!drillStock
+  const closeDrill=()=>{setDrillStock(null);setDrillIndustryKey(null)}
+  const drillOverlay=drillOpen?<div className="drill-layer" role="dialog" aria-modal="true">
+    <button className="drill-backdrop" aria-label="닫기" onClick={closeDrill}/>
+    <aside className="drill-sheet">
+      <div className="drill-handle"/>
+      <div className="drill-head">
+        <div>{drillStock&&<button className="drill-back" onClick={()=>setDrillStock(null)}>← 산업</button>}<small>{drillStock?drillStock.sector:(drillIndustry?.sector||'Industry')}</small><h2>{drillStock?drillStock.name:(drillIndustry?.industry||'산업 상세')}</h2></div>
+        <button className="drill-close" onClick={closeDrill}>×</button>
+      </div>
+      {drillStock?<div className="drill-stock-detail">
+        <div className="drill-meta"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{drillStock.stage}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
+        <div className="metric-grid drill-metrics"><Kpi label="현재가" value={num(drillStock.price)}/><Kpi label="RS순위" value={drillStock.rs_rank??'—'}/><Kpi label="RS 1W" value={pct(drillStock.rs_1w)}/><Kpi label="RS 1M" value={pct(drillStock.rs_1m)}/><Kpi label="52W High" value={pct(drillStock.high_52w_distance)}/><Kpi label="거래량" value={(drillStock.volume_ratio??0).toFixed(2)+'x'}/></div>
+        <div className="drill-guide"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
+        <div className="drill-checks"><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b><span>산업 · 섹터</span><b>{drillStock.industry} · {drillStock.sector}</b></div>
+        <button className="primary-action" onClick={()=>{const r=drillStock;setSelected(r);const next=[{id:'new-'+Date.now(),date:new Date().toISOString().slice(0,10),market:r.market,ticker:r.ticker,name:r.name,sector:r.sector,industry:r.industry,stage:r.stage,leadership_class:leadership(r),rs_rank:r.rs_rank,lynch_category:'',eps_growth_q:null,sales_growth_q:null,eps_growth_3y:null,roe:null,operating_margin:null,debt_ratio:null,operating_cashflow_positive:null,pe:null,peg:null,moat:'',growth_driver:'',key_risk:'',auto_grade:'',conclusion:'',research_note_no:'',journal_no:''},...analysis];updateAnalysis(next)}}>종목분석 기록에 추가</button>
+      </div>:<div className="drill-industry-detail">
+        <div className="drill-summary"><Kpi label="종목 수" value={drillIndustry?.n??0}/><Kpi label="주도 비율" value={drillIndustry?pct(drillIndustry.leadShare):'—'}/><Kpi label="MA50 위" value={drillIndustry?pct(drillIndustry.breadth):'—'}/><Kpi label="RS순위 중앙값" value={drillIndustry?.medRank==null?'—':Math.round(drillIndustry.medRank)}/></div>
+        <p className="drill-note">종목을 누르면 페이지 이동 없이 같은 패널에서 상세 지표를 확인합니다.</p>
+        <div className="drill-stock-list">{drillIndustryStocks.map(r=><button key={r.id} onClick={()=>{setSelected(r);setDrillStock(r)}}>
+          <span><b>{r.name}</b><small>{r.market} · {r.ticker}</small></span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><em className={(r.rs_1w??0)>0?'pos':(r.rs_1w??0)<0?'neg':''}>{pct(r.rs_1w)}</em>
+        </button>)}</div>
+      </div>}
+    </aside>
+  </div>:null
+  return <div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Industry → Stock · Sector as context · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}</div>
 }
