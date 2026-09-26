@@ -259,12 +259,12 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        m.ma50,m.ma200,m.leader_tt,
        case
          when m.leader_tt
-          and coalesce(m.rs_rank,0)>=90
+          and coalesce(m.rs_rank,0)>=95
           and coalesce(m.high_52w_distance,-1)>=-0.15
           and coalesce(m.rs_3m,-1)>0
           and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
          when (m.leader_tt
-          and coalesce(m.rs_rank,0)>=80
+          and coalesce(m.rs_rank,0)>=85
           and coalesce(m.high_52w_distance,-1)>=-0.20
           and coalesce(m.rs_3m,-1)>0)
           or (m.stage='◇ 조정 중 주도주' and coalesce(m.rs_rank,0)>=80)
