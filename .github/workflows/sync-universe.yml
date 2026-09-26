@@ -58,7 +58,8 @@ jobs:
           }
           for OFFSET in $(seq 0 120 1920); do
             TOKEN=$(get_token); echo "::add-mask::$TOKEN"
-            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "{"offset":$OFFSET,"limit":120}")
+            PAYLOAD=$(printf '{"offset":%s,"limit":120}' "$OFFSET")
+            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "$PAYLOAD")
             echo "$RESP"
             REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
             [ "$REQUESTED" -eq 0 ] && break
