@@ -16,10 +16,10 @@ TARGET_EQUITIES=int(os.environ.get("PEPPERCORN_TARGET_EQUITIES","1500"))
 
 NASDAQ_SCREENER="https://api.nasdaq.com/api/screener/stocks"
 SOURCES={
-    "S&P500":"FinanceDataReader S&P500 adapter; validation: S&P Dow Jones Indices",
-    "NASDAQ_CORE":"Nasdaq Stock Screener",
-    "KOSPI200":"KRX index constituents via FinanceDataReader",
-    "KOSDAQ150":"KRX index constituents via FinanceDataReader",
+    "S&P500":"FinanceDataReader S&P500 listing; official reference: S&P Dow Jones Indices",
+    "NASDAQ_CORE":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
+    "KOSPI200":"KRX index constituent snapshot via FinanceDataReader",
+    "KOSDAQ150":"KRX index constituent snapshot via FinanceDataReader",
 }
 
 def request(method,path,**kwargs):
@@ -144,8 +144,8 @@ def main():
             "asset_class":"Equity","exchange":"US",
             "sector":pick(r,"Sector"),"industry":pick(r,"Industry"),
             "benchmark_ticker":"SPY","currency":"USD","active":True,
-            "classification_scheme":"GICS-compatible S&P500 adapter",
-            "classification_source":"AUTO:FinanceDataReader S&P500; validated against S&P DJI",
+            "classification_scheme":"GICS-compatible S&P500 listing",
+            "classification_source":"AUTO:FinanceDataReader S&P500 listing; official reference: S&P DJI",
             "classification_as_of":TODAY,"universe_updated_at":NOW,
         }
         add_instrument(item,3)
@@ -175,8 +175,8 @@ def main():
                 "asset_class":"Equity","exchange":exchange,
                 "sector":sector,"industry":industry,
                 "benchmark_ticker":"069500","currency":"KRW","active":True,
-                "classification_scheme":"KRX market listing classification",
-                "classification_source":"AUTO:KRX market data via FinanceDataReader",
+                "classification_scheme":"KRX listing 업종 / 주요제품",
+                "classification_source":"AUTO:FinanceDataReader KRX listing adapter",
                 "classification_as_of":TODAY,"universe_updated_at":NOW,
             }
             add_instrument(item,2)
@@ -242,8 +242,8 @@ def main():
         "upserted_instruments":len(items),
         "memberships":counts,
         "classification_sources":{
-            "US":"S&P500 adapter for S&P members; Nasdaq official screener SIC mapping for Nasdaq coverage",
-            "KR":"KRX market listing via FinanceDataReader; no KRX GICS redistribution",
+            "US":"S&P500: GICS-compatible adapter with official S&P DJI reference; NASDAQ_CORE: Nasdaq screener sector/industry from Quotemedia SIC mapping",
+            "KR":"KOSPI200/KOSDAQ150: KRX constituent snapshots; classification is KRX listing 업종/주요제품 (not normalized GICS)",
         },
     })
 
