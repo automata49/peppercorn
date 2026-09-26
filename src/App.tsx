@@ -11,14 +11,14 @@ import { loadLeaderboard } from './lib/rest'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
-const pct=(v:number|null|undefined)=>v==null?'—':(v>=0?'+':'')+(v*100).toFixed(1)+'%'
-const num=(v:number|null|undefined)=>v==null?'—':v.toLocaleString('ko-KR')
+const pct=(v:unknown)=>{const n=Number(v);return v==null||!Number.isFinite(n)?'—':(n>=0?'+':'')+(n*100).toFixed(1)+'%'}
+const num=(v:unknown)=>{const n=Number(v);return v==null||!Number.isFinite(n)?'—':n.toLocaleString('ko-KR')}
 const gapPct=(price:number|null|undefined,base:number|null|undefined)=>price==null||base==null||Number(base)===0?'—':pct(Number(price)/Number(base)-1)
 const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wpP9pB5vrni5SrjAMrbbiE/edit'
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
-const med=(values:(number|null|undefined)[])=>{
-  const a=values.filter((v):v is number=>typeof v==='number'&&Number.isFinite(v)).sort((x,y)=>x-y)
+const med=(values:unknown[])=>{
+  const a=values.map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
   if(!a.length) return null
   const m=Math.floor(a.length/2)
   return a.length%2?a[m]:(a[m-1]+a[m])/2
@@ -31,8 +31,8 @@ const leadership=(r:LeaderRow)=>{
   if(String(r.stage).startsWith('❌'))return '약세'
   return '중립'
 }
-const isCorrection=(r:LeaderRow)=>String(r.stage).includes('조정 중')
-const stageTone=(s:string)=>s.startsWith('▲')?'green':s.startsWith('●')?'green-soft':s.startsWith('◆')?'blue':s.startsWith('■')?'violet':s.startsWith('◇')?'teal':s.startsWith('↻')?'amber':s.startsWith('⛔')?'red':s.startsWith('❌')?'gray':'gray'
+const isCorrection=(r:LeaderRow)=>String(r.stage||'').includes('조정 중')
+const stageTone=(value:unknown)=>{const s=String(value||'');return s.startsWith('▲')?'green':s.startsWith('●')?'green-soft':s.startsWith('◆')?'blue':s.startsWith('■')?'violet':s.startsWith('◇')?'teal':s.startsWith('↻')?'amber':s.startsWith('⛔')?'red':s.startsWith('❌')?'gray':'gray'}
 const leadTone=(s:string)=>['핵심 주도','강한 산업'].includes(s)?'green':s==='주도 후보'?'blue':['강세 전환','개선 산업'].includes(s)?'amber':s==='약세'?'red':'gray'
 const selectEditor=(values:(string|number|boolean)[])=>({cellEditor:'agSelectCellEditor',cellEditorParams:{values}})
 const rowNo={headerName:'No',width:62,flex:0,editable:false,valueGetter:(p:any)=>(p.node?.rowIndex??0)+1}
@@ -55,7 +55,7 @@ function buildIndustries(rows:LeaderRow[]):IndustrySummary[]{
   const groups=new Map<string,LeaderRow[]>()
   for(const r of rows){
     if(r.asset_class!=='Equity')continue
-    const industry=(r.industry||'분류 확인').trim()||'분류 확인'
+    const industry=String(r.industry||'분류 확인').trim()||'분류 확인'
     const key=`${r.market}|${r.sector||'분류 확인'}|${industry}`
     const list=groups.get(key)||[];list.push(r);groups.set(key,list)
   }
@@ -330,7 +330,7 @@ export default function App(){
   const marketRows=useMemo(()=>leaders.filter(r=>market==='ALL'||r.market===market),[leaders,market])
   const visible=useMemo(()=>{
     const q=query.trim().toLowerCase()
-    return marketRows.filter(r=>!q||(r.ticker+' '+r.name+' '+r.sector+' '+r.industry).toLowerCase().includes(q))
+    return marketRows.filter(r=>!q||[r.ticker,r.name,r.sector,r.industry].map(v=>String(v||'')).join(' ').toLowerCase().includes(q))
   },[marketRows,query])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
   const leadCount=stockRows.filter(r=>leadership(r)==='핵심 주도').length
@@ -349,7 +349,7 @@ export default function App(){
 
   const leaderMap=useMemo(()=>{
     const m=new Map<string,LeaderRow>()
-    for(const r of leaders){m.set(`${r.market}|${r.ticker}`,r);if(!m.has(r.ticker))m.set(r.ticker,r);m.set(r.name.toLowerCase(),r)}
+    for(const r of leaders){const ticker=String(r.ticker||'');const name=String(r.name||'');m.set(`${r.market}|${ticker}`,r);if(ticker&&!m.has(ticker))m.set(ticker,r);if(name)m.set(name.toLowerCase(),r)}
     return m
   },[leaders])
   const matchLeader=(row:EditableRow)=>{
