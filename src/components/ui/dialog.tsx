@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactNode } from 'react'
+import { forwardRef, type ComponentProps, type ComponentRef, type ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 
 export function Dialog(props:ComponentProps<typeof DialogPrimitive.Root>){
@@ -9,13 +9,13 @@ export function DialogPortal({children}:{children:ReactNode}){
   return <DialogPrimitive.Portal>{children}</DialogPrimitive.Portal>
 }
 
-export function DialogOverlay({className='',...props}:ComponentProps<typeof DialogPrimitive.Overlay>){
-  return <DialogPrimitive.Overlay className={'ui-dialog-overlay '+className} {...props}/>
-}
+export const DialogOverlay=forwardRef<ComponentRef<typeof DialogPrimitive.Overlay>,ComponentProps<typeof DialogPrimitive.Overlay>>(
+  ({className='',...props},ref)=><DialogPrimitive.Overlay ref={ref} className={'ui-dialog-overlay '+className} {...props}/>
+)
 
-export function DialogContent({className='',children,...props}:ComponentProps<typeof DialogPrimitive.Content>){
-  return <DialogPortal><DialogOverlay/><DialogPrimitive.Content className={'ui-dialog-content '+className} {...props}>{children}</DialogPrimitive.Content></DialogPortal>
-}
+export const DialogContent=forwardRef<ComponentRef<typeof DialogPrimitive.Content>,ComponentProps<typeof DialogPrimitive.Content>>(
+  ({className='',children,...props},ref)=><DialogPortal><DialogOverlay/><DialogPrimitive.Content ref={ref} className={'ui-dialog-content '+className} {...props}>{children}</DialogPrimitive.Content></DialogPortal>
+)
 
 export function DialogTitle({className='',...props}:ComponentProps<typeof DialogPrimitive.Title>){
   return <DialogPrimitive.Title className={'ui-dialog-title '+className} {...props}/>
