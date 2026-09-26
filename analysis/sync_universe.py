@@ -153,7 +153,7 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     # to known KRX equities to avoid dates, fund codes, or navigation IDs.
     found=[]
     seen=set()
-    for code in re.findall(r'(?<!\\d)(\\d{6})(?!\\d)',html):
+    for code in re.findall(r'(?<!\d)(\d{6})(?!\d)',html):
         if code in krx_codes and code not in seen:
             seen.add(code);found.append(code)
     lower=max(expected-8,1);upper=expected+8
