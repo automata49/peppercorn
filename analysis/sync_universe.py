@@ -164,7 +164,7 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     # Some responses serialize the holdings table instead of rendering <table>.
     # Capture all standalone 6-digit codes, then restrict to known equities in the
     # correct KRX market so dates, ETF codes, and other numeric IDs are discarded.
-    candidates.extend(re.findall(r'(?<!\\d)(\\d{6})(?!\\d)',html))
+    candidates.extend(re.findall(r'(?<!\d)(\d{6})(?!\d)',html))
     found=[];seen=set()
     for raw in candidates:
         code=norm_kr(raw)
