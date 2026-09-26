@@ -59,6 +59,33 @@ def fetch_nasdaq():
     if len(rows)<500:raise RuntimeError(f"Nasdaq screener returned only {len(rows)} equities")
     return rows
 
+def fetch_tradingview_us_classifications(tickers):
+    # Nasdaq Screener leaves classifications blank for a meaningful minority of
+    # securities. TradingView is used only for those blanks, keeping one coherent
+    # sector/industry taxonomy per affected stock.
+    url="https://scanner.tradingview.com/america/scan"
+    out={}
+    clean=list(dict.fromkeys(norm_us(x) for x in tickers if norm_us(x)))
+    for i in range(0,len(clean),250):
+        batch=clean[i:i+250]
+        body={
+            "filter":[{"left":"name","operation":"in_range","right":batch}],
+            "columns":["name","description","exchange","sector","industry"],
+            "range":[0,len(batch)+20],
+        }
+        r=requests.post(url,json=body,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0","Content-Type":"application/json"},timeout=45)
+        r.raise_for_status()
+        rows=(r.json() or {}).get("data") or []
+        for row in rows:
+            d=row.get("d") or []
+            ticker=norm_us(d[0] if len(d)>0 else "")
+            sector=str(d[3] if len(d)>3 and d[3] is not None else "").strip()
+            industry=str(d[4] if len(d)>4 and d[4] is not None else "").strip()
+            if ticker and sector and industry:
+                out[ticker]={"sector":sector,"industry":industry}
+    return out
+
+
 def fetch_sp500():
     df=fdr.StockListing("S&P500")
     if len(df)<480:raise RuntimeError(f"S&P500 listing returned only {len(df)} rows")
@@ -268,6 +295,12 @@ def records(df): return df.where(pd.notna(df),None).to_dict("records")
 
 def main():
     sp500=fetch_sp500();nasdaq=fetch_nasdaq();krx=fetch_krx_listing()
+    missing_nasdaq=[
+        norm_us(r.get("symbol")) for r in nasdaq[:1800]
+        if not str(r.get("sector") or "").strip() or not str(r.get("industry") or "").strip()
+    ]
+    tv_us=fetch_tradingview_us_classifications(missing_nasdaq) if missing_nasdaq else {}
+    print({"nasdaq_classification_missing":len(missing_nasdaq),"tradingview_filled":len(tv_us)})
     kospi200=fetch_kr_index_with_fallback(
         "1028",190,
         lambda:fetch_tradingview_index("SYML:KRX;KOSPI200",200,krx,"KOSPI","KOSPI200"),
@@ -329,7 +362,18 @@ def main():
         if len(selected)>=TARGET_EQUITIES:break
         ticker=norm_us(r.get("symbol"));key=("US",ticker)
         if not ticker or key in selected:continue
-        add({"market":"US","ticker":ticker,"name":str(r.get("name") or ticker).strip(),"asset_class":"Equity","exchange":"NASDAQ","sector":str(r.get("sector") or "").strip() or None,"industry":str(r.get("industry") or "").strip() or None,"benchmark_ticker":"SPY","currency":"USD","active":True,"classification_scheme":"Nasdaq SIC mapped sector/industry","classification_source":"AUTO:Nasdaq Stock Screener / Quotemedia SIC mapping","classification_as_of":TODAY,"universe_updated_at":NOW},2)
+        sector=str(r.get("sector") or "").strip()
+        industry=str(r.get("industry") or "").strip()
+        if not sector or not industry:
+            fallback=tv_us.get(ticker) or {}
+            sector=str(fallback.get("sector") or "").strip()
+            industry=str(fallback.get("industry") or "").strip()
+            scheme="TradingView market sector · industry" if sector and industry else "Unclassified"
+            source="AUTO:TradingView America scanner fallback for missing Nasdaq classification" if sector and industry else "AUTO:Nasdaq Stock Screener; classification unavailable"
+        else:
+            scheme="Nasdaq SIC mapped sector/industry"
+            source="AUTO:Nasdaq Stock Screener / Quotemedia SIC mapping"
+        add({"market":"US","ticker":ticker,"name":str(r.get("name") or ticker).strip(),"asset_class":"Equity","exchange":"NASDAQ","sector":sector or None,"industry":industry or None,"benchmark_ticker":"SPY","currency":"USD","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":TODAY,"universe_updated_at":NOW},2)
         selected.add(key)
 
     for rank,r in enumerate([x for x in nasdaq if ("US",norm_us(x.get("symbol"))) in instruments],1):
