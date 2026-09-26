@@ -4,6 +4,7 @@ import re
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
+from io import BytesIO
 import FinanceDataReader as fdr
 import pandas as pd
 import requests
@@ -72,7 +73,7 @@ def fetch_krx_listing():
         try:
             r=requests.get(f"{base}/{d}.csv",headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=30)
             if r.status_code!=200:continue
-            df=pd.read_csv(pd.io.common.BytesIO(r.content),dtype={"Code":str})
+            df=pd.read_csv(BytesIO(r.content),dtype={"Code":str})
             if len(df)>=1500:
                 df["Code"]=df["Code"].astype(str).str.zfill(6)
                 df.attrs["as_of"]=d
