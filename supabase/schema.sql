@@ -263,3 +263,14 @@ join lateral (
 where i.active=true;
 
 grant select on public.leaderboard_view to anon,authenticated;
+
+
+-- Covering indexes for foreign-key joins
+create index if not exists portfolio_positions_instrument_idx on public.portfolio_positions(instrument_id);
+create index if not exists portfolio_positions_user_idx on public.portfolio_positions(user_id);
+create index if not exists research_notes_user_idx on public.research_notes(user_id);
+create index if not exists stock_analyses_instrument_idx on public.stock_analyses(instrument_id);
+create index if not exists stock_analyses_user_idx on public.stock_analyses(user_id);
+create index if not exists trade_journal_instrument_idx on public.trade_journal(instrument_id);
+create index if not exists trade_journal_user_idx on public.trade_journal(user_id);
+create index if not exists watchlist_instrument_idx on public.watchlist(instrument_id);
