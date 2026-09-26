@@ -20,8 +20,14 @@ class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}
         <div>
           <strong>Peppercorn Capital</strong>
           <h1>앱을 표시하지 못했습니다.</h1>
-          <p>새 버전 로딩 중 오류가 발생했습니다. 아래 버튼으로 앱을 다시 불러오세요.</p>
-          <button onClick={()=>window.location.reload()}>다시 불러오기</button>
+          <p>화면 데이터 처리 중 오류가 발생했습니다. 아래 진단 메시지를 남겨 두었고, 캐시를 우회해 다시 불러올 수 있습니다.</p>
+          <code>{this.state.error.message||this.state.error.name}</code>
+          <button onClick={async()=>{
+            try{if('caches' in window){for(const key of await caches.keys())await caches.delete(key)}}catch{}
+            const url=new URL(window.location.href)
+            url.searchParams.set('reload',Date.now().toString())
+            window.location.replace(url.toString())
+          }}>캐시 우회해서 다시 불러오기</button>
         </div>
       </main>
     }
