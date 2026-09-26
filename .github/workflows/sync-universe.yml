@@ -6,15 +6,22 @@ on:
     branches: [main]
     paths:
       - 'analysis/sync_universe.py'
-      - 'analysis/fetch_prices.py'
-      - 'analysis/analyze.py'
+      - 'analysis/validate_universe.py'
       - 'analysis/requirements.txt'
+      - 'supabase/functions/universe-import/**'
+      - 'supabase/functions/refresh-market/**'
+      - 'supabase/functions/recalculate-market/**'
       - '.github/workflows/sync-universe.yml'
   schedule:
     - cron: '35 20 * * 0'
 
 permissions:
   contents: read
+  id-token: write
+
+env:
+  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
+  OIDC_AUDIENCE: peppercorn-supabase
 
 jobs:
   sync:
@@ -26,25 +33,40 @@ jobs:
         with:
           python-version: '3.13'
       - run: pip install -r analysis/requirements.txt
-      - name: Sync index and market universe
+      - name: Build 1500-stock universe payload
         run: python analysis/sync_universe.py
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           PEPPERCORN_TARGET_EQUITIES: '1500'
-      - name: Validate universe and classifications
+          UNIVERSE_OUTPUT: universe_payload.json
+      - name: Validate constituents and classifications
         run: python analysis/validate_universe.py
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-      - name: Bootstrap or refresh prices
-        run: python analysis/fetch_prices.py
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          PEPPERCORN_PRICE_WORKERS: '8'
-      - name: Recalculate leadership metrics
-        run: python analysis/analyze.py
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          UNIVERSE_OUTPUT: universe_payload.json
+      - name: Import universe with GitHub OIDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])')
+          echo "::add-mask::$TOKEN"
+          curl -fsS -X POST "$FUNCTIONS_URL/universe-import"             -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json"             --data-binary @universe_payload.json
+      - name: Bootstrap market metrics in chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          get_token() {
+            curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
+          }
+          for OFFSET in $(seq 0 120 1920); do
+            TOKEN=$(get_token); echo "::add-mask::$TOKEN"
+            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d "{"offset":$OFFSET,"limit":120}")
+            echo "$RESP"
+            REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
+            [ "$REQUESTED" -eq 0 ] && break
+          done
+      - name: Recalculate RS and leadership
+        shell: bash
+        run: |
+          set -euo pipefail
+          TOKEN=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])')
+          echo "::add-mask::$TOKEN"
+          curl -fsS -X POST "$FUNCTIONS_URL/recalculate-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
