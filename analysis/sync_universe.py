@@ -143,7 +143,7 @@ def _collect_six_digit_codes(value,out):
         for v in value:_collect_six_digit_codes(v,out)
     elif isinstance(value,(str,int)):
         text=str(value)
-        if re.fullmatch(r"\\d{6}",text):out.append(text)
+        if re.fullmatch(r"\d{6}",text):out.append(text)
 
 def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     # KG ZeroIn documents machine-readable JSON by appending .json to page URLs.
@@ -174,7 +174,7 @@ def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
                     candidates.extend(norm_kr(v) for v in table[code_col].tolist())
         except Exception:
             pass
-        candidates.extend(re.findall(r'(?<!\\d)(\\d{6})(?!\\d)',html))
+        candidates.extend(re.findall(r'(?<!\d)(\d{6})(?!\d)',html))
 
     found=[];seen=set()
     for raw in candidates:
