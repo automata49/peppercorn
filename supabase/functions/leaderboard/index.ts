@@ -54,18 +54,24 @@ Deno.serve(async (req: Request) => {
     return Response.json({ error: "secret_key_missing" }, { status: 500, headers });
   }
 
-  const endpoint = new URL("/rest/v1/leaderboard_view", supabaseUrl);
-  endpoint.searchParams.set("select", "*");
-  endpoint.searchParams.set("order", "rs_rank.desc.nullslast");
+  const pageSize = 1000;
+  const rows: unknown[] = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const endpoint = new URL("/rest/v1/leaderboard_view", supabaseUrl);
+    endpoint.searchParams.set("select", "*");
+    endpoint.searchParams.set("order", "rs_rank.desc.nullslast,market.asc,ticker.asc");
+    endpoint.searchParams.set("offset", String(offset));
+    endpoint.searchParams.set("limit", String(pageSize));
 
-  const db = await fetch(endpoint, { headers: { apikey: secret } });
-
-  if (!db.ok) {
-    const detail = await db.text();
-    return Response.json({ error: "database_error", detail }, { status: 502, headers });
+    const db = await fetch(endpoint, { headers: { apikey: secret } });
+    if (!db.ok) {
+      const detail = await db.text();
+      return Response.json({ error: "database_error", detail, offset }, { status: 502, headers });
+    }
+    const page = await db.json() as unknown[];
+    rows.push(...page);
+    if (page.length < pageSize) break;
   }
-
-  const rows = await db.json();
   return Response.json(
     { updated_at: new Date().toISOString(), source: "supabase", rows },
     {
