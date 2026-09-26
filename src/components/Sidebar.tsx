@@ -3,7 +3,7 @@ const pages=[
   ['leaderboard','↗','Leaderboard'],
   ['watchlist','◎','Watchlist'],
   ['portfolio','◆','Portfolio'],
-  ['analysis','▦','Stock Analysis'],
+  ['analysis','▦','종목 분석'],
   ['research','⌕','Research'],
   ['journal','✎','Journal'],
   ['universe','⊙','Universe'],
