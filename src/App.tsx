@@ -315,7 +315,12 @@ export default function App(){
   const [session,setSessionState]=useState<Session|null>(()=>loadStoredSession())
   const [authOpen,setAuthOpen]=useState(false)
   const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
-  const drillOpen=!!drillStock
+  const drillOpen=!!drillStock||!!summaryTab||drillSectorKey!==null
+  const compactStockLayout=()=>window.matchMedia('(max-width: 1279px)').matches
+  const showStockGroup=(tab:'core'|'candidates'|'turns')=>{
+    setStockTab(tab);setSector(null);setSectorKeySelected(null)
+    if(compactStockLayout()){setSummaryTab(tab);setDrillSectorKey(null);setDrillStock(null)}
+  }
 
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
 
@@ -324,7 +329,7 @@ export default function App(){
   useEffect(()=>{
     if(!drillOpen||!drillRef.current||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
     const root=drillRef.current
-    const compact=window.matchMedia('(max-width: 1180px)').matches
+    const compact=compactStockLayout()
     const tween=gsap.fromTo(root,compact?{y:44,opacity:0}:{x:44,opacity:0},{x:0,y:0,opacity:1,duration:.4,ease:'power3.out'})
     return()=>{tween.kill()}
   },[drillOpen])
@@ -505,9 +510,9 @@ export default function App(){
   if(page==='dashboard'){
     content=<>{filters}
       <section className="kpis">
-        <Kpi label="핵심 주도" value={leadCount} sub="RS≥95 · 3M/6M 상대강도 양호" onClick={()=>{setStockTab('core');setSector(null);setSectorKeySelected(null)}}/>
-        <Kpi label="주도 후보" value={candidateCount} sub="Trend Template 통과 중 상위 후보" onClick={()=>{setStockTab('candidates');setSector(null);setSectorKeySelected(null)}}/>
-        <Kpi label="강세 전환" value={turnCount} sub="Next Leader" onClick={()=>{setStockTab('turns');setSector(null);setSectorKeySelected(null)}}/>
+        <Kpi label="핵심 주도" value={leadCount} sub="RS≥95 · 3M/6M 상대강도 양호" onClick={()=>showStockGroup('core')}/>
+        <Kpi label="주도 후보" value={candidateCount} sub="Trend Template 통과 중 상위 후보" onClick={()=>showStockGroup('candidates')}/>
+        <Kpi label="강세 전환" value={turnCount} sub="Next Leader" onClick={()=>showStockGroup('turns')}/>
         <Kpi label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+stockRows.length+' 종목'}/>
       </section>
       <section className="sector-strip panel compact-panel">
@@ -516,9 +521,9 @@ export default function App(){
       </section>
       <section className="industry-layout">
         <div className="panel industry-panel">
-          <div className="panel-head"><div><h2>섹터 요약</h2><p>섹터별 RS · 등락률 중앙값</p></div><div className="mini-segment"><button className={sectorMode==='HOT'?'on':''} onClick={()=>{setSectorMode('HOT');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>강한·개선</button><button className={sectorMode==='ALL'?'on':''} onClick={()=>{setSectorMode('ALL');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체</button></div></div>
+          <div className="panel-head"><div><h2>섹터 요약</h2><p>섹터별 RS · 등락률 중앙값</p></div><div className="sector-actions"><button className="text-button compact-stock-trigger" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 주도 종목 보기</button><div className="mini-segment"><button className={sectorMode==='HOT'?'on':''} onClick={()=>{setSectorMode('HOT');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>강한·개선</button><button className={sectorMode==='ALL'?'on':''} onClick={()=>{setSectorMode('ALL');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체</button></div></div></div>
           <div className="industry-table-wrap"><table className="industry-table compact-industry-table"><thead><tr><th>섹터</th><th>판정</th><th>RS</th><th>RS 1W</th><th>RS 1M</th><th>RS 3M</th><th>등락 1W</th><th>등락 1M</th><th>등락 3M</th></tr></thead><tbody>
-            {shownSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} onClick={()=>{setSectorKeySelected(g.key);setDrillStock(null)}}>
+            {shownSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setDrillStock(null);if(compactStockLayout()){setSummaryTab(null);setDrillSectorKey(g.key)}}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.n}종목</small></td><td><ValuePill tone={leadTone(g.verdict)}>{g.verdict}</ValuePill>{g.smallSample&&<small className="sample-note">n={g.n}</small>}</td><td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
               {([g.medRs1w,g.medRs1m,g.medRs3m,g.medRet1w,g.medRet1m,g.medRet3m] as const).map((value,i)=><td key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</td>)}
             </tr>)}
@@ -564,7 +569,7 @@ export default function App(){
     <DialogContent ref={drillRef} className="drill-sheet">
       <div className="drill-handle"/>
       <div className="drill-head">
-        <div><small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'Sector')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'섹터 상세')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
+        <div><small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
@@ -577,7 +582,7 @@ export default function App(){
         <p className="drill-note">{market==='ALL'?'전체 시장':market} · {summaryGroups[summaryTab].length}종목 · RS순위 높은 순</p>
         <StockRows rows={summaryGroups[summaryTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>:<div className="drill-industry-detail drill-content">
-        <div className="drill-summary"><Kpi label="판정" value={drillSector?.verdict??'—'}/><Kpi label="종목 수" value={drillSector?.n??0}/><Kpi label="핵심 주도 비율" value={drillSector?pct(drillSector.coreShare):'—'}/><Kpi label="MA50 위" value={drillSector?pct(drillSector.breadth):'—'}/><Kpi label="RS순위 중앙값" value={drillSector?.medRank==null?'—':Math.round(drillSector.medRank)}/><Kpi label="RS 3M" value={drillSector?pct(drillSector.medRs3m):'—'}/></div>
+        {drillSector&&<div className="drill-summary"><Kpi label="판정" value={drillSector.verdict}/><Kpi label="종목 수" value={drillSector.n}/><Kpi label="핵심 주도 비율" value={pct(drillSector.coreShare)}/><Kpi label="MA50 위" value={pct(drillSector.breadth)}/><Kpi label="RS순위 중앙값" value={drillSector.medRank==null?'—':Math.round(drillSector.medRank)}/><Kpi label="RS 3M" value={pct(drillSector.medRs3m)}/></div>}
         {drillSector?.smallSample&&<p className="sample-explainer">소표본 섹터입니다. 종목 수를 별도 표시하고 더 엄격한 판정 기준을 적용합니다.</p>}
         <div className="tabs drill-tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도 <b>{drillStockGroups.core.length}</b></button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보 <b>{drillStockGroups.candidates.length}</b></button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환 <b>{drillStockGroups.turns.length}</b></button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중 <b>{drillStockGroups.corrections.length}</b></button></div>
         <p className="drill-note">종목을 누르면 상세 지표를 확인합니다.</p>

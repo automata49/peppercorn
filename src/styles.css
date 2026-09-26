@@ -88,6 +88,44 @@
 .compact-industry-table tbody tr:hover td:first-child{background:#f7f9fc}
 .stock-rows-head span:first-child{position:sticky;left:0;z-index:2;background:#f2f5f8;text-align:left;box-shadow:6px 0 9px -9px #66768a}
 .stock-row .stock-id{position:sticky;left:0;z-index:1;min-width:0;background:#fff;box-shadow:6px 0 9px -9px #66768a}
+
+/* Tablet navigation: keep every destination legible within the narrow rail. */
+.sidebar nav button .nav-icon{flex:none}
+.sidebar nav button .nav-label{width:auto;text-align:left;color:inherit}
+@media (min-width:651px) and (max-width:1000px){
+  .shell{grid-template-columns:92px minmax(0,1fr)}
+  .sidebar{padding:16px 7px}
+  .sidebar .brand{padding:4px 0 18px}
+  .sidebar nav{gap:3px}
+  .sidebar nav button,.sidebar nav button:not(.active){width:100%;min-height:58px;padding:7px 2px;flex-direction:column;justify-content:center;gap:4px;text-align:center;font-size:11px;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
+  .sidebar nav button .nav-icon{width:auto;font-size:19px;line-height:1}
+  .sidebar nav button .nav-label{width:100%;font-size:11px;color:inherit}
+}
+@media (max-width:650px){
+  .sidebar nav button .nav-label{display:none}
+  .sidebar nav button .nav-icon{width:auto;font-size:19px}
+}
+
+/* Show the inline stock pane only when its columns have enough room. */
+.sector-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.compact-stock-trigger{display:none}
+@media (max-width:1279px){
+  .industry-layout{grid-template-columns:minmax(0,1fr)}
+  .industry-layout .stock-panel{display:none}
+  .compact-stock-trigger{display:inline-flex}
+  .drill-summary-list .stock-rows{max-height:calc(88dvh - 150px);overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  .drill-summary-list .stock-rows-head{position:sticky;top:0;z-index:3;background:#f2f5f8}
+  .drill-summary-list .stock-rows-head span:first-child{position:sticky;left:0;z-index:4;background:#f2f5f8}
+  .drill-summary-list .stock-row .stock-id{position:sticky;left:0;z-index:2;background:#fff}
+  .drill-summary-list .stock-row:hover .stock-id,.drill-summary-list .stock-row:focus-visible .stock-id{background:#f7f9fc}
+  .drill-sheet{left:0;right:0;top:auto;bottom:0;transform:none;width:100%;height:auto;max-height:88dvh;border-left:0;border-top:1px solid #dce3eb;border-radius:20px 20px 0 0;padding:12px 18px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -18px 50px rgba(36,50,68,.16)}
+  .drill-handle{display:block}
+  .drill-head{top:-12px;padding-top:4px}
+}
+@media (max-width:650px){
+  .sector-actions{justify-content:flex-start}
+  .industry-panel .panel-head{align-items:flex-start;flex-direction:column}
+}
 .stock-row:hover .stock-id{background:#f7f9fc}
 .stock-id b,.stock-id small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .stock-price{font-variant-numeric:tabular-nums}
