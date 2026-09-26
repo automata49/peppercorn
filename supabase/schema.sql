@@ -267,7 +267,7 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
           and coalesce(m.rs_rank,0)>=85
           and coalesce(m.high_52w_distance,-1)>=-0.20
           and coalesce(m.rs_3m,-1)>0)
-          or (m.stage='◇ 조정 중 주도주' and coalesce(m.rs_rank,0)>=80)
+          or (m.stage='◇ 조정 중 주도주' and coalesce(m.rs_rank,0)>=85)
            then '주도 후보'
          when m.stage='↻ 넥스트 리더' then '강세 전환'
          when m.stage='❌ 제외' then '약세'
@@ -350,3 +350,122 @@ left join lateral (
 ) m on true;
 
 grant select on public.trade_journal_view to authenticated;
+
+
+-- Automated universe activation and cross-sectional leadership recalculation
+create or replace function public.activate_index_universe()
+returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare affected integer;
+begin
+  update public.instruments i
+     set active = exists (
+       select 1 from public.universe_memberships um
+       where um.instrument_id=i.id and um.entry_type='INDEX'
+     ), updated_at=now()
+   where i.asset_class='Equity' and i.market in ('US','KR');
+  get diagnostics affected = row_count;
+  return affected;
+end;
+$$;
+revoke all on function public.activate_index_universe() from public,anon,authenticated;
+grant execute on function public.activate_index_universe() to service_role;
+
+create or replace function public.recalculate_market_leadership()
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare updated_rows integer:=0; core_rows integer:=0; candidate_rows integer:=0;
+begin
+  with latest as (
+    select distinct on (mm.instrument_id)
+      mm.instrument_id,mm.as_of,mm.return_1w,mm.return_1m,mm.return_3m,mm.return_6m,mm.return_12m
+    from public.market_metrics mm join public.instruments i on i.id=mm.instrument_id
+    where i.active=true order by mm.instrument_id,mm.as_of desc
+  ), bench as (
+    select i.market,l.return_1w,l.return_1m,l.return_3m,l.return_6m,l.return_12m
+    from latest l join public.instruments i on i.id=l.instrument_id
+    where (i.market='US' and i.ticker='SPY') or (i.market='KR' and i.ticker='069500')
+  ), rs_base as (
+    select l.instrument_id,l.as_of,i.market,i.asset_class,
+      case when l.return_1w is not null and b.return_1w is not null then l.return_1w-b.return_1w end rs_1w,
+      case when l.return_1m is not null and b.return_1m is not null then l.return_1m-b.return_1m end rs_1m,
+      case when l.return_3m is not null and b.return_3m is not null then l.return_3m-b.return_3m end rs_3m,
+      case when l.return_6m is not null and b.return_6m is not null then l.return_6m-b.return_6m end rs_6m,
+      case when l.return_12m is not null and b.return_12m is not null then l.return_12m-b.return_12m end rs_12m
+    from latest l join public.instruments i on i.id=l.instrument_id left join bench b on b.market=i.market
+  ), scored as (
+    select r.*,
+      (coalesce(r.rs_1m*.30,0)+coalesce(r.rs_3m*.30,0)+coalesce(r.rs_6m*.20,0)+coalesce(r.rs_12m*.20,0))
+      / nullif((case when r.rs_1m is not null then .30 else 0 end)+(case when r.rs_3m is not null then .30 else 0 end)+(case when r.rs_6m is not null then .20 else 0 end)+(case when r.rs_12m is not null then .20 else 0 end),0) score
+    from rs_base r
+  ), ranked as (
+    select s.instrument_id,s.as_of,s.rs_1w,s.rs_1m,s.rs_3m,s.rs_6m,s.rs_12m,
+      round(1+98*cume_dist() over(partition by s.market order by s.score))::int rs_rank
+    from scored s where s.asset_class='Equity' and s.score is not null
+  )
+  update public.market_metrics mm set
+    rs_1w=r.rs_1w,rs_1m=r.rs_1m,rs_3m=r.rs_3m,rs_6m=r.rs_6m,rs_12m=r.rs_12m,rs_rank=r.rs_rank,updated_at=now()
+  from ranked r where mm.instrument_id=r.instrument_id and mm.as_of=r.as_of;
+
+  with latest as (
+    select distinct on (mm.instrument_id) mm.*
+    from public.market_metrics mm join public.instruments i on i.id=mm.instrument_id
+    where i.active=true and i.asset_class='Equity'
+    order by mm.instrument_id,mm.as_of desc
+  ), flags as (
+    select l.*,
+      (coalesce(l.price>l.ma50,false)::int+coalesce(l.ma50>l.ma200,false)::int+coalesce(l.price>l.ma200,false)::int+coalesce(l.high_52w_distance>=-.25,false)::int+coalesce(l.rs_rank>=70,false)::int+coalesce(l.low_52w>0 and l.price>=l.low_52w*1.30,false)::int) tt_count,
+      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.rs_rank>=70,false) structural,
+      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.15 and l.rs_rank>=95 and l.rs_3m>0 and l.rs_6m>0,false) core,
+      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.20 and l.rs_rank>=85 and l.rs_3m>0,false) candidate,
+      coalesce(l.price>l.ma200 and l.ma50>l.ma200 and l.rs_rank>=85 and l.high_52w_distance between -.40 and -.20,false) correction
+    from latest l
+  ), flags2 as (
+    select f.*,coalesce(not f.structural and not f.correction and f.price>f.ma50 and f.high_52w_distance>=-.30 and f.rs_rank>=70 and f.rs_1w>0 and f.rs_1m>0,false) next_leader
+    from flags f
+  ), classified as (
+    select f.*,
+      case when f.structural and f.high_52w_distance>=-.05 then '▲ 돌파 매수권'
+           when f.structural and f.atr_multiple>=7 then '⛔ 과확장'
+           when f.structural and f.atr_multiple>=5 then '◆ 확장 리더'
+           when f.structural and f.atr_multiple<=2 then '● 눌림 매수권'
+           when f.structural then '■ 베이스 형성'
+           when f.correction then '◇ 조정 중 주도주'
+           when f.next_leader then '↻ 넥스트 리더'
+           when f.ma200 is not null and f.price<f.ma200 then '❌ 제외' else '○ 관찰' end new_stage,
+      case when f.structural and f.high_52w_distance>=-.05 and f.core and coalesce(f.volume_ratio,0)>=1.4 then '⭐ 최우선 관심'
+           when f.structural and f.high_52w_distance>=-.05 and f.core then '★ 우선 분석'
+           when f.structural and f.high_52w_distance>=-.05 then '△ 거래량 확인 대기'
+           when f.structural and f.atr_multiple>=5 then '✋ 추격 금지'
+           when f.structural and f.core then '★ 우선 분석'
+           when f.structural and f.candidate then '☆ 관심·분석 보완'
+           when f.structural then '✎ 종목분석 먼저'
+           when f.correction then '⌛ 새 베이스 대기'
+           when f.next_leader then '◎ 전환 관찰' else '—' end new_verdict,
+      case when f.structural and f.high_52w_distance>=-.05 then '52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인'
+           when f.structural and f.atr_multiple>=7 then '신규 진입보다 베이스 재형성 대기'
+           when f.structural and f.atr_multiple>=5 then '상승 추격 대신 눌림 또는 새 베이스 대기'
+           when f.structural and f.atr_multiple<=2 then 'MA50 지지와 거래량 회복을 확인'
+           when f.structural then '베이스 상단·피벗과 거래량 수급을 확인'
+           when f.correction then 'MA50 회복과 새로운 베이스 형성을 확인'
+           when f.next_leader then 'RS 3M 개선과 정배열 완성 시 후보 승격'
+           when f.ma200 is not null and f.price<f.ma200 then '200일선 회복 및 RS 개선 대기' else '추세·RS 개선 대기' end new_guide
+    from flags2 f
+  )
+  update public.market_metrics mm set tt_pass_count=c.tt_count,leader_tt=c.structural,stage=c.new_stage,verdict=c.new_verdict,action_guide=c.new_guide,updated_at=now()
+  from classified c where mm.instrument_id=c.instrument_id and mm.as_of=c.as_of;
+  get diagnostics updated_rows=row_count;
+
+  select count(*) into core_rows from public.leaderboard_view where asset_class='Equity' and leadership_class='핵심 주도';
+  select count(*) into candidate_rows from public.leaderboard_view where asset_class='Equity' and leadership_class='주도 후보';
+  return jsonb_build_object('updated',updated_rows,'core',core_rows,'candidates',candidate_rows);
+end;
+$$;
+revoke all on function public.recalculate_market_leadership() from public,anon,authenticated;
+grant execute on function public.recalculate_market_leadership() to service_role;
