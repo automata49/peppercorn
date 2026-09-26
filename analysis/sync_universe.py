@@ -4,7 +4,7 @@ import re
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
-from io import BytesIO
+from io import BytesIO, StringIO
 import FinanceDataReader as fdr
 import pandas as pd
 import requests
@@ -137,32 +137,46 @@ def fetch_kr_index(code,minimum):
     return df
 
 def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
-    # GoInsider publishes ETF holdings collected from exchange/issuer filings.
-    # This is a fallback when KRX blocks anonymous constituent API access.
-    url=f"https://goinsider.kr/etf/{etf_code}"
+    # KG ZeroIn publishes the full ETF portfolio table, sourced from issuer/exchange
+    # disclosures. This is used only when KRX blocks anonymous constituent access.
+    url=f"https://etf.zeroin.co.kr/etf/{etf_code}/holdings"
     r=requests.get(url,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
     r.raise_for_status()
-    html=r.text
+    tables=pd.read_html(StringIO(r.text))
+    holding_table=None
+    for table in tables:
+        cols=[str(c).strip() for c in table.columns]
+        if any("종목코드" in c for c in cols) and len(table)>=expected-10:
+            holding_table=table
+            break
+    if holding_table is None:
+        raise RuntimeError(f"ZeroIn {index_name} full holdings table not found")
+    code_col=next(c for c in holding_table.columns if "종목코드" in str(c))
+    name_col=next((c for c in holding_table.columns if "종목명" in str(c)),None)
+
     krx_codes={}
     for row in records(krx_df):
         code=norm_kr(pick(row,"Code","Symbol","단축코드","종목코드"))
         market=str(pick(row,"Market","시장구분",default="") or "").upper()
         if code and (market_name.upper() in market or (market_name=="KOSPI" and market=="STK") or (market_name=="KOSDAQ" and market=="KSQ")):
             krx_codes[code]=pick(row,"Name","종목명","한글 종목명",default=code)
-    # Holdings are embedded in the rendered document; restrict six-digit matches
-    # to known KRX equities to avoid dates, fund codes, or navigation IDs.
+
     found=[]
     seen=set()
-    for code in re.findall(r'(?<!\d)(\d{6})(?!\d)',html):
+    for _,row in holding_table.iterrows():
+        code=norm_kr(row.get(code_col))
         if code in krx_codes and code not in seen:
-            seen.add(code);found.append(code)
-    lower=max(expected-8,1);upper=expected+8
+            seen.add(code)
+            fallback_name=str(row.get(name_col) if name_col is not None else "").strip()
+            found.append({"Code":code,"Name":krx_codes.get(code) or fallback_name or code})
+
+    lower=max(expected-10,1);upper=expected+10
     if not lower<=len(found)<=upper:
-        raise RuntimeError(f"GoInsider {index_name} proxy matched {len(found)} KRX equities, expected about {expected}")
-    df=pd.DataFrame([{"Code":code,"Name":krx_codes[code]} for code in found])
+        raise RuntimeError(f"ZeroIn {index_name} proxy matched {len(found)} KRX equities, expected about {expected}")
+    df=pd.DataFrame(found)
     df.attrs.update({
         "composition_status":"PROXY_VALIDATED",
-        "source":f"GoInsider {etf_code} holdings; source stated as KRX & issuer filings; benchmark owner KRX"
+        "source":f"KG ZeroIn {etf_code} full ETF holdings; issuer/exchange disclosure based; benchmark owner KRX"
     })
     return df
 
