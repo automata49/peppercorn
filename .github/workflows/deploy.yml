@@ -20,11 +20,62 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 30
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm install --ignore-scripts
       - run: npm run build
+      - name: Preserve recent hashed bundles for cached PWA shells
+        run: |
+          python - <<'PY'
+          import pathlib, re, subprocess
+
+          dist = pathlib.Path("dist")
+          kept = []
+          commits = subprocess.check_output(
+              ["git", "rev-list", "--max-count=30", "HEAD"], text=True
+          ).splitlines()
+
+          for commit in commits:
+              try:
+                  html = subprocess.check_output(
+                      ["git", "show", f"{commit}:index.html"],
+                      text=True,
+                      stderr=subprocess.DEVNULL,
+                  )
+              except subprocess.CalledProcessError:
+                  continue
+
+              paths = re.findall(
+                  r'/peppercorn/(assets/index-[^"\\']+\\.(?:js|css))',
+                  html,
+              )
+              js_path = next((p for p in paths if p.endswith(".js")), None)
+              if not js_path or js_path in kept:
+                  continue
+
+              kept.append(js_path)
+              for rel in paths:
+                  target = dist / rel
+                  if target.exists():
+                      continue
+                  try:
+                      data = subprocess.check_output(
+                          ["git", "show", f"{commit}:{rel}"],
+                          stderr=subprocess.DEVNULL,
+                      )
+                  except subprocess.CalledProcessError:
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(data)
+
+              if len(kept) >= 5:
+                  break
+
+          print("Preserved previous JS bundles:", kept)
+          PY
       - name: Keep branch Pages source deployable
         run: |
           cp dist/index.html index.html
