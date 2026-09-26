@@ -94,20 +94,39 @@ def main():
         iid=item["id"]
         if iid not in result:continue
         m=result[iid];p=m["price"];ma50=m.get("ma50");ma200=m.get("ma200");rank=m.get("rs_rank") or 0
-        dist=m.get("high_52w_distance");rs1w=m.get("rs_1w");rs1m=m.get("rs_1m");atrx=m.get("atr_multiple")
+        dist=m.get("high_52w_distance");rs1w=m.get("rs_1w");rs1m=m.get("rs_1m");rs3m=m.get("rs_3m");rs6m=m.get("rs_6m")
+        atrx=m.get("atr_multiple");vol=m.get("volume_ratio")
         tt=sum([bool(p and ma50 and p>ma50),bool(ma50 and ma200 and ma50>ma200),bool(p and ma200 and p>ma200),bool(dist is not None and dist>=-.25),bool(rank>=70),bool(m.get("low_52w") and p>=m["low_52w"]*1.30)])
-        leader=bool(p and ma50 and ma200 and p>ma50>ma200 and dist is not None and dist>=-.25 and rank>=70)
-        correction=bool(p and ma50 and ma200 and p>ma200 and ma50>ma200 and rank>=70 and dist is not None and -.40<=dist<-.25)
-        next_leader=bool(not leader and not correction and p and ma50 and p>ma50 and dist is not None and dist>=-.30 and (rs1w or -1)>0 and (rs1m or -1)>0)
-        if leader and dist is not None and dist>=-.05:stage,verdict,guide="▲ 돌파 매수권","1. 주도","52주 고점(피벗) 돌파 + 거래량 ≥1.4배 확인"
-        elif leader and atrx is not None and atrx<=2:stage,verdict,guide="● 눌림 매수권","1. 주도","MA50 지지와 거래량 회복 확인"
-        elif leader and atrx is not None and atrx>=5:stage,verdict,guide="⛔ 과확장","1. 주도","추격 금지 · 신규 베이스 또는 눌림 대기"
-        elif leader:stage,verdict,guide="■ 베이스 형성","1. 주도","베이스 상단 또는 피벗 확인"
-        elif correction:stage,verdict,guide="◇ 조정 중 주도주","1. 주도","MA50 회복·새 베이스 형성 확인"
-        elif next_leader:stage,verdict,guide="↻ 넥스트 리더","2. 강세 전환","RS순위 70↑ · 정배열 확인 시 리더 편입"
-        elif p and ma200 and p<ma200:stage,verdict,guide="❌ 제외","약세","200일선 회복 및 RS 개선 대기"
-        else:stage,verdict,guide="○ 관찰","중립","추세·RS 개선 대기"
-        m.update({"instrument_id":iid,"tt_pass_count":tt,"leader_tt":leader,"stage":stage,"verdict":verdict,"action_guide":guide})
+        structural=bool(p and ma50 and ma200 and p>ma50>ma200 and dist is not None and dist>=-.25 and rank>=70)
+        core=bool(structural and rank>=90 and dist is not None and dist>=-.15 and (rs3m or -1)>0 and (rs6m or -1)>0)
+        candidate=bool(structural and rank>=80 and dist is not None and dist>=-.20 and (rs3m or -1)>0)
+        correction=bool(p and ma50 and ma200 and p>ma200 and ma50>ma200 and rank>=80 and dist is not None and -.40<=dist<-.20)
+        next_leader=bool(not structural and not correction and p and ma50 and p>ma50 and dist is not None and dist>=-.30 and rank>=70 and (rs1w or -1)>0 and (rs1m or -1)>0)
+        if structural and dist is not None and dist>=-.05:
+            stage="▲ 돌파 매수권"
+            verdict="⭐ 최우선 관심" if core and (vol or 0)>=1.4 else ("★ 우선 분석" if core else "△ 거래량 확인 대기")
+            guide="52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인"
+        elif structural and atrx is not None and atrx>=7:
+            stage,verdict,guide="⛔ 과확장","✋ 추격 금지","신규 진입보다 베이스 재형성 대기"
+        elif structural and atrx is not None and atrx>=5:
+            stage,verdict,guide="◆ 확장 리더","✋ 추격 금지","상승 추격 대신 눌림 또는 새 베이스 대기"
+        elif structural and atrx is not None and atrx<=2:
+            stage="● 눌림 매수권"
+            verdict="★ 우선 분석" if core else ("☆ 관심·분석 보완" if candidate else "✎ 종목분석 먼저")
+            guide="MA50 지지와 거래량 회복을 확인"
+        elif structural:
+            stage="■ 베이스 형성"
+            verdict="★ 우선 분석" if core else ("☆ 관심·분석 보완" if candidate else "✎ 종목분석 먼저")
+            guide="베이스 상단·피벗과 거래량 수급을 확인"
+        elif correction:
+            stage,verdict,guide="◇ 조정 중 주도주","⌛ 새 베이스 대기","MA50 회복과 새로운 베이스 형성을 확인"
+        elif next_leader:
+            stage,verdict,guide="↻ 넥스트 리더","◎ 전환 관찰","RS 3M 개선과 정배열 완성 시 후보 승격"
+        elif p and ma200 and p<ma200:
+            stage,verdict,guide="❌ 제외","—","200일선 회복 및 RS 개선 대기"
+        else:
+            stage,verdict,guide="○ 관찰","—","추세·RS 개선 대기"
+        m.update({"instrument_id":iid,"tt_pass_count":tt,"leader_tt":structural,"stage":stage,"verdict":verdict,"action_guide":guide})
         payload.append({k:safe(v) for k,v in m.items()})
 
     for i in range(0,len(payload),400):upsert("market_metrics",payload[i:i+400],"instrument_id,as_of")
