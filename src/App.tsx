@@ -25,8 +25,8 @@ const med=(values:(number|null|undefined)[])=>{
 }
 const leadership=(r:LeaderRow)=>{
   if(r.leadership_class)return r.leadership_class
-  if(r.leader_tt&&(r.rs_rank??0)>=90&&(r.high_52w_distance??-1)>=-.15&&(r.rs_3m??-1)>0&&(r.rs_6m??-1)>0)return '핵심 주도'
-  if((r.leader_tt&&(r.rs_rank??0)>=80&&(r.high_52w_distance??-1)>=-.20&&(r.rs_3m??-1)>0)||(isCorrection(r)&&(r.rs_rank??0)>=80))return '주도 후보'
+  if(r.leader_tt&&(r.rs_rank??0)>=95&&(r.high_52w_distance??-1)>=-.15&&(r.rs_3m??-1)>0&&(r.rs_6m??-1)>0)return '핵심 주도'
+  if((r.leader_tt&&(r.rs_rank??0)>=85&&(r.high_52w_distance??-1)>=-.20&&(r.rs_3m??-1)>0)||(isCorrection(r)&&(r.rs_rank??0)>=85))return '주도 후보'
   if(String(r.stage).includes('넥스트 리더'))return '강세 전환'
   if(String(r.stage).startsWith('❌'))return '약세'
   return '중립'
@@ -409,7 +409,7 @@ export default function App(){
   if(page==='dashboard'){
     content=<>{filters}
       <section className="kpis">
-        <Kpi label="핵심 주도" value={leadCount} sub="RS≥90 · 3M/6M 상대강도 양호"/>
+        <Kpi label="핵심 주도" value={leadCount} sub="RS≥95 · 3M/6M 상대강도 양호"/>
         <Kpi label="주도 후보" value={candidateCount} sub="Trend Template 통과 중 상위 후보"/>
         <Kpi label="강세 전환" value={turnCount} sub="Next Leader"/>
         <Kpi label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+stockRows.length+' 종목'}/>
