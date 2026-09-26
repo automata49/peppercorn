@@ -14,6 +14,10 @@ create table if not exists public.instruments (
   theme text,
   benchmark_ticker text,
   currency text,
+  classification_scheme text,
+  classification_source text,
+  classification_as_of date,
+  universe_updated_at timestamptz,
   active boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -252,7 +256,25 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        m.return_1w,m.return_1m,m.return_3m,m.return_6m,m.return_12m,
        m.rs_1w,m.rs_1m,m.rs_3m,m.rs_6m,m.rs_12m,m.rs_rank,
        m.high_52w_distance,m.volume_ratio,m.adr20_pct,m.rsi14,m.atr_multiple,
-       m.ma50,m.ma200,m.leader_tt
+       m.ma50,m.ma200,m.leader_tt,
+       case
+         when m.leader_tt
+          and coalesce(m.rs_rank,0)>=95
+          and coalesce(m.high_52w_distance,-1)>=-0.15
+          and coalesce(m.rs_3m,-1)>0
+          and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
+         when (m.leader_tt
+          and coalesce(m.rs_rank,0)>=85
+          and coalesce(m.high_52w_distance,-1)>=-0.20
+          and coalesce(m.rs_3m,-1)>0)
+          or (m.stage='◇ 조정 중 주도주' and coalesce(m.rs_rank,0)>=80)
+           then '주도 후보'
+         when m.stage='↻ 넥스트 리더' then '강세 전환'
+         when m.stage='❌ 제외' then '약세'
+         else '중립'
+       end as leadership_class,
+       i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
+       coalesce(u.index_memberships,'{}'::text[]) as index_memberships
 from public.instruments i
 join lateral (
   select mm.* from public.market_metrics mm
@@ -260,6 +282,12 @@ join lateral (
   order by mm.as_of desc
   limit 1
 ) m on true
+left join lateral (
+  select array_agg(distinct um.theme_group order by um.theme_group)
+         filter (where um.entry_type='INDEX' and um.theme_group is not null) as index_memberships
+  from public.universe_memberships um
+  where um.instrument_id=i.id
+) u on true
 where i.active=true;
 
 grant select on public.leaderboard_view to anon,authenticated;

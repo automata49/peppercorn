@@ -8,6 +8,11 @@ export type LeaderRow = {
   asset_class: string
   sector: string
   industry: string
+  exchange?: string | null
+  classification_scheme?: string | null
+  classification_source?: string | null
+  classification_as_of?: string | null
+  index_memberships?: string[]
   price: number | null
   verdict: string
   stage: string
