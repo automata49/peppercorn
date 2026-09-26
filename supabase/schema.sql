@@ -274,7 +274,8 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
          else '중립'
        end as leadership_class,
        i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
-       coalesce(u.index_memberships,'{}'::text[]) as index_memberships
+       coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
+       coalesce(u.index_statuses,'{}'::text[]) as index_statuses
 from public.instruments i
 join lateral (
   select mm.* from public.market_metrics mm
@@ -283,8 +284,11 @@ join lateral (
   limit 1
 ) m on true
 left join lateral (
-  select array_agg(distinct um.theme_group order by um.theme_group)
-         filter (where um.entry_type='INDEX' and um.theme_group is not null) as index_memberships
+  select
+    array_agg(distinct um.theme_group order by um.theme_group)
+      filter (where um.entry_type='INDEX' and um.theme_group is not null) as index_memberships,
+    array_agg(distinct um.composition_status order by um.composition_status)
+      filter (where um.entry_type='INDEX' and um.composition_status is not null) as index_statuses
   from public.universe_memberships um
   where um.instrument_id=i.id
 ) u on true
