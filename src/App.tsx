@@ -202,8 +202,8 @@ function Kpi({label,value,sub,onClick}:{label:string;value:string|number;sub?:st
 function ValuePill({children,tone='gray'}:{children:any;tone?:string}){return <span className={'pill '+tone}>{children}</span>}
 
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>단계</span><span>RS</span><span>RS 5D</span><span>RS 20D</span><span>RS 50D</span><span>등락 5D</span><span>등락 20D</span><span>등락 50D</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
-    <div className="stock-id"><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong>
+  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>현재가</span><span>단계</span><span>RS</span><span>RS 5D</span><span>RS 20D</span><span>RS 50D</span><span>등락 5D</span><span>등락 20D</span><span>등락 50D</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong>
     {([r.rs_5d,r.rs_20d,r.rs_50d,r.return_5d,r.return_20d,r.return_50d] as const).map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
@@ -523,9 +523,7 @@ export default function App(){
         {drillSector?.smallSample&&<p className="sample-explainer">소표본 섹터입니다. 종목 수를 별도 표시하고 더 엄격한 판정 기준을 적용합니다.</p>}
         <div className="tabs drill-tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도 <b>{drillStockGroups.core.length}</b></button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보 <b>{drillStockGroups.candidates.length}</b></button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환 <b>{drillStockGroups.turns.length}</b></button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중 <b>{drillStockGroups.corrections.length}</b></button></div>
         <p className="drill-note">종목을 누르면 상세 지표를 확인합니다.</p>
-        <div className="drill-stock-list">{drillStockGroups[stockTab].map(r=><button key={r.id} onClick={()=>{setSelected(r);setDrillStock(r)}}>
-          <span><b>{r.name}</b><small>{r.market} · {r.ticker}</small></span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><em className={(r.rs_1w??0)>0?'pos':(r.rs_1w??0)<0?'neg':''}>{pct(r.rs_1w)}</em>
-        </button>)}{!drillStockGroups[stockTab].length&&<div className="empty">해당 분류의 종목이 없습니다.</div>}</div>
+        <StockRows rows={drillStockGroups[stockTab]} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>}
     </DialogContent>
   </Dialog>
