@@ -29,11 +29,11 @@ def main():
     if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
     if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
     if nas<700:fail(f"NASDAQ coverage unexpectedly small: {nas}")
-    allowed_kr={"OFFICIAL_KRX","OFFICIAL_KRX_ADAPTER","PROXY_VALIDATED"}
+    allowed_kr={"OFFICIAL_KRX","OFFICIAL_KRX_ADAPTER","MARKET_PROXY_TRADINGVIEW","PROXY_VALIDATED"}
     for group in ("KOSPI200","KOSDAQ150"):
         status=statuses.get(group) or set()
         if len(status)!=1 or not status.issubset(allowed_kr):fail(f"{group} invalid composition status: {status}")
-        if "PROXY_VALIDATED" in status:print(f"VALIDATION WARNING: {group} uses PROXY_VALIDATED because KRX anonymous access is blocked")
+        if status & {"MARKET_PROXY_TRADINGVIEW","PROXY_VALIDATED"}:print(f"VALIDATION WARNING: {group} uses validated market proxy because KRX anonymous access is blocked: {status}")
 
     missing_sector=[x for x in instruments if not x.get("sector")]
     missing_industry=[x for x in instruments if not x.get("industry")]

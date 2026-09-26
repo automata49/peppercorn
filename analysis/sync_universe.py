@@ -146,6 +146,43 @@ def _collect_six_digit_codes(value,out):
         text=str(value)
         if re.fullmatch(r"\d{6}",text):out.append(text)
 
+def fetch_tradingview_index(symbolset,expected,krx_df,market_name,index_name):
+    # TradingView's Korea scanner exposes maintained KRX index symbolsets without
+    # authentication. It is a market-data proxy, not an official KRX endpoint.
+    url="https://scanner.tradingview.com/korea/scan"
+    body={
+        "symbols":{"symbolset":[symbolset]},
+        "columns":["name","description","exchange"],
+        "sort":{"sortBy":"market_cap_basic","sortOrder":"desc"},
+        "range":[0,expected+30],
+    }
+    r=requests.post(url,json=body,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0","Content-Type":"application/json"},timeout=45)
+    r.raise_for_status()
+    j=r.json()
+    rows=j.get("data") or []
+    krx_codes={}
+    for row in records(krx_df):
+        code=norm_kr(pick(row,"Code","Symbol","단축코드","종목코드"))
+        market=str(pick(row,"Market","시장구분",default="") or "").upper()
+        if code and (market_name.upper() in market or (market_name=="KOSPI" and market=="STK") or (market_name=="KOSDAQ" and market=="KSQ")):
+            krx_codes[code]=pick(row,"Name","종목명","한글 종목명",default=code)
+    found=[];seen=set()
+    for row in rows:
+        data=row.get("d") or []
+        raw=str(data[0] if data else row.get("s") or "")
+        code=norm_kr(raw.split(":")[-1])
+        if code in krx_codes and code not in seen:
+            seen.add(code);found.append({"Code":code,"Name":krx_codes[code]})
+    lower=max(expected-10,1);upper=expected+10
+    if not lower<=len(found)<=upper:
+        raise RuntimeError(f"TradingView {index_name} symbolset matched {len(found)} KRX equities, expected about {expected}")
+    df=pd.DataFrame(found)
+    df.attrs.update({
+        "composition_status":"MARKET_PROXY_TRADINGVIEW",
+        "source":f"TradingView Korea scanner {symbolset}; cross-checked to KRX/KIND listing; benchmark owner KRX"
+    })
+    return df
+
 def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     # KG ZeroIn documents machine-readable JSON by appending .json to page URLs.
     # KRX official composition remains first choice; this path is fallback-only.
@@ -210,7 +247,7 @@ def fetch_kr_index_pykrx(code,minimum):
     })
     return df
 
-def fetch_kr_index_with_fallback(code,minimum,proxy_fn):
+def fetch_kr_index_with_fallback(code,minimum,tradingview_fn,proxy_fn):
     try:
         df=fetch_kr_index(code,minimum)
         df.attrs.update({"composition_status":"OFFICIAL_KRX","source":"KRX Data System MDCSTAT00601 official index constituents"})
@@ -220,15 +257,27 @@ def fetch_kr_index_with_fallback(code,minimum,proxy_fn):
     try:
         return fetch_kr_index_pykrx(code,minimum)
     except Exception as adapter_exc:
-        print(f"WARNING: pykrx KRX {code} unavailable ({adapter_exc}); using validated market proxy")
+        print(f"WARNING: pykrx KRX {code} unavailable ({adapter_exc}); trying TradingView KRX symbolset")
+    try:
+        return tradingview_fn()
+    except Exception as tv_exc:
+        print(f"WARNING: TradingView KRX {code} unavailable ({tv_exc}); using ETF holdings proxy")
         return proxy_fn()
 
 def records(df): return df.where(pd.notna(df),None).to_dict("records")
 
 def main():
     sp500=fetch_sp500();nasdaq=fetch_nasdaq();krx=fetch_krx_listing()
-    kospi200=fetch_kr_index_with_fallback("1028",190,lambda:fetch_etf_holdings_proxy("069500",200,krx,"KOSPI","KOSPI200"))
-    kosdaq150=fetch_kr_index_with_fallback("2203",145,lambda:fetch_etf_holdings_proxy("229200",150,krx,"KOSDAQ","KOSDAQ150"))
+    kospi200=fetch_kr_index_with_fallback(
+        "1028",190,
+        lambda:fetch_tradingview_index("SYML:KRX;KOSPI200",200,krx,"KOSPI","KOSPI200"),
+        lambda:fetch_etf_holdings_proxy("069500",200,krx,"KOSPI","KOSPI200"),
+    )
+    kosdaq150=fetch_kr_index_with_fallback(
+        "2203",145,
+        lambda:fetch_tradingview_index("SYML:KRX;KOSDAQ150",150,krx,"KOSDAQ","KOSDAQ150"),
+        lambda:fetch_etf_holdings_proxy("229200",150,krx,"KOSDAQ","KOSDAQ150"),
+    )
 
     krx_map={}
     for r in records(krx):
