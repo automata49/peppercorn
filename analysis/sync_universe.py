@@ -45,7 +45,7 @@ def market_cap(value):
 
 def is_common_equity(row):
     symbol=norm_us(row.get("symbol"));name=str(row.get("name") or "").lower()
-    if not symbol or any(x in name for x in [" warrant","warrant "," unit"," rights","right to"," preferred"," depositary"]):return False
+    if not symbol or any(x in name for x in [" warrant","warrant "," unit"," rights","right to"," preferred"," depositary"," senior notes"," notes due "]):return False
     if symbol.endswith(("W","WS","U","R")) and len(symbol)>4:return False
     return True
 

@@ -14,6 +14,7 @@ export type LeaderRow = {
   classification_as_of?: string | null
   index_memberships?: string[]
   index_statuses?: string[]
+  data_status?: string | null
   price: number | null
   verdict: string
   stage: string
