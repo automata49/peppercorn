@@ -4,7 +4,7 @@ import re
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
-from io import BytesIO, StringIO
+from io import BytesIO
 import FinanceDataReader as fdr
 import pandas as pd
 import requests
@@ -16,7 +16,7 @@ OUTPUT=Path(os.environ.get("UNIVERSE_OUTPUT","universe_payload.json"))
 NASDAQ_SCREENER="https://api.nasdaq.com/api/screener/stocks"
 SOURCES={
     "S&P500":"Wikipedia S&P 500 constituent table via FinanceDataReader; benchmark owner: S&P DJI",
-    "NASDAQ_CORE":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
+    "NASDAQ":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
     "KOSPI200":"KRX Data System MDCSTAT00601 official index constituents",
     "KOSDAQ150":"KRX Data System MDCSTAT00601 official index constituents",
 }
@@ -136,64 +136,36 @@ def fetch_kr_index(code,minimum):
     df.attrs["as_of"]=trd_dd
     return df
 
-def fetch_kospi200_proxy():
-    # Naver Finance's index constituent pages are fed by Korean market data and
-    # return the 200 underlying stocks. This is a fallback only, never labelled official.
-    session=requests.Session()
-    session.headers.update({"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"})
-    session.get("https://finance.naver.com/",timeout=30)
-    found={}
-    for page in range(1,30):
-        r=session.get("https://finance.naver.com/sise/entryJongmok.naver",params={"indCode":"KPI200","page":page},timeout=30)
-        r.raise_for_status()
-        r.encoding=r.apparent_encoding or "euc-kr"
-        pairs=re.findall(r'item/main\\.naver\\?code=(\\d{6})[^>]*>([^<]+)',r.text,re.I)
-        if not pairs:
-            if page>1:break
-            continue
-        for code,name in pairs:found[code]=re.sub(r"\\s+"," ",name).strip()
-    if not 190<=len(found)<=210:raise RuntimeError(f"Naver KOSPI200 proxy returned {len(found)} rows")
-    df=pd.DataFrame([{"Code":k,"Name":v} for k,v in found.items()])
-    df.attrs.update({"composition_status":"PROXY_VALIDATED","source":"Naver Finance KPI200 constituent pages (market-data proxy; benchmark owner KRX)"})
-    return df
-
-def _norm_name(value):
-    s=str(value or "").strip().upper()
-    s=re.sub(r"[\\s·ㆍ.,()（）㈜주식회사]+","",s)
-    return s.replace("&","AND")
-
-def fetch_kosdaq150_proxy(krx_df):
-    # KODEX 229200 tracks KOSDAQ150 and publishes 150 stock holdings.
-    # We use its full stock basket as a fallback and map every name back to KRX-DESC.
-    r=requests.get("https://etfmap.kr/etf/229200",headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
+def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
+    # GoInsider publishes ETF holdings collected from exchange/issuer filings.
+    # This is a fallback when KRX blocks anonymous constituent API access.
+    url=f"https://goinsider.kr/etf/{etf_code}"
+    r=requests.get(url,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=45)
     r.raise_for_status()
-    names=[]
-    try:
-        for table in pd.read_html(StringIO(r.text)):
-            name_col=next((c for c in table.columns if "종목명" in str(c)),None)
-            if name_col is None:continue
-            vals=[str(x).strip() for x in table[name_col].tolist() if pd.notna(x)]
-            if len(vals)>=100:names.extend(vals)
-    except Exception:
-        pass
-    if len(set(names))<140:
-        # ETFmap also exposes holdings in rendered/serialized HTML.
-        names.extend(re.findall(r'(?:name|종목명)["\' :=]+["\']([^"\']{2,40})["\']',r.text,re.I))
-    by_name={}
+    html=r.text
+    krx_codes={}
     for row in records(krx_df):
         code=norm_kr(pick(row,"Code","Symbol","단축코드","종목코드"))
-        name=pick(row,"Name","종목명","한글 종목명")
         market=str(pick(row,"Market","시장구분",default="") or "").upper()
-        if code and name and ("KOSDAQ" in market or market=="KSQ"):by_name.setdefault(_norm_name(name),(code,name))
-    matched={}
-    for name in names:
-        hit=by_name.get(_norm_name(name))
-        if hit:matched[hit[0]]=hit[1]
-    if not 145<=len(matched)<=155:
-        raise RuntimeError(f"KODEX KOSDAQ150 proxy matched {len(matched)} KRX stocks from {len(set(names))} names")
-    df=pd.DataFrame([{"Code":k,"Name":v} for k,v in matched.items()])
-    df.attrs.update({"composition_status":"PROXY_VALIDATED","source":"KODEX KOSDAQ150(229200) 150-stock holdings via ETFmap; benchmark owner KRX"})
+        if code and (market_name.upper() in market or (market_name=="KOSPI" and market=="STK") or (market_name=="KOSDAQ" and market=="KSQ")):
+            krx_codes[code]=pick(row,"Name","종목명","한글 종목명",default=code)
+    # Holdings are embedded in the rendered document; restrict six-digit matches
+    # to known KRX equities to avoid dates, fund codes, or navigation IDs.
+    found=[]
+    seen=set()
+    for code in re.findall(r'(?<!\d)(\d{6})(?!\d)',html):
+        if code in krx_codes and code not in seen:
+            seen.add(code);found.append(code)
+    lower=max(expected-8,1);upper=expected+8
+    if not lower<=len(found)<=upper:
+        raise RuntimeError(f"GoInsider {index_name} proxy matched {len(found)} KRX equities, expected about {expected}")
+    df=pd.DataFrame([{"Code":code,"Name":krx_codes[code]} for code in found])
+    df.attrs.update({
+        "composition_status":"PROXY_VALIDATED",
+        "source":f"GoInsider {etf_code} holdings; source stated as KRX & issuer filings; benchmark owner KRX"
+    })
     return df
+
 
 def fetch_kr_index_with_fallback(code,minimum,proxy_fn):
     try:
@@ -208,8 +180,8 @@ def records(df): return df.where(pd.notna(df),None).to_dict("records")
 
 def main():
     sp500=fetch_sp500();nasdaq=fetch_nasdaq();krx=fetch_krx_listing()
-    kospi200=fetch_kr_index_with_fallback("1028",190,fetch_kospi200_proxy)
-    kosdaq150=fetch_kr_index_with_fallback("2203",145,lambda:fetch_kosdaq150_proxy(krx))
+    kospi200=fetch_kr_index_with_fallback("1028",190,lambda:fetch_etf_holdings_proxy("069500",200,krx,"KOSPI","KOSPI200"))
+    kosdaq150=fetch_kr_index_with_fallback("2203",145,lambda:fetch_etf_holdings_proxy("229200",150,krx,"KOSDAQ","KOSDAQ150"))
 
     krx_map={}
     for r in records(krx):
@@ -248,10 +220,10 @@ def main():
             if not ticker:continue
             meta=krx_map.get(ticker,{})
             sector=pick(meta,"Sector","업종","업종명")
-            industry=pick(meta,"Industry","주요제품","산업") or sector
+            industry=sector
             name=pick(meta,"Name","종목명","한글 종목명") or pick(r,"Name","종목명") or ticker
             exchange=pick(meta,"Market","시장구분") or market_name
-            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":"KRX/KIND 업종 · 주요제품","classification_source":"AUTO:FinanceData KRX-DESC cache (source: KRX/KIND)","classification_as_of":TODAY,"universe_updated_at":NOW},2)
+            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":"KRX/KIND 업종","classification_source":"AUTO:FinanceData KRX-DESC cache (source: KRX/KIND company 업종)","classification_as_of":TODAY,"universe_updated_at":NOW},2)
             member("KR",ticker,group,SOURCES[group],rank)
 
     add_kr_index(kospi200,"KOSPI200","KOSPI");add_kr_index(kosdaq150,"KOSDAQ150","KOSDAQ")
@@ -265,7 +237,7 @@ def main():
         selected.add(key)
 
     for rank,r in enumerate([x for x in nasdaq if ("US",norm_us(x.get("symbol"))) in instruments],1):
-        member("US",norm_us(r.get("symbol")),"NASDAQ_CORE",SOURCES["NASDAQ_CORE"],rank)
+        member("US",norm_us(r.get("symbol")),"NASDAQ",SOURCES["NASDAQ"],rank)
 
     items=[]
     for item in instruments.values():
