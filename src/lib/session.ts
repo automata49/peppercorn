@@ -26,7 +26,7 @@ export function refresh(session:Session){return authRequest({action:'refresh',re
 export async function ensureSession(session:Session):Promise<Session>{const expiresAt=Number(session.expires_at||0);if(!expiresAt||Date.now()/1000<expiresAt-90)return session;return refresh(session)}
 
 function normalize(resource:WorkspaceResource,rows:any[]):any[]{
-  if(resource==='research')return rows.map(r=>({...r,date:r.written_at,type:r.note_type}))
+  if(resource==='research')return rows.map(r=>({...r,date:r.written_at,type:r.note_type,verification:r.verification||(r.verified===true?'확인됨':r.verified===false?'반박됨':'미검증')}))
   if(resource==='analysis')return rows.map(r=>({...r,date:r.analysis_date}))
   if(resource==='journal')return rows.map(r=>({...r,date:r.trade_date}))
   return rows
