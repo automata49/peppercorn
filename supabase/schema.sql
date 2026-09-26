@@ -274,3 +274,51 @@ create index if not exists stock_analyses_user_idx on public.stock_analyses(user
 create index if not exists trade_journal_instrument_idx on public.trade_journal(instrument_id);
 create index if not exists trade_journal_user_idx on public.trade_journal(user_id);
 create index if not exists watchlist_instrument_idx on public.watchlist(instrument_id);
+
+
+-- Workspace parity: Research / Stock Analysis / Journal
+alter table public.research_notes
+  add column if not exists verification text,
+  add column if not exists journal_no text;
+
+alter table public.stock_analyses
+  add column if not exists lynch_category text,
+  add column if not exists research_note_no text,
+  add column if not exists journal_no text;
+
+alter table public.trade_journal
+  add column if not exists thesis_hit text;
+
+create or replace view public.stock_analysis_view
+with (security_invoker=true) as
+select a.*,i.market,i.ticker,i.name,i.sector,i.industry,
+       m.stage,m.verdict,m.rs_rank,m.price,m.ma50,m.ma200,m.high_52w_distance
+from public.stock_analyses a
+join public.instruments i on i.id=a.instrument_id
+left join lateral (
+  select mm.stage,mm.verdict,mm.rs_rank,mm.price,mm.ma50,mm.ma200,mm.high_52w_distance
+  from public.market_metrics mm
+  where mm.instrument_id=i.id
+  order by mm.as_of desc
+  limit 1
+) m on true;
+
+grant select on public.stock_analysis_view to authenticated;
+
+create or replace view public.trade_journal_view
+with (security_invoker=true) as
+select j.id,j.user_id,j.instrument_id,j.trade_date,j.account,j.tranche,j.buy_price,j.currency,
+       j.thesis,j.evidence_type,j.confidence,j.target_price,j.stop_price,j.review_condition,
+       j.review_date,j.status,j.exit_date,j.sell_price,j.realized_return,j.review_note,j.lesson,j.created_at,
+       i.market,i.ticker,i.name,j.thesis_hit,i.sector,i.industry,m.stage,m.verdict,m.rs_rank
+from public.trade_journal j
+left join public.instruments i on i.id=j.instrument_id
+left join lateral (
+  select mm.stage,mm.verdict,mm.rs_rank
+  from public.market_metrics mm
+  where mm.instrument_id=i.id
+  order by mm.as_of desc
+  limit 1
+) m on true;
+
+grant select on public.trade_journal_view to authenticated;
