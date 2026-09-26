@@ -14,10 +14,12 @@ def main():
     instruments=payload.get("instruments") or []
     memberships=payload.get("memberships") or []
     groups={}
+    statuses={}
     member_keys=set()
     by_key={(x["market"],x["ticker"]):x for x in instruments}
     for m in memberships:
         groups[m["theme_group"]]=groups.get(m["theme_group"],0)+1
+        statuses.setdefault(m["theme_group"],set()).add(m.get("composition_status"))
         member_keys.add((m["market"],m["ticker"]))
 
     sp=groups.get("S&P500",0);k200=groups.get("KOSPI200",0);k150=groups.get("KOSDAQ150",0);nas=groups.get("NASDAQ_CORE",0)
@@ -27,6 +29,8 @@ def main():
     if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
     if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
     if nas<700:fail(f"NASDAQ_CORE coverage unexpectedly small: {nas}")
+    if statuses.get("KOSPI200")!={"OFFICIAL_KRX"}:fail(f"KOSPI200 is not official KRX composition: {statuses.get('KOSPI200')}")
+    if statuses.get("KOSDAQ150")!={"OFFICIAL_KRX"}:fail(f"KOSDAQ150 is not official KRX composition: {statuses.get('KOSDAQ150')}")
 
     missing_sector=[x for x in instruments if not x.get("sector")]
     missing_industry=[x for x in instruments if not x.get("industry")]
