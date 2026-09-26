@@ -119,11 +119,10 @@ def main():
     def add_instrument(item,classification_priority=0):
         key=(item["market"],item["ticker"])
         old=instruments.get(key)
-        if old is None or classification_priority>=old.pop("_classification_priority",0):
+        old_priority=old.get("_classification_priority",0) if old else -1
+        if old is None or classification_priority>=old_priority:
             item["_classification_priority"]=classification_priority
             instruments[key]=item
-        elif old is not None:
-            old["_classification_priority"]=max(old.get("_classification_priority",0),classification_priority)
 
     def add_membership(market,ticker,group,source,rank=None):
         stable=f"peppercorn:index:{market}:{ticker}:{group}"
