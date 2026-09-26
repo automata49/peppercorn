@@ -46,7 +46,7 @@ function buildIndustries(rows:LeaderRow[]):IndustrySummary[]{
     const lead=list.filter(r=>leadership(r)==='1. 주도').length
     const turn=list.filter(r=>leadership(r)==='2. 강세 전환').length
     const correction=list.filter(isCorrection).length
-    const leadShare=n?(lead+correction)/n:0
+    const leadShare=n?lead/n:0
     const breadth=n?list.filter(r=>r.price!=null&&r.ma50!=null&&Number(r.price)>Number(r.ma50)).length/n:0
     const medRank=med(list.map(r=>r.rs_rank))
     const medRs1w=med(list.map(r=>r.rs_1w))
@@ -161,7 +161,7 @@ export default function App(){
   const [query,setQuery]=useState('')
   const [sector,setSector]=useState<string|null>(null)
   const [industryKey,setIndustryKey]=useState<string|null>(null)
-  const [industryMode,setIndustryMode]=useState<'HOT'|'ALL'>('HOT')
+  const [industryMode,setIndustryMode]=useState<'HOT'|'ALL'>('ALL')
   const [stockTab,setStockTab]=useState<'leaders'|'turns'|'corrections'>('leaders')
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [watch,setWatch]=useLocalRows<EditableRow>('peppercorn-watchlist',initialWatchlist)
@@ -266,7 +266,7 @@ export default function App(){
       </section>
       <section className="sector-strip panel compact-panel">
         <div className="panel-head"><div><h2>섹터 필터</h2><p>섹터는 보조 필터입니다. 아래 산업 흐름을 먼저 확인하세요.</p></div></div>
-        <div className="chips"><button className={!sector?'chip on':''} onClick={()=>{setSector(null);setIndustryKey(null)}}>전체 섹터</button>{sectorNames.map(s=><button key={s} className={sector===s?'chip on':'chip'} onClick={()=>{setSector(sector===s?null:s);setIndustryKey(null)}}>{s}</button>)}</div>
+        <div className="chips"><button className={!sector?'chip on':'chip'} onClick={()=>{setSector(null);setIndustryKey(null)}}>전체 섹터</button>{sectorNames.map(s=><button key={s} className={sector===s?'chip on':'chip'} onClick={()=>{setSector(sector===s?null:s);setIndustryKey(null)}}>{s}</button>)}</div>
       </section>
       <section className="industry-layout">
         <div className="panel industry-panel">
