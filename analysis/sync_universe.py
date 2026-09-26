@@ -4,8 +4,6 @@ import re
 import uuid
 from datetime import date, datetime, timezone
 from pathlib import Path
-from io import StringIO
-
 import FinanceDataReader as fdr
 import pandas as pd
 import requests
@@ -16,10 +14,10 @@ TARGET_EQUITIES=int(os.environ.get("PEPPERCORN_TARGET_EQUITIES","1500"))
 OUTPUT=Path(os.environ.get("UNIVERSE_OUTPUT","universe_payload.json"))
 NASDAQ_SCREENER="https://api.nasdaq.com/api/screener/stocks"
 SOURCES={
-    "S&P500":"FinanceDataReader S&P500 listing; official reference: S&P Dow Jones Indices",
+    "S&P500":"Wikipedia S&P 500 constituent table via FinanceDataReader; benchmark owner: S&P DJI",
     "NASDAQ_CORE":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
-    "KOSPI200":"Naver Finance/Koscom KOSPI200 constituents; official benchmark: KRX",
-    "KOSDAQ150":"KODEX KOSDAQ150 holdings via ETFmap fallback, cross-checked with PLUS ETF; official benchmark: KRX",
+    "KOSPI200":"KRX Data System MDCSTAT00601 official index constituents",
+    "KOSDAQ150":"KRX Data System MDCSTAT00601 official index constituents",
 }
 
 def pick(row,*names,default=None):
@@ -65,102 +63,83 @@ def fetch_sp500():
     return df
 
 def fetch_krx_listing():
-    df=fdr.StockListing("KRX")
-    if len(df)<1500:raise RuntimeError(f"KRX listing returned only {len(df)} rows")
-    return df
-
-def fetch_kospi200():
-    session=requests.Session()
-    session.headers.update({"User-Agent":"Mozilla/5.0 (Peppercorn Capital universe sync)"})
-    session.get("https://finance.naver.com/",timeout=30)
-    found={}
-    for page in range(1,30):
-        r=session.get("https://finance.naver.com/sise/entryJongmok.naver",params={"indCode":"KPI200","page":page},timeout=30)
-        r.raise_for_status()
-        r.encoding=r.apparent_encoding or "euc-kr"
-        pairs=re.findall(r'item/main\\.naver\\?code=(\\d{6})[^>]*>([^<]+)',r.text,re.I)
-        if not pairs:
-            if page>1:break
+    # FinanceDataReader's KRX-DESC cache is generated from KRX/KIND and includes
+    # KRX Market + company 업종(Sector) + 주요제품(Industry). Reading the cache
+    # directly avoids the fragile KRX resource-bundle call made by the adapter.
+    base="https://raw.githubusercontent.com/FinanceData/fdr_krx_data_cache/master/data/listing/desc"
+    for days_back in range(0,15):
+        d=(pd.Timestamp.today()-pd.Timedelta(days=days_back)).strftime("%Y-%m-%d")
+        try:
+            r=requests.get(f"{base}/{d}.csv",headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=30)
+            if r.status_code!=200:continue
+            df=pd.read_csv(pd.io.common.BytesIO(r.content),dtype={"Code":str})
+            if len(df)>=1500:
+                df["Code"]=df["Code"].astype(str).str.zfill(6)
+                df.attrs["as_of"]=d
+                return df
+        except Exception:
             continue
-        for code,name in pairs:
-            found[code]=re.sub(r"\\s+"," ",name).strip()
-    if not 190<=len(found)<=210:
-        raise RuntimeError(f"Naver KOSPI200 returned {len(found)} rows")
-    return pd.DataFrame([{"Code":k,"Name":v} for k,v in found.items()])
+    raise RuntimeError("KRX-DESC cache unavailable for the last 15 days")
 
-def _norm_name(value):
-    s=str(value or "").strip().upper()
-    s=re.sub(r"[\\s·ㆍ.,()（）㈜주식회사]+","",s)
-    s=s.replace("&","AND")
-    return s
+KRX_HEADERS={
+    "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Referer":"https://data.krx.co.kr/contents/MDC/MDI/outerLoader/index.cmd",
+}
 
-def _extract_etfmap_names(html):
-    names=[]
+def _krx_session():
+    session=requests.Session()
+    session.headers.update(KRX_HEADERS)
+    # KRX requires a session cookie even for public MDC endpoints. FinanceData's
+    # cache collector uses the same resource-bundle initialization before calls.
+    init="https://data.krx.co.kr/comm/bldAttendant/executeForResourceBundle.cmd?baseName=krx.mdc.i18n.component&key=B128.bld"
+    r=session.get(init,timeout=20)
+    r.raise_for_status()
+    try:r.json()
+    except Exception:raise RuntimeError("KRX session initialization did not return JSON")
+    return session
+
+def _krx_last_working_day(session):
+    date_str=pd.Timestamp.today().strftime("%Y%m%d")
+    url="https://data.krx.co.kr/comm/bldAttendant/executeForResourceBundle.cmd"
+    r=session.get(url,params={"baseName":"krx.mdc.i18n.component","key":"B161.bld","inDate":date_str},timeout=20)
+    r.raise_for_status()
     try:
-        for table in pd.read_html(StringIO(html)):
-            cols=[str(c).strip() for c in table.columns]
-            name_col=next((c for c in table.columns if "종목명" in str(c)),None)
-            if name_col is None:continue
-            vals=[str(x).strip() for x in table[name_col].tolist() if pd.notna(x)]
-            if len(vals)>=100:
-                names.extend(vals)
-    except Exception:
-        pass
-    if len(set(names))<100:
-        # Fallback for Next/React serialized text or server-rendered rows.
-        pairs=re.findall(r'(?:rank|순위|no)["\' :=]+\\d+.*?(?:name|종목명)["\' :=]+["\']([^"\']{2,40})["\']',html,re.I|re.S)
-        names.extend(pairs)
-    out=[]
-    seen=set()
-    for n in names:
-        n=re.sub(r"\\s+"," ",n).strip()
-        if not n or n in seen:continue
-        seen.add(n);out.append(n)
-    return out
+        j=r.json()
+        return str(j["result"]["output"][0]["bis_work_dt"])
+    except Exception as exc:
+        raise RuntimeError(f"KRX working-day response invalid: {r.text[:120]}") from exc
 
-def _plus_top_codes(url):
-    try:
-        r=requests.get(url,headers={"User-Agent":"Mozilla/5.0"},timeout=30);r.raise_for_status()
-        tables=pd.read_html(StringIO(r.text))
-        codes=[]
-        for table in tables:
-            code_col=next((c for c in table.columns if "종목코드" in str(c)),None)
-            if code_col is None:continue
-            for value in table[code_col].tolist():
-                code=norm_kr(value)
-                if code and code not in codes:codes.append(code)
-        return codes[:10]
-    except Exception:
-        return []
-
-def fetch_kosdaq150(krx_df):
-    r=requests.get("https://etfmap.kr/etf/229200",headers={"User-Agent":"Mozilla/5.0"},timeout=45);r.raise_for_status()
-    names=_extract_etfmap_names(r.text)
-    by_name={}
-    for row in records(krx_df):
-        code=norm_kr(pick(row,"Symbol","Code","단축코드","종목코드"))
-        name=pick(row,"Name","종목명","한글 종목명")
-        if code and name:by_name.setdefault(_norm_name(name),(code,name))
-    matched={}
-    unmatched=[]
-    for name in names:
-        hit=by_name.get(_norm_name(name))
-        if hit:matched[hit[0]]=hit[1]
-        elif len(name)>1:unmatched.append(name)
-    if not 145<=len(matched)<=155:
-        raise RuntimeError(f"ETFmap KOSDAQ150 matched {len(matched)} rows; raw names={len(names)}; unmatched sample={unmatched[:12]}")
-    official_top=_plus_top_codes("https://www.plusetf.co.kr/product/detail?n=006318")
-    if official_top:
-        overlap=len(set(official_top)&set(matched))
-        if overlap<8:
-            raise RuntimeError(f"KOSDAQ150 PLUS cross-check failed: {overlap}/{len(official_top)} top holdings matched")
-    return pd.DataFrame([{"Code":k,"Name":v} for k,v in matched.items()])
+def fetch_kr_index(code,minimum):
+    session=_krx_session()
+    trd_dd=_krx_last_working_day(session)
+    url="https://data.krx.co.kr/comm/bldAttendant/getJsonData.cmd"
+    form={
+        "bld":"dbms/MDC/STAT/standard/MDCSTAT00601",
+        "indIdx":code[0],
+        "indIdx2":code[1:],
+        "param1indIdx_finder_equidx0_1":"",
+        "trdDd":trd_dd,
+        "money":"1",
+        "csvxls_isNo":"false",
+    }
+    r=session.post(url,data=form,timeout=30)
+    r.raise_for_status()
+    try:j=r.json()
+    except Exception as exc:
+        raise RuntimeError(f"KRX index {code} response was not JSON: {r.text[:160]}") from exc
+    raw=j.get("output") or []
+    if len(raw)<minimum:
+        raise RuntimeError(f"KRX index {code} returned only {len(raw)} constituents")
+    df=pd.DataFrame(raw).rename(columns={"ISU_SRT_CD":"Code","ISU_ABBRV":"Name","MKTCAP":"Marcap"})
+    df["Code"]=df["Code"].astype(str).str.zfill(6)
+    df.attrs["as_of"]=trd_dd
+    return df
 
 def records(df): return df.where(pd.notna(df),None).to_dict("records")
 
 def main():
     sp500=fetch_sp500();nasdaq=fetch_nasdaq();krx=fetch_krx_listing()
-    kospi200=fetch_kospi200();kosdaq150=fetch_kosdaq150(krx)
+    kospi200=fetch_kr_index("1028",190);kosdaq150=fetch_kr_index("2203",145)
 
     krx_map={}
     for r in records(krx):
@@ -173,13 +152,13 @@ def main():
         if old is None or priority>=old.get("_priority",-1):
             item["_priority"]=priority;instruments[key]=item
     def member(market,ticker,group,source,rank):
-        composition="AUTO_CURRENT_PROXY" if group=="KOSDAQ150" else "AUTO_CURRENT"
+        composition="OFFICIAL_KRX" if group in ("KOSPI200","KOSDAQ150") else ("REFERENCE_TABLE" if group=="S&P500" else "NASDAQ_MARKET_COVERAGE")
         memberships.append({"id":str(uuid.uuid5(uuid.NAMESPACE_URL,f"peppercorn:index:{market}:{ticker}:{group}")),"market":market,"ticker":ticker,"entry_type":"INDEX","theme_group":group,"parent_etf_ticker":None,"holding_rank":rank,"weight":None,"as_of":TODAY,"source":source,"validation_status":"AUTO_CURRENT","composition_status":composition})
 
     for rank,r in enumerate(records(sp500),1):
         ticker=norm_us(pick(r,"Symbol","Ticker"))
         if not ticker:continue
-        add({"market":"US","ticker":ticker,"name":pick(r,"Name",default=ticker),"asset_class":"Equity","exchange":"US","sector":pick(r,"Sector"),"industry":pick(r,"Industry"),"benchmark_ticker":"SPY","currency":"USD","active":True,"classification_scheme":"GICS-compatible S&P500 listing","classification_source":"AUTO:FinanceDataReader S&P500 listing; official reference: S&P DJI","classification_as_of":TODAY,"universe_updated_at":NOW},3)
+        add({"market":"US","ticker":ticker,"name":pick(r,"Name",default=ticker),"asset_class":"Equity","exchange":"US","sector":pick(r,"Sector"),"industry":pick(r,"Industry"),"benchmark_ticker":"SPY","currency":"USD","active":True,"classification_scheme":"GICS sector · sub-industry","classification_source":"AUTO:Wikipedia S&P 500 table via FinanceDataReader; benchmark reference: S&P DJI","classification_as_of":TODAY,"universe_updated_at":NOW},3)
         member("US",ticker,"S&P500",SOURCES["S&P500"],rank)
 
     for r in nasdaq:
@@ -195,7 +174,7 @@ def main():
             industry=pick(meta,"Industry","주요제품","산업") or sector
             name=pick(meta,"Name","종목명","한글 종목명") or pick(r,"Name","종목명") or ticker
             exchange=pick(meta,"Market","시장구분") or market_name
-            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":"KRX listing 업종 / 주요제품","classification_source":"AUTO:FinanceDataReader KRX listing adapter","classification_as_of":TODAY,"universe_updated_at":NOW},2)
+            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":"KRX/KIND 업종 · 주요제품","classification_source":"AUTO:FinanceData KRX-DESC cache (source: KRX/KIND)","classification_as_of":TODAY,"universe_updated_at":NOW},2)
             member("KR",ticker,group,SOURCES[group],rank)
 
     add_kr_index(kospi200,"KOSPI200","KOSPI");add_kr_index(kosdaq150,"KOSDAQ150","KOSDAQ")
