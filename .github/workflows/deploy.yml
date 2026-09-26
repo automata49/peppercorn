@@ -54,7 +54,7 @@ jobs:
                   continue
 
               aliases.update(re.findall(
-                  r'/peppercorn/(assets/index-[^"\']+\.(?:js|css))',
+                  r"/peppercorn/(assets/index-[A-Za-z0-9_.-]+\.(?:js|css))",
                   html,
               ))
 
