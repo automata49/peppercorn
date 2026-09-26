@@ -2,6 +2,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from kr_classification import WICS_HIERARCHY
 
 PATH=Path(os.environ.get("UNIVERSE_OUTPUT","universe_payload.json"))
 
@@ -50,6 +51,20 @@ def main():
     if len(missing_industry)/max(1,total)>.08:fail(f"missing industry >8%: {len(missing_industry)}/{total}")
     if missing_source:fail(f"classification provenance missing: {len(missing_source)}")
 
-    print(json.dumps({"unique_equities":total,"memberships":groups,"composition_statuses":{k:sorted(v) for k,v in statuses.items()},"missing_sector":len(missing_sector),"missing_industry":len(missing_industry),"classification_provenance":"PASS"},ensure_ascii=False))
+    kr=[x for x in instruments if x.get("market")=="KR"]
+    invalid=[x["ticker"] for x in kr if x.get("sector") and
+             x.get("sector") not in WICS_HIERARCHY.get(x.get("industry"),{})]
+    if invalid:fail(f"KR WICS industry/sector hierarchy mismatch: {invalid[:15]}")
+    if sum(bool(x.get("sector")) for x in kr)<len(kr)*.95:
+        fail("KR WICS coverage below 95%")
+    examples={"008930":("건강관리","제약과생물공학"),
+              "042700":("IT","반도체와반도체장비"),
+              "128940":("건강관리","제약과생물공학")}
+    for ticker,category in examples.items():
+        item=by_key.get(("KR",ticker))
+        if item and (item.get("industry"),item.get("sector"))!=category:
+            fail(f"KR WICS classification check failed for {ticker}: {item.get('industry')}/{item.get('sector')}")
+
+    print(json.dumps({"unique_equities":total,"memberships":groups,"composition_statuses":{k:sorted(v) for k,v in statuses.items()},"missing_sector":len(missing_sector),"missing_industry":len(missing_industry),"kr_wics_classified":sum(bool(x.get("sector")) for x in kr),"kr_total":len(kr),"classification_provenance":"PASS"},ensure_ascii=False))
 
 if __name__=="__main__":main()

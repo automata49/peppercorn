@@ -70,7 +70,7 @@ const sectorKey=(r:LeaderRow)=>`${r.market}|${r.sector||'분류 확인'}`
 function buildSectors(rows:LeaderRow[]):SectorSummary[]{
   const groups=new Map<string,LeaderRow[]>()
   for(const r of rows){
-    if(r.asset_class!=='Equity')continue
+    if(r.asset_class!=='Equity'||!r.sector||r.sector==='분류 확인')continue
     const key=sectorKey(r)
     const list=groups.get(key)||[];list.push(r);groups.set(key,list)
   }

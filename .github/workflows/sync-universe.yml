@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'analysis/sync_universe.py'
+      - 'analysis/kr_classification.py'
       - 'analysis/validate_universe.py'
       - 'analysis/requirements.txt'
       - 'supabase/functions/universe-import/**'
