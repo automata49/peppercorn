@@ -38,6 +38,14 @@ def main():
     missing_sector=[x for x in instruments if not x.get("sector")]
     missing_industry=[x for x in instruments if not x.get("industry")]
     missing_source=[x for x in instruments if not x.get("classification_source")]
+    if missing_sector:
+        by_market={}
+        for x in missing_sector:by_market[x.get("market","?")]=by_market.get(x.get("market","?"),0)+1
+        print("MISSING SECTOR BY MARKET:",by_market)
+    if missing_industry:
+        by_market={}
+        for x in missing_industry:by_market[x.get("market","?")]=by_market.get(x.get("market","?"),0)+1
+        print("MISSING INDUSTRY BY MARKET:",by_market)
     if len(missing_sector)/max(1,total)>.05:fail(f"missing sector >5%: {len(missing_sector)}/{total}")
     if len(missing_industry)/max(1,total)>.08:fail(f"missing industry >8%: {len(missing_industry)}/{total}")
     if missing_source:fail(f"classification provenance missing: {len(missing_source)}")
