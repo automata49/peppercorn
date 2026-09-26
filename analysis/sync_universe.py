@@ -92,9 +92,9 @@ def fetch_sp500():
     return df
 
 def fetch_krx_listing():
-    # FinanceDataReader's KRX-DESC cache is generated from KRX/KIND and includes
-    # KRX Market + company 업종(Sector) + 주요제품(Industry). Reading the cache
-    # directly avoids the fragile KRX resource-bundle call made by the adapter.
+    # FinanceDataReader's KRX-DESC cache is generated from KRX/KIND. Its Industry
+    # column is the company industry; Sector is a listing-board classification
+    # (especially on KOSDAQ), and Products is the major-product description.
     base="https://raw.githubusercontent.com/FinanceData/fdr_krx_data_cache/master/data/listing/desc"
     for days_back in range(0,15):
         d=(pd.Timestamp.today()-pd.Timedelta(days=days_back)).strftime("%Y-%m-%d")
@@ -210,6 +210,27 @@ def fetch_tradingview_index(symbolset,expected,krx_df,market_name,index_name):
     })
     return df
 
+def fetch_tradingview_kr_sectors(tickers):
+    url="https://scanner.tradingview.com/korea/scan"
+    out={}
+    clean=list(dict.fromkeys(norm_kr(x) for x in tickers if norm_kr(x)))
+    for i in range(0,len(clean),200):
+        batch=clean[i:i+200]
+        body={
+            "filter":[{"left":"name","operation":"in_range","right":batch}],
+            "columns":["name","sector"],
+            "range":[0,len(batch)+20],
+        }
+        r=requests.post(url,json=body,headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0","Content-Type":"application/json"},timeout=45)
+        r.raise_for_status()
+        for row in (r.json() or {}).get("data") or []:
+            d=row.get("d") or []
+            ticker=norm_kr(d[0] if len(d)>0 else "")
+            sector=str(d[1] if len(d)>1 and d[1] is not None else "").strip()
+            if ticker and sector:out[ticker]=sector
+    return out
+
+
 def fetch_etf_holdings_proxy(etf_code,expected,krx_df,market_name,index_name):
     # KG ZeroIn documents machine-readable JSON by appending .json to page URLs.
     # KRX official composition remains first choice; this path is fallback-only.
@@ -311,6 +332,16 @@ def main():
         lambda:fetch_tradingview_index("SYML:KRX;KOSDAQ150",150,krx,"KOSDAQ","KOSDAQ150"),
         lambda:fetch_etf_holdings_proxy("229200",150,krx,"KOSDAQ","KOSDAQ150"),
     )
+    kr_codes=list(dict.fromkeys(
+        [norm_kr(x) for x in kospi200.get("Code",[])] +
+        [norm_kr(x) for x in kosdaq150.get("Code",[])]
+    ))
+    try:
+        tv_kr_sector=fetch_tradingview_kr_sectors(kr_codes)
+    except Exception as exc:
+        print(f"WARNING: TradingView KR sector classification unavailable ({exc}); using KRX/KIND industry as sector fallback")
+        tv_kr_sector={}
+    print({"kr_sector_requested":len(kr_codes),"tradingview_kr_sector_filled":len(tv_kr_sector)})
 
     krx_map={}
     for r in records(krx):
@@ -348,11 +379,18 @@ def main():
             ticker=norm_kr(pick(r,"Code","Symbol","단축코드","종목코드"))
             if not ticker:continue
             meta=krx_map.get(ticker,{})
-            sector=pick(meta,"Sector","업종","업종명")
-            industry=sector
+            industry=pick(meta,"Industry","업종","업종명")
+            market_sector=str(tv_kr_sector.get(ticker) or "").strip()
+            sector=market_sector or industry
             name=pick(meta,"Name","종목명","한글 종목명") or pick(r,"Name","종목명") or ticker
             exchange=pick(meta,"Market","시장구분") or market_name
-            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":"KRX/KIND 업종","classification_source":"AUTO:FinanceData KRX-DESC cache (source: KRX/KIND company 업종)","classification_as_of":TODAY,"universe_updated_at":NOW},2)
+            if market_sector:
+                scheme="TradingView sector + KRX/KIND industry"
+                source="AUTO:TradingView Korea market sector; FinanceData KRX-DESC industry (source: KRX/KIND)"
+            else:
+                scheme="KRX/KIND industry"
+                source="AUTO:FinanceData KRX-DESC industry (source: KRX/KIND)"
+            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":krx.attrs.get("as_of",TODAY),"universe_updated_at":NOW},2)
             member("KR",ticker,group,SOURCES[group],rank)
 
     add_kr_index(kospi200,"KOSPI200","KOSPI");add_kr_index(kosdaq150,"KOSDAQ150","KOSDAQ")
