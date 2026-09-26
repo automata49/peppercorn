@@ -21,21 +21,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 30
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm install --ignore-scripts
       - run: npm run build
-      - name: Preserve recent hashed bundles for cached PWA shells
+      - name: Add legacy bundle aliases for cached iPad/PWA shells
         run: |
           python - <<'PY'
-          import pathlib, re, subprocess
+          import pathlib, re, shutil, subprocess
 
           dist = pathlib.Path("dist")
-          kept = []
+          js = dist / "assets" / "app.js"
+          css = dist / "assets" / "app.css"
+          if not js.exists() or not css.exists():
+              raise SystemExit("stable app.js/app.css were not produced")
+
+          aliases = set()
           commits = subprocess.check_output(
-              ["git", "rev-list", "--max-count=30", "HEAD"], text=True
+              ["git", "rev-list", "--max-count=120", "HEAD"], text=True
           ).splitlines()
 
           for commit in commits:
@@ -48,33 +53,17 @@ jobs:
               except subprocess.CalledProcessError:
                   continue
 
-              paths = re.findall(
-                  r'/peppercorn/(assets/index-[^"\\']+\\.(?:js|css))',
+              aliases.update(re.findall(
+                  r'/peppercorn/(assets/index-[^"\']+\.(?:js|css))',
                   html,
-              )
-              js_path = next((p for p in paths if p.endswith(".js")), None)
-              if not js_path or js_path in kept:
-                  continue
+              ))
 
-              kept.append(js_path)
-              for rel in paths:
-                  target = dist / rel
-                  if target.exists():
-                      continue
-                  try:
-                      data = subprocess.check_output(
-                          ["git", "show", f"{commit}:{rel}"],
-                          stderr=subprocess.DEVNULL,
-                      )
-                  except subprocess.CalledProcessError:
-                      continue
-                  target.parent.mkdir(parents=True, exist_ok=True)
-                  target.write_bytes(data)
+          for rel in sorted(aliases):
+              target = dist / rel
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(js if rel.endswith(".js") else css, target)
 
-              if len(kept) >= 5:
-                  break
-
-          print("Preserved previous JS bundles:", kept)
+          print(f"Created {len(aliases)} legacy aliases:", sorted(aliases))
           PY
       - name: Keep branch Pages source deployable
         run: |
