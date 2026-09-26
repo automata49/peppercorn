@@ -7,7 +7,9 @@ provider's sector to imply a single parent/child classification.
 
 import html
 import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, timedelta
 
 import requests
 
@@ -67,26 +69,125 @@ for industry, sectors in WICS_HIERARCHY.items():
                 raise ValueError(f"Ambiguous WICS category: {detail}")
             WICS_DETAIL[key] = (industry, sector)
 
+# WiseIndex publishes the constituent list for each WICS middle-group index.
+# These codes are the published hierarchy's four-digit middle-group codes.
+WICS_MIDDLE_CODES = {
+    "G1010": ("에너지", "에너지"),
+    "G1510": ("소재", "소재"),
+    "G2010": ("산업재", "자본재"),
+    "G2020": ("산업재", "상업서비스와공급품"),
+    "G2030": ("산업재", "운송"),
+    "G2510": ("경기관련소비재", "자동차와부품"),
+    "G2520": ("경기관련소비재", "내구소비재와의류"),
+    "G2530": ("경기관련소비재", "호텔,레스토랑,레저 등"),
+    "G2550": ("경기관련소비재", "소매(유통)"),
+    "G2560": ("경기관련소비재", "교육서비스"),
+    "G3010": ("필수소비재", "식품과기본식료품소매"),
+    "G3020": ("필수소비재", "식품,음료,담배"),
+    "G3030": ("필수소비재", "가정용품과개인용품"),
+    "G3510": ("건강관리", "건강관리장비와서비스"),
+    "G3520": ("건강관리", "제약과생물공학"),
+    "G4010": ("금융", "은행"),
+    "G4020": ("금융", "증권"),
+    "G4030": ("금융", "다각화된금융"),
+    "G4040": ("금융", "보험"),
+    "G4050": ("금융", "부동산"),
+    "G4510": ("IT", "소프트웨어와서비스"),
+    "G4520": ("IT", "기술하드웨어와장비"),
+    "G4530": ("IT", "반도체와반도체장비"),
+    "G4535": ("IT", "전자와 전기제품"),
+    "G4540": ("IT", "디스플레이"),
+    "G5010": ("커뮤니케이션서비스", "전기통신서비스"),
+    "G5020": ("커뮤니케이션서비스", "미디어와엔터테인먼트"),
+    "G5510": ("유틸리티", "유틸리티"),
+}
+if set(WICS_MIDDLE_CODES.values()) != {
+    (industry, sector) for industry, sectors in WICS_HIERARCHY.items() for sector in sectors
+}:
+    raise ValueError("WICS middle-group codes and hierarchy disagree")
+
 
 def parse_wics_label(page):
     match = re.search(r"<dt\b[^>]*>\s*WICS\s*:\s*([^<]+)</dt>", page, re.I)
     return html.unescape(match.group(1)).strip() if match else None
 
 
+def _components(code, as_of):
+    url = "https://www.wiseindex.com/Index/GetIndexComponets"
+    response = requests.get(url, params={"ceil_yn": "0", "dt": as_of, "sec_cd": code},
+                            timeout=18, headers={"User-Agent": "Mozilla/5.0"})
+    response.raise_for_status()
+    data = response.json()
+    return data.get("list") or []
+
+
+def _latest_wics_date():
+    # The index constituents can be published several days after the trade date.
+    # Probe recent Fridays to avoid treating a valid but unpublished day as empty.
+    today = date.today()
+    friday = today - timedelta(days=(today.weekday() - 4) % 7)
+    if friday >= today:
+        friday -= timedelta(days=7)
+    for week in range(7):
+        candidate = (friday - timedelta(weeks=week)).strftime("%Y%m%d")
+        try:
+            if len(_components("G45", candidate)) >= 100:
+                return candidate
+        except (requests.RequestException, ValueError) as exc:
+            print(f"WICS index probe failed for {candidate}: {exc}")
+    raise RuntimeError("No recent published WiseIndex WICS constituents (last seven Fridays)")
+
+
 def fetch_wics_classifications(tickers):
-    """Fetch each stock's published WICS label; fail closed on coverage drift."""
+    """Read published WICS middle-group constituents and verify each stock."""
     codes = sorted(set(tickers))
+    as_of = _latest_wics_date()
+    result = {}
+
+    def fetch_group(code, category):
+        for attempt in range(2):
+            try:
+                rows = _components(code, as_of)
+                for row in rows:
+                    if row.get("IDX_CD") != code or normalized(row.get("SEC_NM_KOR")) != normalized(category[0]):
+                        raise ValueError(f"WiseIndex {code} returned an unexpected classification")
+                return code, category, rows
+            except (requests.RequestException, ValueError) as exc:
+                if attempt:
+                    print(f"WICS group unavailable for {code}: {exc}")
+                else:
+                    time.sleep(1)
+        return code, category, []
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        futures = [pool.submit(fetch_group, code, category)
+                   for code, category in WICS_MIDDLE_CODES.items()]
+        for future in as_completed(futures):
+            group_code, category, rows = future.result()
+            for row in rows:
+                ticker = str(row.get("CMP_CD") or "").zfill(6)
+                if ticker not in codes:
+                    continue
+                if ticker in result and result[ticker] != category:
+                    raise RuntimeError(f"Conflicting WICS classifications for {ticker}")
+                result[ticker] = category
+
+    # Individual pages cover edge cases absent from index constituents.
+    missing = sorted(set(codes) - result.keys())
+    if missing:
+        print(f"WiseIndex {as_of}: {len(result)}/{len(codes)} from index; checking {len(missing)} company pages")
 
     def fetch(ticker):
         url = "https://navercomp.wisereport.co.kr/v2/company/c1010001.aspx"
-        response = requests.get(url, params={"cmp_cd": ticker}, timeout=30,
+        response = requests.get(url, params={"cmp_cd": ticker}, timeout=15,
                                 headers={"User-Agent": "Mozilla/5.0 (Peppercorn universe classification check)"})
         response.raise_for_status()
+        response.encoding = response.apparent_encoding
         return ticker, parse_wics_label(response.text)
 
-    result, missing, unknown = {}, [], {}
+    unresolved, unknown = [], {}
     with ThreadPoolExecutor(max_workers=5) as pool:
-        futures = {pool.submit(fetch, ticker): ticker for ticker in codes}
+        futures = {pool.submit(fetch, ticker): ticker for ticker in missing}
         for future in as_completed(futures):
             ticker = futures[future]
             try:
@@ -97,12 +198,12 @@ def fetch_wics_classifications(tickers):
                 elif detail:
                     unknown[ticker] = detail
                 else:
-                    missing.append(ticker)
+                    unresolved.append(ticker)
             except (requests.RequestException, ValueError) as exc:
-                missing.append(ticker)
+                unresolved.append(ticker)
                 print(f"WICS unavailable for {ticker}: {exc}")
-    print({"wics_requested": len(codes), "matched": len(result),
-           "missing": len(missing), "unknown": unknown})
+    print({"wics_as_of": as_of, "wics_requested": len(codes), "matched": len(result),
+           "missing": len(unresolved), "unknown": unknown})
     if len(result) < len(codes) * 0.95:
         raise RuntimeError(f"WICS classification coverage below 95%: {len(result)}/{len(codes)}")
-    return result
+    return result, as_of

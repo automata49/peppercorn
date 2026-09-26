@@ -316,7 +316,7 @@ def main():
         [norm_kr(x) for x in kospi200.get("Code",[])] +
         [norm_kr(x) for x in kosdaq150.get("Code",[])]
     ))
-    wics_kr=fetch_wics_classifications(kr_codes)
+    wics_kr,wics_as_of=fetch_wics_classifications(kr_codes)
 
     krx_map={}
     for r in records(krx):
@@ -358,8 +358,9 @@ def main():
             name=pick(meta,"Name","종목명","한글 종목명") or pick(r,"Name","종목명") or ticker
             exchange=pick(meta,"Market","시장구분") or market_name
             scheme="WICS 대분류 · 중분류" if sector else "WICS 확인 필요"
-            source="AUTO:FnGuide CompanyGuide WICS per-stock classification; WiseIndex WICS taxonomy"
-            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":krx.attrs.get("as_of",TODAY),"universe_updated_at":NOW},2)
+            source=("AUTO:WiseIndex WICS middle-group index constituents; FnGuide company WICS fallback"
+                    if sector else "AUTO:WiseIndex/FnGuide WICS classification unavailable")
+            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":f"{wics_as_of[:4]}-{wics_as_of[4:6]}-{wics_as_of[6:]}","universe_updated_at":NOW},2)
             member("KR",ticker,group,SOURCES[group],rank)
 
     add_kr_index(kospi200,"KOSPI200","KOSPI");add_kr_index(kosdaq150,"KOSDAQ150","KOSDAQ")
