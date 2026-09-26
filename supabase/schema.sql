@@ -20,6 +20,25 @@ create table if not exists public.instruments (
   unique (market,ticker)
 );
 
+create table if not exists public.universe_memberships (
+  id uuid primary key,
+  instrument_id uuid not null references public.instruments(id) on delete cascade,
+  entry_type text,
+  theme_group text,
+  parent_etf_ticker text,
+  holding_rank integer,
+  weight numeric,
+  as_of date,
+  source text,
+  gf_symbol text,
+  validation_status text,
+  composition_status text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists universe_memberships_instrument_idx on public.universe_memberships(instrument_id);
+create index if not exists universe_memberships_parent_etf_idx on public.universe_memberships(parent_etf_ticker);
+
 create table if not exists public.price_daily (
   instrument_id uuid not null references public.instruments(id) on delete cascade,
   trade_date date not null,
@@ -179,6 +198,7 @@ create table if not exists public.user_thresholds (
 );
 
 alter table public.instruments enable row level security;
+alter table public.universe_memberships enable row level security;
 alter table public.price_daily enable row level security;
 alter table public.market_metrics enable row level security;
 alter table public.watchlist enable row level security;
@@ -188,10 +208,11 @@ alter table public.research_notes enable row level security;
 alter table public.trade_journal enable row level security;
 alter table public.user_thresholds enable row level security;
 
-grant select on public.instruments,public.price_daily,public.market_metrics to anon,authenticated;
+grant select on public.instruments,public.universe_memberships,public.price_daily,public.market_metrics to anon,authenticated;
 grant select,insert,update,delete on public.watchlist,public.portfolio_positions,public.stock_analyses,public.research_notes,public.trade_journal,public.user_thresholds to authenticated;
 
 create policy "public instruments read" on public.instruments for select to anon,authenticated using (true);
+create policy "public universe memberships read" on public.universe_memberships for select to anon,authenticated using (true);
 create policy "public prices read" on public.price_daily for select to anon,authenticated using (true);
 create policy "public metrics read" on public.market_metrics for select to anon,authenticated using (true);
 
