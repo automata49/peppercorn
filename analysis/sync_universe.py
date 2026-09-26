@@ -16,7 +16,7 @@ OUTPUT=Path(os.environ.get("UNIVERSE_OUTPUT","universe_payload.json"))
 NASDAQ_SCREENER="https://api.nasdaq.com/api/screener/stocks"
 SOURCES={
     "S&P500":"Wikipedia S&P 500 constituent table via FinanceDataReader; benchmark owner: S&P DJI",
-    "NASDAQ_CORE":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
+    "NASDAQ":"Nasdaq Stock Screener; sector/industry mapped from Quotemedia SIC",
     "KOSPI200":"KRX Data System MDCSTAT00601 official index constituents",
     "KOSDAQ150":"KRX Data System MDCSTAT00601 official index constituents",
 }
@@ -237,7 +237,7 @@ def main():
         selected.add(key)
 
     for rank,r in enumerate([x for x in nasdaq if ("US",norm_us(x.get("symbol"))) in instruments],1):
-        member("US",norm_us(r.get("symbol")),"NASDAQ_CORE",SOURCES["NASDAQ_CORE"],rank)
+        member("US",norm_us(r.get("symbol")),"NASDAQ",SOURCES["NASDAQ"],rank)
 
     items=[]
     for item in instruments.values():
