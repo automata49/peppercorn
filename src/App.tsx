@@ -368,7 +368,6 @@ export default function App(){
         gsap.set([icon,title,capital,slogan],{autoAlpha:0})
       }
       const timeline=gsap.timeline({onComplete:finish})
-      timeline.fromTo(root,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},0)
       if(!reduceMotion){
         timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},.15)
           .fromTo(title,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.45)

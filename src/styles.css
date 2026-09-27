@@ -196,7 +196,7 @@
 .install-dialog .install-note{margin-top:20px;color:#8a6b38;font-size:12px;line-height:1.5}
 .install-close{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#6e7d8e;font-size:25px;cursor:pointer}
 /* GSAP controls the first-visit entrance, progress, and dashboard reveal. */
-.launch-overlay{position:fixed;z-index:200;inset:0;background:#f4f6fa;opacity:0}
+.launch-overlay{position:fixed;z-index:200;inset:0;background:#f4f6fa}
 .launch-screen{display:grid;place-items:center;width:100vw;height:100dvh;padding:24px;color:#26364b}
 .launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,420px);text-align:center}
 .launch-brand.brand{display:flex!important;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:0!important}
