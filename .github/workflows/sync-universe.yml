@@ -51,6 +51,7 @@ jobs:
           echo "::add-mask::$TOKEN"
           curl -fsS -X POST "$FUNCTIONS_URL/universe-import"             -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json"             --data-binary @universe_payload.json
       - name: Bootstrap market metrics in chunks
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
           set -euo pipefail
@@ -66,6 +67,7 @@ jobs:
             [ "$REQUESTED" -eq 0 ] && break
           done
       - name: Recalculate RS and leadership
+        if: github.event_name == 'workflow_dispatch'
         shell: bash
         run: |
           set -euo pipefail

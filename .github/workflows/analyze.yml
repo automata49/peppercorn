@@ -2,8 +2,24 @@ name: Refresh market analysis
 
 on:
   workflow_dispatch:
+    inputs:
+      market:
+        description: Market to refresh manually
+        type: choice
+        options: [ALL, KR, US]
+        default: ALL
   schedule:
-    - cron: '17 21 * * 1-5'
+    # One hour before/after regular sessions; 14:00 ET covers NYSE early closes.
+    - cron: '0 8 * * 1-5'
+      timezone: Asia/Seoul
+    - cron: '30 16 * * 1-5'
+      timezone: Asia/Seoul
+    - cron: '30 8 * * 1-5'
+      timezone: America/New_York
+    - cron: '0 14 * * 1-5'
+      timezone: America/New_York
+    - cron: '0 17 * * 1-5'
+      timezone: America/New_York
 
 permissions:
   contents: read
@@ -18,8 +34,56 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
-      - name: Refresh all active instruments
+      - name: Select market and verify the exchange session
+        id: route
         shell: bash
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_MARKET: ${{ inputs.market }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SCHEDULE" ]; then
+            echo "market=${MANUAL_MARKET:-ALL}" >> "$GITHUB_OUTPUT"
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$SCHEDULE" in
+            '0 8 * * 1-5'|'30 16 * * 1-5') MARKET=KR; TIMEZONE=Asia/Seoul ;;
+            '30 8 * * 1-5'|'0 14 * * 1-5'|'0 17 * * 1-5') MARKET=US; TIMEZONE=America/New_York ;;
+            *) echo "Unexpected schedule: $SCHEDULE" >&2; exit 1 ;;
+          esac
+          echo "market=$MARKET" >> "$GITHUB_OUTPUT"
+          export MARKET TIMEZONE
+          python -m pip install --quiet 'exchange_calendars==4.13.2'
+          python - <<'PY'
+          import datetime as dt
+          import os
+          from zoneinfo import ZoneInfo
+          import exchange_calendars as xcals
+
+          market = os.environ['MARKET']
+          zone = ZoneInfo(os.environ['TIMEZONE'])
+          today = dt.datetime.now(zone).date()
+          calendar = xcals.get_calendar('XKRX' if market == 'KR' else 'XNYS')
+          slot = os.environ['SCHEDULE'].split()
+          minute, hour = int(slot[0]), int(slot[1])
+          allowed = False
+          if calendar.is_session(str(today)):
+              opened, closed = calendar.session_open_close(str(today))
+              for target in (opened - dt.timedelta(hours=1), closed + dt.timedelta(hours=1)):
+                  local = target.to_pydatetime().astimezone(zone)
+                  if (local.hour, local.minute) == (hour, minute):
+                      allowed = True
+                      break
+          print(f'{market} {today}: {"refresh" if allowed else "skip (holiday or different session hours)"}')
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'run={str(allowed).lower()}\n')
+          PY
+      - name: Refresh selected market
+        if: steps.route.outputs.run == 'true'
+        shell: bash
+        env:
+          TARGET_MARKET: ${{ steps.route.outputs.market }}
         run: |
           set -euo pipefail
           get_token() {
@@ -27,13 +91,14 @@ jobs:
           }
           for OFFSET in $(seq 0 120 1920); do
             TOKEN=$(get_token); echo "::add-mask::$TOKEN"
-            PAYLOAD=$(printf '{"offset":%s,"limit":120}' "$OFFSET")
+            PAYLOAD=$(printf '{"offset":%s,"limit":120,"market":"%s"}' "$OFFSET" "$TARGET_MARKET")
             RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "$PAYLOAD")
             echo "$RESP"
             REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
             [ "$REQUESTED" -eq 0 ] && break
           done
       - name: Recalculate RS and leadership
+        if: steps.route.outputs.run == 'true'
         shell: bash
         run: |
           set -euo pipefail

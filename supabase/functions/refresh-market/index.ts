@@ -83,10 +83,13 @@ Deno.serve(async(req:Request)=>{
 
   const offset=Math.max(0,Number(body?.offset||0));
   const limit=Math.min(120,Math.max(1,Number(body?.limit||80)));
+  const market=body?.market??"ALL";
+  if(market!=="ALL" && market!=="KR" && market!=="US")return Response.json({error:"invalid_market"},{status:400});
 
   const q=new URL(base+"/rest/v1/instruments");
   q.searchParams.set("select","id,market,ticker,exchange");
   q.searchParams.set("active","eq.true");
+  if(market!=="ALL")q.searchParams.set("market","eq."+market);
   q.searchParams.set("order","market.asc,ticker.asc");
   q.searchParams.set("offset",String(offset));
   q.searchParams.set("limit",String(limit));
