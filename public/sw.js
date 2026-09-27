@@ -1,4 +1,5 @@
-const CACHE_NAME = 'peppercorn-shell-v3'
+const BUILD_REV = '__BUILD_REV__'
+const CACHE_NAME = `peppercorn-shell-${BUILD_REV}`
 const APP_ROOT = new URL('./', self.registration.scope)
 
 self.addEventListener('install', event => {
@@ -20,7 +21,7 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || event.request.mode !== 'navigate') return
   const url = new URL(event.request.url)
   if (url.origin !== APP_ROOT.origin || !url.pathname.startsWith(APP_ROOT.pathname)) return
-  event.respondWith(fetch(event.request).then(response => {
+  event.respondWith(fetch(event.request, {cache:'no-store'}).then(response => {
     if (response.ok) {
       const copy = response.clone()
       event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(APP_ROOT.href, copy)))
