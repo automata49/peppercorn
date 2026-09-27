@@ -191,3 +191,9 @@
 .launch-progress span{display:block;width:34px;height:100%;border-radius:2px;background:#9c7840;animation:launch-scan 1.4s ease-in-out infinite alternate}
 @keyframes launch-scan{from{transform:translateX(-34px)}to{transform:translateX(88px)}}
 @media(prefers-reduced-motion:reduce){.launch-progress span{animation:none;width:100%}}
+/* Keep 52W period and high-distance labels on one line in compact stock details. */
+.stock-snapshot,.snapshot-section{min-width:0}
+.signal-strip{grid-template-columns:repeat(6,minmax(76px,1fr));overflow-x:auto;overscroll-behavior-x:contain}
+.signal-strip>div{min-width:76px}
+.signal-strip span,.snapshot-item>span{white-space:nowrap}
+@media(max-width:760px){.signal-strip{grid-template-columns:repeat(6,minmax(76px,1fr))}}
