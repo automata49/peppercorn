@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
@@ -227,8 +227,30 @@ const tradingPeriods=['5D','20D','50D','120D','200D','52W'] as const
 const rsTradingValues=(r:LeaderRow)=>[r.rs_5d,r.rs_20d,r.rs_50d,r.rs_120d,r.rs_200d,r.rs_12m]
 const returnTradingValues=(r:LeaderRow)=>[r.return_5d,r.return_20d,r.return_50d,r.return_120d,r.return_200d,r.return_12m]
 
+const STOCK_NAME_DEFAULT_WIDTH=260
+const STOCK_NAME_MIN_WIDTH=220
+const STOCK_NAME_MAX_WIDTH=520
+const STOCK_NAME_WIDTH_KEY='peppercorn-stock-name-width'
+
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>현재가</span><span>단계</span><span>RS</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+  const [stockNameWidth,setStockNameWidth]=useState(()=>{
+    try{
+      const saved=Number(localStorage.getItem(STOCK_NAME_WIDTH_KEY))
+      return Number.isFinite(saved)?Math.min(STOCK_NAME_MAX_WIDTH,Math.max(STOCK_NAME_MIN_WIDTH,saved)):STOCK_NAME_DEFAULT_WIDTH
+    }catch{return STOCK_NAME_DEFAULT_WIDTH}
+  })
+  useEffect(()=>{
+    try{localStorage.setItem(STOCK_NAME_WIDTH_KEY,String(stockNameWidth))}catch{}
+  },[stockNameWidth])
+  return <div className="stock-rows" style={{'--stock-name-width':`${stockNameWidth}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">종목<button type="button" className="stock-column-resizer" aria-label="종목 열 너비 조절" title="드래그하여 종목 열 너비 조절" onPointerDown={event=>{
+    event.preventDefault();event.stopPropagation()
+    const startX=event.clientX,startWidth=stockNameWidth
+    const previousCursor=document.body.style.cursor,previousSelect=document.body.style.userSelect
+    document.body.style.cursor='col-resize';document.body.style.userSelect='none'
+    const move=(moveEvent:PointerEvent)=>setStockNameWidth(Math.min(STOCK_NAME_MAX_WIDTH,Math.max(STOCK_NAME_MIN_WIDTH,startWidth+moveEvent.clientX-startX)))
+    const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);document.body.style.cursor=previousCursor;document.body.style.userSelect=previousSelect}
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)
+  }}/></span><span>현재가</span><span>단계</span><span>RS</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
     <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={r.ibd_rs_as_of?`가격 기준 ${r.ibd_rs_as_of} · IBD 방식 추정치`:'가격 이력 253거래일 미만'}>{r.ibd_rs_estimate??'—'}</strong>
     {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
