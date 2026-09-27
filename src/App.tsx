@@ -135,12 +135,14 @@ const leaderCols:ColDef<LeaderRow>[]=[
   {field:'rs_50d',headerName:'RS 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'rs_120d',headerName:'RS 120D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'rs_200d',headerName:'RS 200D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'rs_12m',headerName:'RS 252D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_5d',headerName:'등락 5D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_20d',headerName:'등락 20D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_50d',headerName:'등락 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_120d',headerName:'등락 120D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_200d',headerName:'등락 200D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'high_52w_distance',headerName:'52W 고점 대비',valueFormatter:p=>pct(p.value)},
+  {field:'return_12m',headerName:'등락 252D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'high_52w_distance',headerName:'52W 고점 대비',headerTooltip:'최근 252개 거래 세션의 최고가 대비 현재가',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'volume_ratio',headerName:'거래량 배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(2)+'x'},
   {field:'rsi14',headerName:'RSI',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(0)},
   {field:'atr_multiple',headerName:'ATR배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(1)+'x'},
@@ -220,9 +222,9 @@ function Kpi({label,value,sub,onClick}:{label:string;value:string|number;sub?:st
 
 function ValuePill({children,tone='gray'}:{children:any;tone?:string}){return <span className={'pill '+tone}>{children}</span>}
 
-const tradingPeriods=['5D','20D','50D','120D','200D'] as const
-const rsTradingValues=(r:LeaderRow)=>[r.rs_5d,r.rs_20d,r.rs_50d,r.rs_120d,r.rs_200d]
-const returnTradingValues=(r:LeaderRow)=>[r.return_5d,r.return_20d,r.return_50d,r.return_120d,r.return_200d]
+const tradingPeriods=['5D','20D','50D','120D','200D','252D'] as const
+const rsTradingValues=(r:LeaderRow)=>[r.rs_5d,r.rs_20d,r.rs_50d,r.rs_120d,r.rs_200d,r.rs_12m]
+const returnTradingValues=(r:LeaderRow)=>[r.return_5d,r.return_20d,r.return_50d,r.return_120d,r.return_200d,r.return_12m]
 
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>현재가</span><span>단계</span><span>RS</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
@@ -231,8 +233,8 @@ function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>v
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
 
-function SnapshotItem({label,children,wide=false}:{label:string;children:any;wide?:boolean}){
-  return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong>{children}</strong></div>
+function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:string;children:any;wide?:boolean;valueClassName?:string}){
+  return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong className={valueClassName}>{children}</strong></div>
 }
 
 function StockSnapshot({row}:{row:LeaderRow}){
@@ -271,7 +273,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
         <SnapshotItem label="현재가">{num(row.price)}</SnapshotItem>
         <SnapshotItem label="MA50 이격">{gapPct(row.price,row.ma50)}</SnapshotItem>
         <SnapshotItem label="200일선">{ma200Status}</SnapshotItem>
-        <SnapshotItem label="52W 고점 대비">{pct(row.high_52w_distance)}</SnapshotItem>
+        <SnapshotItem label="52W 고점 대비" valueClassName={row.high_52w_distance!=null&&row.high_52w_distance>0?'pos':row.high_52w_distance!=null&&row.high_52w_distance<0?'neg':''}>{pct(row.high_52w_distance)}</SnapshotItem>
         <SnapshotItem label="거래량">{row.volume_ratio==null?'—':Number(row.volume_ratio).toFixed(2)+'x'}</SnapshotItem>
         <SnapshotItem label="RSI(14)">{row.rsi14==null?'—':Number(row.rsi14).toFixed(0)}</SnapshotItem>
         <SnapshotItem label="ATR배수">{row.atr_multiple==null?'—':Number(row.atr_multiple).toFixed(1)+'x'}</SnapshotItem>
@@ -337,27 +339,20 @@ export default function App(){
 
   useEffect(()=>{
     let active=true
-    let dismissed=false
-    let dismissTimer:ReturnType<typeof setTimeout>|undefined
-    const started=performance.now()
-    const dismiss=()=>{
-      if(!active||!showIntro||dismissed)return
-      dismissed=true
-      clearTimeout(fallbackTimer)
-      dismissTimer=setTimeout(()=>{
-        if(!active)return
-        try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
-        setShowIntro(false)
-      },Math.max(0,850-(performance.now()-started)))
-    }
-    const fallbackTimer=setTimeout(dismiss,8000)
     loadLeaderboard().then(r=>{
       if(!active)return
       setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)
-      dismiss()
-    }).catch(dismiss)
-    return()=>{active=false;clearTimeout(fallbackTimer);clearTimeout(dismissTimer)}
+    })
+    return()=>{active=false}
   },[])
+  useEffect(()=>{
+    if(!showIntro)return
+    const timer=setTimeout(()=>{
+      try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
+      setShowIntro(false)
+    },3000)
+    return()=>clearTimeout(timer)
+  },[showIntro])
   useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
   useEffect(()=>{
     if(!drillOpen||!drillRef.current||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
@@ -592,7 +587,7 @@ export default function App(){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     content=<><div className="page-note"><b>Universe</b><span>S&P500 · NASDAQ · KOSPI200 · KOSDAQ150 구성과 분류 출처를 자동 동기화합니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
   }else{
-    content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 253거래일 미만은 공란입니다. 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
+    content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="setting"><span>52W · 252D 계산</span><b>52W 고점: 최근 최대 252개 거래 세션의 최고가(이력 부족 시 확보된 기간) · RS/등락 252D: 252거래일 전 종가 대비</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 253거래일 미만은 공란입니다. 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / Research / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
@@ -630,5 +625,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div>{showIntro&&<div className="launch-screen" role="status" aria-live="polite"><div className="launch-card"><div className="launch-rule"/><img src="./icon-512.png" alt="Peppercorn Capital 아이콘"/><span className="launch-eyebrow">INVESTMENT INTELLIGENCE</span><h1>Peppercorn <em>Capital</em></h1><p>시장 데이터와 주도 종목을 준비하고 있습니다</p><div className="launch-progress" aria-hidden="true"><span/></div><small>SECTOR · STOCK · LEADERSHIP</small></div></div>}</>
+  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div><Dialog open={showIntro}><DialogContent className="launch-screen" overlayClassName="launch-overlay" onEscapeKeyDown={event=>event.preventDefault()} onPointerDownOutside={event=>event.preventDefault()}><div className="launch-center"><div className="brand launch-brand"><img src="./logo.webp" alt=""/><div><DialogTitle>Peppercorn</DialogTitle><span>Capital</span></div></div><DialogDescription>Historia Vitae</DialogDescription><div className="launch-progress" role="status" aria-label="화면 준비 중"><span/></div></div></DialogContent></Dialog></>
 }

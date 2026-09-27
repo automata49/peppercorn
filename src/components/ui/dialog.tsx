@@ -13,8 +13,8 @@ export const DialogOverlay=forwardRef<ComponentRef<typeof DialogPrimitive.Overla
   ({className='',...props},ref)=><DialogPrimitive.Overlay ref={ref} className={'ui-dialog-overlay '+className} {...props}/>
 )
 
-export const DialogContent=forwardRef<ComponentRef<typeof DialogPrimitive.Content>,ComponentProps<typeof DialogPrimitive.Content>>(
-  ({className='',children,...props},ref)=><DialogPortal><DialogOverlay/><DialogPrimitive.Content ref={ref} className={'ui-dialog-content '+className} {...props}>{children}</DialogPrimitive.Content></DialogPortal>
+export const DialogContent=forwardRef<ComponentRef<typeof DialogPrimitive.Content>,ComponentProps<typeof DialogPrimitive.Content>&{overlayClassName?:string}>(
+  ({className='',overlayClassName='',children,...props},ref)=><DialogPortal><DialogOverlay className={overlayClassName}/><DialogPrimitive.Content ref={ref} className={'ui-dialog-content '+className} {...props}>{children}</DialogPrimitive.Content></DialogPortal>
 )
 
 export function DialogTitle({className='',...props}:ComponentProps<typeof DialogPrimitive.Title>){
