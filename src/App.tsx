@@ -250,8 +250,9 @@ function StockSnapshot({row}:{row:LeaderRow}){
     <section className="snapshot-section leadership-section drill-animate">
       <div className="snapshot-section-head"><div><span>01</span><h3>리더십 · 분류</h3></div><ValuePill tone={leadTone(leadership(row))}>{leadership(row)}</ValuePill></div>
       <div className="leadership-hero">
-        <div><span>RS순위</span><strong>{row.rs_rank??'—'}</strong></div><div title={row.ibd_rs_as_of?`가격 기준 ${row.ibd_rs_as_of}`:undefined}><span>IBD식 RS · 추정</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
-        <div className="leadership-copy"><b>{row.verdict||'—'}</b><small>{row.stage||'—'}</small></div>
+        <div className="leadership-score"><span>RS순위</span><strong>{row.rs_rank??'—'}</strong></div>
+        <div className="leadership-score ibd-score" title={row.ibd_rs_as_of?`가격 기준 ${row.ibd_rs_as_of} · 공식 IBD 점수가 아닌 추정치`:'253거래일 가격 이력 부족'}><span>IBD식 RS · 추정</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
+        <div className="leadership-copy"><span>최종 판단</span><b>{row.verdict||'—'}</b><small>{row.stage||'—'}</small></div>
       </div>
       <p className="classification-summary">{row.market} · {sectorName(row.market,row.sector||'분류 확인')} · {row.industry||'분류 확인'} · {row.exchange||row.market}</p>
       <p className="classification-meta" title={row.classification_source||undefined}>지수 {indexes} · 데이터 {row.data_status||'정상'}{row.classification_as_of&&` · 분류 ${row.classification_as_of}`}{row.classification_source&&` · 출처 ${sourceName(row.classification_source)}`}</p>
