@@ -68,7 +68,7 @@
 .tabs{flex-wrap:wrap}
 .tabs b{margin-left:3px;font-variant-numeric:tabular-nums}
 .stock-rows{overflow-x:auto}
-.stock-rows-head,.stock-row{min-width:1850px;display:grid;grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(12,75px) 110px;gap:8px;align-items:center}
+.stock-rows-head,.stock-row{min-width:calc(var(--stock-name-width,260px) + 1645px);display:grid;grid-template-columns:var(--stock-name-width,260px) 100px 145px 55px 75px repeat(12,75px) 110px;gap:8px;align-items:center}
 .stock-rows-head{padding:8px 4px;background:#f2f5f8;color:#68778a;font-size:10.5px;font-weight:700;text-align:left;white-space:nowrap}
 .stock-rows-head span:first-child,.stock-rows-head span:nth-child(3){text-align:left}
 .stock-row>span,.stock-row>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -79,7 +79,7 @@
 .kpi-action:hover{border-color:#9ab0c9;background:#f8fbff}
 .kpi-action:focus-visible{outline:2px solid #315a83;outline-offset:2px}
 .drill-summary-list .stock-rows{margin-top:12px;max-height:min(68dvh,700px);overflow:auto}
-@media(max-width:650px){.stock-row{grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(12,75px) 110px}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
+@media(max-width:650px){.stock-row{grid-template-columns:var(--stock-name-width,260px) 100px 145px 55px 75px repeat(12,75px) 110px}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
 
 /* Wide viewport: sector selection updates the adjacent stock pane. */
 @media(min-width:1181px){.industry-layout{grid-template-columns:minmax(0,43fr) minmax(0,57fr)}}
@@ -208,3 +208,41 @@
 .launch-center .launch-slogan{margin-top:28px;color:#7d8998;font-family:inherit;font-size:clamp(15px,4vw,18px);letter-spacing:.1em}
 .launch-progress{width:132px;height:2px;margin-top:30px;overflow:hidden;border-radius:2px;background:#dfe5ec}
 .launch-progress span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#28486f,#b79159);transform-origin:left}
+
+
+/* Readability pass: larger typography across dashboard, details, and editable workspaces. */
+body{font-size:14px;line-height:1.45}
+.brand strong{font-size:17px}.brand span{font-size:13px}
+.sidebar nav button,.segment button,.mini-segment button,.top-actions button,.panel-head button,.text-button{font-size:13px}
+.topbar h1{font-size:23px}.topbar p,.source,.sync-state{font-size:12.5px}
+.kpi span,.panel-head p,.page-note b,.page-note span{font-size:13px}
+.kpi strong{font-size:26px}.kpi small{font-size:12px}
+.panel h2{font-size:16px}.chip,.tabs button{font-size:12.5px}
+.industry-table th,.compact-industry-table th{font-size:12px}
+.industry-table td,.compact-industry-table td{font-size:13px}
+.pill{font-size:12px}
+.stock-rows-head{font-size:12px}
+.stock-id b{font-size:14px}.stock-id small{font-size:12px}
+.stock-row>span,.stock-row>strong{font-size:12.5px}
+.stock-name-head{position:sticky;left:0;z-index:4;min-width:0;padding-right:14px}
+.stock-column-resizer{position:absolute;top:0;right:-5px;width:10px;height:100%;padding:0;border:0;background:transparent;cursor:col-resize;touch-action:none}
+.stock-column-resizer::after{content:"";position:absolute;top:18%;bottom:18%;left:4px;width:2px;border-radius:2px;background:#aab7c6;opacity:.65}
+.stock-column-resizer:hover::after,.stock-column-resizer:focus-visible::after{background:#456a9e;opacity:1}
+.drill-head small{font-size:12px}.drill-head h2{font-size:24px}
+.drill-note,.drill-meta>span:last-child{font-size:12.5px}
+.drill-guide span{font-size:12px}.drill-guide strong{font-size:14px}
+.drill-checks span,.drill-checks b{font-size:13px}
+.snapshot-section h3{font-size:14px}.snapshot-section-head>small{font-size:11.5px}
+.leadership-hero span,.signal-strip span,.return-strip span{font-size:11.5px}
+.leadership-copy b{font-size:15px}.leadership-copy small{font-size:11.5px}
+.classification-summary{font-size:13.5px}.classification-meta{font-size:11.5px}
+.snapshot-item>span{font-size:12px}.snapshot-item>strong,.signal-strip strong,.return-strip strong{font-size:13.5px}
+.page-note,.note,.criteria-sources{line-height:1.65}
+.ticker-entry label,.ticker-entry-error{font-size:13px}
+.auth-card label,.auth-description,.ui-alert-description{font-size:12.5px}
+@media(max-width:650px){
+  .topbar h1{font-size:18px}
+  .kpi strong{font-size:23px}
+  .drill-head h2{font-size:21px}
+  .stock-id b{font-size:13.5px}
+}
