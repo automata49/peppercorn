@@ -1,4 +1,4 @@
-const BUILD_REV = 'b3e886cff404'
+const BUILD_REV = '89263a898ddc'
 const CACHE_NAME = `peppercorn-shell-${BUILD_REV}`
 const APP_ROOT = new URL('./', self.registration.scope)
 
