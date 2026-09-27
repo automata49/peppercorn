@@ -186,25 +186,35 @@
 .top-actions .install-trigger{border-color:#b2c4d9;background:#ecf3fa;color:#24476f;font-weight:700;white-space:nowrap}
 .top-actions .install-trigger:hover{background:#e0ecf8}
 @media(max-width:650px){.top-actions .install-trigger{display:inline-flex;padding:8px 10px;font-size:12px}.topbar h1{font-size:16px}}
-.install-dialog.ui-dialog-content{width:min(400px,calc(100vw - 32px));padding:28px;color:#26364b;text-align:center}
+.ui-popover-overlay{position:fixed;z-index:100;inset:0;background:rgba(40,49,61,.30);backdrop-filter:blur(4px)}
+.ui-popover-content{z-index:101;outline:none}
+div[data-radix-popper-content-wrapper]:has(>.drill-popover){position:fixed!important;inset:0!important;transform:none!important;min-width:100vw!important;pointer-events:none!important}
+.drill-popover{position:fixed;z-index:101;pointer-events:auto}
+.install-dialog.ui-popover-content{width:min(400px,calc(100vw - 24px));padding:28px;background:#fff;border:1px solid #dce3eb;border-radius:16px;box-shadow:0 26px 80px rgba(51,65,83,.18);color:#26364b;text-align:center}
 .install-icon{width:72px;height:72px;object-fit:contain;border-radius:16px;margin:0 auto 14px}
-.install-dialog .ui-dialog-title{font-size:20px}
-.install-dialog .ui-dialog-description{margin-top:9px;color:#6e7d8e;font-size:13px}
+.install-dialog h2{font-size:20px}
+.install-dialog .install-description{margin-top:9px;color:#6e7d8e;font-size:13px}
 .install-dialog ol{padding:0 0 0 24px;margin:24px 0 0;text-align:left;color:#46576d;font-size:13px;line-height:1.8}
 .install-dialog li+li{margin-top:7px}
 .install-dialog .install-note{margin-top:20px;color:#8a6b38;font-size:12px;line-height:1.5}
 .install-close{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#6e7d8e;font-size:25px;cursor:pointer}
-/* First visit: the icon fades in, then the name and motto appear. */
+/* First visit: the icon gently bounces in, then the name and motto appear. */
 .launch-overlay.ui-dialog-overlay{background:#f4f6fa;backdrop-filter:none;animation:none}
 .launch-screen.ui-dialog-content{inset:0;left:0;top:0;transform:none;display:grid;place-items:center;width:100vw;height:100dvh;padding:24px;background:#f4f6fa;color:#26364b;outline:0}
 .launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,420px);text-align:center}
 .launch-brand.brand{display:flex!important;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:0!important}
 .launch-brand.brand div{display:block!important;font-size:inherit!important}
-.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:clamp(130px,35vw,160px);height:clamp(130px,35vw,160px);animation:launch-icon-fade 1.55s ease-out both}
+.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:clamp(130px,35vw,160px);height:clamp(130px,35vw,160px);animation:launch-icon-bounce 1.55s ease-out both}
 .launch-brand.brand .launch-emblem img{display:block;width:clamp(112px,30vw,140px);height:clamp(112px,30vw,140px);object-fit:contain;filter:drop-shadow(0 9px 8px rgba(36,55,77,.12))}
 .launch-brand .ui-dialog-title{color:#26364b;font-family:inherit;font-size:clamp(28px,8vw,36px);font-weight:700;letter-spacing:-.035em;animation:launch-reveal .55s 1.55s both}
 .launch-brand.brand span{display:block;color:#9c7840;font-size:clamp(18px,5vw,22px);margin-top:5px;letter-spacing:.03em;animation:launch-reveal .55s 1.7s both}
 .launch-center .ui-dialog-description{margin-top:28px;color:#7d8998;font-family:inherit;font-size:clamp(15px,4vw,18px);letter-spacing:.1em;animation:launch-reveal .55s 2.05s both}
-@keyframes launch-icon-fade{from{opacity:0}to{opacity:1}}
+@keyframes launch-icon-bounce{
+  0%{opacity:0;transform:translateY(22px) scale(.78)}
+  48%{opacity:1;transform:translateY(-13px) scale(1.09)}
+  72%{transform:translateY(5px) scale(.96)}
+  87%{transform:translateY(-4px) scale(1.03)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
 @keyframes launch-reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.launch-brand.brand .launch-emblem,.launch-brand .ui-dialog-title,.launch-brand.brand span,.launch-center .ui-dialog-description{animation:none!important;opacity:1;transform:none}}

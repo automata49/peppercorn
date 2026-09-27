@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './ui/dialog'
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from './ui/popover'
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -42,14 +42,15 @@ export function InstallApp() {
     }
   }
 
-  return <>
-    <button className="install-trigger" onClick={startInstall} aria-label="Peppercorn Capital 홈 화면에 설치">앱 설치</button>
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="install-dialog">
-        <DialogClose asChild><button className="install-close" aria-label="닫기">×</button></DialogClose>
+  return <Popover open={open} onOpenChange={setOpen}>
+    <PopoverTrigger asChild>
+      <button className="install-trigger" onClick={event=>{event.preventDefault();void startInstall()}} aria-label="Peppercorn Capital 홈 화면에 설치">앱 설치</button>
+    </PopoverTrigger>
+      <PopoverContent className="install-dialog" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Peppercorn Capital 설치 안내">
+        <PopoverClose asChild><button className="install-close" aria-label="닫기">×</button></PopoverClose>
         <img className="install-icon" src="./icon-192.png" alt="Peppercorn Capital 아이콘" />
-        <DialogTitle>Peppercorn Capital</DialogTitle>
-        <DialogDescription>홈 화면에 추가하면 앱처럼 바로 열 수 있습니다.</DialogDescription>
+        <h2>Peppercorn Capital</h2>
+        <p className="install-description">홈 화면에 추가하면 앱처럼 바로 열 수 있습니다.</p>
         <ol>
           {isIOS ? <>
             <li>브라우저의 <strong>공유</strong> 버튼을 누르세요.</li>
@@ -60,7 +61,6 @@ export function InstallApp() {
           </>}
         </ol>
         <p className="install-note">카카오톡에서 열었다면 우선 링크를 Chrome{isIOS ? ' 또는 Safari' : ''}에서 여세요.</p>
-      </DialogContent>
-    </Dialog>
-  </>
+      </PopoverContent>
+  </Popover>
 }

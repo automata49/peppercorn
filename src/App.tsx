@@ -6,6 +6,7 @@ import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
 import { AuthModal } from './components/AuthModal'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
+import { Popover, PopoverClose, PopoverContent } from './components/ui/popover'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
@@ -351,7 +352,7 @@ export default function App(){
     const timer=setTimeout(()=>{
       try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
       setShowIntro(false)
-    },3000)
+    },5000)
     return()=>clearTimeout(timer)
   },[showIntro])
   useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
@@ -594,12 +595,12 @@ export default function App(){
 
   const pageTitle:Record<string,string>={dashboard:'Investment Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
-  const drillOverlay=<Dialog open={drillOpen} onOpenChange={open=>{if(!open)closeDrill()}}>
-    <DialogContent ref={drillRef} className="drill-sheet">
+  const drillOverlay=<Popover modal open={drillOpen} onOpenChange={open=>{if(!open)closeDrill()}}>
+    <PopoverContent ref={drillRef} className="drill-sheet drill-popover" overlay onOverlayClick={closeDrill} aria-label="종목 및 섹터 상세 정보">
       <div className="drill-handle"/>
       <div className="drill-head">
-        <div><small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
-        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+        <div><small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><h2>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</h2><p className="sr-only">분류별 주도 종목과 상세 리더십 지표</p></div>
+        <PopoverClose asChild><button className="drill-close" aria-label="닫기">×</button></PopoverClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{drillStock.stage}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
@@ -617,8 +618,8 @@ export default function App(){
         <p className="drill-note">종목을 누르면 상세 지표를 확인합니다.</p>
         <StockRows rows={drillStockGroups[stockTab]} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>}
-    </DialogContent>
-  </Dialog>
+    </PopoverContent>
+  </Popover>
   const deleteDialog=<AlertDialog open={!!analysisDeleteTarget} onOpenChange={open=>{if(!open)setAnalysisDeleteTarget(null)}}>
     <AlertDialogContent>
       <AlertDialogTitle>종목분석 기록을 삭제할까요?</AlertDialogTitle>
