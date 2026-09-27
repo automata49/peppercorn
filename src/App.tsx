@@ -298,6 +298,9 @@ function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
 }
 
 export default function App(){
+  const [showIntro,setShowIntro]=useState(()=>{
+    try{return sessionStorage.getItem('peppercorn-intro-seen')!=='1'}catch{return true}
+  })
   const [page,setPage]=useState('dashboard')
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
   const [source,setSource]=useState<'demo'|'supabase'>('demo')
@@ -332,7 +335,29 @@ export default function App(){
 
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
 
-  useEffect(()=>{loadLeaderboard().then(r=>{setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)})},[])
+  useEffect(()=>{
+    let active=true
+    let dismissed=false
+    let dismissTimer:ReturnType<typeof setTimeout>|undefined
+    const started=performance.now()
+    const dismiss=()=>{
+      if(!active||!showIntro||dismissed)return
+      dismissed=true
+      clearTimeout(fallbackTimer)
+      dismissTimer=setTimeout(()=>{
+        if(!active)return
+        try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
+        setShowIntro(false)
+      },Math.max(0,850-(performance.now()-started)))
+    }
+    const fallbackTimer=setTimeout(dismiss,8000)
+    loadLeaderboard().then(r=>{
+      if(!active)return
+      setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)
+      dismiss()
+    }).catch(dismiss)
+    return()=>{active=false;clearTimeout(fallbackTimer);clearTimeout(dismissTimer)}
+  },[])
   useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
   useEffect(()=>{
     if(!drillOpen||!drillRef.current||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return
@@ -605,5 +630,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div>
+  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div>{showIntro&&<div className="launch-screen" role="status" aria-live="polite"><div className="launch-card"><div className="launch-rule"/><img src="./icon-512.png" alt="Peppercorn Capital 아이콘"/><span className="launch-eyebrow">INVESTMENT INTELLIGENCE</span><h1>Peppercorn <em>Capital</em></h1><p>시장 데이터와 주도 종목을 준비하고 있습니다</p><div className="launch-progress" aria-hidden="true"><span/></div><small>SECTOR · STOCK · LEADERSHIP</small></div></div>}</>
 }
