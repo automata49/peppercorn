@@ -1,93 +1,6 @@
+-- Apply to an existing project before deploying the matching application build.
 alter table public.market_metrics add column if not exists ibd_rs_estimate integer;
 alter table public.market_metrics add column if not exists ibd_rs_as_of date;
-
--- Add exact trading-day returns and benchmark-relative RS to an existing Peppercorn project.
-alter table public.market_metrics add column if not exists return_5d numeric;
-alter table public.market_metrics add column if not exists rs_5d numeric;
-alter table public.market_metrics add column if not exists return_20d numeric;
-alter table public.market_metrics add column if not exists rs_20d numeric;
-alter table public.market_metrics add column if not exists return_50d numeric;
-alter table public.market_metrics add column if not exists rs_50d numeric;
-alter table public.market_metrics add column if not exists return_120d numeric;
-alter table public.market_metrics add column if not exists rs_120d numeric;
-alter table public.market_metrics add column if not exists return_200d numeric;
-alter table public.market_metrics add column if not exists rs_200d numeric;
-
--- Backfill each metric date using the close exactly N trading sessions earlier.
-with history as (
-  select m.instrument_id,m.as_of,p.close,
-    row_number() over(partition by m.instrument_id,m.as_of order by p.trade_date desc) as rn
-  from public.market_metrics m
-  join lateral (
-    select trade_date,close from public.price_daily
-    where instrument_id=m.instrument_id and trade_date<=m.as_of and close is not null
-    order by trade_date desc limit 201
-  ) p on true
-), closes as (
-  select instrument_id,as_of,
-    max(close) filter(where rn=1) as latest,
-    max(close) filter(where rn=6) as close_5d,
-    max(close) filter(where rn=21) as close_20d,
-    max(close) filter(where rn=51) as close_50d,
-    max(close) filter(where rn=121) as close_120d,
-    max(close) filter(where rn=201) as close_200d
-  from history group by instrument_id,as_of
-)
-update public.market_metrics m set
-  return_5d=case when c.close_5d<>0 then c.latest/c.close_5d-1 end,
-  return_20d=case when c.close_20d<>0 then c.latest/c.close_20d-1 end,
-  return_50d=case when c.close_50d<>0 then c.latest/c.close_50d-1 end,
-  return_120d=case when c.close_120d<>0 then c.latest/c.close_120d-1 end,
-  return_200d=case when c.close_200d<>0 then c.latest/c.close_200d-1 end
-from closes c where m.instrument_id=c.instrument_id and m.as_of=c.as_of;
-
-create or replace view public.leaderboard_view with (security_invoker=true) as
-select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
-       m.price,m.verdict,m.stage,m.action_guide,
-       m.return_1w,m.return_1m,m.return_3m,m.return_6m,m.return_12m,
-       m.rs_1w,m.rs_1m,m.rs_3m,m.rs_6m,m.rs_12m,m.rs_rank,
-       m.high_52w_distance,m.volume_ratio,m.adr20_pct,m.rsi14,m.atr_multiple,
-       m.ma50,m.ma200,m.leader_tt,
-       case
-         when m.instrument_id is null then '데이터 준비중'
-         when m.leader_tt
-          and coalesce(m.rs_rank,0)>=95
-          and coalesce(m.high_52w_distance,-1)>=-0.15
-          and coalesce(m.rs_3m,-1)>0
-          and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
-         when (m.leader_tt
-          and coalesce(m.ibd_rs_estimate,0)>=80
-          and coalesce(m.high_52w_distance,-1)>=-0.25
-          and coalesce(m.rs_3m,-1)>0)
-           then '주도 후보'
-         when m.stage='↻ 넥스트 리더' then '강세 전환'
-         when m.stage='❌ 제외' then '약세'
-         else '중립'
-       end as leadership_class,
-       i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
-       coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
-       coalesce(u.index_statuses,'{}'::text[]) as index_statuses,
-       case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status,
-       m.return_5d,m.rs_5d,m.return_20d,m.rs_20d,m.return_50d,m.rs_50d,m.return_120d,m.rs_120d,m.return_200d,m.rs_200d,
-       m.ibd_rs_estimate,m.ibd_rs_as_of
-from public.instruments i
-left join lateral (
-  select mm.* from public.market_metrics mm
-  where mm.instrument_id=i.id
-  order by mm.as_of desc
-  limit 1
-) m on true
-left join lateral (
-  select
-    array_agg(distinct um.theme_group order by um.theme_group)
-      filter (where um.entry_type='INDEX' and um.theme_group is not null) as index_memberships,
-    array_agg(distinct um.composition_status order by um.composition_status)
-      filter (where um.entry_type='INDEX' and um.composition_status is not null) as index_statuses
-  from public.universe_memberships um
-  where um.instrument_id=i.id
-) u on true
-where i.active=true;
-
 
 -- IBD-style estimate: four consecutive 63-session quarterly returns, weighted 40/20/20/20.
 -- Universe: active equities with 253 valid sessions in each separate market (KR / US).
@@ -143,6 +56,55 @@ end;
 $$;
 revoke all on function public.recalculate_ibd_rs_estimate() from public,anon,authenticated;
 grant execute on function public.recalculate_ibd_rs_estimate() to service_role;
+
+
+create or replace view public.leaderboard_view with (security_invoker=true) as
+select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
+       m.price,m.verdict,m.stage,m.action_guide,
+       m.return_1w,m.return_1m,m.return_3m,m.return_6m,m.return_12m,
+       m.rs_1w,m.rs_1m,m.rs_3m,m.rs_6m,m.rs_12m,m.rs_rank,
+       m.high_52w_distance,m.volume_ratio,m.adr20_pct,m.rsi14,m.atr_multiple,
+       m.ma50,m.ma200,m.leader_tt,
+       case
+         when m.instrument_id is null then '데이터 준비중'
+         when m.leader_tt
+          and coalesce(m.rs_rank,0)>=95
+          and coalesce(m.high_52w_distance,-1)>=-0.15
+          and coalesce(m.rs_3m,-1)>0
+          and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
+         when (m.leader_tt
+          and coalesce(m.ibd_rs_estimate,0)>=80
+          and coalesce(m.high_52w_distance,-1)>=-0.25
+          and coalesce(m.rs_3m,-1)>0)
+           then '주도 후보'
+         when m.stage='↻ 넥스트 리더' then '강세 전환'
+         when m.stage='❌ 제외' then '약세'
+         else '중립'
+       end as leadership_class,
+       i.exchange,i.classification_scheme,i.classification_source,i.classification_as_of,
+       coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
+       coalesce(u.index_statuses,'{}'::text[]) as index_statuses,
+       case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status,
+       m.return_5d,m.rs_5d,m.return_20d,m.rs_20d,m.return_50d,m.rs_50d,m.return_120d,m.rs_120d,m.return_200d,m.rs_200d,
+       m.ibd_rs_estimate,m.ibd_rs_as_of
+from public.instruments i
+left join lateral (
+  select mm.* from public.market_metrics mm
+  where mm.instrument_id=i.id
+  order by mm.as_of desc
+  limit 1
+) m on true
+left join lateral (
+  select
+    array_agg(distinct um.theme_group order by um.theme_group)
+      filter (where um.entry_type='INDEX' and um.theme_group is not null) as index_memberships,
+    array_agg(distinct um.composition_status order by um.composition_status)
+      filter (where um.entry_type='INDEX' and um.composition_status is not null) as index_statuses
+  from public.universe_memberships um
+  where um.instrument_id=i.id
+) u on true
+where i.active=true;
+
 
 create or replace function public.recalculate_market_leadership()
 returns jsonb
@@ -244,5 +206,7 @@ begin
   return jsonb_build_object('updated',updated_rows,'core',core_rows,'candidates',candidate_rows);
 end;
 $$;
+revoke all on function public.recalculate_market_leadership() from public,anon,authenticated;
+grant execute on function public.recalculate_market_leadership() to service_role;
 
 select public.recalculate_market_leadership();

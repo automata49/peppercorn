@@ -78,6 +78,8 @@ create table if not exists public.market_metrics (
   rs_6m numeric,
   rs_12m numeric,
   rs_rank integer,
+  ibd_rs_estimate integer check (ibd_rs_estimate between 1 and 99),
+  ibd_rs_as_of date,
   atr_multiple numeric,
   tt_pass_count integer,
   leader_tt boolean not null default false,
@@ -275,7 +277,7 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
           and coalesce(m.rs_3m,-1)>0
           and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
          when (m.leader_tt
-          and coalesce(m.rs_rank,0)>=80
+          and coalesce(m.ibd_rs_estimate,0)>=80
           and coalesce(m.high_52w_distance,-1)>=-0.25
           and coalesce(m.rs_3m,-1)>0)
            then '주도 후보'
@@ -287,7 +289,8 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
        coalesce(u.index_memberships,'{}'::text[]) as index_memberships,
        coalesce(u.index_statuses,'{}'::text[]) as index_statuses,
        case when m.instrument_id is null then '데이터 준비중' else '정상' end as data_status,
-       m.return_5d,m.rs_5d,m.return_20d,m.rs_20d,m.return_50d,m.rs_50d,m.return_120d,m.rs_120d,m.return_200d,m.rs_200d
+       m.return_5d,m.rs_5d,m.return_20d,m.rs_20d,m.return_50d,m.rs_50d,m.return_120d,m.rs_120d,m.return_200d,m.rs_200d,
+       m.ibd_rs_estimate,m.ibd_rs_as_of
 from public.instruments i
 left join lateral (
   select mm.* from public.market_metrics mm
@@ -390,6 +393,61 @@ $$;
 revoke all on function public.activate_index_universe() from public,anon,authenticated;
 grant execute on function public.activate_index_universe() to service_role;
 
+-- IBD-style estimate: four consecutive 63-session quarterly returns, weighted 40/20/20/20.
+-- Universe: active equities with 253 valid sessions in each separate market (KR / US).
+create or replace function public.recalculate_ibd_rs_estimate()
+returns integer
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare updated_rows integer;
+begin
+  with latest as (
+    select distinct on (m.instrument_id) m.instrument_id,m.as_of,i.market
+    from public.market_metrics m join public.instruments i on i.id=m.instrument_id
+    where i.active and i.asset_class='Equity'
+    order by m.instrument_id,m.as_of desc
+  ), history as (
+    select l.instrument_id,l.as_of,l.market,p.trade_date,p.close,
+      row_number() over(partition by l.instrument_id order by p.trade_date desc)-1 as age
+    from latest l
+    join lateral (
+      select trade_date,close from public.price_daily
+      where instrument_id=l.instrument_id and trade_date<=l.as_of and close>0
+      order by trade_date desc limit 253
+    ) p on true
+  ), quarters as (
+    select instrument_id,as_of,market,
+      max(trade_date) filter(where age=0) as price_date,
+      max(close) filter(where age=0) as p0,
+      max(close) filter(where age=63) as p63,
+      max(close) filter(where age=126) as p126,
+      max(close) filter(where age=189) as p189,
+      max(close) filter(where age=252) as p252
+    from history group by instrument_id,as_of,market
+  ), scores as (
+    select instrument_id,as_of,market,price_date,
+      .40*(p0/p63-1)+.20*(p63/p126-1)+.20*(p126/p189-1)+.20*(p189/p252-1) as score
+    from quarters
+    where p252 is not null and as_of-price_date<=7
+  ), ranked as (
+    select instrument_id,as_of,price_date,
+      round(1+98*cume_dist() over(partition by market order by score))::integer as rating
+    from scores
+  )
+  update public.market_metrics m set
+    ibd_rs_estimate=r.rating,ibd_rs_as_of=r.price_date
+  from latest l left join ranked r on r.instrument_id=l.instrument_id and r.as_of=l.as_of
+  where m.instrument_id=l.instrument_id and m.as_of=l.as_of
+    and (m.ibd_rs_estimate is distinct from r.rating or m.ibd_rs_as_of is distinct from r.price_date);
+  get diagnostics updated_rows=row_count;
+  return updated_rows;
+end;
+$$;
+revoke all on function public.recalculate_ibd_rs_estimate() from public,anon,authenticated;
+grant execute on function public.recalculate_ibd_rs_estimate() to service_role;
+
 create or replace function public.recalculate_market_leadership()
 returns jsonb
 language plpgsql
@@ -434,6 +492,8 @@ begin
     rs_1w=r.rs_1w,rs_1m=r.rs_1m,rs_3m=r.rs_3m,rs_6m=r.rs_6m,rs_12m=r.rs_12m,rs_5d=r.rs_5d,rs_20d=r.rs_20d,rs_50d=r.rs_50d,rs_120d=r.rs_120d,rs_200d=r.rs_200d,rs_rank=r.rs_rank,updated_at=now()
   from ranked r where mm.instrument_id=r.instrument_id and mm.as_of=r.as_of;
 
+  perform public.recalculate_ibd_rs_estimate();
+
   with latest as (
     select distinct on (mm.instrument_id) mm.*
     from public.market_metrics mm join public.instruments i on i.id=mm.instrument_id
@@ -444,7 +504,7 @@ begin
       (coalesce(l.price>l.ma50,false)::int+coalesce(l.ma50>l.ma200,false)::int+coalesce(l.price>l.ma200,false)::int+coalesce(l.high_52w_distance>=-.25,false)::int+coalesce(l.rs_rank>=70,false)::int+coalesce(l.low_52w>0 and l.price>=l.low_52w*1.30,false)::int) tt_count,
       coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.rs_rank>=70,false) structural,
       coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.15 and l.rs_rank>=95 and l.rs_3m>0 and l.rs_6m>0,false) core,
-      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.rs_rank>=80 and l.rs_3m>0,false) candidate,
+      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.ibd_rs_estimate>=80 and l.rs_3m>0,false) candidate,
       coalesce(l.price>l.ma200 and l.ma50>l.ma200 and l.rs_rank>=85 and l.high_52w_distance between -.40 and -.20,false) correction
     from latest l
   ), flags2 as (

@@ -41,6 +41,8 @@ export type LeaderRow = {
   rs_120d?: number | null
   rs_200d?: number | null
   rs_rank: number | null
+  ibd_rs_estimate?: number | null
+  ibd_rs_as_of?: string | null
   high_52w_distance: number | null
   volume_ratio: number | null
   adr20_pct: number | null

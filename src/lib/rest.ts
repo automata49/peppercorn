@@ -7,7 +7,7 @@ const endpoint =
 const numericFields = [
   'price','return_1w','return_1m','return_3m','return_6m','return_12m',
   'return_5d','return_20d','return_50d','return_120d','return_200d',
-  'rs_1w','rs_1m','rs_3m','rs_6m','rs_12m','rs_rank',
+  'rs_1w','rs_1m','rs_3m','rs_6m','rs_12m','rs_rank','ibd_rs_estimate',
   'rs_5d','rs_20d','rs_50d','rs_120d','rs_200d',
   'high_52w_distance','volume_ratio','adr20_pct','rsi14','atr_multiple',
   'ma50','ma200'
@@ -16,7 +16,7 @@ const numericFields = [
 const textFields = [
   'ticker','name','asset_class','sector','industry','stage','verdict','action_guide',
   'leadership_class','exchange','classification_scheme','classification_source',
-  'classification_as_of','data_status'
+  'classification_as_of','data_status','ibd_rs_as_of'
 ] as const
 
 const toNumber=(value:unknown)=>{
