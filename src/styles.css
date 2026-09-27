@@ -135,3 +135,39 @@
 .classification-summary{color:#34475d;font-size:12px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
 .classification-meta{margin-top:5px;color:#8290a0;font-size:10.5px;line-height:1.55;overflow-wrap:anywhere}
 .stock-snapshot>.external-links{margin-top:0}
+
+/* Phone and iPad share a full-width workspace and a left-side navigation drawer. */
+.menu-trigger{display:none;position:fixed;top:18px;left:16px;z-index:8;align-items:center;gap:7px;min-height:44px;padding:7px 11px;border:1px solid #d5dce5;border-radius:9px;background:#fff;color:#28486f;font-weight:700;box-shadow:0 2px 8px #26384f12;cursor:pointer}
+.menu-trigger span:first-child{font-size:20px;line-height:1}
+.menu-drawer{left:0;right:auto;top:0;bottom:0;transform:none;width:min(320px,85vw);height:100dvh;display:flex;flex-direction:column;overflow-y:auto;background:#fff;padding:20px 14px calc(20px + env(safe-area-inset-bottom));box-shadow:18px 0 50px #24324429}
+.menu-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.menu-drawer .brand{display:flex;padding:4px 8px 22px}
+.menu-drawer .brand div{display:block}
+.menu-drawer .brand h2{font-size:16px;color:#26364b}
+.menu-drawer .brand span{font-size:12px}
+.menu-drawer-close{width:40px;height:40px;flex:none;border:1px solid #d9e0e8;border-radius:9px;background:#fff;color:#526176;font-size:24px;line-height:1;cursor:pointer}
+.menu-drawer nav{display:flex;flex-direction:column;gap:5px}
+.menu-drawer nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:11px 13px;border:0;border-radius:9px;background:transparent;color:#566579;text-align:left;cursor:pointer}
+.menu-drawer nav button .nav-icon{width:22px;flex:none;text-align:center;color:#8591a1;font-size:18px}
+.menu-drawer nav button .nav-label{font-size:15px}
+.menu-drawer nav button:hover,.menu-drawer nav button:focus-visible{background:#f4f7fa;color:#24476f}
+.menu-drawer nav button.active{background:#eaf0f7;color:#24476f;font-weight:700}
+.menu-drawer nav button.active .nav-icon{color:#9a7438}
+.menu-drawer[data-state="open"]{animation:menuSlideIn .24s ease-out}
+.menu-drawer[data-state="closed"]{animation:menuSlideOut .18s ease-in}
+@keyframes menuSlideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes menuSlideOut{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+@media(prefers-reduced-motion:reduce){.menu-drawer[data-state]{animation:none}}
+@media(max-width:1279px){
+  .shell,.shell>main{display:block;min-width:0}
+  .shell>.sidebar{display:none}
+  .menu-trigger{display:inline-flex}
+  .topbar{padding-left:112px}
+}
+@media(max-width:650px){
+  .menu-trigger{top:13px;left:10px;padding:7px 9px}
+  .menu-trigger-label{display:none}
+  .topbar{padding-left:74px}
+  .topbar h1{font-size:18px}
+  .top-actions .source{display:none}
+}
