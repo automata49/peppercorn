@@ -660,3 +660,143 @@ body{font-size:15.5px}
   .sector-summary-dialog{width:100%}
   .sector-count{min-width:25px;padding:2px 5px;font-size:10px}
 }
+
+
+/* Sector summary compact/detail parity */
+/* Match the sector '전체 보기' action to the leadership section link. */
+.dashboard-sector-head .dashboard-section-action{
+  padding:4px 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#2c68a8;
+  font-size:12.5px;
+  font-weight:800;
+  box-shadow:none;
+}
+.dashboard-sector-head .dashboard-section-action:hover{
+  background:transparent;
+  color:#235b91;
+}
+
+/* Sector summary uses the same typography rhythm as the leading-stock detail table. */
+.sector-metrics-table th{
+  padding:8px 4px;
+  background:#f2f5f8;
+  color:#68778a;
+  font-size:12.5px;
+  font-weight:700;
+  line-height:1.2;
+  white-space:nowrap;
+}
+.sector-metrics-table td{
+  padding:10px 4px;
+  font-size:13px;
+  line-height:1.35;
+  white-space:nowrap;
+}
+.sector-metrics-table .industry-name-cell b{
+  display:block;
+  overflow:hidden;
+  font-size:14.5px;
+  line-height:1.25;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.sector-metrics-table .industry-name-cell small{
+  display:block;
+  overflow:hidden;
+  margin-top:3px;
+  color:#8893a2;
+  font-size:12.5px;
+  line-height:1.25;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+/* Default sector column is 120px (2/3 of the previous 180px) and is manually resizable. */
+.sector-metrics-table{
+  width:calc(var(--sector-name-width,120px) + 1014px)!important;
+  min-width:calc(var(--sector-name-width,120px) + 1014px)!important;
+  table-layout:fixed;
+}
+.sector-metrics-table th:first-child,
+.sector-metrics-table td:first-child{
+  width:var(--sector-name-width,120px)!important;
+  min-width:var(--sector-name-width,120px)!important;
+  max-width:var(--sector-name-width,120px)!important;
+}
+.sector-metrics-table .industry-name-cell{
+  width:var(--sector-name-width,120px)!important;
+  min-width:var(--sector-name-width,120px)!important;
+  max-width:var(--sector-name-width,120px)!important;
+}
+.sector-metrics-table .industry-name-cell b,
+.sector-metrics-table .industry-name-cell small{
+  max-width:calc(var(--sector-name-width,120px) - 10px)!important;
+}
+
+/* Remaining columns are as narrow as possible while keeping every header on one line. */
+.sector-metrics-table th:nth-child(2),.sector-metrics-table td:nth-child(2){width:70px;min-width:70px;max-width:70px}
+.sector-metrics-table th:nth-child(3),.sector-metrics-table td:nth-child(3){width:66px;min-width:66px;max-width:66px}
+.sector-metrics-table th:nth-child(4),.sector-metrics-table td:nth-child(4),
+.sector-metrics-table th:nth-child(5),.sector-metrics-table td:nth-child(5),
+.sector-metrics-table th:nth-child(6),.sector-metrics-table td:nth-child(6){width:78px;min-width:78px;max-width:78px}
+.sector-metrics-table th:nth-child(7),.sector-metrics-table td:nth-child(7){width:66px;min-width:66px;max-width:66px}
+.sector-metrics-table th:nth-child(8),.sector-metrics-table td:nth-child(8){width:72px;min-width:72px;max-width:72px}
+.sector-metrics-table th:nth-child(9),.sector-metrics-table td:nth-child(9),
+.sector-metrics-table th:nth-child(10),.sector-metrics-table td:nth-child(10){width:76px;min-width:76px;max-width:76px}
+.sector-metrics-table th:nth-child(11),.sector-metrics-table td:nth-child(11),
+.sector-metrics-table th:nth-child(12),.sector-metrics-table td:nth-child(12){width:82px;min-width:82px;max-width:82px}
+.sector-metrics-table th:nth-child(13),.sector-metrics-table td:nth-child(13){width:78px;min-width:78px;max-width:78px}
+.sector-metrics-table th:nth-child(14),.sector-metrics-table td:nth-child(14){width:112px;min-width:112px;max-width:112px}
+
+/* Resize handle mirrors the stock-detail table behavior. */
+.sector-name-head{position:sticky!important;left:0;z-index:5!important;padding-right:12px!important}
+.sector-column-resizer{
+  position:absolute;
+  top:0;
+  right:-5px;
+  width:10px;
+  height:100%;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:col-resize;
+  touch-action:none;
+}
+.sector-column-resizer::after{
+  content:"";
+  position:absolute;
+  top:18%;
+  bottom:18%;
+  left:4px;
+  width:2px;
+  border-radius:2px;
+  background:#aab7c6;
+  opacity:.65;
+}
+.sector-column-resizer:hover::after,
+.sector-column-resizer:focus-visible::after{background:#456a9e;opacity:1}
+
+/* Leadership count pills stay compact but match the stock detail font scale. */
+.sector-count{
+  min-width:26px;
+  padding:3px 5px;
+  font-size:12px;
+}
+
+/* Popup/table share one consistent table appearance at every viewport. */
+.sector-summary-full-table{margin-top:12px}
+@media(max-width:650px){
+  .dashboard-sector-head .dashboard-section-action{padding:4px 0;font-size:12px}
+  .sector-metrics-table{
+    width:calc(var(--sector-name-width,120px) + 1014px)!important;
+    min-width:calc(var(--sector-name-width,120px) + 1014px)!important;
+  }
+  .sector-metrics-table th{padding:8px 4px;font-size:12.5px;line-height:1.2}
+  .sector-metrics-table td{padding:10px 4px;font-size:13px}
+  .sector-metrics-table .industry-name-cell b{font-size:14.5px}
+  .sector-metrics-table .industry-name-cell small{font-size:12.5px}
+  .sector-count{min-width:26px;padding:3px 5px;font-size:12px}
+}
