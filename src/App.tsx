@@ -71,6 +71,8 @@ type SectorSummary={
   coreShare:number;breadth:number;medRank:number|null;
   medRs1w:number|null;medRs1m:number|null;medRs3m:number|null;
   medRet1w:number|null;medRet1m:number|null;medRet3m:number|null;
+  medRet5d:number|null;medRet20d:number|null;medRet50d:number|null;
+  medRet120d:number|null;medRet200d:number|null;medRet12m:number|null;
   avgRet1w:number|null;highNearShare:number;
   verdict:string;smallSample:boolean;top:string[]
 }
@@ -94,6 +96,8 @@ function buildSectors(rows:LeaderRow[]):SectorSummary[]{
     const medRank=med(list.map(r=>r.rs_rank))
     const medRs1w=med(list.map(r=>r.rs_1w)),medRs1m=med(list.map(r=>r.rs_1m)),medRs3m=med(list.map(r=>r.rs_3m))
     const medRet1w=med(list.map(r=>r.return_1w)),medRet1m=med(list.map(r=>r.return_1m)),medRet3m=med(list.map(r=>r.return_3m))
+    const medRet5d=med(list.map(r=>r.return_5d)),medRet20d=med(list.map(r=>r.return_20d)),medRet50d=med(list.map(r=>r.return_50d))
+    const medRet120d=med(list.map(r=>r.return_120d)),medRet200d=med(list.map(r=>r.return_200d)),medRet12m=med(list.map(r=>r.return_12m))
     const avgRet1w=avg(list.map(r=>r.return_1w))
     const highNearRows=list.filter(r=>r.high_52w_distance!=null)
     const highNearShare=highNearRows.length?highNearRows.filter(r=>Number(r.high_52w_distance)>=-.10).length/highNearRows.length:0
@@ -109,7 +113,7 @@ function buildSectors(rows:LeaderRow[]):SectorSummary[]{
     else if(improvingShare>=.35&&(medRank??0)>=55&&breadth>=.45&&(medRs1m??-1)>0)verdict='개선 섹터'
     else if(breadth<.35&&(medRank??50)<45)verdict='약세'
     const ranked=list.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).slice(0,3).map(r=>r.name)
-    return {key,market:list[0].market,sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs1w,medRs1m,medRs3m,medRet1w,medRet1m,medRet3m,avgRet1w,highNearShare,verdict,smallSample,top:ranked}
+    return {key,market:list[0].market,sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs1w,medRs1m,medRs3m,medRet1w,medRet1m,medRet3m,medRet5d,medRet20d,medRet50d,medRet120d,medRet200d,medRet12m,avgRet1w,highNearShare,verdict,smallSample,top:ranked}
   }).sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.coreShare-a.coreShare)
 }
 
@@ -685,16 +689,19 @@ export default function App(){
               <div className="mini-segment"><button className={sectorMode==='HOT'?'on':''} onClick={()=>{setSectorMode('HOT');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>강한·개선</button><button className={sectorMode==='ALL'?'on':''} onClick={()=>{setSectorMode('ALL');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체</button></div>
             </div>
           </div>
-          <div className="industry-table-wrap dashboard-sector-table-wrap"><table className="industry-table dashboard-sector-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>평균 등락률</th><th>52W 고점 근접</th></tr></thead><tbody>
+          <div className="industry-table-wrap dashboard-sector-table-wrap"><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
             {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
               <td>{g.n}</td>
-              <td><strong className="sector-core-count">{g.core}</strong></td>
-              <td className={(g.avgRet1w??0)>0?'pos':(g.avgRet1w??0)<0?'neg':''}>{pct(g.avgRet1w)}</td>
+              <td><strong className="sector-count sector-core-count">{g.core}</strong></td>
+              <td><strong className="sector-count candidate">{g.candidate}</strong></td>
+              <td><strong className="sector-count turn">{g.turn}</strong></td>
+              <td><strong className="sector-count correction">{g.correction}</strong></td>
+              {[g.medRet5d,g.medRet20d,g.medRet50d,g.medRet120d,g.medRet200d,g.medRet12m].map((value,i)=><td key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</td>)}
               <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
             </tr>)}
-            {!dashboardTopSectors.length&&<tr><td colSpan={6} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
+            {!dashboardTopSectors.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
           </tbody></table></div>
         </div>
       </section>
@@ -731,19 +738,22 @@ export default function App(){
     <DialogContent className="sector-summary-dialog">
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
-        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>RS 순위 중앙값 기준 내림차순</DialogDescription></div>
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>RS 순위 중앙값 기준 내림차순 · 주도 분류와 등락 5D~52W 전체 보기</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
-      <div className="sector-summary-dialog-table"><table className="industry-table dashboard-sector-table sector-summary-full-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>평균 등락률</th><th>52W 고점 근접</th></tr></thead><tbody>
+      <div className="sector-summary-dialog-table"><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
         {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
           <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
           <td>{g.n}</td>
-          <td><strong className="sector-core-count">{g.core}</strong></td>
-          <td className={(g.avgRet1w??0)>0?'pos':(g.avgRet1w??0)<0?'neg':''}>{pct(g.avgRet1w)}</td>
+          <td><strong className="sector-count sector-core-count">{g.core}</strong></td>
+          <td><strong className="sector-count candidate">{g.candidate}</strong></td>
+          <td><strong className="sector-count turn">{g.turn}</strong></td>
+          <td><strong className="sector-count correction">{g.correction}</strong></td>
+          {[g.medRet5d,g.medRet20d,g.medRet50d,g.medRet120d,g.medRet200d,g.medRet12m].map((value,i)=><td key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</td>)}
           <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
         </tr>)}
-        {!rankedSectorRows.length&&<tr><td colSpan={6} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
+        {!rankedSectorRows.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
       </tbody></table></div>
     </DialogContent>
   </Dialog>
