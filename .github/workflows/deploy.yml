@@ -27,6 +27,22 @@ jobs:
           node-version: 22
       - run: npm install --ignore-scripts
       - run: npm run build
+      - name: Version browser assets for immediate refresh
+        run: |
+          python - <<'PY'
+          import os, pathlib
+
+          rev = os.environ["GITHUB_SHA"][:12]
+          index = pathlib.Path("dist/index.html")
+          html = index.read_text()
+          html = html.replace('/peppercorn/assets/app.js"', f'/peppercorn/assets/app.js?v={rev}"')
+          html = html.replace('/peppercorn/assets/app.css"', f'/peppercorn/assets/app.css?v={rev}"')
+          index.write_text(html)
+
+          sw = pathlib.Path("dist/sw.js")
+          sw.write_text(sw.read_text().replace("__BUILD_REV__", rev))
+          print(f"Versioned browser assets and service worker with {rev}")
+          PY
       - name: Add legacy bundle aliases for cached iPad/PWA shells
         run: |
           python - <<'PY'
