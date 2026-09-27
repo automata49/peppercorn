@@ -269,7 +269,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
   return <div className="stock-snapshot">
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
-      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker · {row.ticker} ↗</a>}
+      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
       <a target="_blank" rel="noreferrer" href={SHEET_URL}>Google Sheet ↗</a>
     </div>
     <section className="snapshot-section leadership-section drill-animate">
