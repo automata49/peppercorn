@@ -128,7 +128,7 @@ const leaderCols:ColDef<LeaderRow>[]=[
   {field:'stage',headerName:'모멘텀 단계',minWidth:150,cellClassRules:stageRules},
   {field:'verdict',headerName:'최종 판단',minWidth:135},
   {field:'price',headerName:'현재가',valueFormatter:p=>num(p.value)},
-  {field:'ibd_rs_estimate',headerName:'IBD식 RS (추정)',width:128,flex:0,headerTooltip:'IBD 공식 점수가 아닌 KR/US 시장별 253거래일 가격 기반 추정치',valueFormatter:p=>p.value??'—'},
+  {field:'ibd_rs_estimate',headerName:'IBD식 RS',width:128,flex:0,headerTooltip:'IBD 공식 점수가 아닌 KR/US 시장별 253거래일 가격 기반 추정치',valueFormatter:p=>p.value??'—'},
   {field:'rs_rank',headerName:'RS순위',cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
   {field:'rs_5d',headerName:'RS 5D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'rs_20d',headerName:'RS 20D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
@@ -251,8 +251,8 @@ function StockSnapshot({row}:{row:LeaderRow}){
       <div className="snapshot-section-head"><div><span>01</span><h3>리더십 · 분류</h3></div><ValuePill tone={leadTone(leadership(row))}>{leadership(row)}</ValuePill></div>
       <div className="leadership-hero">
         <div className="leadership-score"><span>RS순위</span><strong>{row.rs_rank??'—'}</strong></div>
-        <div className="leadership-score ibd-score" title={row.ibd_rs_as_of?`가격 기준 ${row.ibd_rs_as_of} · 공식 IBD 점수가 아닌 추정치`:'253거래일 가격 이력 부족'}><span>IBD식 RS · 추정</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
-        <div className="leadership-copy"><span>최종 판단</span><b>{row.verdict||'—'}</b><small>{row.stage||'—'}</small></div>
+        <div className="leadership-score ibd-score" title={row.ibd_rs_as_of?`가격 기준 ${row.ibd_rs_as_of} · 공식 IBD 점수가 아닌 추정치`:'253거래일 가격 이력 부족'}><span>IBD식 RS</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
+        <div className="leadership-copy"><span>최종 판단</span><ValuePill tone={stageTone(row.stage)}>{row.verdict||'—'}</ValuePill><small>{row.stage||'—'}</small></div>
       </div>
       <p className="classification-summary">{row.market} · {sectorName(row.market,row.sector||'분류 확인')} · {row.industry||'분류 확인'} · {row.exchange||row.market}</p>
       <p className="classification-meta" title={row.classification_source||undefined}>지수 {indexes} · 데이터 {row.data_status||'정상'}{row.classification_as_of&&` · 분류 ${row.classification_as_of}`}{row.classification_source&&` · 출처 ${sourceName(row.classification_source)}`}</p>
