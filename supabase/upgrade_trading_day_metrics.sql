@@ -53,10 +53,9 @@ select i.id,i.market,i.ticker,i.name,i.asset_class,i.sector,i.industry,
           and coalesce(m.rs_3m,-1)>0
           and coalesce(m.rs_6m,-1)>0 then '핵심 주도'
          when (m.leader_tt
-          and coalesce(m.rs_rank,0)>=85
-          and coalesce(m.high_52w_distance,-1)>=-0.20
+          and coalesce(m.rs_rank,0)>=80
+          and coalesce(m.high_52w_distance,-1)>=-0.25
           and coalesce(m.rs_3m,-1)>0)
-          or (m.stage='◇ 조정 중 주도주' and coalesce(m.rs_rank,0)>=85)
            then '주도 후보'
          when m.stage='↻ 넥스트 리더' then '강세 전환'
          when m.stage='❌ 제외' then '약세'
@@ -140,7 +139,7 @@ begin
       (coalesce(l.price>l.ma50,false)::int+coalesce(l.ma50>l.ma200,false)::int+coalesce(l.price>l.ma200,false)::int+coalesce(l.high_52w_distance>=-.25,false)::int+coalesce(l.rs_rank>=70,false)::int+coalesce(l.low_52w>0 and l.price>=l.low_52w*1.30,false)::int) tt_count,
       coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.rs_rank>=70,false) structural,
       coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.15 and l.rs_rank>=95 and l.rs_3m>0 and l.rs_6m>0,false) core,
-      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.20 and l.rs_rank>=85 and l.rs_3m>0,false) candidate,
+      coalesce(l.price>l.ma50 and l.ma50>l.ma200 and l.high_52w_distance>=-.25 and l.rs_rank>=80 and l.rs_3m>0,false) candidate,
       coalesce(l.price>l.ma200 and l.ma50>l.ma200 and l.rs_rank>=85 and l.high_52w_distance between -.40 and -.20,false) correction
     from latest l
   ), flags2 as (

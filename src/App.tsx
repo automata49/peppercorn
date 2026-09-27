@@ -27,6 +27,8 @@ const krSectorNames:Record<string,string>={
 }
 const sectorName=(market:Market,sector:string)=>market==='KR'?(krSectorNames[sector]||sector):sector
 const sourceName=(source:string)=>source.includes('TradingView')?(source.includes('KRX')?'TradingView·KRX':'TradingView'):source.includes('Nasdaq')?'Nasdaq':source.includes('S&P 500')?'S&P 500':source.replace(/^AUTO:/,'').slice(0,28)
+const CANDIDATE_RS_MIN=80
+const CANDIDATE_HIGH_DISTANCE_MIN=-.25
 const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wpP9pB5vrni5SrjAMrbbiE/edit'
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
@@ -39,7 +41,7 @@ const med=(values:unknown[])=>{
 const leadership=(r:LeaderRow)=>{
   if(r.leadership_class)return r.leadership_class
   if(r.leader_tt&&(r.rs_rank??0)>=95&&(r.high_52w_distance??-1)>=-.15&&(r.rs_3m??-1)>0&&(r.rs_6m??-1)>0)return '핵심 주도'
-  if((r.leader_tt&&(r.rs_rank??0)>=85&&(r.high_52w_distance??-1)>=-.20&&(r.rs_3m??-1)>0)||(isCorrection(r)&&(r.rs_rank??0)>=85))return '주도 후보'
+  if(r.leader_tt&&(r.rs_rank??0)>=CANDIDATE_RS_MIN&&(r.high_52w_distance??-1)>=CANDIDATE_HIGH_DISTANCE_MIN&&(r.rs_3m??-1)>0)return '주도 후보'
   if(String(r.stage).includes('넥스트 리더'))return '강세 전환'
   if(String(r.stage).startsWith('❌'))return '약세'
   return '중립'
@@ -559,7 +561,7 @@ export default function App(){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     content=<><div className="page-note"><b>Universe</b><span>S&P500 · NASDAQ · KOSPI200 · KOSDAQ150 구성과 분류 출처를 자동 동기화합니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
   }else{
-    content=<div className="settings-grid"><div className="panel"><h2>Leadership Thresholds</h2><div className="setting"><span>핵심 주도</span><b>RS ≥95 · 52W ≥-15%</b></div><div className="setting"><span>핵심 주도 확인</span><b>RS 3M/6M &gt; 0</b></div><div className="setting"><span>주도 후보</span><b>RS ≥85 · 52W ≥-20%</b></div><div className="setting"><span>Trend Template</span><b>RS ≥70 · Price &gt; MA50 &gt; MA200</b></div><div className="setting"><span>Breakout Volume</span><b>≥ 1.4x</b></div><div className="setting"><span>Next Leader 52W High</span><b>≥ -30%</b></div></div>
+    content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · RS순위 ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. 이 앱의 RS순위는 자체 계산값으로 IBD의 독점 RS Rating과 동일하지 않습니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / Research / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
