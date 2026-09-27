@@ -227,10 +227,10 @@ const tradingPeriods=['5D','20D','50D','120D','200D','52W'] as const
 const rsTradingValues=(r:LeaderRow)=>[r.rs_5d,r.rs_20d,r.rs_50d,r.rs_120d,r.rs_200d,r.rs_12m]
 const returnTradingValues=(r:LeaderRow)=>[r.return_5d,r.return_20d,r.return_50d,r.return_120d,r.return_200d,r.return_12m]
 
-const STOCK_NAME_DEFAULT_WIDTH=205
-const STOCK_NAME_MIN_WIDTH=185
+const STOCK_NAME_DEFAULT_WIDTH=102
+const STOCK_NAME_MIN_WIDTH=80
 const STOCK_NAME_MAX_WIDTH=360
-const STOCK_NAME_WIDTH_KEY='peppercorn-stock-name-width-v2'
+const STOCK_NAME_WIDTH_KEY='peppercorn-stock-name-width-v3'
 
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const [stockNameWidth,setStockNameWidth]=useState(()=>{
