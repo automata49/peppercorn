@@ -180,13 +180,13 @@
 /* A quiet first-session screen built on the existing Radix dialog and sidebar brand. */
 .launch-overlay.ui-dialog-overlay{background:#f4f6fa;backdrop-filter:none;animation:none}
 .launch-screen.ui-dialog-content{inset:0;left:0;top:0;transform:none;display:grid;place-items:center;width:100vw;height:100dvh;padding:24px;background:#f4f6fa;color:#26364b;outline:0}
-.launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,360px);text-align:center}
-.launch-brand.brand{display:flex!important;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:0!important}
-.launch-brand.brand img{display:block;width:76px;height:76px;object-fit:contain}
+.launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,420px);text-align:center}
+.launch-brand.brand{display:flex!important;flex-direction:column;gap:23px;align-items:center;justify-content:center;padding:0!important}
+.launch-brand.brand img{display:block;width:clamp(96px,27vw,124px);height:clamp(96px,27vw,124px);object-fit:contain}
 .launch-brand.brand div{display:block!important;font-size:inherit!important}
-.launch-brand .ui-dialog-title{color:#26364b;font-family:inherit;font-size:24px;font-weight:700;letter-spacing:-.035em}
-.launch-brand.brand span{display:block;color:#9c7840;font-size:16px;margin-top:3px;letter-spacing:.03em}
-.launch-center .ui-dialog-description{margin-top:34px;color:#7d8998;font-family:inherit;font-size:12px;letter-spacing:.12em}
+.launch-brand .ui-dialog-title{color:#26364b;font-family:inherit;font-size:clamp(28px,8vw,36px);font-weight:700;letter-spacing:-.035em}
+.launch-brand.brand span{display:block;color:#9c7840;font-size:clamp(18px,5vw,22px);margin-top:5px;letter-spacing:.03em}
+.launch-center .ui-dialog-description{margin-top:38px;color:#7d8998;font-family:inherit;font-size:clamp(15px,4vw,18px);letter-spacing:.1em}
 .launch-progress{width:88px;height:2px;margin-top:27px;overflow:hidden;border-radius:2px;background:#dfe5ec}
 .launch-progress span{display:block;width:34px;height:100%;border-radius:2px;background:#9c7840;animation:launch-scan 1.4s ease-in-out infinite alternate}
 @keyframes launch-scan{from{transform:translateX(-34px)}to{transform:translateX(88px)}}
