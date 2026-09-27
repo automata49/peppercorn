@@ -186,10 +186,7 @@
 .top-actions .install-trigger{border-color:#b2c4d9;background:#ecf3fa;color:#24476f;font-weight:700;white-space:nowrap}
 .top-actions .install-trigger:hover{background:#e0ecf8}
 @media(max-width:650px){.top-actions .install-trigger{display:inline-flex;padding:8px 10px;font-size:12px}.topbar h1{font-size:16px}}
-.ui-popover-overlay{position:fixed;z-index:100;inset:0;background:rgba(40,49,61,.30);backdrop-filter:blur(4px)}
 .ui-popover-content{z-index:101;outline:none}
-div[data-radix-popper-content-wrapper]:has(>.drill-popover){position:fixed!important;inset:0!important;transform:none!important;min-width:100vw!important;pointer-events:none!important}
-.drill-popover{position:fixed;z-index:101;pointer-events:auto}
 .install-dialog.ui-popover-content{width:min(400px,calc(100vw - 24px));padding:28px;background:#fff;border:1px solid #dce3eb;border-radius:16px;box-shadow:0 26px 80px rgba(51,65,83,.18);color:#26364b;text-align:center}
 .install-icon{width:72px;height:72px;object-fit:contain;border-radius:16px;margin:0 auto 14px}
 .install-dialog h2{font-size:20px}
@@ -209,6 +206,8 @@ div[data-radix-popper-content-wrapper]:has(>.drill-popover){position:fixed!impor
 .launch-brand .ui-dialog-title{color:#26364b;font-family:inherit;font-size:clamp(28px,8vw,36px);font-weight:700;letter-spacing:-.035em;animation:launch-reveal .55s 1.55s both}
 .launch-brand.brand span{display:block;color:#9c7840;font-size:clamp(18px,5vw,22px);margin-top:5px;letter-spacing:.03em;animation:launch-reveal .55s 1.7s both}
 .launch-center .ui-dialog-description{margin-top:28px;color:#7d8998;font-family:inherit;font-size:clamp(15px,4vw,18px);letter-spacing:.1em;animation:launch-reveal .55s 2.05s both}
+.launch-progress{width:132px;height:2px;margin-top:30px;overflow:hidden;border-radius:2px;background:#dfe5ec}
+.launch-progress span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#28486f,#b79159);transform-origin:left;animation:launch-fill 5s linear both}
 @keyframes launch-icon-bounce{
   0%{opacity:0;transform:translateY(22px) scale(.78)}
   48%{opacity:1;transform:translateY(-13px) scale(1.09)}
@@ -217,4 +216,5 @@ div[data-radix-popper-content-wrapper]:has(>.drill-popover){position:fixed!impor
   100%{opacity:1;transform:translateY(0) scale(1)}
 }
 @keyframes launch-reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.launch-brand.brand .launch-emblem,.launch-brand .ui-dialog-title,.launch-brand.brand span,.launch-center .ui-dialog-description{animation:none!important;opacity:1;transform:none}}
+@keyframes launch-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.launch-brand.brand .launch-emblem,.launch-brand .ui-dialog-title,.launch-brand.brand span,.launch-center .ui-dialog-description,.launch-progress span{animation:none!important;opacity:1;transform:none}}
