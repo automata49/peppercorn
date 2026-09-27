@@ -197,6 +197,17 @@
 .signal-strip>div{min-width:76px}
 .signal-strip span,.snapshot-item>span{white-space:nowrap}
 @media(max-width:760px){.signal-strip{grid-template-columns:repeat(6,minmax(76px,1fr))}}
+.top-actions .install-trigger{border-color:#b2c4d9;background:#ecf3fa;color:#24476f;font-weight:700;white-space:nowrap}
+.top-actions .install-trigger:hover{background:#e0ecf8}
+@media(max-width:650px){.top-actions .install-trigger{display:inline-flex;padding:8px 10px;font-size:12px}.topbar h1{font-size:16px}}
+.install-dialog.ui-dialog-content{width:min(400px,calc(100vw - 32px));padding:28px;color:#26364b;text-align:center}
+.install-icon{width:72px;height:72px;object-fit:contain;border-radius:16px;margin:0 auto 14px}
+.install-dialog .ui-dialog-title{font-size:20px}
+.install-dialog .ui-dialog-description{margin-top:9px;color:#6e7d8e;font-size:13px}
+.install-dialog ol{padding:0 0 0 24px;margin:24px 0 0;text-align:left;color:#46576d;font-size:13px;line-height:1.8}
+.install-dialog li+li{margin-top:7px}
+.install-dialog .install-note{margin-top:20px;color:#8a6b38;font-size:12px;line-height:1.5}
+.install-close{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#6e7d8e;font-size:25px;cursor:pointer}
 /* Subtle orbit and timed data trace on the three-second launch dialog. */
 .launch-screen.ui-dialog-content{isolation:isolate;background:radial-gradient(circle at 50% 43%,#fff 0%,#f4f6fa 65%)}
 .launch-screen.ui-dialog-content::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.27;background-image:linear-gradient(#ccd6e2 1px,transparent 1px),linear-gradient(90deg,#ccd6e2 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(circle at center,#000 0%,transparent 65%)}
