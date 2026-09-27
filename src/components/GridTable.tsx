@@ -10,7 +10,7 @@ const gridTheme = themeQuartz.withParams({
   borderColor:'#dfe5ec',
   rowHoverColor:'#f7f9fc',
   accentColor:'#456a9e',
-  fontSize:12,
+  fontSize:14,
   spacing:6
 })
 
