@@ -279,6 +279,10 @@ const STOCK_NAME_DEFAULT_WIDTH=102
 const STOCK_NAME_MIN_WIDTH=80
 const STOCK_NAME_MAX_WIDTH=360
 const STOCK_NAME_WIDTH_KEY='peppercorn-stock-name-width-v3'
+const SECTOR_NAME_DEFAULT_WIDTH=120
+const SECTOR_NAME_MIN_WIDTH=80
+const SECTOR_NAME_MAX_WIDTH=260
+const SECTOR_NAME_WIDTH_KEY='peppercorn-sector-name-width-v1'
 
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const [stockNameWidth,setStockNameWidth]=useState(()=>{
@@ -381,8 +385,13 @@ export default function App(){
   const [query,setQuery]=useState('')
   const [sector,setSector]=useState<string|null>(null)
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
-  const [sectorMode,setSectorMode]=useState<'HOT'|'ALL'>('ALL')
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
+  const [sectorNameWidth,setSectorNameWidth]=useState(()=>{
+    try{
+      const saved=Number(localStorage.getItem(SECTOR_NAME_WIDTH_KEY))
+      return Number.isFinite(saved)?Math.min(SECTOR_NAME_MAX_WIDTH,Math.max(SECTOR_NAME_MIN_WIDTH,saved)):SECTOR_NAME_DEFAULT_WIDTH
+    }catch{return SECTOR_NAME_DEFAULT_WIDTH}
+  })
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
   const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|'corrections'|null>(null)
   const [selected,setSelected]=useState<LeaderRow|null>(null)
@@ -409,6 +418,20 @@ export default function App(){
   }
 
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
+  const sectorTableStyle={'--sector-name-width':`${sectorNameWidth}px`} as CSSProperties
+  const startSectorColumnResize=(event:any)=>{
+    event.preventDefault();event.stopPropagation()
+    const startX=event.clientX,startWidth=sectorNameWidth
+    const previousCursor=document.body.style.cursor,previousSelect=document.body.style.userSelect
+    document.body.style.cursor='col-resize';document.body.style.userSelect='none'
+    const move=(moveEvent:PointerEvent)=>setSectorNameWidth(Math.min(SECTOR_NAME_MAX_WIDTH,Math.max(SECTOR_NAME_MIN_WIDTH,startWidth+moveEvent.clientX-startX)))
+    const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);document.body.style.cursor=previousCursor;document.body.style.userSelect=previousSelect}
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)
+  }
+
+  useEffect(()=>{
+    try{localStorage.setItem(SECTOR_NAME_WIDTH_KEY,String(sectorNameWidth))}catch{}
+  },[sectorNameWidth])
 
   useEffect(()=>{
     let active=true
@@ -531,7 +554,7 @@ export default function App(){
   const averageRs=avg(stockRows.map(r=>r.rs_rank))
 
   const allSectorRows=useMemo(()=>buildSectors(marketRows),[marketRows])
-  const eligibleSectors=sectorMode==='ALL'?allSectorRows:allSectorRows.filter(g=>g.verdict==='강한 섹터'||g.verdict==='개선 섹터')
+  const eligibleSectors=allSectorRows
   const sectorLabel=(g:SectorSummary)=>`${market==='ALL'?g.market+' · ':''}${sectorName(g.market,g.sector)}`
   const sectorOptions=eligibleSectors.slice().sort((a,b)=>sectorLabel(a).localeCompare(sectorLabel(b),'ko'))
   const shownSectors=sector?eligibleSectors.filter(g=>g.key===sector):eligibleSectors
@@ -686,10 +709,9 @@ export default function App(){
             <div><h2>섹터 요약</h2><p>RS 순위 기준 Top 5 · 섹터별 리더십과 52W 고점 근접도</p></div>
             <div className="sector-actions">
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
-              <div className="mini-segment"><button className={sectorMode==='HOT'?'on':''} onClick={()=>{setSectorMode('HOT');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>강한·개선</button><button className={sectorMode==='ALL'?'on':''} onClick={()=>{setSectorMode('ALL');setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체</button></div>
             </div>
           </div>
-          <div className="industry-table-wrap dashboard-sector-table-wrap"><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
+          <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
             {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
@@ -741,7 +763,7 @@ export default function App(){
         <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>RS 순위 중앙값 기준 내림차순 · 주도 분류와 등락 5D~52W 전체 보기</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
-      <div className="sector-summary-dialog-table"><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th>섹터</th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
+      <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
         {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
           <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
