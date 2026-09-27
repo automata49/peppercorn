@@ -1,10 +1,30 @@
-// 최소 서비스워커: 화면 파일만 캐시, 데이터(API)는 항상 네트워크
-const C = 'peppercorn-v2', FILES = ['./', 'index.html', 'logo.webp', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'manifest.webmanifest'];
-self.addEventListener('install', e => e.waitUntil(caches.open(C).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
-self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())));
-self.addEventListener('fetch', e => {
-  const u = new URL(e.request.url);
-  if (u.origin !== location.origin) return;                  // Apps Script 데이터는 캐시 안 함
-  e.respondWith(fetch(e.request).then(r => { const cp = r.clone(); caches.open(C).then(c => c.put(e.request, cp)); return r; })
-    .catch(() => caches.match(e.request)));
-});
+const CACHE_NAME = 'peppercorn-shell-v3'
+const APP_ROOT = new URL('./', self.registration.scope)
+
+self.addEventListener('install', event => {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([
+    APP_ROOT.href,
+    new URL('icon-192.png', APP_ROOT).href,
+  ])))
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', event => {
+  event.waitUntil(Promise.all([
+    caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('peppercorn-shell-') && key !== CACHE_NAME).map(key => caches.delete(key)))),
+    self.clients.claim(),
+  ]))
+})
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || event.request.mode !== 'navigate') return
+  const url = new URL(event.request.url)
+  if (url.origin !== APP_ROOT.origin || !url.pathname.startsWith(APP_ROOT.pathname)) return
+  event.respondWith(fetch(event.request).then(response => {
+    if (response.ok) {
+      const copy = response.clone()
+      event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(APP_ROOT.href, copy)))
+    }
+    return response
+  }).catch(async () => (await caches.match(APP_ROOT.href)) || Response.error()))
+})
