@@ -29,14 +29,14 @@ export function Sidebar({page,setPage}:{page:string;setPage:(p:string)=>void}){
 
   return <>
     <aside className="sidebar">
-      <div className="brand"><img src="./logo.webp" alt=""/><div><strong>Peppercorn</strong><span>Capital</span></div></div>
+      <div className="brand"><img src="./logo.webp" alt=""/><div className="brand-wordmark"><strong className="brand-wordmark-pepper">Peppercorn</strong><span className="brand-wordmark-capital">Capital</span></div></div>
       {navigation}
       <div className="side-foot">Investment Workspace <b>v0.1</b></div>
     </aside>
 
     <div className="mobile-brandbar">
       <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Dashboard로 이동">
-        <img src="./logo.webp" alt=""/><strong>Peppercorn Capital</strong>
+        <img src="./logo.webp" alt=""/><span className="brand-wordmark"><strong className="brand-wordmark-pepper">Peppercorn</strong><span className="brand-wordmark-capital">Capital</span></span>
       </button>
       <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}>☰</button>
     </div>
@@ -55,7 +55,7 @@ export function Sidebar({page,setPage}:{page:string;setPage:(p:string)=>void}){
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="menu-drawer">
         <div className="menu-drawer-head">
-          <div className="brand"><img src="./logo.webp" alt=""/><div><DialogTitle>Peppercorn</DialogTitle><span>Capital</span></div></div>
+          <div className="brand"><img src="./logo.webp" alt=""/><div className="brand-wordmark"><DialogTitle className="brand-wordmark-pepper">Peppercorn</DialogTitle><span className="brand-wordmark-capital">Capital</span></div></div>
           <DialogClose asChild><button className="menu-drawer-close" aria-label="메뉴 닫기">×</button></DialogClose>
         </div>
         <DialogDescription className="sr-only">페이지를 선택하세요.</DialogDescription>
