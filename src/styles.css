@@ -194,24 +194,17 @@
 .install-dialog li+li{margin-top:7px}
 .install-dialog .install-note{margin-top:20px;color:#8a6b38;font-size:12px;line-height:1.5}
 .install-close{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#6e7d8e;font-size:25px;cursor:pointer}
-/* First visit: the icon rolls into place, then the name and motto appear. */
+/* First visit: the icon fades in, then the name and motto appear. */
 .launch-overlay.ui-dialog-overlay{background:#f4f6fa;backdrop-filter:none;animation:none}
 .launch-screen.ui-dialog-content{inset:0;left:0;top:0;transform:none;display:grid;place-items:center;width:100vw;height:100dvh;padding:24px;background:#f4f6fa;color:#26364b;outline:0}
 .launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,420px);text-align:center}
 .launch-brand.brand{display:flex!important;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:0!important}
 .launch-brand.brand div{display:block!important;font-size:inherit!important}
-.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:clamp(130px,35vw,160px);height:clamp(130px,35vw,160px);transform-origin:50% 85%;animation:launch-roll-in 1.55s cubic-bezier(.22,.74,.2,1) both}
+.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:clamp(130px,35vw,160px);height:clamp(130px,35vw,160px);animation:launch-icon-fade 1.55s ease-out both}
 .launch-brand.brand .launch-emblem img{display:block;width:clamp(112px,30vw,140px);height:clamp(112px,30vw,140px);object-fit:contain;filter:drop-shadow(0 9px 8px rgba(36,55,77,.12))}
 .launch-brand .ui-dialog-title{color:#26364b;font-family:inherit;font-size:clamp(28px,8vw,36px);font-weight:700;letter-spacing:-.035em;animation:launch-reveal .55s 1.55s both}
 .launch-brand.brand span{display:block;color:#9c7840;font-size:clamp(18px,5vw,22px);margin-top:5px;letter-spacing:.03em;animation:launch-reveal .55s 1.7s both}
 .launch-center .ui-dialog-description{margin-top:28px;color:#7d8998;font-family:inherit;font-size:clamp(15px,4vw,18px);letter-spacing:.1em;animation:launch-reveal .55s 2.05s both}
-@keyframes launch-roll-in{
-  0%{opacity:0;transform:translateX(-66vw) translateY(-35px) rotate(-450deg) scale(.78)}
-  45%{opacity:1;transform:translateX(-15vw) translateY(-56px) rotate(-205deg) scale(.94)}
-  73%{transform:translateX(12px) translateY(0) rotate(-22deg) scale(1.1)}
-  85%{transform:translateX(-4px) translateY(-29px) rotate(8deg) scale(.96)}
-  100%{opacity:1;transform:translateX(0) translateY(0) rotate(0) scale(1)}
-}
+@keyframes launch-icon-fade{from{opacity:0}to{opacity:1}}
 @keyframes launch-reveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.launch-brand.brand .launch-emblem,.launch-brand .ui-dialog-title,.launch-brand.brand span,.launch-center .ui-dialog-description{animation:none!important;opacity:1;transform:none}}
-
