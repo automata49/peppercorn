@@ -351,32 +351,34 @@ export default function App(){
     const root=launchRef.current
     if(!showIntro||!root)return
     const icon=root.querySelector<HTMLElement>('.launch-emblem')
-    const title=root.querySelector<HTMLElement>('.launch-brand .ui-dialog-title')
+    const title=root.querySelector<HTMLElement>('.launch-brand h2')
     const capital=root.querySelector<HTMLElement>('.launch-brand span')
-    const slogan=root.querySelector<HTMLElement>('.ui-dialog-description')
+    const slogan=root.querySelector<HTMLElement>('.launch-slogan')
     const progress=root.querySelector<HTMLElement>('.launch-progress span')
-    const overlay=document.querySelector<HTMLElement>('.launch-overlay')
     const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const finish=()=>{
+      try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
+      setShowIntro(false)
+    }
+    // A suspended animation must never leave the dashboard covered.
+    const fallback=window.setTimeout(finish,5300)
     const context=gsap.context(()=>{
       gsap.set(progress,{scaleX:0})
       if(!reduceMotion){
         gsap.set([icon,title,capital,slogan],{autoAlpha:0})
       }
-      const timeline=gsap.timeline({onComplete:()=>{
-        try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
-        setShowIntro(false)
-      }})
+      const timeline=gsap.timeline({onComplete:finish})
+      timeline.fromTo(root,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},0)
       if(!reduceMotion){
-        timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},0)
+        timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},.15)
           .fromTo(title,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.45)
           .fromTo(capital,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.63)
           .fromTo(slogan,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.9)
       }
-      timeline.to(progress,{scaleX:1,duration:4.45,ease:'none'},0)
-        .to(root,{autoAlpha:0,duration:.55,ease:'power2.inOut'},4.45)
-      if(overlay)timeline.to(overlay,{autoAlpha:0,duration:.55,ease:'power2.inOut'},4.45)
+      timeline.to(progress,{scaleX:1,duration:4.35,ease:'none'},0)
+        .to(root,{autoAlpha:0,duration:.65,ease:'power2.inOut'},4.35)
     },root)
-    return()=>context.revert()
+    return()=>{window.clearTimeout(fallback);context.revert()}
   },[showIntro])
   useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
   useEffect(()=>{
@@ -650,5 +652,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div><Dialog open={showIntro}><DialogContent ref={launchRef} className="launch-screen" overlayClassName="launch-overlay" onEscapeKeyDown={event=>event.preventDefault()} onPointerDownOutside={event=>event.preventDefault()}><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div><DialogTitle>Peppercorn</DialogTitle><span>Capital</span></div></div><DialogDescription>Historia Magistra Vitae</DialogDescription><div className="launch-progress" role="status" aria-label="화면 준비 중"><span/></div></div></DialogContent></Dialog></>
+  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Peppercorn Capital 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div><h2>Peppercorn</h2><span>Capital</span></div></div><p className="launch-slogan">Historia Magistra Vitae</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</>
 }
