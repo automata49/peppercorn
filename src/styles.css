@@ -68,7 +68,7 @@
 .tabs{flex-wrap:wrap}
 .tabs b{margin-left:3px;font-variant-numeric:tabular-nums}
 .stock-rows{overflow-x:auto}
-.stock-rows-head,.stock-row{min-width:1140px;display:grid;grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(6,75px);gap:8px;align-items:center}
+.stock-rows-head,.stock-row{min-width:1660px;display:grid;grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(10,75px) 110px;gap:8px;align-items:center}
 .stock-rows-head{padding:8px 4px;background:#f2f5f8;color:#68778a;font-size:10.5px;font-weight:700;text-align:left;white-space:nowrap}
 .stock-rows-head span:first-child,.stock-rows-head span:nth-child(3){text-align:left}
 .stock-row>span,.stock-row>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -79,7 +79,7 @@
 .kpi-action:hover{border-color:#9ab0c9;background:#f8fbff}
 .kpi-action:focus-visible{outline:2px solid #315a83;outline-offset:2px}
 .drill-summary-list .stock-rows{margin-top:12px;max-height:min(68dvh,700px);overflow:auto}
-@media(max-width:650px){.stock-row{grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(6,75px)}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
+@media(max-width:650px){.stock-row{grid-template-columns:minmax(205px,1fr) 100px 145px 55px 75px repeat(10,75px) 110px}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
 
 /* Wide viewport: sector selection updates the adjacent stock pane. */
 @media(min-width:1181px){.industry-layout{grid-template-columns:minmax(0,43fr) minmax(0,57fr)}}

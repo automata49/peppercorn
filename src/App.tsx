@@ -140,7 +140,7 @@ const leaderCols:ColDef<LeaderRow>[]=[
   {field:'return_50d',headerName:'등락 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_120d',headerName:'등락 120D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'return_200d',headerName:'등락 200D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'high_52w_distance',headerName:'52W High',valueFormatter:p=>pct(p.value)},
+  {field:'high_52w_distance',headerName:'52W 고점 대비',valueFormatter:p=>pct(p.value)},
   {field:'volume_ratio',headerName:'거래량 배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(2)+'x'},
   {field:'rsi14',headerName:'RSI',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(0)},
   {field:'atr_multiple',headerName:'ATR배수',valueFormatter:p=>p.value==null?'—':Number(p.value).toFixed(1)+'x'},
@@ -220,10 +220,14 @@ function Kpi({label,value,sub,onClick}:{label:string;value:string|number;sub?:st
 
 function ValuePill({children,tone='gray'}:{children:any;tone?:string}){return <span className={'pill '+tone}>{children}</span>}
 
+const tradingPeriods=['5D','20D','50D','120D','200D'] as const
+const rsTradingValues=(r:LeaderRow)=>[r.rs_5d,r.rs_20d,r.rs_50d,r.rs_120d,r.rs_200d]
+const returnTradingValues=(r:LeaderRow)=>[r.return_5d,r.return_20d,r.return_50d,r.return_120d,r.return_200d]
+
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>현재가</span><span>단계</span><span>RS</span><span>IBD식 RS</span><span>RS 1W</span><span>RS 1M</span><span>RS 3M</span><span>등락 1W</span><span>등락 1M</span><span>등락 3M</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+  return <div className="stock-rows"><div className="stock-rows-head"><span>종목</span><span>현재가</span><span>단계</span><span>RS</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
     <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{r.stage}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={r.ibd_rs_as_of?`가격 기준 ${r.ibd_rs_as_of} · IBD 방식 추정치`:'가격 이력 253거래일 미만'}>{r.ibd_rs_estimate??'—'}</strong>
-    {([r.rs_1w,r.rs_1m,r.rs_3m,r.return_1w,r.return_1m,r.return_3m] as const).map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
+    {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
 
@@ -235,8 +239,8 @@ function StockSnapshot({row}:{row:LeaderRow}){
   const ma200Gap=gapPct(row.price,row.ma200)
   const ma200Status=row.price!=null&&row.ma200!=null?(Number(row.price)>=Number(row.ma200)?'위 ':'아래 ')+ma200Gap:'—'
   const indexes=row.index_memberships?.length?row.index_memberships.join(' · '):'—'
-  const rsItems=[['1W',row.rs_1w],['1M',row.rs_1m],['3M',row.rs_3m],['6M',row.rs_6m],['12M',row.rs_12m]] as const
-  const retItems=[['1W',row.return_1w],['1M',row.return_1m],['3M',row.return_3m],['6M',row.return_6m],['12M',row.return_12m]] as const
+  const rsItems=tradingPeriods.map((period,i)=>[period,rsTradingValues(row)[i]] as const)
+  const retItems=tradingPeriods.map((period,i)=>[period,returnTradingValues(row)[i]] as const)
   return <div className="stock-snapshot">
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
@@ -258,7 +262,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
     </section>
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>03</span><h3>가격 모멘텀</h3></div><small>기간 수익률</small></div>
-      <div className="signal-strip">{retItems.map(([label,value])=><div key={label}><span>{label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
+      <div className="signal-strip">{retItems.map(([label,value])=><div key={label}><span>등락 {label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
     </section>
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>04</span><h3>추세 · 리스크</h3></div></div>
@@ -266,7 +270,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
         <SnapshotItem label="현재가">{num(row.price)}</SnapshotItem>
         <SnapshotItem label="MA50 이격">{gapPct(row.price,row.ma50)}</SnapshotItem>
         <SnapshotItem label="200일선">{ma200Status}</SnapshotItem>
-        <SnapshotItem label="52주 고점 대비">{pct(row.high_52w_distance)}</SnapshotItem>
+        <SnapshotItem label="52W 고점 대비">{pct(row.high_52w_distance)}</SnapshotItem>
         <SnapshotItem label="거래량">{row.volume_ratio==null?'—':Number(row.volume_ratio).toFixed(2)+'x'}</SnapshotItem>
         <SnapshotItem label="RSI(14)">{row.rsi14==null?'—':Number(row.rsi14).toFixed(0)}</SnapshotItem>
         <SnapshotItem label="ATR배수">{row.atr_multiple==null?'—':Number(row.atr_multiple).toFixed(1)+'x'}</SnapshotItem>
