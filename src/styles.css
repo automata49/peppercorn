@@ -589,3 +589,74 @@ body{font-size:15.5px}
   .sector-summary-full-table{min-width:560px}
   .mobile-bottom-nav button b{font-size:10.5px}
 }
+
+
+/* Expanded sector summary columns */
+.dashboard-sector-head .dashboard-section-action{
+  padding:7px 10px;
+  border:1px solid #d4e0ec;
+  border-radius:9px;
+  background:#f7fbff;
+  color:#2b68a8;
+  font-weight:800;
+}
+.dashboard-sector-head .dashboard-section-action:hover{background:#edf5fd}
+
+/* Wide sector metric table: keep labels readable and allow horizontal scroll. */
+.dashboard-sector-table-wrap{overflow:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.sector-metrics-table{min-width:1420px!important;table-layout:auto}
+.sector-metrics-table th,.sector-metrics-table td{white-space:nowrap}
+.sector-metrics-table th:first-child,.sector-metrics-table td:first-child{
+  position:sticky;
+  left:0;
+  z-index:2;
+  background:#fff;
+  box-shadow:7px 0 10px -10px rgba(50,65,82,.55);
+}
+.sector-metrics-table thead th:first-child{z-index:4;background:#f2f5f8}
+.sector-metrics-table tbody tr:hover td:first-child{background:#f7f9fc}
+.sector-metrics-table tbody tr.selected td:first-child{background:#edf3fa}
+.sector-metrics-table th:nth-child(1){min-width:180px;width:180px}
+.sector-metrics-table th:nth-child(2){min-width:76px}
+.sector-metrics-table th:nth-child(3){min-width:70px}
+.sector-metrics-table th:nth-child(4),
+.sector-metrics-table th:nth-child(5),
+.sector-metrics-table th:nth-child(6),
+.sector-metrics-table th:nth-child(7){min-width:82px}
+.sector-metrics-table th:nth-child(n+8):nth-child(-n+13){min-width:86px}
+.sector-metrics-table th:nth-child(14){min-width:126px}
+.sector-count{
+  display:inline-flex;
+  min-width:28px;
+  justify-content:center;
+  padding:3px 6px;
+  border-radius:999px;
+  font-size:11.5px;
+  font-weight:800;
+}
+.sector-count.sector-core-count{background:#e8f6ee;color:#237a4b}
+.sector-count.candidate{background:#eaf3fd;color:#2166b1}
+.sector-count.turn{background:#fff5dd;color:#946300}
+.sector-count.correction{background:#f1ebff;color:#7046b8}
+
+/* The all-sectors popup is intentionally wide and scrollable. */
+.sector-summary-dialog{width:min(1220px,calc(100vw - 28px))}
+.sector-summary-dialog-table{overflow:auto}
+.sector-summary-full-table{min-width:1420px!important}
+
+/* A subtle edge hint tells touch users the sector table scrolls horizontally. */
+.dashboard-sector-table-wrap,.sector-summary-dialog-table{background:
+  linear-gradient(to right,#fff 30%,rgba(255,255,255,0)) left center/24px 100% no-repeat,
+  linear-gradient(to left,#fff 30%,rgba(255,255,255,0)) right center/24px 100% no-repeat;
+}
+
+@media(max-width:650px){
+  .dashboard-sector-head .dashboard-section-action{padding:6px 8px;font-size:11px}
+  .sector-metrics-table{min-width:1320px!important}
+  .sector-metrics-table th,.sector-metrics-table td{font-size:10.5px}
+  .sector-metrics-table th{font-size:9.8px}
+  .sector-metrics-table th:nth-child(1){min-width:150px;width:150px}
+  .sector-summary-full-table{min-width:1320px!important}
+  .sector-summary-dialog{width:100%}
+  .sector-count{min-width:25px;padding:2px 5px;font-size:10px}
+}
