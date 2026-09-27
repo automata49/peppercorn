@@ -68,7 +68,7 @@
 .tabs{flex-wrap:wrap}
 .tabs b{margin-left:3px;font-variant-numeric:tabular-nums}
 .stock-rows{overflow-x:auto}
-.stock-rows-head,.stock-row{min-width:calc(var(--stock-name-width,102px) + 1184px);display:grid;grid-template-columns:var(--stock-name-width,102px) 80px 72px repeat(15,62px);gap:6px;align-items:center}
+.stock-rows-head,.stock-row{min-width:calc(var(--stock-name-width,102px) + 1214px);display:grid;grid-template-columns:var(--stock-name-width,102px) 80px 72px repeat(14,62px) 92px;gap:6px;align-items:center}
 .stock-rows-head{padding:8px 4px;background:#f2f5f8;color:#68778a;font-size:10.5px;font-weight:700;text-align:left;white-space:nowrap}
 .stock-rows-head span:first-child,.stock-rows-head span:nth-child(3){text-align:left}
 .stock-row>span,.stock-row>strong{white-space:nowrap;font-variant-numeric:tabular-nums}
@@ -79,7 +79,7 @@
 .kpi-action:hover{border-color:#9ab0c9;background:#f8fbff}
 .kpi-action:focus-visible{outline:2px solid #315a83;outline-offset:2px}
 .drill-summary-list .stock-rows{margin-top:12px;max-height:min(68dvh,700px);overflow:auto}
-@media(max-width:650px){.stock-row{grid-template-columns:var(--stock-name-width,102px) 80px 72px repeat(15,62px)}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
+@media(max-width:650px){.stock-row{grid-template-columns:var(--stock-name-width,102px) 80px 72px repeat(14,62px) 92px}.stock-row>span:last-child,.stock-row>span:nth-last-child(2){display:inline-flex;justify-content:flex-end}}
 
 /* Wide viewport: sector selection updates the adjacent stock pane. */
 @media(min-width:1181px){.industry-layout{grid-template-columns:minmax(0,43fr) minmax(0,57fr)}}
@@ -201,8 +201,8 @@
 .launch-center{display:flex;flex-direction:column;align-items:center;width:min(100%,420px);text-align:center}
 .launch-brand.brand{display:flex!important;flex-direction:column;gap:10px;align-items:center;justify-content:center;padding:0!important}
 .launch-brand.brand>div:last-child{display:flex!important;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
-.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:34px;height:34px;flex:none}
-.launch-brand.brand .launch-emblem img{display:block;width:34px;height:34px;object-fit:contain;filter:drop-shadow(0 4px 5px rgba(36,55,77,.10))}
+.launch-brand.brand .launch-emblem{display:grid!important;place-items:center;width:40px;height:40px;flex:none;transform:translateY(-8px);margin-bottom:-4px}
+.launch-brand.brand .launch-emblem img{display:block;width:40px;height:40px;object-fit:contain;filter:drop-shadow(0 5px 7px rgba(36,55,77,.12))}
 .launch-brand h2{margin:0;color:#26364b;font-family:inherit;font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1}
 .launch-brand.brand span{display:block;color:#9c7840;font-size:24px;margin-top:0!important;letter-spacing:.01em;line-height:1}
 .launch-center .launch-slogan{margin-top:18px;color:#7d8998;font-family:inherit;font-size:14px;letter-spacing:.08em}
@@ -210,8 +210,8 @@
 .launch-progress span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#28486f,#b79159);transform-origin:left}
 @media(max-width:650px){
   .launch-brand.brand{gap:9px}
-  .launch-brand.brand .launch-emblem{width:34px;height:34px}
-  .launch-brand.brand .launch-emblem img{width:34px;height:34px}
+  .launch-brand.brand .launch-emblem{width:38px;height:38px;transform:translateY(-7px);margin-bottom:-3px}
+  .launch-brand.brand .launch-emblem img{width:38px;height:38px}
   .launch-brand h2,.launch-brand.brand span{font-size:21px}
   .launch-center .launch-slogan{font-size:13.5px}
 }
@@ -258,3 +258,31 @@ body{font-size:14px;line-height:1.45}
 .stock-rows-head span:not(:first-child){text-align:center;white-space:normal;line-height:1.15;overflow:hidden}
 .stock-row .pill{max-width:100%;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;justify-content:center;padding:3px 5px;font-size:11px}
 .stock-price{padding-right:2px}
+
+/* Leader stock section emphasis */
+.stock-panel{border-color:#d4dee9;box-shadow:0 4px 14px rgba(40,72,111,.06)}
+.stock-panel>.panel-head{margin:-16px -16px 14px;padding:14px 16px 13px;background:linear-gradient(90deg,#edf4fb 0%,#f8fbfe 72%,#fff 100%);border-bottom:1px solid #d9e3ed}
+.stock-panel>.panel-head h2{font-size:17px;color:#203f63;font-weight:800;letter-spacing:-.02em}
+.stock-panel>.panel-head h2::before{content:"";display:inline-block;width:4px;height:16px;margin-right:8px;border-radius:99px;background:#3f6f9e;vertical-align:-2px}
+.stock-panel>.panel-head p{color:#687b91;font-weight:600}
+.stock-panel>.tabs{gap:7px;padding:7px;background:#f6f8fb;border:1px solid #e0e6ed;border-radius:12px}
+.stock-panel>.tabs button{font-weight:700;border-color:transparent;background:#fff;box-shadow:0 1px 2px rgba(34,47,64,.05)}
+.stock-panel>.tabs button:nth-child(1){color:#237a4b;background:#edf7f1}
+.stock-panel>.tabs button:nth-child(2){color:#2166b1;background:#eef5fd}
+.stock-panel>.tabs button:nth-child(3){color:#946300;background:#fff7df}
+.stock-panel>.tabs button:nth-child(4){color:#17756d;background:#ecf8f6}
+.stock-panel>.tabs button:nth-child(1).on{color:#fff;background:#237a4b;border-color:#237a4b}
+.stock-panel>.tabs button:nth-child(2).on{color:#fff;background:#2166b1;border-color:#2166b1}
+.stock-panel>.tabs button:nth-child(3).on{color:#fff;background:#a06c00;border-color:#a06c00}
+.stock-panel>.tabs button:nth-child(4).on{color:#fff;background:#17756d;border-color:#17756d}
+.stock-panel>.tabs button b{display:inline-flex;min-width:20px;justify-content:center;padding:1px 5px;border-radius:999px;background:rgba(255,255,255,.7)}
+.stock-panel>.tabs button.on b{background:rgba(255,255,255,.2);color:#fff}
+
+/* Single-line controls and long labels */
+.topbar{min-width:0}
+.top-actions{min-width:0;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+.top-actions::-webkit-scrollbar{display:none}
+.top-actions>*{flex:none}
+.top-actions button,.top-actions .source,.top-actions .sync-state{white-space:nowrap}
+.stock-rows-head span:last-child{white-space:nowrap!important;overflow:visible}
+.snapshot-item>span,.signal-strip span{white-space:nowrap}
