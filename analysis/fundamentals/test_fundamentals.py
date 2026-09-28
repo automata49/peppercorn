@@ -346,13 +346,38 @@ def test_checks_reject_future_date_and_null_required():
     assert result['필수 항목'] is False
 
 
+def _reference_quarters(ticker):
+    return {p['period_end']: dict(p['values']) for p in reconcile.REFERENCE[ticker]['periods']}
+
+
 def test_official_reference_rejects_changed_value_and_missing_period():
-    expected = reconcile.REFERENCE['NVDA']
-    result = {'ticker': 'NVDA', 'quarters': {expected['period_end']: dict(expected['values'])}}
+    period = reconcile.REFERENCE['NVDA']['periods'][0]['period_end']
+    result = {'ticker': 'NVDA', 'quarters': _reference_quarters('NVDA')}
     assert all(ok for _, ok, _ in reconcile.compare(result))
-    result['quarters'][expected['period_end']]['operating_cash_flow'] += 1_000_000
+    result['quarters'][period]['operating_cash_flow'] += 1_000_000
     assert not all(ok for _, ok, _ in reconcile.compare(result))
+    result['quarters'].pop(period)
+    assert any(name == f'공식 공시 {period}' and not ok for name, ok, _ in reconcile.compare(result))
     assert not reconcile.compare({'ticker': 'NVDA', 'quarters': {}})[0][1]
+
+
+def test_official_reference_periods_are_ordered_and_complete():
+    for ticker, expected in reconcile.REFERENCE.items():
+        ends = [p['period_end'] for p in expected['periods']]
+        assert ends == sorted(set(ends))
+        for p in expected['periods']:
+            assert p['filed'] > p['period_end'] and p['values'] and p['source'] and p['urls']
+            assert set(p['methods']) == set(p['values'])
+            assert all(isinstance(v, int) and v > 0 for v in p['values'].values())
+    assert len(reconcile.REFERENCE['NVDA']['periods']) >= 6
+
+
+def test_official_reference_skips_quarters_not_yet_filed_at_as_of():
+    periods = reconcile.REFERENCE['NVDA']['periods']
+    only_first = {'ticker': 'NVDA', 'quarters': {periods[0]['period_end']: dict(periods[0]['values'])}}
+    assert not all(ok for _, ok, _ in reconcile.compare(only_first))
+    assert all(ok for _, ok, _ in reconcile.compare(only_first, as_of=periods[0]['filed']))
+    assert reconcile.compare(only_first, as_of='2000-01-01') == []
 
 
 def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
@@ -363,7 +388,7 @@ def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
     for ticker, expected in reconcile.REFERENCE.items():
         (tmp_path / f'{ticker}.json').write_text(json.dumps({
             'ticker': 'NVDA', 'currency': expected['currency'],
-            'quarters': {expected['period_end']: dict(expected['values'])}}), encoding='utf-8')
+            'quarters': _reference_quarters(ticker)}), encoding='utf-8')
     result = subprocess.run([sys.executable, script, str(tmp_path)], capture_output=True, text=True)
     assert result.returncode == 1
     assert '005930: artifact identity' in result.stdout

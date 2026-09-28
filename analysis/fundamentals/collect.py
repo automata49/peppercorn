@@ -52,8 +52,7 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
     check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
     check_results.extend(conflict_checks(parsed, sorted(q)[-8:]))
-    if not as_of or as_of >= "2025-08-27":
-        check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
+    check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}, as_of=as_of))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
             "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
             "raw_sha256": parsed.get("raw_sha256"), "source_revisions": parsed.get("source_revisions", {}),

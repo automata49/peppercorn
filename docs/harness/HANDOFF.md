@@ -34,3 +34,8 @@ Validation: `python -m pytest -q analysis/fundamentals` and `npm run harness:che
 ## SEC same-day tie policy — 2026-09-28
 `sec.py` now orders amendments by filing date then accession, so a same-day tie no longer depends on API response order. A different accession filed the same day with a different amount is recorded in `source_conflicts`, and `collect.py` fails the `동일자 공시 충돌 (최근 8분기)` check. Offline only: 4 new cases (31 total) pass under pytest 8.4.2; the 3 SEC cases fail against the previous `sec.py`. `npm run harness:check` passed locally (12 Analyst, 14 Position AI cases). No UI change, so no build/browser run. No live SEC fetch, DB write or verdict.
 Next: independently reconcile the remaining recent quarters against official filings, then market-specific ROIC conventions and thresholds; DART historical archival remains open.
+
+## NVIDIA reference extension — 2026-09-28
+`official_reference_2025.json` is now multi-period (`periods`, each with `filed`); `reconcile.compare(result, as_of)` checks only quarters filed by the cutoff. Added 5 NVIDIA quarters (6 total): 2024-10-27, 2025-04-27, 2025-10-26, 2026-04-26, 2026-07-26 from the primary 10-Qs. Read via a summarizing web fetch with cross-checks (prior-year columns, cumulative sums); not yet spot-checked by a person. Details and gaps in `SOURCE_RECONCILIATION.md`.
+Open: fiscal Q4 quarters 2025-01-26 and 2026-01-25 (10-K fetch truncated before the statements); Samsung has 1 quarter (PDFs need a text extractor such as pypdf, not installed here); the live collector has not been compared with the new rows, so the first `fundamentals-poc` run may fail and should be inspected, not loosened.
+Validation: `python -m pytest -q analysis/fundamentals` (33 passed), `npm run harness:check`.

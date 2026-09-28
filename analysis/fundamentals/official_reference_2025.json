@@ -1,48 +1,184 @@
 {
   "NVDA": {
-    "period_end": "2025-07-27",
     "currency": "USD",
-    "source": "SEC 10-Q, accession 0001045810-25-000209, filed 2025-08-27; Q1 10-Q accession 0001045810-25-000116, filed 2025-05-28",
-    "urls": [
-      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
-      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
-    ],
-    "methods": {
-      "revenue": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
-      "operating_income": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
-      "operating_cash_flow": "Q2 six months 42,779 minus Q1 three months 27,414; USD millions times 1e6",
-      "capex": "Q2 six months 3,122 minus Q1 three months 1,227, purchases related to PPE and intangibles; USD millions times 1e6"
-    },
-    "values": {
-      "revenue": 46743000000,
-      "operating_income": 28440000000,
-      "operating_cash_flow": 15365000000,
-      "capex": 1895000000
-    }
+    "periods": [
+      {
+        "period_end": "2024-10-27",
+        "filed": "2024-11-20",
+        "source": "SEC 10-Q accession 0001045810-24-000316 filed 2024-11-20; Q2 10-Q 0001045810-24-000264 filed 2024-08-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000316/nvda-20241027.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000264/nvda-20240728.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, one pass per filing. Revenue and operating income also appear as prior-year columns in the 2025-11-19 10-Q; the nine-month and six-month cash flow figures are single-source. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 10-Q three months ended Oct 27, 2024; USD millions times 1e6",
+          "operating_income": "Q3 10-Q three months ended Oct 27, 2024; USD millions times 1e6",
+          "operating_cash_flow": "Q3 nine months 47,460 minus Q2 six months 29,833",
+          "capex": "Q3 nine months 2,159 minus Q2 six months 1,346, purchases related to PPE and intangibles",
+          "cash": "Q3 balance sheet at Oct 27, 2024",
+          "equity": "Q3 balance sheet total shareholders' equity at Oct 27, 2024"
+        },
+        "values": {
+          "revenue": 35082000000,
+          "operating_income": 21869000000,
+          "operating_cash_flow": 17627000000,
+          "capex": 813000000,
+          "cash": 9107000000,
+          "equity": 65899000000
+        }
+      },
+      {
+        "period_end": "2025-04-27",
+        "filed": "2025-05-28",
+        "source": "SEC 10-Q accession 0001045810-25-000116 filed 2025-05-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
+        ],
+        "verification": "Read through a summarizing web fetch; the same figures appear as prior-year columns in the 2026-05-20 10-Q; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q1 10-Q three months ended Apr 27, 2025",
+          "operating_income": "Q1 10-Q three months ended Apr 27, 2025",
+          "operating_cash_flow": "Q1 10-Q three months",
+          "capex": "Q1 10-Q three months, purchases related to PPE and intangibles",
+          "cash": "Q1 balance sheet at Apr 27, 2025",
+          "equity": "Q1 balance sheet total shareholders' equity at Apr 27, 2025"
+        },
+        "values": {
+          "revenue": 44062000000,
+          "operating_income": 21638000000,
+          "operating_cash_flow": 27414000000,
+          "capex": 1227000000,
+          "cash": 15234000000,
+          "equity": 83843000000
+        }
+      },
+      {
+        "period_end": "2025-07-27",
+        "filed": "2025-08-27",
+        "source": "SEC 10-Q, accession 0001045810-25-000209, filed 2025-08-27; Q1 10-Q accession 0001045810-25-000116, filed 2025-05-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
+        ],
+        "methods": {
+          "revenue": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+          "operating_income": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+          "operating_cash_flow": "Q2 six months 42,779 minus Q1 three months 27,414; USD millions times 1e6",
+          "capex": "Q2 six months 3,122 minus Q1 three months 1,227, purchases related to PPE and intangibles; USD millions times 1e6"
+        },
+        "values": {
+          "revenue": 46743000000,
+          "operating_income": 28440000000,
+          "operating_cash_flow": 15365000000,
+          "capex": 1895000000
+        }
+      },
+      {
+        "period_end": "2025-10-26",
+        "filed": "2025-11-19",
+        "source": "SEC 10-Q accession 0001045810-25-000230 filed 2025-11-19; Q2 10-Q 0001045810-25-000209",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000230/nvda-20251026.htm"
+        ],
+        "verification": "Read through a summarizing web fetch; prior-year columns and nine-month sums cross-checked against earlier figures; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 10-Q three months ended Oct 26, 2025",
+          "operating_income": "Q3 10-Q three months ended Oct 26, 2025",
+          "operating_cash_flow": "Q3 nine months 66,530 minus Q2 six months 42,779",
+          "capex": "Q3 nine months 4,758 minus Q2 six months 3,122, purchases related to PPE and intangibles",
+          "cash": "Q3 balance sheet at Oct 26, 2025",
+          "equity": "Q3 balance sheet total shareholders' equity at Oct 26, 2025"
+        },
+        "values": {
+          "revenue": 57006000000,
+          "operating_income": 36010000000,
+          "operating_cash_flow": 23751000000,
+          "capex": 1636000000,
+          "cash": 11486000000,
+          "equity": 118897000000
+        }
+      },
+      {
+        "period_end": "2026-04-26",
+        "filed": "2026-05-20",
+        "source": "SEC 10-Q accession 0001045810-26-000052 filed 2026-05-20",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000052/nvda-20260426.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, twice with matching figures; prior-year column reproduces the verified Q1 FY26 values; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q1 FY27 10-Q three months ended Apr 26, 2026",
+          "operating_income": "Q1 FY27 10-Q three months ended Apr 26, 2026",
+          "operating_cash_flow": "Q1 FY27 10-Q three months",
+          "capex": "Q1 FY27 10-Q three months, purchases related to PPE and intangibles",
+          "cash": "Q1 FY27 balance sheet at Apr 26, 2026",
+          "equity": "Q1 FY27 balance sheet total shareholders' equity at Apr 26, 2026"
+        },
+        "values": {
+          "revenue": 81615000000,
+          "operating_income": 53536000000,
+          "operating_cash_flow": 50344000000,
+          "capex": 1757000000,
+          "cash": 13237000000,
+          "equity": 195474000000
+        }
+      },
+      {
+        "period_end": "2026-07-26",
+        "filed": "2026-08-26",
+        "source": "SEC 10-Q accession 0001045810-26-000075 filed 2026-08-26; Q1 10-Q 0001045810-26-000052",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, twice with matching figures; prior-year columns and six-month sums cross-checked; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q2 FY27 10-Q three months ended Jul 26, 2026",
+          "operating_income": "Q2 FY27 10-Q three months ended Jul 26, 2026",
+          "operating_cash_flow": "Q2 FY27 six months 74,421 minus Q1 three months 50,344",
+          "capex": "Q2 FY27 six months 4,434 minus Q1 1,757, purchases related to PPE and intangibles",
+          "cash": "Q2 FY27 balance sheet at Jul 26, 2026",
+          "equity": "Q2 FY27 balance sheet total shareholders' equity at Jul 26, 2026"
+        },
+        "values": {
+          "revenue": 96221000000,
+          "operating_income": 63734000000,
+          "operating_cash_flow": 24077000000,
+          "capex": 2677000000,
+          "cash": 22443000000,
+          "equity": 228984000000
+        }
+      }
+    ]
   },
   "005930": {
-    "period_end": "2025-03-31",
     "currency": "KRW",
-    "source": "Samsung Electronics consolidated Q1 statements, DART report 20250515001922, filed 2025-05-15; KRW millions times 1e6",
-    "urls": [
-      "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf",
-      "https://opendart.fss.or.kr/xbrl/viewer/main.do?rcpNo=20250515001922"
-    ],
-    "methods": {
-      "revenue": "Consolidated income statement page 7",
-      "operating_income": "Consolidated income statement page 7",
-      "operating_cash_flow": "Consolidated cash flow statement page 10",
-      "capex": "Consolidated cash flow statement page 10, PPE purchases only; intangible purchases 1,257,544 KRW millions excluded",
-      "cash": "Consolidated balance sheet page 5",
-      "debt": "Balance sheet pages 5-6: short-term 5,333,859 + current long-term 2,035,992 + bonds 14,518 + long-term 3,759,579 KRW millions"
-    },
-    "values": {
-      "revenue": 79140503000000,
-      "operating_income": 6685272000000,
-      "operating_cash_flow": 16580866000000,
-      "capex": 12127934000000,
-      "cash": 53161004000000,
-      "debt": 11143948000000
-    }
+    "periods": [
+      {
+        "period_end": "2025-03-31",
+        "filed": "2025-05-15",
+        "source": "Samsung Electronics consolidated Q1 statements, DART report 20250515001922, filed 2025-05-15; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf",
+          "https://opendart.fss.or.kr/xbrl/viewer/main.do?rcpNo=20250515001922"
+        ],
+        "methods": {
+          "revenue": "Consolidated income statement page 7",
+          "operating_income": "Consolidated income statement page 7",
+          "operating_cash_flow": "Consolidated cash flow statement page 10",
+          "capex": "Consolidated cash flow statement page 10, PPE purchases only; intangible purchases 1,257,544 KRW millions excluded",
+          "cash": "Consolidated balance sheet page 5",
+          "debt": "Balance sheet pages 5-6: short-term 5,333,859 + current long-term 2,035,992 + bonds 14,518 + long-term 3,759,579 KRW millions"
+        },
+        "values": {
+          "revenue": 79140503000000,
+          "operating_income": 6685272000000,
+          "operating_cash_flow": 16580866000000,
+          "capex": 12127934000000,
+          "cash": 53161004000000,
+          "debt": 11143948000000
+        }
+      }
+    ]
   }
 }
