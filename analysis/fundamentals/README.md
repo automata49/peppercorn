@@ -23,4 +23,6 @@ Actions → **Fundamentals PoC (NVDA + Samsung)** → Run workflow. 실행 요�
 
 로컬: `cd analysis/fundamentals && SEC_USER_AGENT="..." DART_API_KEY=... python collect.py`
 
+미국 공시의 과거 기준일 재현: `python collect.py --only US --as-of 2025-08-27 --out out-asof`. 선택한 SEC 수치의 수정 공시 후보는 `source_revisions`, 실제 분기 계산 입력은 `source_lineage`, 조회 시점은 `fetched_at`, 공시 제한 날짜는 `as_of`에 기록됩니다. 이는 현재 SEC API가 반환하는 제출 이력을 기준일로 필터링한 결과이며, 당시 API 응답 자체의 불변 보존본은 아닙니다. 한국 DART API는 현재 응답으로 과거 정정 전 수치를 복원할 수 없으므로 `--as-of` 실행을 거부합니다.
+
 과거 PoC 아티팩트 대조: `python analysis/fundamentals/reconcile.py /path/to/fundamentals-poc.zip` (저장소 루트). 기준값과 확인 범위는 `docs/harness/SOURCE_RECONCILIATION.md`를 참고하세요. `methods.py`에 US와 KR FCF 방법 버전을 별도로 정의합니다. 출력 JSON에는 방법, 원천 응답 해시와 계산 항목별 입력 자료의 출처를 기록합니다. 서로 다른 방법의 FCF 마진을 하나의 시장 간 순위로 비교하지 않습니다. 각 시장별 자동 Position 판정은 해당 시장의 공시 범위 검증과 별도 기준·임계값 검증이 완료된 뒤에 켭니다.
