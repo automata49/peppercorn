@@ -51,11 +51,13 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
     m = metrics.compute(q, t["tax"])
     check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
+    check_results.extend(conflict_checks(parsed, sorted(q)[-8:]))
     if not as_of or as_of >= "2025-08-27":
         check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
             "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
             "raw_sha256": parsed.get("raw_sha256"), "source_revisions": parsed.get("source_revisions", {}),
+            "source_conflicts": parsed.get("source_conflicts", {}),
             "as_of": as_of,
             "tag_by_period": parsed.get("tag_by_period", {}),
             "quarters": q, "metrics": m, "checks": check_results}
@@ -78,6 +80,14 @@ def lineage_checks(parsed: dict, market: str, periods: list[str]) -> list[tuple[
                     missing.append(f"{end}/{field}: receipt/date/hash")
     return [("원천 공시 추적 (최근 8분기)", not missing,
              "완료" if not missing else f"누락 {len(missing)}건: {', '.join(missing[:3])}")]
+
+
+def conflict_checks(parsed: dict, periods: list[str]) -> list[tuple[str, bool, str]]:
+    """Same-day filings that disagree cannot be ordered reliably; fail rather than pick silently."""
+    found = [f"{end}/{field}" for end in periods
+             for field in parsed.get("source_conflicts", {}).get(end, {})]
+    return [("동일자 공시 충돌 (최근 8분기)", not found,
+             "없음" if not found else f"{len(found)}건: {', '.join(found[:3])}")]
 
 
 def render(results: list[dict]) -> str:

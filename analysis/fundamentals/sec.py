@@ -64,6 +64,17 @@ def _entries(facts: dict, tag: str, unit: str = "USD", as_of: str | None = None)
             if f.get("form") in FORMS and (as_of is None or (f.get("filed") and f["filed"] <= as_of))]
 
 
+def _rank(row: dict) -> tuple[str, str]:
+    """Amendment order: filing date, then accession (its yearly sequence breaks same-day ties)."""
+    return (row.get("filed") or "", row.get("accn") or "")
+
+
+def _same_day_conflicts(candidates: list[dict], chosen: dict) -> list[dict]:
+    """Facts filed the same day under another accession with a different amount."""
+    return [c for c in candidates
+            if c["filed"] == chosen.get("filed") and c["accession"] != chosen.get("accn") and c["value"] != chosen["val"]]
+
+
 def _latest_rows(facts: dict, tags: list[str], unit: str, as_of: str | None = None) -> dict[tuple[str, str], tuple[str, dict]]:
     """Select latest amendment for each span, retaining historical tag changes."""
     selected = {}
@@ -73,7 +84,7 @@ def _latest_rows(facts: dict, tags: list[str], unit: str, as_of: str | None = No
                 continue
             span = (row["start"], row["end"])
             prior = selected.get(span)
-            if prior is None or row.get("filed", "") > prior[1].get("filed", ""):
+            if prior is None or _rank(row) > _rank(prior[1]):
                 selected[span] = (tag, row)
     return selected
 
@@ -94,6 +105,7 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
     tag_by_period: dict[str, dict[str, str]] = {}
     lineage: dict[str, dict[str, dict]] = {}
     revisions: dict[str, dict[str, list[dict]]] = {}
+    conflicts: dict[str, dict[str, list[dict]]] = {}
     for field, tags in DURATION_TAGS.items():
         unit = "shares" if field == "diluted_shares" else "USD"
         selected = _latest_rows(facts, tags, unit, as_of)
@@ -125,6 +137,11 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             revisions.setdefault(end, {})[field] = [item for span in derived[end]["spans"]
                                                       for item in by_span.get(span, [])]
             revisions[end][field].sort(key=lambda item: (item["start"], item["end"], item["filed"] or "", item["accession"] or ""))
+            for span in derived[end]["spans"]:
+                clash = _same_day_conflicts(by_span.get(span, []), selected[span][1])
+                if clash:
+                    conflicts.setdefault(end, {}).setdefault(field, []).append(
+                        _conflict_record(selected[span][1], clash))
             # tag_by_period is a display hint; lineage contains every chosen input.
             matching = [(tag, row) for (_, e), (tag, row) in selected.items() if e == end]
             if matching:
@@ -140,17 +157,20 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             for r in _entries(facts, t, as_of=as_of):
                 if "start" in r:
                     continue
-                if r["end"] not in latest or r.get("filed", "") > latest[r["end"]].get("filed", ""):
+                if r["end"] not in latest or _rank(r) > _rank(latest[r["end"]]):
                     latest[r["end"]] = r
             per_tag[t] = latest
         hits: dict[str, str] = {}
         for end, row in table.items():
             candidates = [(t, per_tag[t][end], i) for i, t in enumerate(tags) if end in per_tag[t]]
             if candidates:
-                t, fact, _ = max(candidates, key=lambda item: (item[1].get("filed", ""), -item[2]))
+                t, fact, _ = max(candidates, key=lambda item: (*_rank(item[1]), -item[2]))
                 row[field] = fact["val"]
                 lineage.setdefault(end, {})[field] = _instant_lineage(t, fact)
                 revisions.setdefault(end, {})[field] = _instant_revisions(facts, tags, end, as_of)
+                clash = _same_day_conflicts(revisions[end][field], fact)
+                if clash:
+                    conflicts.setdefault(end, {}).setdefault(field, []).append(_conflict_record(fact, clash))
                 hits[end] = t
         rev_ends = [e for e, r in table.items() if "revenue" in r]
         latest_end = max(rev_ends) if rev_ends else None
@@ -195,11 +215,19 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             if field not in row:
                 lineage[end].pop(field)
                 revisions.get(end, {}).pop(field, None)
+                conflicts.get(end, {}).pop(field, None)
     table = {k: v for k, v in table.items() if "revenue" in v}
     return {"quarters": dict(sorted(table.items())), "tags": used, "tag_by_period": tag_by_period,
             "entity": facts.get("entityName"), "source_lineage": {k: lineage[k] for k in table},
-            "source_revisions": {k: revisions.get(k, {}) for k in table}, "as_of": as_of,
+            "source_revisions": {k: revisions.get(k, {}) for k in table},
+            "source_conflicts": {k: conflicts[k] for k in table if conflicts.get(k)}, "as_of": as_of,
             "raw_sha256": facts.get("_raw_sha256")}
+
+
+def _conflict_record(chosen: dict, competing: list[dict]) -> dict:
+    return {"selected": {"accession": chosen.get("accn"), "filed": chosen.get("filed"), "value": chosen["val"]},
+            "competing": [{"accession": c["accession"], "filed": c["filed"], "value": c["value"], "tag": c["tag"]}
+                          for c in competing]}
 
 
 def _instant_lineage(tag: str, row: dict) -> dict:

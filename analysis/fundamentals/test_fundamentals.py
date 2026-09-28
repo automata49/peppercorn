@@ -369,6 +369,59 @@ def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
     assert '005930: artifact identity' in result.stdout
 
 
+def _acc(fact, accn):
+    return {**fact, "accn": accn}
+
+
+def test_sec_same_day_conflict_is_order_independent_and_recorded():
+    first = _acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "0000000001-25-000010")
+    second = _acc(_sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-05-01"), "0000000001-25-000011")
+    for rows in ([first, second], [second, first]):
+        parsed = sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": rows}}}}})
+        assert parsed["quarters"]["2025-03-31"]["revenue"] == 12
+        record = parsed["source_conflicts"]["2025-03-31"]["revenue"][0]
+        assert record["selected"]["accession"] == "0000000001-25-000011"
+        assert [c["value"] for c in record["competing"]] == [10]
+
+
+def test_sec_same_day_agreeing_or_amended_later_is_not_a_conflict():
+    same = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+            _acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-2")]
+    later = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-06-01"), "a-2")]
+    for rows in (same, later):
+        parsed = sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": rows}}}}})
+        assert parsed["source_conflicts"] == {}
+    # The competing same-day filing is invisible before its filing date.
+    clash = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 12, filed="2025-06-01"), "a-2"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 13, filed="2025-06-01"), "a-3")]
+    facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": clash}}}}}
+    assert sec.parse(facts, as_of="2025-05-31")["source_conflicts"] == {}
+    assert sec.parse(facts, as_of="2025-06-01")["source_conflicts"]
+
+
+def test_sec_same_day_instant_conflict_is_order_independent_and_recorded():
+    rev = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    cash = [_acc(_sec_fact(None, "2025-03-31", 50, filed="2025-06-01"), "b-1"),
+            _acc(_sec_fact(None, "2025-03-31", 60, filed="2025-06-01"), "b-2")]
+    for rows in (cash, cash[::-1]):
+        parsed = sec.parse({"facts": {"us-gaap": {
+            "Revenues": {"units": {"USD": [rev]}},
+            "CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": rows}}}}})
+        assert parsed["quarters"]["2025-03-31"]["cash"] == 60
+        assert parsed["source_conflicts"]["2025-03-31"]["cash"][0]["selected"]["accession"] == "b-2"
+
+
+def test_conflict_check_fails_recent_periods_only():
+    from collect import conflict_checks
+    parsed = {"source_conflicts": {"2023-03-31": {"revenue": [{}]}, "2025-06-30": {"capex": [{}]}}}
+    assert conflict_checks(parsed, ["2025-03-31", "2025-06-30"])[0][1] is False
+    assert "2025-06-30/capex" in conflict_checks(parsed, ["2025-06-30"])[0][2]
+    assert conflict_checks(parsed, ["2025-03-31"])[0][1] is True
+    assert conflict_checks({}, ["2025-03-31"])[0][1] is True
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
