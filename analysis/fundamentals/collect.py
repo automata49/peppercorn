@@ -21,8 +21,8 @@ import reconcile
 import sec
 
 TARGETS = [
-    {"ticker": "NVDA", "market": "US", "name": "NVIDIA", "source": "SEC", "cik": 1045810, "currency": "USD", "tax": 0.21},
-    {"ticker": "005930", "market": "KR", "name": "삼성전자", "source": "DART", "corp_code": "00126380", "currency": "KRW", "tax": 0.24},
+    {"ticker": "NVDA", "market": "US", "name": "NVIDIA", "source": "SEC", "cik": 1045810, "currency": "USD"},
+    {"ticker": "005930", "market": "KR", "name": "삼성전자", "source": "DART", "corp_code": "00126380", "currency": "KRW"},
 ]
 
 
@@ -43,19 +43,21 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
         if as_of is not None:
             raise ValueError("DART historical as-of requires an archived filing snapshot")
         this_year = date.today().year
-        parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - 4, this_year + 1))))
+        parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - dart.HISTORY_YEARS, this_year + 1))))
     q = parsed["quarters"]
     method = methods.for_market(t["market"])
     if method["currency"] != t["currency"]:
         raise ValueError("Market and currency mismatch")
-    m = metrics.compute(q, t["tax"])
+    year = date.fromisoformat(max(q)).year if q else date.today().year
+    m = metrics.compute(q, methods.statutory_tax_rate(t["market"], year), method["roic"])
     check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
-    if not as_of or as_of >= "2025-08-27":
-        check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
+    check_results.extend(conflict_checks(parsed, sorted(q)[-8:]))
+    check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}, as_of=as_of))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
             "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
             "raw_sha256": parsed.get("raw_sha256"), "source_revisions": parsed.get("source_revisions", {}),
+            "source_conflicts": parsed.get("source_conflicts", {}),
             "as_of": as_of,
             "tag_by_period": parsed.get("tag_by_period", {}),
             "quarters": q, "metrics": m, "checks": check_results}
@@ -80,6 +82,14 @@ def lineage_checks(parsed: dict, market: str, periods: list[str]) -> list[tuple[
              "완료" if not missing else f"누락 {len(missing)}건: {', '.join(missing[:3])}")]
 
 
+def conflict_checks(parsed: dict, periods: list[str]) -> list[tuple[str, bool, str]]:
+    """Same-day filings that disagree cannot be ordered reliably; fail rather than pick silently."""
+    found = [f"{end}/{field}" for end in periods
+             for field in parsed.get("source_conflicts", {}).get(end, {})]
+    return [("동일자 공시 충돌 (최근 8분기)", not found,
+             "없음" if not found else f"{len(found)}건: {', '.join(found[:3])}")]
+
+
 def render(results: list[dict]) -> str:
     lines = ["# Pepper 재무 수집 PoC 결과", ""]
     for r in results:
@@ -95,6 +105,8 @@ def render(results: list[dict]) -> str:
         method = r["methodology"]
         lines += ["", f"**지표 (TTM, 기준 {m.get('as_of')}; {method['version']})**", "",
                   f"FCF 기준: {method['capex_basis']}. 시장별 기준이며 원시 FCF 마진의 시장 간 순위 비교는 제공하지 않습니다.",
+                  f"ROIC 기준: {m.get('roic_method') or '–'}; 리스 {m.get('roic_lease_basis') or '–'}; "
+                  f"세율 {pct(m.get('tax_rate_used'))} ({m.get('tax_rate_source') or '–'}).",
                   "", "| 지표 | 값 |", "|---|---:|",
                   f"| 매출 | {money(m.get('ttm_revenue'), cur)} |",
                   f"| 영업이익 | {money(m.get('ttm_operating_income'), cur)} |",

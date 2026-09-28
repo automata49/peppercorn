@@ -36,6 +36,14 @@ STOCK = {
     "cash": (["ifrs-full_CashAndCashEquivalents"], ["현금및현금성자산"]),
     "short_term_investments": (["ifrs-full_ShortTermDepositsNotClassifiedAsCashEquivalents"], ["단기금융상품"]),
 }
+GRANT_NAME = "정부보조금의수취"
+# Complete prior years fetched in addition to the current year: at least 20 consecutive quarters,
+# enough for a 3-year TTM CAGR with an earlier comparison TTM.
+HISTORY_YEARS = 5
+# IFRS 16 lease liability lines. Account ids/names are matched, never guessed from amounts.
+LEASE_CURRENT = ({"ifrs-full_CurrentLeaseLiabilities"}, {"유동리스부채", "리스부채(유동)", "유동성리스부채"})
+LEASE_NONCURRENT = ({"ifrs-full_NoncurrentLeaseLiabilities"}, {"비유동리스부채", "리스부채(비유동)", "비유동성리스부채"})
+LEASE_TOTAL = ({"ifrs-full_LeaseLiabilities"}, {"리스부채"})
 DEBT_NAMES = {"단기차입금", "유동성장기부채", "유동성장기차입금", "유동성사채", "사채", "장기차입금"}
 
 
@@ -105,6 +113,28 @@ def _filing_dates(corp_code: str, year: int, receipts: set[str], key: str) -> di
     return found
 
 
+def _lease_rows(rows: list[dict]) -> list[dict] | None:
+    """Rows making up the lease liability, or None when the balance sheet does not present them unambiguously.
+
+    A current and a non-current line (one each) or a single total line qualify; anything else, such as only
+    one half presented, could understate the liability and is treated as not presented.
+    """
+    bs = [r for r in rows if r.get("sj_div") == "BS"]
+
+    def hits(ids_names):
+        ids, names = ids_names
+        return [r for r in bs if r.get("account_id") in ids or (r.get("account_nm") or "").replace(" ", "") in names]
+
+    current, noncurrent, total = hits(LEASE_CURRENT), hits(LEASE_NONCURRENT), hits(LEASE_TOTAL)
+    if len(current) == 1 and len(noncurrent) == 1:
+        parts = [current[0], noncurrent[0]]
+    elif not current and not noncurrent and len(total) == 1:
+        parts = total
+    else:
+        return None
+    return parts if all(_num(r.get("thstrm_amount")) is not None for r in parts) else None
+
+
 def _find(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str]) -> dict | None:
     cand = [r for r in rows if r.get("sj_div") in sj]
     for i in ids:
@@ -138,10 +168,20 @@ def parse(reports: list[dict]) -> dict:
                 val = _num(row.get("thstrm_amount"))
             if val is None:
                 continue
+            grant = None
             if field == "capex":
-                val = abs(val)
+                gross = abs(val)
+                # From FY2025 Samsung reports grants received on a separate investing line while the
+                # acquisition line turns gross; earlier reports netted them. Net both to one basis.
+                grant = _find(rows, ("CF",), [], [GRANT_NAME])
+                grant_amount = 0.0 if not grant else (_num(grant.get("thstrm_amount")) or 0.0)
+                val = gross - grant_amount
             durations[field][(start, end)] = val
-            duration_sources[field][(start, end)] = _input(rep, row, val, start, end)
+            source = _input(rep, row, val, start, end)
+            if grant:
+                source["gross_value"] = gross
+                source["government_grants"] = _input(rep, grant, grant_amount, start, end)
+            duration_sources[field][(start, end)] = source
         snap = stock.setdefault(end, {})
         for field, (ids, names) in STOCK.items():
             row = _find(rows, ("BS",), ids, names)
@@ -149,6 +189,11 @@ def parse(reports: list[dict]) -> dict:
                 snap[field] = _num(row["thstrm_amount"])
                 lineage.setdefault(end, {})[field] = {"operation": "direct", "inputs": [
                     _input(rep, row, snap[field], None, end)]}
+        lease_rows = _lease_rows(rows)
+        if lease_rows:
+            snap["lease_liabilities"] = sum(_num(r["thstrm_amount"]) for r in lease_rows)
+            lineage.setdefault(end, {})["lease_liabilities"] = {"operation": "sum", "inputs": [
+                _input(rep, r, _num(r["thstrm_amount"]), None, end) for r in lease_rows]}
         debt_rows = [r for r in rows if r.get("sj_div") == "BS"
                      and (r.get("account_nm") or "").replace(" ", "") in DEBT_NAMES]
         debt_by_name = {}

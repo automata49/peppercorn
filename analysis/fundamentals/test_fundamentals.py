@@ -223,6 +223,46 @@ def test_dart_cumulative_lineage_has_both_receipts_and_ppe_basis():
     assert "PPE" in methods.for_market("KR")["capex_basis"]
 
 
+def _samsung_capex_reports(grants_line_in_fy2025=True):
+    ppe = "ifrs-full_PurchaseOfPropertyPlantAndEquipment"
+
+    def rep(year, code, revenue, cumulative, gross, grant=None):
+        rows = [_row("IS", "ifrs-full_Revenue", "매출액", revenue, cumulative),
+                _row("CF", ppe, "유형자산의 취득", -gross)]
+        if grant is not None:
+            rows.append(_row("CF", "-표준계정코드 미사용-", "정부보조금의 수취", grant))
+        return {"year": year, "reprt_code": code, "rows": rows}
+
+    return [rep(2025, "11013", 79_140_503, 79_140_503, 12_127_934),
+            rep(2025, "11012", 74_566_317, 153_706_820, 25_163_382),
+            rep(2025, "11014", 86_061_747, 239_768_567, 35_972_891),
+            rep(2025, "11011", 333_605_938, None, 47_522_179, 1_722_357 if grants_line_in_fy2025 else None),
+            rep(2026, "11013", 133_873_444, 133_873_444, 17_127_003, 1_586_919),
+            rep(2026, "11012", 171_499_470, 305_372_914, 31_234_818, 1_592_914)]
+
+
+def test_dart_capex_uses_one_net_basis_across_grant_line_presentation_change():
+    parsed = dart.parse(_samsung_capex_reports())
+    q = parsed["quarters"]
+    # Filed net through nine months; the FY2025 report is gross plus a separate grants line.
+    assert q["2025-09-30"]["capex"] == 35_972_891 - 25_163_382
+    assert q["2025-12-31"]["capex"] == (47_522_179 - 1_722_357) - 35_972_891 == 9_826_931
+    assert q["2026-03-31"]["capex"] == 17_127_003 - 1_586_919
+    assert q["2026-06-30"]["capex"] == (31_234_818 - 1_592_914) - (17_127_003 - 1_586_919) == 14_101_820
+    inputs = parsed["source_lineage"]["2025-12-31"]["capex"]["inputs"]
+    fy = next(item for item in inputs if item["reprt_code"] == "11011")
+    assert fy["gross_value"] == 47_522_179 and fy["government_grants"]["value"] == 1_722_357
+    assert fy["value"] == 45_799_822
+    assert "government_grants" not in next(item for item in inputs if item["reprt_code"] == "11014")
+
+
+def test_dart_grant_line_without_amount_is_zero_and_absent_line_leaves_gross_unchanged():
+    reports = _samsung_capex_reports()
+    reports[3]["rows"][-1]["thstrm_amount"] = "-"
+    assert dart.parse(reports)["quarters"]["2025-12-31"]["capex"] == 47_522_179 - 35_972_891
+    assert dart.parse(_samsung_capex_reports(False))["quarters"]["2025-12-31"]["capex"] == 47_522_179 - 35_972_891
+
+
 def test_dart_filing_dates_match_receipts_and_paginate(monkeypatch):
     class Response:
         def __init__(self, body): self.body = body
@@ -346,13 +386,48 @@ def test_checks_reject_future_date_and_null_required():
     assert result['필수 항목'] is False
 
 
+def _reference_quarters(ticker):
+    return {p['period_end']: dict(p['values']) for p in reconcile.REFERENCE[ticker]['periods']}
+
+
 def test_official_reference_rejects_changed_value_and_missing_period():
-    expected = reconcile.REFERENCE['NVDA']
-    result = {'ticker': 'NVDA', 'quarters': {expected['period_end']: dict(expected['values'])}}
+    period = reconcile.REFERENCE['NVDA']['periods'][0]['period_end']
+    result = {'ticker': 'NVDA', 'quarters': _reference_quarters('NVDA')}
     assert all(ok for _, ok, _ in reconcile.compare(result))
-    result['quarters'][expected['period_end']]['operating_cash_flow'] += 1_000_000
+    result['quarters'][period]['operating_cash_flow'] += 1_000_000
     assert not all(ok for _, ok, _ in reconcile.compare(result))
+    result['quarters'].pop(period)
+    assert any(name == f'공식 공시 {period}' and not ok for name, ok, _ in reconcile.compare(result))
     assert not reconcile.compare({'ticker': 'NVDA', 'quarters': {}})[0][1]
+
+
+def test_official_reference_periods_are_ordered_and_complete():
+    for ticker, expected in reconcile.REFERENCE.items():
+        ends = [p['period_end'] for p in expected['periods']]
+        assert ends == sorted(set(ends))
+        for p in expected['periods']:
+            assert p['filed'] is None or p['filed'] > p['period_end']
+            assert p['values'] and p['source'] and p['urls']
+            assert set(p['methods']) == set(p['values'])
+            assert all(isinstance(v, int) and v > 0 for v in p['values'].values())
+    assert len(reconcile.REFERENCE['NVDA']['periods']) >= 6
+    assert len(reconcile.REFERENCE['005930']['periods']) >= 8
+
+
+def test_official_reference_skips_quarters_not_yet_filed_at_as_of():
+    periods = reconcile.REFERENCE['NVDA']['periods']
+    only_first = {'ticker': 'NVDA', 'quarters': {periods[0]['period_end']: dict(periods[0]['values'])}}
+    assert not all(ok for _, ok, _ in reconcile.compare(only_first))
+    assert all(ok for _, ok, _ in reconcile.compare(only_first, as_of=periods[0]['filed']))
+    assert reconcile.compare(only_first, as_of='2000-01-01') == []
+
+
+def test_official_reference_with_unknown_filing_date_is_only_checked_without_as_of(monkeypatch):
+    period = {'period_end': '2025-06-30', 'filed': None, 'values': {'revenue': 5}}
+    monkeypatch.setattr(reconcile, 'REFERENCE', {'X': {'currency': 'KRW', 'periods': [period]}})
+    result = {'ticker': 'X', 'quarters': {'2025-06-30': {'revenue': 6}}}
+    assert not reconcile.compare(result)[0][1]
+    assert reconcile.compare(result, as_of='2030-01-01') == []
 
 
 def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
@@ -363,10 +438,161 @@ def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
     for ticker, expected in reconcile.REFERENCE.items():
         (tmp_path / f'{ticker}.json').write_text(json.dumps({
             'ticker': 'NVDA', 'currency': expected['currency'],
-            'quarters': {expected['period_end']: dict(expected['values'])}}), encoding='utf-8')
+            'quarters': _reference_quarters(ticker)}), encoding='utf-8')
     result = subprocess.run([sys.executable, script, str(tmp_path)], capture_output=True, text=True)
     assert result.returncode == 1
     assert '005930: artifact identity' in result.stdout
+
+
+def _acc(fact, accn):
+    return {**fact, "accn": accn}
+
+
+def test_sec_same_day_conflict_is_order_independent_and_recorded():
+    first = _acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "0000000001-25-000010")
+    second = _acc(_sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-05-01"), "0000000001-25-000011")
+    for rows in ([first, second], [second, first]):
+        parsed = sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": rows}}}}})
+        assert parsed["quarters"]["2025-03-31"]["revenue"] == 12
+        record = parsed["source_conflicts"]["2025-03-31"]["revenue"][0]
+        assert record["selected"]["accession"] == "0000000001-25-000011"
+        assert [c["value"] for c in record["competing"]] == [10]
+
+
+def test_sec_same_day_agreeing_or_amended_later_is_not_a_conflict():
+    same = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+            _acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-2")]
+    later = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-06-01"), "a-2")]
+    for rows in (same, later):
+        parsed = sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": rows}}}}})
+        assert parsed["source_conflicts"] == {}
+    # The competing same-day filing is invisible before its filing date.
+    clash = [_acc(_sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01"), "a-1"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 12, filed="2025-06-01"), "a-2"),
+             _acc(_sec_fact("2025-01-01", "2025-03-31", 13, filed="2025-06-01"), "a-3")]
+    facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": clash}}}}}
+    assert sec.parse(facts, as_of="2025-05-31")["source_conflicts"] == {}
+    assert sec.parse(facts, as_of="2025-06-01")["source_conflicts"]
+
+
+def test_sec_same_day_instant_conflict_is_order_independent_and_recorded():
+    rev = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    cash = [_acc(_sec_fact(None, "2025-03-31", 50, filed="2025-06-01"), "b-1"),
+            _acc(_sec_fact(None, "2025-03-31", 60, filed="2025-06-01"), "b-2")]
+    for rows in (cash, cash[::-1]):
+        parsed = sec.parse({"facts": {"us-gaap": {
+            "Revenues": {"units": {"USD": [rev]}},
+            "CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": rows}}}}})
+        assert parsed["quarters"]["2025-03-31"]["cash"] == 60
+        assert parsed["source_conflicts"]["2025-03-31"]["cash"][0]["selected"]["accession"] == "b-2"
+
+
+def test_conflict_check_fails_recent_periods_only():
+    from collect import conflict_checks
+    parsed = {"source_conflicts": {"2023-03-31": {"revenue": [{}]}, "2025-06-30": {"capex": [{}]}}}
+    assert conflict_checks(parsed, ["2025-03-31", "2025-06-30"])[0][1] is False
+    assert "2025-06-30/capex" in conflict_checks(parsed, ["2025-06-30"])[0][2]
+    assert conflict_checks(parsed, ["2025-03-31"])[0][1] is True
+    assert conflict_checks({}, ["2025-03-31"])[0][1] is True
+
+
+def _roic_quarters(lease_by_end=None, pretax=None, tax=None):
+    ends = ["2024-06-30", "2024-09-30", "2024-12-31", "2025-03-31", "2025-06-30", "2025-09-30"]
+    q = {}
+    for i, e in enumerate(ends):
+        q[e] = {"revenue": 100, "operating_income": 40, "net_income": 30, "operating_cash_flow": 35, "capex": 5,
+                "equity": 500 + 10 * i, "cash": 100, "short_term_investments": 0, "debt": 50}
+        if pretax is not None:
+            q[e]["pretax_income"], q[e]["income_tax"] = pretax, tax
+        if lease_by_end and e in lease_by_end:
+            q[e]["lease_liabilities"] = lease_by_end[e]
+    return q
+
+
+def test_statutory_tax_schedule_only_returns_reviewed_years():
+    assert methods.statutory_tax_rate("US", 2026) == 0.21
+    assert methods.statutory_tax_rate("KR", 2025) == 0.264
+    assert methods.statutory_tax_rate("KR", 2026) == 0.275
+    import pytest
+    for market, year in (("US", 2017), ("KR", 2022), ("KR", 2023), ("KR", 2024), ("XX", 2026)):
+        with pytest.raises(ValueError, match="reviewed statutory"):
+            methods.statutory_tax_rate(market, year)
+
+
+def test_roic_tax_uses_effective_rate_in_band_else_statutory_and_reports_source():
+    method = methods.for_market("KR")["roic"]
+    inside = metrics.compute(_roic_quarters(pretax=100, tax=20), 0.275, method)
+    assert inside["tax_rate_used"] == 0.2 and inside["tax_rate_source"] == "effective"
+    for pretax, tax in ((100, 60), (100, -5), (None, None)):
+        outside = metrics.compute(_roic_quarters(pretax=pretax, tax=tax), 0.275, method)
+        assert outside["tax_rate_used"] == 0.275 and outside["tax_rate_source"] == "statutory_fallback"
+
+
+def test_kr_roic_adds_leases_only_when_presented_at_both_dates():
+    method = methods.for_market("KR")["roic"]
+    plain = metrics.compute(_roic_quarters(), 0.264, method)
+    assert plain["roic_lease_basis"] == "excluded_not_presented" and plain["roic"]
+    both = {"2024-09-30": 60, "2025-09-30": 80}
+    included = metrics.compute(_roic_quarters(both), 0.264, method)
+    assert included["roic_lease_basis"] == "included"
+    assert included["roic_method"] == "KR-ROIC-1"
+    assert 0 < included["roic"] < plain["roic"]        # leases enlarge invested capital
+    one_date = metrics.compute(_roic_quarters({"2025-09-30": 80}), 0.264, method)
+    assert one_date["roic_lease_basis"] == "inconsistent"
+    assert one_date["roic"] is None and one_date["incremental_roic"] is None
+
+
+def test_us_roic_never_adds_leases_and_declares_its_basis():
+    method = methods.for_market("US")["roic"]
+    q = _roic_quarters({"2024-09-30": 60, "2025-09-30": 80})
+    result = metrics.compute(q, 0.21, method)
+    assert result["roic_lease_basis"] == "excluded" and result["roic_method"] == "US-ROIC-1"
+    assert result["roic"] == metrics.compute(_roic_quarters(), 0.21, method)["roic"]
+    assert metrics.compute(_roic_quarters(), 0.21)["roic_method"] is None
+
+
+def test_sec_equity_prefers_total_including_noncontrolling_interest():
+    rev = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    def parse(units):
+        return sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": [rev]}}, **units}}})
+    both = parse({"StockholdersEquity": {"units": {"USD": [_sec_fact(None, "2025-03-31", 80, filed="2025-05-01")]}},
+                  "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest": {"units": {"USD": [
+                      _sec_fact(None, "2025-03-31", 95, filed="2025-05-01")]}}})
+    assert both["quarters"]["2025-03-31"]["equity"] == 95
+    only_parent = parse({"StockholdersEquity": {"units": {"USD": [_sec_fact(None, "2025-03-31", 80, filed="2025-05-01")]}}})
+    assert only_parent["quarters"]["2025-03-31"]["equity"] == 80
+
+
+def test_dart_lease_lines_need_both_halves_or_one_total():
+    def reps(*lines):
+        rows = [_row("IS", "ifrs-full_Revenue", "매출액", 100, 100)]
+        rows += [_row("BS", aid, name, amount) for aid, name, amount in lines]
+        return dart.parse([{"year": 2025, "reprt_code": "11013", "rows": rows}])["quarters"]["2025-03-31"]
+    both = reps(("ifrs-full_CurrentLeaseLiabilities", "유동리스부채", 30), ("x", "비유동리스부채", 70))
+    assert both["lease_liabilities"] == 100
+    assert reps(("x", "리스부채", 120))["lease_liabilities"] == 120
+    assert "lease_liabilities" not in reps(("ifrs-full_CurrentLeaseLiabilities", "유동리스부채", 30))
+    assert "lease_liabilities" not in reps(("x", "리스부채", 5), ("y", "리스부채", 7))
+    assert "lease_liabilities" not in reps(("x", "유동리스부채", "-"), ("y", "비유동리스부채", 7))
+    assert "lease_liabilities" not in reps(("x", "기타유동부채", 9))
+
+
+def test_kr_collection_requests_five_prior_years_and_reports_roic_basis(monkeypatch):
+    import collect
+    seen = {}
+    ends = ["2025-03-31", "2025-06-30", "2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30"]
+    quarters = {e: {"revenue": 100, "operating_income": 40, "net_income": 30, "operating_cash_flow": 35, "capex": 5,
+                    "equity": 500, "cash": 100, "short_term_investments": 0, "debt": 50} for e in ends}
+    monkeypatch.setattr(collect.dart, "fetch", lambda corp, years: seen.setdefault("years", years))
+    monkeypatch.setattr(collect.dart, "parse", lambda reports: {"quarters": quarters, "tags": {}})
+    result = collect.run_one(collect.TARGETS[1])
+    this_year = date.today().year
+    assert seen["years"] == list(range(this_year - 5, this_year + 1))
+    assert result["metrics"]["roic_method"] == "KR-ROIC-1"
+    assert result["metrics"]["tax_rate_used"] == 0.275     # latest quarter is in 2026
+    assert result["methodology"]["roic"]["lease_liabilities"] == "included_if_presented"
+    assert "ROIC 기준: KR-ROIC-1" in collect.render([result])
 
 
 if __name__ == "__main__":

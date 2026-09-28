@@ -1,48 +1,417 @@
 {
   "NVDA": {
-    "period_end": "2025-07-27",
     "currency": "USD",
-    "source": "SEC 10-Q, accession 0001045810-25-000209, filed 2025-08-27; Q1 10-Q accession 0001045810-25-000116, filed 2025-05-28",
-    "urls": [
-      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
-      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
-    ],
-    "methods": {
-      "revenue": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
-      "operating_income": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
-      "operating_cash_flow": "Q2 six months 42,779 minus Q1 three months 27,414; USD millions times 1e6",
-      "capex": "Q2 six months 3,122 minus Q1 three months 1,227, purchases related to PPE and intangibles; USD millions times 1e6"
-    },
-    "values": {
-      "revenue": 46743000000,
-      "operating_income": 28440000000,
-      "operating_cash_flow": 15365000000,
-      "capex": 1895000000
-    }
+    "periods": [
+      {
+        "period_end": "2024-10-27",
+        "filed": "2024-11-20",
+        "source": "SEC 10-Q accession 0001045810-24-000316 filed 2024-11-20; Q2 10-Q 0001045810-24-000264 filed 2024-08-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000316/nvda-20241027.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000264/nvda-20240728.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, one pass per filing. Revenue and operating income also appear as prior-year columns in the 2025-11-19 10-Q; the nine-month and six-month cash flow figures are single-source. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 10-Q three months ended Oct 27, 2024; USD millions times 1e6",
+          "operating_income": "Q3 10-Q three months ended Oct 27, 2024; USD millions times 1e6",
+          "operating_cash_flow": "Q3 nine months 47,460 minus Q2 six months 29,833",
+          "capex": "Q3 nine months 2,159 minus Q2 six months 1,346, purchases related to PPE and intangibles",
+          "cash": "Q3 balance sheet at Oct 27, 2024",
+          "equity": "Q3 balance sheet total shareholders' equity at Oct 27, 2024"
+        },
+        "values": {
+          "revenue": 35082000000,
+          "operating_income": 21869000000,
+          "operating_cash_flow": 17627000000,
+          "capex": 813000000,
+          "cash": 9107000000,
+          "equity": 65899000000
+        }
+      },
+      {
+        "period_end": "2025-01-26",
+        "filed": "2025-02-26",
+        "source": "SEC 10-K accession 0001045810-25-000023 filed 2025-02-26 (FY2025 totals); nine-month cumulative from the Q3 FY25 10-Q 0001045810-24-000316 and the Q3 FY26 10-Q prior-year columns",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R3.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R9.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R5.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000316/nvda-20241027.htm"
+        ],
+        "verification": "Read through a summarizing web fetch of the 10-K XBRL statement pages (R3 income, R5 balance sheet, R9 cash flow); fiscal Q4 is derived by subtracting nine-month cumulative figures. The FY2025 totals and January 2025 balance sheet also appear unchanged as prior-year columns in the FY2026 10-K and 2025-11-19 10-Q; the nine-month cash flow figures are from a single 10-Q read. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 130,497 minus nine months 91,166 (nine-month figure from the Q3 FY26 10-Q prior-year column)",
+          "operating_income": "FY 81,453 minus nine months 57,419",
+          "operating_cash_flow": "FY 64,089 minus nine months 47,460",
+          "capex": "FY 3,236 minus nine months 2,159, purchases related to PPE and intangibles",
+          "cash": "10-K balance sheet at fiscal year end",
+          "equity": "10-K balance sheet total shareholders' equity at fiscal year end"
+        },
+        "values": {
+          "revenue": 39331000000,
+          "operating_income": 24034000000,
+          "operating_cash_flow": 16629000000,
+          "capex": 1077000000,
+          "cash": 8589000000,
+          "equity": 79327000000
+        }
+      },
+      {
+        "period_end": "2025-04-27",
+        "filed": "2025-05-28",
+        "source": "SEC 10-Q accession 0001045810-25-000116 filed 2025-05-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
+        ],
+        "verification": "Read through a summarizing web fetch; the same figures appear as prior-year columns in the 2026-05-20 10-Q; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q1 10-Q three months ended Apr 27, 2025",
+          "operating_income": "Q1 10-Q three months ended Apr 27, 2025",
+          "operating_cash_flow": "Q1 10-Q three months",
+          "capex": "Q1 10-Q three months, purchases related to PPE and intangibles",
+          "cash": "Q1 balance sheet at Apr 27, 2025",
+          "equity": "Q1 balance sheet total shareholders' equity at Apr 27, 2025"
+        },
+        "values": {
+          "revenue": 44062000000,
+          "operating_income": 21638000000,
+          "operating_cash_flow": 27414000000,
+          "capex": 1227000000,
+          "cash": 15234000000,
+          "equity": 83843000000
+        }
+      },
+      {
+        "period_end": "2025-07-27",
+        "filed": "2025-08-27",
+        "source": "SEC 10-Q, accession 0001045810-25-000209, filed 2025-08-27; Q1 10-Q accession 0001045810-25-000116, filed 2025-05-28",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
+        ],
+        "methods": {
+          "revenue": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+          "operating_income": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+          "operating_cash_flow": "Q2 six months 42,779 minus Q1 three months 27,414; USD millions times 1e6",
+          "capex": "Q2 six months 3,122 minus Q1 three months 1,227, purchases related to PPE and intangibles; USD millions times 1e6"
+        },
+        "values": {
+          "revenue": 46743000000,
+          "operating_income": 28440000000,
+          "operating_cash_flow": 15365000000,
+          "capex": 1895000000
+        }
+      },
+      {
+        "period_end": "2025-10-26",
+        "filed": "2025-11-19",
+        "source": "SEC 10-Q accession 0001045810-25-000230 filed 2025-11-19; Q2 10-Q 0001045810-25-000209",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000230/nvda-20251026.htm"
+        ],
+        "verification": "Read through a summarizing web fetch; prior-year columns and nine-month sums cross-checked against earlier figures; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 10-Q three months ended Oct 26, 2025",
+          "operating_income": "Q3 10-Q three months ended Oct 26, 2025",
+          "operating_cash_flow": "Q3 nine months 66,530 minus Q2 six months 42,779",
+          "capex": "Q3 nine months 4,758 minus Q2 six months 3,122, purchases related to PPE and intangibles",
+          "cash": "Q3 balance sheet at Oct 26, 2025",
+          "equity": "Q3 balance sheet total shareholders' equity at Oct 26, 2025"
+        },
+        "values": {
+          "revenue": 57006000000,
+          "operating_income": 36010000000,
+          "operating_cash_flow": 23751000000,
+          "capex": 1636000000,
+          "cash": 11486000000,
+          "equity": 118897000000
+        }
+      },
+      {
+        "period_end": "2026-01-25",
+        "filed": "2026-02-25",
+        "source": "SEC 10-K accession 0001045810-26-000021 filed 2026-02-25 (FY2026 totals); nine-month cumulative from the Q3 FY26 10-Q 0001045810-25-000230",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R3.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R9.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R5.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000230/nvda-20251026.htm"
+        ],
+        "verification": "Read through a summarizing web fetch of the 10-K XBRL statement pages (R3 income, R5 balance sheet, R9 cash flow); fiscal Q4 is derived by subtracting nine-month cumulative figures. The January 25, 2026 balance sheet values match those printed as comparative columns in both 2026 10-Qs; the nine-month figures were read twice from the Q3 FY26 10-Q. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 215,938 minus nine months 147,811 (nine-month revenue equals the sum of the three reported quarters)",
+          "operating_income": "FY 130,387 minus nine months 86,088",
+          "operating_cash_flow": "FY 102,718 minus nine months 66,530",
+          "capex": "FY 6,042 minus nine months 4,758, purchases related to PPE and intangibles",
+          "cash": "10-K balance sheet at fiscal year end",
+          "equity": "10-K balance sheet total shareholders' equity at fiscal year end"
+        },
+        "values": {
+          "revenue": 68127000000,
+          "operating_income": 44299000000,
+          "operating_cash_flow": 36188000000,
+          "capex": 1284000000,
+          "cash": 10605000000,
+          "equity": 157293000000
+        }
+      },
+      {
+        "period_end": "2026-04-26",
+        "filed": "2026-05-20",
+        "source": "SEC 10-Q accession 0001045810-26-000052 filed 2026-05-20",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000052/nvda-20260426.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, twice with matching figures; prior-year column reproduces the verified Q1 FY26 values; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q1 FY27 10-Q three months ended Apr 26, 2026",
+          "operating_income": "Q1 FY27 10-Q three months ended Apr 26, 2026",
+          "operating_cash_flow": "Q1 FY27 10-Q three months",
+          "capex": "Q1 FY27 10-Q three months, purchases related to PPE and intangibles",
+          "cash": "Q1 FY27 balance sheet at Apr 26, 2026",
+          "equity": "Q1 FY27 balance sheet total shareholders' equity at Apr 26, 2026"
+        },
+        "values": {
+          "revenue": 81615000000,
+          "operating_income": 53536000000,
+          "operating_cash_flow": 50344000000,
+          "capex": 1757000000,
+          "cash": 13237000000,
+          "equity": 195474000000
+        }
+      },
+      {
+        "period_end": "2026-07-26",
+        "filed": "2026-08-26",
+        "source": "SEC 10-Q accession 0001045810-26-000075 filed 2026-08-26; Q1 10-Q 0001045810-26-000052",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
+        ],
+        "verification": "Read through a summarizing web fetch, twice with matching figures; prior-year columns and six-month sums cross-checked; not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q2 FY27 10-Q three months ended Jul 26, 2026",
+          "operating_income": "Q2 FY27 10-Q three months ended Jul 26, 2026",
+          "operating_cash_flow": "Q2 FY27 six months 74,421 minus Q1 three months 50,344",
+          "capex": "Q2 FY27 six months 4,434 minus Q1 1,757, purchases related to PPE and intangibles",
+          "cash": "Q2 FY27 balance sheet at Jul 26, 2026",
+          "equity": "Q2 FY27 balance sheet total shareholders' equity at Jul 26, 2026"
+        },
+        "values": {
+          "revenue": 96221000000,
+          "operating_income": 63734000000,
+          "operating_cash_flow": 24077000000,
+          "capex": 2677000000,
+          "cash": 22443000000,
+          "equity": 228984000000
+        }
+      }
+    ]
   },
   "005930": {
-    "period_end": "2025-03-31",
     "currency": "KRW",
-    "source": "Samsung Electronics consolidated Q1 statements, DART report 20250515001922, filed 2025-05-15; KRW millions times 1e6",
-    "urls": [
-      "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf",
-      "https://opendart.fss.or.kr/xbrl/viewer/main.do?rcpNo=20250515001922"
-    ],
-    "methods": {
-      "revenue": "Consolidated income statement page 7",
-      "operating_income": "Consolidated income statement page 7",
-      "operating_cash_flow": "Consolidated cash flow statement page 10",
-      "capex": "Consolidated cash flow statement page 10, PPE purchases only; intangible purchases 1,257,544 KRW millions excluded",
-      "cash": "Consolidated balance sheet page 5",
-      "debt": "Balance sheet pages 5-6: short-term 5,333,859 + current long-term 2,035,992 + bonds 14,518 + long-term 3,759,579 KRW millions"
-    },
-    "values": {
-      "revenue": 79140503000000,
-      "operating_income": 6685272000000,
-      "operating_cash_flow": 16580866000000,
-      "capex": 12127934000000,
-      "cash": 53161004000000,
-      "debt": 11143948000000
-    }
+    "periods": [
+      {
+        "period_end": "2024-09-30",
+        "filed": null,
+        "source": "Samsung consolidated Q3 2024 statements (BS PDF p.6-7, IS p.8, CF p.11); H1 2024 cumulative cash flow from the H1 2024 report (CF p.11); KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter03_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter02_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 2024 income statement, three months, PDF p.8",
+          "operating_income": "Q3 2024 income statement, three months, PDF p.8",
+          "operating_cash_flow": "Nine months 50,960,350 minus H1 28,761,716 (CF p.11)",
+          "capex": "Nine months PPE acquisition 36,320,811 minus H1 25,362,271; reports of this period carry no separate government-grant line",
+          "cash": "Q3 2024 balance sheet PDF p.6",
+          "debt": "PDF p.6: short-term 11,035,119 + current long-term 2,111,782 + bonds 19,537 + long-term 3,765,437"
+        },
+        "values": {
+          "revenue": 79098731000000,
+          "operating_income": 9183371000000,
+          "operating_cash_flow": 22198634000000,
+          "capex": 10958540000000,
+          "cash": 43131359000000,
+          "debt": 16931875000000
+        }
+      },
+      {
+        "period_end": "2024-12-31",
+        "filed": null,
+        "source": "Samsung consolidated FY2024 statements (IS PDF p.11, CF p.15, BS p.9-10) minus nine-month cumulative from the Q3 2024 report; balance-sheet current debt lines from the comparative column of the FY2025 filings; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter04_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter03_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 300,870,903 minus nine months 225,082,634",
+          "operating_income": "FY 32,725,961 minus nine months 26,233,258",
+          "operating_cash_flow": "FY 72,982,621 minus nine months 50,960,350",
+          "capex": "FY PPE acquisition 51,406,355 minus nine months 36,320,811; no separate grant line",
+          "cash": "FY2024 balance sheet PDF p.9",
+          "debt": "Short-term 13,172,504 + current long-term 2,207,290 + bonds 14,530 + long-term 3,935,860"
+        },
+        "values": {
+          "revenue": 75788269000000,
+          "operating_income": 6492703000000,
+          "operating_cash_flow": 22022271000000,
+          "capex": 15085544000000,
+          "cash": 53705579000000,
+          "debt": 19330184000000
+        }
+      },
+      {
+        "period_end": "2025-03-31",
+        "filed": "2025-05-15",
+        "source": "Samsung Electronics consolidated Q1 statements, DART report 20250515001922, filed 2025-05-15; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf",
+          "https://opendart.fss.or.kr/xbrl/viewer/main.do?rcpNo=20250515001922"
+        ],
+        "methods": {
+          "revenue": "Consolidated income statement page 7",
+          "operating_income": "Consolidated income statement page 7",
+          "operating_cash_flow": "Consolidated cash flow statement page 10",
+          "capex": "Consolidated cash flow statement page 10, PPE purchases only; intangible purchases 1,257,544 KRW millions excluded",
+          "cash": "Consolidated balance sheet page 5",
+          "debt": "Balance sheet pages 5-6: short-term 5,333,859 + current long-term 2,035,992 + bonds 14,518 + long-term 3,759,579 KRW millions"
+        },
+        "values": {
+          "revenue": 79140503000000,
+          "operating_income": 6685272000000,
+          "operating_cash_flow": 16580866000000,
+          "capex": 12127934000000,
+          "cash": 53161004000000,
+          "debt": 11143948000000
+        }
+      },
+      {
+        "period_end": "2025-06-30",
+        "filed": null,
+        "source": "Samsung consolidated H1 2025 statements (BS PDF p.6-7, IS p.8, CF p.11) and Q1 2025 cumulative; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter02_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "H1 2025 income statement, three months (74,566,317); H1 153,706,820 minus Q1 79,140,503 agrees",
+          "operating_income": "H1 income statement three months (4,676,057); H1 11,361,329 minus Q1 6,685,272 agrees",
+          "operating_cash_flow": "H1 33,941,002 minus Q1 16,580,866",
+          "capex": "H1 PPE acquisition 25,163,382 minus Q1 12,127,934; net presentation, no grant line",
+          "cash": "H1 balance sheet PDF p.6",
+          "debt": "PDF p.6: short-term 7,190,268 + current long-term 1,203,701 + bonds 13,470 + long-term 5,622,234"
+        },
+        "values": {
+          "revenue": 74566317000000,
+          "operating_income": 4676057000000,
+          "operating_cash_flow": 17360136000000,
+          "capex": 13035448000000,
+          "cash": 47120025000000,
+          "debt": 14029673000000
+        }
+      },
+      {
+        "period_end": "2025-09-30",
+        "filed": null,
+        "source": "Samsung consolidated Q3 2025 statements (BS PDF p.6-7, IS p.8, CF p.11) and H1 2025 cumulative; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter03_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter02_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q3 income statement three months, PDF p.8",
+          "operating_income": "Q3 income statement three months, PDF p.8",
+          "operating_cash_flow": "Nine months 56,515,496 minus H1 33,941,002",
+          "capex": "Nine months PPE acquisition 35,972,891 minus H1 25,163,382; net presentation, no grant line",
+          "cash": "Q3 balance sheet PDF p.6",
+          "debt": "PDF p.6: short-term 9,846,829 + current long-term 1,170,040 + bonds 13,948 + long-term 5,641,463"
+        },
+        "values": {
+          "revenue": 86061747000000,
+          "operating_income": 12166062000000,
+          "operating_cash_flow": 22574494000000,
+          "capex": 10809509000000,
+          "cash": 53399483000000,
+          "debt": 16672280000000
+        }
+      },
+      {
+        "period_end": "2025-12-31",
+        "filed": null,
+        "source": "Samsung consolidated FY2025 statements (BS PDF p.10, IS p.12, CF p.15) minus nine-month cumulative from the Q3 2025 report; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter04_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter03_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 333,605,938 minus nine months 239,768,567",
+          "operating_income": "FY 43,601,051 minus nine months 23,527,391",
+          "operating_cash_flow": "FY 85,315,148 minus nine months 56,515,496",
+          "capex": "FY PPE acquisition 47,522,179 minus separate government grants received 1,722,357, minus nine months 35,972,891 (net basis, KR-FCF-PPE-2); the gross FY figure less the net nine-month figure would be 11,549,288 and mixes bases",
+          "cash": "FY2025 balance sheet PDF p.10",
+          "debt": "PDF p.10: short-term 17,574,980 + current long-term 1,177,508 + bonds 7,134 + long-term 6,479,517"
+        },
+        "values": {
+          "revenue": 93837371000000,
+          "operating_income": 20073660000000,
+          "operating_cash_flow": 28799652000000,
+          "capex": 9826931000000,
+          "cash": 57856378000000,
+          "debt": 25239139000000
+        }
+      },
+      {
+        "period_end": "2026-03-31",
+        "filed": null,
+        "source": "Samsung consolidated Q1 2026 statements (BS PDF p.6, IS p.8, CF p.11); KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter01_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "Q1 2026 income statement PDF p.8",
+          "operating_income": "Q1 2026 income statement PDF p.8",
+          "operating_cash_flow": "Q1 2026 cash flow PDF p.11",
+          "capex": "PPE acquisition 17,127,003 minus separate government grants received 1,586,919 (net basis, KR-FCF-PPE-2)",
+          "cash": "Q1 2026 balance sheet PDF p.6"
+        },
+        "values": {
+          "revenue": 133873444000000,
+          "operating_income": 57232797000000,
+          "operating_cash_flow": 40274106000000,
+          "capex": 15540084000000,
+          "cash": 73306751000000
+        }
+      },
+      {
+        "period_end": "2026-06-30",
+        "filed": null,
+        "source": "Samsung consolidated H1 2026 statements (BS PDF p.6, IS p.8, CF p.11) and Q1 2026 cumulative; KRW millions times 1e6",
+        "urls": [
+          "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter02_all.pdf",
+          "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter01_all.pdf"
+        ],
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "H1 2026 income statement three months (171,499,470); H1 305,372,914 minus Q1 133,873,444 agrees",
+          "operating_income": "H1 income statement three months (89,492,412); H1 146,725,209 minus Q1 57,232,797 agrees",
+          "operating_cash_flow": "H1 145,355,192 minus Q1 40,274,106",
+          "capex": "H1 PPE acquisition 31,234,818 minus grants received 1,592,914, minus Q1 net 15,540,084 (net basis, KR-FCF-PPE-2)",
+          "cash": "H1 2026 balance sheet PDF p.6"
+        },
+        "values": {
+          "revenue": 171499470000000,
+          "operating_income": 89492412000000,
+          "operating_cash_flow": 105081086000000,
+          "capex": 14101820000000,
+          "cash": 92916382000000
+        }
+      }
+    ]
   }
 }

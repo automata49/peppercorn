@@ -10,7 +10,7 @@ Source: [Pepper Position Growth 요구 정의서 v0.1 (2026-09-28)](https://driv
 | HN-02: skills | `harness/skills`, generated `.claude/skills`, `.agents/skills`, plugin copy | Add five Position skills to canonical directory; `npm run harness:sync` copies them and CI detects drift. |
 | HN-03: collector, analyst, valuator, red-team | `.claude/agents` Markdown; `.codex/agents` TOML | Add read-only specialists for targeted diff/evidence review. Running them is optional; no live AI model is provisioned. |
 | HN-04: validation/protected tables | `scripts/harness/analyst.mjs`, CI, existing `price_daily`/`market_metrics` writers | Add Position AI output gate and allowed write target policy. A future writer must call them before saving; do not block the independent Swing jobs. Client edit hooks only run fast checks, not database permission enforcement. |
-| HN-05: restricted writes | `supabase/schema.sql` uses RLS; GitHub Actions PoC has no DB writes | Use dedicated server-side credentials and table grants in a reviewed migration; never expose service credentials to browser or agent. This repository change does not create or apply that migration. |
+| HN-05: restricted writes | `supabase/schema.sql` uses RLS; GitHub Actions PoC has no DB writes | Use dedicated server-side credentials and table grants in a reviewed migration; never expose service credentials to browser or agent. `supabase/position_growth.sql` now defines the role, tables and grants (see Storage migration below); it has not been applied to any deployed database. |
 
 | App boundary | Current reality | Required integration |
 |---|---|---|
@@ -31,7 +31,7 @@ Source: [Pepper Position Growth 요구 정의서 v0.1 (2026-09-28)](https://driv
 
 | Source question / ambiguity | Decision gate |
 |---|---|
-| Q-01 ROIC invested capital; FR-CALC-05 Owner Earnings | Define cash exclusion and average capital; name FCF minus SBC as a proxy, not Buffett's maintenance CapEx based Owner Earnings. Preserve missing SBC. Apply versioned, market-specific FCF inputs and independent local thresholds; never infer common cross-market ranking. |
+| Q-01 ROIC invested capital; FR-CALC-05 Owner Earnings | ROIC conventions are decided per market below (`US-ROIC-1`, `KR-ROIC-1`). Owner Earnings remains open: define cash exclusion and average capital; name FCF minus SBC as a proxy, not Buffett's maintenance CapEx based Owner Earnings. Preserve missing SBC. Apply versioned, market-specific FCF inputs and independent local thresholds; never infer common cross-market ranking. |
 | Q-02/Q-03 type thresholds and Pepper growth | Backtest proposed type-specific thresholds and growth assumptions against historical filings without lookahead before publishing verdicts. |
 | Q-04 existing `stock_analyses` | Keep owner-controlled notes separate; decide any migration of user content with a dedicated privacy review. |
 | Q-05/Q-07 targets and fiscal calendar | Agree instrument scope and non-December reporting periods before AC-1-1; 8 quarters for QC does not guarantee 3-year CAGR. |
@@ -41,3 +41,26 @@ Source: [Pepper Position Growth 요구 정의서 v0.1 (2026-09-28)](https://driv
 | NFR-09 Actions Node 24 | Audit action versions and pinned upgrades as separate workflow work; current workflows use checkout@v4/setup-node@v4/setup-python@v5. |
 
 The source document's PoC figures and 10/10 checks are historical examples, not independent filing verification. `POST_POC_REVIEW.md` lists observed extraction risks and the previous 11-test baseline. Never mark an acceptance criterion complete from a schema fixture or a proposed table definition.
+
+## ROIC conventions v1 — 2026-09-28
+
+Declared per market in `analysis/fundamentals/methods.py` (`roic` block) and emitted with every result as `roic_method`, `roic_lease_basis`, `tax_rate_used` and `tax_rate_source`. Values are compared only within a market.
+
+| Item | US-ROIC-1 | KR-ROIC-1 |
+|---|---|---|
+| NOPAT | TTM operating income × (1 − t) | same |
+| Tax t | TTM effective rate when within 0–40%, else federal statutory 21% (state tax not added) | TTM effective rate when within 0–40%, else top-bracket statutory including local income tax: 26.4% for 2025, 27.5% from 2026; other years, including 2023 and 2024, are rejected until sourced |
+| Invested capital | total equity + debt − cash − short-term investments; equity uses the tag that includes non-controlling interests, falling back to parent-only | consolidated total equity (includes non-controlling interests) + debt lines − cash − short-term financial instruments |
+| Timing | average of the latest quarter end and four quarters earlier | same |
+| Leases | operating lease liabilities excluded from capital and operating lease cost left in EBIT (ASC 842 single-line expense) so both sides agree | IFRS 16 EBIT excludes lease interest, so lease liabilities are added when the balance sheet presents current and non-current lines (or one total) at both dates; absent at both is reported as `excluded_not_presented`; present at one date only makes ROIC unknown |
+| Financial firms | exempt (ROIC not meaningful) | exempt |
+
+Basis. Damodaran, [Return on Capital, ROIC and ROE](https://pages.stern.nyu.edu/~adamodar/pdfiles/papers/returnmeasures.pdf): after-tax operating income over book invested capital, tax may be effective or marginal, operating leases should be treated as debt with operating income adjusted, and he divides by prior-period capital where this repository averages the two dates. IFRS 16 versus ASC 842: IFRS 16 splits all lease cost into depreciation and interest while ASC 842 keeps operating lease cost in one operating line (KPMG and other summaries), which is why the two markets pair leases differently instead of forcing one rule. Korean rates: 24% top bracket for 2025 business years and 25% from 2026 with local income tax at 10% of it, from two secondary sources that agree; the primary text (Corporate Tax Act art. 55) was not read.
+
+Limits. Samsung's consolidated balance sheet does not present lease liabilities as a line, so its ROIC is reported with `excluded_not_presented` and is somewhat overstated; the DART lease account ids and names are matched by rule but have not been compared with live DART output. The US method does not add operating leases the way Damodaran recommends, trading that for internal consistency. The averaging convention, the effective-rate choice and the 0–40% band are unchanged from the previous code. Recalculation impact: only the KR statutory fallback changed (24% to 26.4% or 27.5%), so KR `roic` differs only where the effective rate fell outside the band; no stored data or verdict exists to migrate. DART history is now five prior years plus the current one (at least 20 quarters, enough for a 3-year TTM CAGR with its earlier comparison TTM).
+
+## Storage migration — 2026-09-28
+
+`supabase/position_growth.sql` creates the `position_pipeline` role (no login, no secret) and two append-only tables, `fundamentals_q` and `position_snapshot`, with RLS. The pipeline may only read `instruments` and select or insert on its two tables; it holds no privilege on Swing or user-owned tables, and it cannot update or delete. A changed source input has a new `input_hash` and adds a row, so amendment history stays; a repeated run with the same input adds nothing (`on conflict do nothing`). Constraints enforce that unknown is never stored as zero, that an `ok` snapshot needs every check to be boolean true, that any other status has no labels or reasons, and that no combined score key exists. Snapshots are readable by anon and authenticated (as market data is); facts only by authenticated.
+
+Verification. `npm run harness:check` statically reviews the SQL against `position-write-policy.json` and confirms nine deliberately broken variants are caught. `supabase/tests/position_growth.verify.mjs` runs `schema.sql` and the migration in PGlite (Postgres 18 in WASM) with Supabase-like roles and passes 72 checks, including re-running the migration and every constraint by name. It is not run in CI and PGlite is not a Supabase project, so grant behavior under Supabase's own JWT role mapping and default privileges is untested. Not created because their rules or providers are undecided: `filings`, `valuation_scenarios`, `industry_kpis`, `ai_runs`, `theses`, `thesis_breaks`. No ingestion job writes these tables yet, and label vocabularies and thresholds are still uncalibrated, so no Position label may be shown.
