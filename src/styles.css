@@ -1023,3 +1023,25 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
   .menu-drawer .brand-wordmark{min-width:0;gap:4px}
   .menu-drawer .brand-wordmark-pepper,.menu-drawer .brand-wordmark-capital{font-size:clamp(15px,3.5vw,20px)!important}
 }
+
+/* Canonical financial-table tokens: sector, dashboard stocks and detail stocks. */
+:root{--pepper-table-head-size:12.5px;--pepper-table-cell-size:13px;--pepper-table-name-size:14.5px;--pepper-table-meta-size:12.5px;--pepper-table-head-bg:#f2f5f8;--pepper-table-head-ink:#68778a}
+.sector-metrics-table th,.stock-rows-head{font-size:var(--pepper-table-head-size);font-weight:700;line-height:1.2;background:var(--pepper-table-head-bg);color:var(--pepper-table-head-ink)}
+.sector-metrics-table td,.stock-row>span,.stock-row>strong{font-size:var(--pepper-table-cell-size);line-height:1.35;font-variant-numeric:tabular-nums}
+.sector-metrics-table .industry-name-cell b,.stock-id b{font-size:var(--pepper-table-name-size);line-height:1.25}
+.sector-metrics-table .industry-name-cell small,.stock-id small{font-size:var(--pepper-table-meta-size);line-height:1.25;color:#8893a2;margin-top:3px}
+.stock-rows-head{padding:8px 4px;position:sticky;top:0;z-index:6}
+.stock-row{padding:10px 4px;min-height:55px}
+.stock-rows-head>span{white-space:nowrap}
+.stock-rows{max-width:100%;overflow:auto;isolation:isolate}
+.dashboard-stock-panel .stock-rows{max-height:520px}
+.dashboard-stock-panel .panel-head{align-items:center}
+.dashboard-stock-panel .panel-head>div{min-width:0}
+.dashboard-stock-panel .dashboard-section-action{flex:none;white-space:nowrap}
+.stock-row:focus-visible{outline:2px solid #456a9e;outline-offset:-2px}
+.stock-rows-head,.stock-row{grid-template-columns:var(--stock-name-width,102px) 90px 92px 70px 82px 72px 76px 76px 82px 82px 78px 72px 76px 76px 82px 82px 78px 112px;gap:0;width:max-content;min-width:100%}
+.stock-rows-head>span:not(:first-child){padding:0 4px;white-space:nowrap;overflow:visible;text-align:right}
+.stock-row>span,.stock-row>strong{padding-left:4px;padding-right:4px;text-align:right;justify-self:stretch}
+.stock-row .stock-id{text-align:left;padding-right:8px}
+.stock-row .pill{justify-self:center}
+.stock-column-resizer{right:0}

@@ -1,0 +1,6 @@
+{
+  "name": "pepper-harness",
+  "version": "1.0.0",
+  "description": "Pepper shared engineering skills; run inside the Peppercorn checkout.",
+  "skills": "./skills/"
+}

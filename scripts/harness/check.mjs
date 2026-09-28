@@ -1,0 +1,10 @@
+import {execFileSync} from 'node:child_process';
+import {readFileSync,existsSync} from 'node:fs';
+import assert from 'node:assert/strict';
+import {validateAnalyst} from './analyst.mjs';
+execFileSync(process.execPath,['scripts/harness/sync.mjs','--check'],{stdio:'inherit'});
+for(const file of ['AGENTS.md','CLAUDE.md','.claude/settings.json','.codex/hooks.json','docs/harness/CONTRACT.md','docs/harness/HANDOFF.md'])assert(existsSync(file),`Missing ${file}`);
+for(const file of ['.claude/settings.json','.codex/hooks.json'])JSON.parse(readFileSync(file,'utf8'));
+const cases=JSON.parse(readFileSync('harness/evals/analyst-cases.json','utf8'));
+for(const c of cases)assert.equal(validateAnalyst(c.output,c.context).ok,c.expected,c.name);
+console.log(`${cases.length} offline Analyst contract cases passed (no live model invoked).`);

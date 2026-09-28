@@ -1,0 +1,51 @@
+import {test,expect} from '@playwright/test'
+const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:i%2?'Electronic Technology':'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[i%2?'KOSPI200':'S&P 500'],price:100+i,rs_rank:99-i%4,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
+for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
+ test(view.name+' layout and stock parity',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
+  const page=await context.newPage();
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}));
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.dashboard-sector-table tbody tr')).toHaveCount(2);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
+  const panel=page.locator('.dashboard-stock-panel');
+  if(view.width>=1280){
+   await expect(panel).toBeVisible();
+   const sectorBox=await page.locator('.dashboard-sector-panel').boundingBox();const stockBox=await panel.boundingBox();
+   expect(stockBox!.x).toBeGreaterThan(sectorBox!.x+sectorBox!.width);
+   const headFont=await panel.locator('.stock-rows-head').evaluate(e=>getComputedStyle(e).fontSize);
+   expect(headFont).toBe(await page.locator('.sector-metrics-table th').first().evaluate(e=>getComputedStyle(e).fontSize));
+   for(const period of ['5D','20D','50D','120D','200D','52W'])await expect(panel.locator('.stock-rows-head').getByText('등락 '+period,{exact:true})).toBeVisible();
+   const heads=panel.locator('.stock-rows-head > span');
+   expect(await heads.evaluateAll(es=>es.map(e=>({text:e.textContent,width:e.clientWidth,scroll:e.scrollWidth})).filter(e=>e.scroll>e.width+1))).toEqual([]);
+   await expect(panel.locator('.stock-row').first().locator('span').last()).toHaveText('-10.0%');
+   await page.locator('.dashboard-sector-table tbody tr').first().click();
+   await expect(page.locator('.drill-sheet')).toHaveCount(0);
+   const scroll=panel.locator('.stock-rows');
+   await scroll.evaluate(e=>{e.scrollTop=100;e.scrollLeft=200});
+   const frozen=await panel.locator('.stock-name-head').boundingBox();const box=await scroll.boundingBox();
+   expect(Math.abs(frozen!.x-box!.x)).toBeLessThan(6);
+   await scroll.evaluate(e=>{e.scrollTop=0;e.scrollLeft=0});
+   const resize=panel.getByRole('button',{name:'종목 열 너비 조절'});
+   const handle=await resize.boundingBox();
+   await page.mouse.move(handle!.x+handle!.width/2,handle!.y+handle!.height/2);
+   await page.mouse.down();await page.mouse.move(handle!.x+handle!.width/2+40,handle!.y+handle!.height/2);await page.mouse.up();
+   expect(await panel.locator('.stock-name-head').evaluate(e=>e.getBoundingClientRect().width)).toBeGreaterThan(102);
+   await panel.locator('.stock-row').first().focus();await page.keyboard.press('Enter');
+  }else{
+   await expect(panel).toBeHidden();
+   const cards=page.locator('.market-metric-card');const b=await cards.evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y}}));
+   expect(b[0].y).toBe(b[2].y);expect(b[3].y).toBe(b[4].y);expect(b[3].y).toBeGreaterThan(b[0].y);
+   await page.locator('.dashboard-sector-table tbody tr').first().click();
+   await expect(page.locator('.drill-sheet')).toBeVisible();
+   await page.locator('.drill-sheet .stock-row').first().click();
+  }
+  await expect(page.getByRole('button',{name:'종목분석 기록 작성 →'})).toBeVisible();
+  await page.getByRole('button',{name:'닫기',exact:true}).click();
+  await expect(page.locator('.drill-sheet')).toHaveCount(0);
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:`test-results/${view.name}.png`,fullPage:true});
+  await context.close();
+ })
+}

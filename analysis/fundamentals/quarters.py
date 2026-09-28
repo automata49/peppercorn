@@ -56,6 +56,8 @@ def derive_quarters(durations: dict[tuple[str, str], float]) -> dict[str, float]
 def ttm(quarterly: dict[str, float], end: str) -> float | None:
     """최근 4개 분기 합(TTM). 4개가 모두 있어야 계산."""
     keys = [k for k in sorted(quarterly) if k <= end][-4:]
-    if len(keys) < 4 or days(keys[0], end) > 300:
+    if (len(keys) < 4 or keys[-1] != end
+            or any(not 80 <= days(a, b) <= 100 for a, b in zip(keys, keys[1:]))
+            or any(quarterly[k] is None for k in keys)):
         return None
     return sum(quarterly[k] for k in keys)

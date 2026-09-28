@@ -85,6 +85,14 @@ def render(results: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def results_failed(results: list[dict]) -> bool:
+    """A successful job requires every target and quality check to pass."""
+    return not results or any(
+        "error" in r or not r.get("checks") or any(not passed for _, passed, _ in r["checks"])
+        for r in results
+    )
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="out")
@@ -112,7 +120,7 @@ def main():
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as f:
             f.write(md + "\n")
-    if any("error" in r for r in results):
+    if results_failed(results):
         raise SystemExit(1)
 
 
