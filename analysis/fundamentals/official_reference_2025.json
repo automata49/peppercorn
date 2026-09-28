@@ -212,13 +212,13 @@
     "periods": [
       {
         "period_end": "2024-09-30",
-        "filed": null,
+        "filed": "2024-11-14",
         "source": "Samsung consolidated Q3 2024 statements (BS PDF p.6-7, IS p.8, CF p.11); H1 2024 cumulative cash flow from the H1 2024 report (CF p.11); KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter03_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter02_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "Q3 2024 income statement, three months, PDF p.8",
           "operating_income": "Q3 2024 income statement, three months, PDF p.8",
@@ -234,17 +234,21 @@
           "capex": 10958540000000,
           "cash": 43131359000000,
           "debt": 16931875000000
-        }
+        },
+        "receipts": [
+          "20240814003284",
+          "20241114002642"
+        ]
       },
       {
         "period_end": "2024-12-31",
-        "filed": null,
+        "filed": "2025-03-11",
         "source": "Samsung consolidated FY2024 statements (IS PDF p.11, CF p.15, BS p.9-10) minus nine-month cumulative from the Q3 2024 report; balance-sheet current debt lines from the comparative column of the FY2025 filings; KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter04_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2024/2024_con_quarter03_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "FY 300,870,903 minus nine months 225,082,634",
           "operating_income": "FY 32,725,961 minus nine months 26,233,258",
@@ -260,7 +264,11 @@
           "capex": 15085544000000,
           "cash": 53705579000000,
           "debt": 19330184000000
-        }
+        },
+        "receipts": [
+          "20241114002642",
+          "20250311001085"
+        ]
       },
       {
         "period_end": "2025-03-31",
@@ -285,17 +293,20 @@
           "capex": 12127934000000,
           "cash": 53161004000000,
           "debt": 11143948000000
-        }
+        },
+        "receipts": [
+          "20250515001922"
+        ]
       },
       {
         "period_end": "2025-06-30",
-        "filed": null,
+        "filed": "2025-08-14",
         "source": "Samsung consolidated H1 2025 statements (BS PDF p.6-7, IS p.8, CF p.11) and Q1 2025 cumulative; KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter02_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "H1 2025 income statement, three months (74,566,317); H1 153,706,820 minus Q1 79,140,503 agrees",
           "operating_income": "H1 income statement three months (4,676,057); H1 11,361,329 minus Q1 6,685,272 agrees",
@@ -311,17 +322,21 @@
           "capex": 13035448000000,
           "cash": 47120025000000,
           "debt": 14029673000000
-        }
+        },
+        "receipts": [
+          "20250515001922",
+          "20250814003156"
+        ]
       },
       {
         "period_end": "2025-09-30",
-        "filed": null,
+        "filed": "2025-11-14",
         "source": "Samsung consolidated Q3 2025 statements (BS PDF p.6-7, IS p.8, CF p.11) and H1 2025 cumulative; KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter03_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter02_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "Q3 income statement three months, PDF p.8",
           "operating_income": "Q3 income statement three months, PDF p.8",
@@ -337,17 +352,21 @@
           "capex": 10809509000000,
           "cash": 53399483000000,
           "debt": 16672280000000
-        }
+        },
+        "receipts": [
+          "20250814003156",
+          "20251114002447"
+        ]
       },
       {
         "period_end": "2025-12-31",
-        "filed": null,
+        "filed": "2026-03-10",
         "source": "Samsung consolidated FY2025 statements (BS PDF p.10, IS p.12, CF p.15) minus nine-month cumulative from the Q3 2025 report; KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter04_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter03_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "FY 333,605,938 minus nine months 239,768,567",
           "operating_income": "FY 43,601,051 minus nine months 23,527,391",
@@ -363,16 +382,20 @@
           "capex": 9826931000000,
           "cash": 57856378000000,
           "debt": 25239139000000
-        }
+        },
+        "receipts": [
+          "20251114002447",
+          "20260310002820"
+        ]
       },
       {
         "period_end": "2026-03-31",
-        "filed": null,
+        "filed": "2026-05-15",
         "source": "Samsung consolidated Q1 2026 statements (BS PDF p.6, IS p.8, CF p.11); KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter01_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "Q1 2026 income statement PDF p.8",
           "operating_income": "Q1 2026 income statement PDF p.8",
@@ -388,17 +411,20 @@
           "capex": 15540084000000,
           "cash": 73306751000000,
           "debt": 28138794000000
-        }
+        },
+        "receipts": [
+          "20260515002181"
+        ]
       },
       {
         "period_end": "2026-06-30",
-        "filed": null,
+        "filed": "2026-08-14",
         "source": "Samsung consolidated H1 2026 statements (BS PDF p.6, IS p.8, CF p.11) and Q1 2026 cumulative; KRW millions times 1e6",
         "urls": [
           "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter02_all.pdf",
           "https://images.samsung.com/kdp/ir/financial-info/2026/2026_con_quarter01_all.pdf"
         ],
-        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. DART receipt number and filing date were not captured, so filed is null. Not yet spot-checked by a person.",
+        "verification": "Read from Samsung's official consolidated statement PDF by text extraction (no summarizer); statement pages cited as PDF page numbers. Derived by cumulative subtraction as the collector does. Filing date and DART receipt numbers come from the DART disclosure API through the collector lineage of fundamentals-poc run 36432983094 (the same lineage reproduces the human-checked 2025-03-31 receipt); the values themselves were read from the PDF, not from the collector. Not yet spot-checked by a person.",
         "methods": {
           "revenue": "H1 2026 income statement three months (171,499,470); H1 305,372,914 minus Q1 133,873,444 agrees",
           "operating_income": "H1 income statement three months (89,492,412); H1 146,725,209 minus Q1 57,232,797 agrees",
@@ -414,7 +440,11 @@
           "capex": 14101820000000,
           "cash": 92916382000000,
           "debt": 22408721000000
-        }
+        },
+        "receipts": [
+          "20260515002181",
+          "20260814003699"
+        ]
       }
     ]
   }
