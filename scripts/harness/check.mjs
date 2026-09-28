@@ -8,3 +8,4 @@ for(const file of ['.claude/settings.json','.codex/hooks.json'])JSON.parse(readF
 const cases=JSON.parse(readFileSync('harness/evals/analyst-cases.json','utf8'));
 for(const c of cases)assert.equal(validateAnalyst(c.output,c.context).ok,c.expected,c.name);
 console.log(`${cases.length} offline Analyst contract cases passed (no live model invoked).`);
+await import('./position-cases.mjs');

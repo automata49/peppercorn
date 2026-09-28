@@ -12,3 +12,9 @@ Merged upstream POC at 2189dc8 without conflicts. Reviewed run 36380836618 and d
 UI build and 5 Chromium viewport tests passed; Analyst offline contract: 12 cases passed. Physical iPad Safari and live provider not tested.
 
 Fundamentals regression: 11 pytest cases passed (6 existing + 5 new). Quality failures now fail the collector job; missing SBC remains unknown; TTM requires the requested end and consecutive quarters.
+
+## Position Growth requirements adoption — 2026-09-28
+Source: https://drive.google.com/file/d/1p4ZjyGE_h6jGTmRH1fzunMUwbVvZjnbv/view?usp=drivesdk
+Review: `docs/harness/POSITION_GROWTH.md` maps FR/DR/UI/HN and acceptance conditions to the existing Swing app and PoC. Existing shared CONTRACT remains canonical; five focused skills and four read-only role definitions per client support future work. Position AI citation and write-target gates are offline scaffolding, not live database enforcement.
+Next: independently reconcile the PoC's NVDA/Samsung financial rows with official filings, settle ROIC/FCF conventions and acquisition coverage, then implement a reviewed migration and ingestion job. No Position labels should be displayed until a validated snapshot exists.
+Validation: `npm run harness:check`; `python -m pytest -q analysis/fundamentals` for collector work; build/browser tests for UI work.
