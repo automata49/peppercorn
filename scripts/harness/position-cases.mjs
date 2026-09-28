@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {validatePositionAi} from './position-ai.mjs';
 import {assertPositionWriteTarget} from './position-write.mjs';
+import {reviewPositionMigration, positionMigrationSql} from './position-migration.mjs';
 
 const hash='a'.repeat(64);
 const source={source_id:'SEC-123',source_url:'https://www.sec.gov/Archives/test',content_hash:hash,as_of:'2026-07-26',filed_at:'2026-08-27',sections:{Results:['p-1']}};
@@ -26,4 +27,25 @@ const cases=[
 for(const [name,actual,input,expected] of cases)assert.equal(validatePositionAi(actual,input).ok,expected,name);
 for(const table of ['fundamentals_q','position_snapshot','valuation_scenarios','industry_kpis','filings','ai_runs'])assert.equal(assertPositionWriteTarget(table),table);
 for(const table of ['price_daily','market_metrics','stock_analyses','watchlist','portfolio_positions','user_thresholds','theses','thesis_breaks','arbitrary'])assert.throws(()=>assertPositionWriteTarget(table),/write denied/);
-console.log(`${cases.length} Position AI evidence cases and Position write target policy passed (offline only).`);
+const migration=positionMigrationSql();
+assert.deepEqual(reviewPositionMigration(migration),[],'Position migration review');
+const mutations=[
+  ['grant insert on a Swing table',`${migration}
+grant insert on public.price_daily to position_pipeline;`],
+  ['grant update on its own table',`${migration}
+grant update on public.fundamentals_q to position_pipeline;`],
+  ['grant read on market_metrics',`${migration}
+grant select on public.market_metrics to position_pipeline;`],
+  ['grant delete on instruments',`${migration}
+grant delete on public.instruments to position_pipeline;`],
+  ['grant write to a public role',`${migration}
+grant insert on public.position_snapshot to anon;`],
+  ['grant to service_role',`${migration}
+grant all on public.fundamentals_q to service_role;`],
+  ['create a table outside the policy',`${migration}
+create table if not exists public.theses (id uuid);`],
+  ['drop the RLS statement',migration.replace('alter table public.fundamentals_q enable row level security;','')],
+  ['drop the Swing revoke',migration.replace(/revoke all on public\.price_daily[\s\S]*?from position_pipeline;/,'')]
+];
+for(const [name,sql] of mutations)assert(reviewPositionMigration(sql).length>0,`migration mutation not caught: ${name}`);
+console.log(`${cases.length} Position AI evidence cases, Position write target policy and ${mutations.length} migration mutations passed (offline only).`);

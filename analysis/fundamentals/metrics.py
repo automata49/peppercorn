@@ -15,21 +15,33 @@ def _ttm_field(q: dict, field: str, end: str):
     return ttm(series, end)
 
 
-def _ic(row: dict):
-    """투하자본 = 자본 + 차입금 - 현금 - 단기투자 (간이 정의)"""
+def _ic(row: dict, with_leases: bool = False):
+    """투하자본 = 자본 + 차입금 (+ 리스부채) - 현금 - 단기투자 (간이 정의)"""
     if any(row.get(field) is None for field in ("equity", "debt", "cash", "short_term_investments")):
         return None
-    return (row["equity"] + row["debt"] + row.get("debt_current", 0)
-            - row["cash"] - row["short_term_investments"])
+    ic = (row["equity"] + row["debt"] + row.get("debt_current", 0)
+          - row["cash"] - row["short_term_investments"])
+    return ic + row["lease_liabilities"] if with_leases else ic
 
 
-def compute(q: dict, default_tax: float) -> dict:
+def _lease_basis(policy: str, now: dict, prev: dict | None) -> str:
+    """included | excluded | excluded_not_presented | inconsistent (lease line at one date only)."""
+    if policy != "included_if_presented":
+        return "excluded"
+    present = [row.get("lease_liabilities") is not None for row in (now, prev) if row is not None]
+    if all(present):
+        return "included"
+    return "excluded_not_presented" if not any(present) else "inconsistent"
+
+
+def compute(q: dict, default_tax: float, roic_method: dict | None = None) -> dict:
     ends = sorted(q)
     if len(ends) < 4:
         return {}
     e = ends[-1]
     e1 = ends[-5] if len(ends) >= 5 else None      # 1년 전 분기
     e3 = ends[-13] if len(ends) >= 13 else None    # 3년 전 분기
+    roic_method = roic_method or {}
 
     def T(f, end=e):
         return _ttm_field(q, f, end) if end else None
@@ -38,15 +50,20 @@ def compute(q: dict, default_tax: float) -> dict:
     fcf = None if ocf is None or capex is None else ocf - capex
     sbc = T("sbc")
     tax_rate = _div(T("income_tax"), T("pretax_income"))
+    tax_source = "effective"
     if tax_rate is None or not 0 <= tax_rate <= 0.4:
-        tax_rate = default_tax
+        tax_rate, tax_source = default_tax, "statutory_fallback"
 
     def nopat(end):
         o = T("operating_income", end)
         return None if o is None else o * (1 - tax_rate)
 
-    ic_now = _ic(q[e])
-    ic_prev = _ic(q[e1]) if e1 else None
+    lease_basis = _lease_basis(roic_method.get("lease_liabilities", "excluded"), q[e], q[e1] if e1 else None)
+    with_leases = lease_basis == "included"
+    ic_now = _ic(q[e], with_leases)
+    ic_prev = _ic(q[e1], with_leases) if e1 else None
+    if lease_basis == "inconsistent":
+        ic_now = ic_prev = None
     avg_ic = (ic_now + ic_prev) / 2 if ic_now is not None and ic_prev is not None else None
     roic = _div(nopat(e), avg_ic) if avg_ic and avg_ic > 0 else None
     inc_roic = None
@@ -71,7 +88,8 @@ def compute(q: dict, default_tax: float) -> dict:
         "operating_margin": _div(op, rev),
         "fcf_margin": _div(fcf, rev),
         "fcf_conversion": _div(fcf, ni),
-        "tax_rate_used": tax_rate,
+        "tax_rate_used": tax_rate, "tax_rate_source": tax_source,
+        "roic_method": roic_method.get("version"), "roic_lease_basis": lease_basis,
         "roic": roic, "incremental_roic": inc_roic,
         "roe": _div(ni, last.get("equity")),
         "net_debt": net_debt,

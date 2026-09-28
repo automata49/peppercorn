@@ -36,7 +36,8 @@ DURATION_TAGS = {
     "diluted_shares": ["WeightedAverageNumberOfDilutedSharesOutstanding"],
 }
 INSTANT_TAGS = {
-    "equity": ["StockholdersEquity"],
+    # Consolidated operating income pairs with equity including non-controlling interests; fall back to parent-only.
+    "equity": ["StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "StockholdersEquity"],
     "cash": ["CashAndCashEquivalentsAtCarryingValue"],
     "short_term_investments": ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "ShortTermInvestments", "OtherShortTermInvestments"],
     "debt": ["LongTermDebt", "LongTermDebtNoncurrent"],

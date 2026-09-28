@@ -497,6 +497,104 @@ def test_conflict_check_fails_recent_periods_only():
     assert conflict_checks({}, ["2025-03-31"])[0][1] is True
 
 
+def _roic_quarters(lease_by_end=None, pretax=None, tax=None):
+    ends = ["2024-06-30", "2024-09-30", "2024-12-31", "2025-03-31", "2025-06-30", "2025-09-30"]
+    q = {}
+    for i, e in enumerate(ends):
+        q[e] = {"revenue": 100, "operating_income": 40, "net_income": 30, "operating_cash_flow": 35, "capex": 5,
+                "equity": 500 + 10 * i, "cash": 100, "short_term_investments": 0, "debt": 50}
+        if pretax is not None:
+            q[e]["pretax_income"], q[e]["income_tax"] = pretax, tax
+        if lease_by_end and e in lease_by_end:
+            q[e]["lease_liabilities"] = lease_by_end[e]
+    return q
+
+
+def test_statutory_tax_schedule_only_returns_reviewed_years():
+    assert methods.statutory_tax_rate("US", 2026) == 0.21
+    assert methods.statutory_tax_rate("KR", 2025) == 0.264
+    assert methods.statutory_tax_rate("KR", 2026) == 0.275
+    import pytest
+    for market, year in (("US", 2017), ("KR", 2022), ("KR", 2023), ("KR", 2024), ("XX", 2026)):
+        with pytest.raises(ValueError, match="reviewed statutory"):
+            methods.statutory_tax_rate(market, year)
+
+
+def test_roic_tax_uses_effective_rate_in_band_else_statutory_and_reports_source():
+    method = methods.for_market("KR")["roic"]
+    inside = metrics.compute(_roic_quarters(pretax=100, tax=20), 0.275, method)
+    assert inside["tax_rate_used"] == 0.2 and inside["tax_rate_source"] == "effective"
+    for pretax, tax in ((100, 60), (100, -5), (None, None)):
+        outside = metrics.compute(_roic_quarters(pretax=pretax, tax=tax), 0.275, method)
+        assert outside["tax_rate_used"] == 0.275 and outside["tax_rate_source"] == "statutory_fallback"
+
+
+def test_kr_roic_adds_leases_only_when_presented_at_both_dates():
+    method = methods.for_market("KR")["roic"]
+    plain = metrics.compute(_roic_quarters(), 0.264, method)
+    assert plain["roic_lease_basis"] == "excluded_not_presented" and plain["roic"]
+    both = {"2024-09-30": 60, "2025-09-30": 80}
+    included = metrics.compute(_roic_quarters(both), 0.264, method)
+    assert included["roic_lease_basis"] == "included"
+    assert included["roic_method"] == "KR-ROIC-1"
+    assert 0 < included["roic"] < plain["roic"]        # leases enlarge invested capital
+    one_date = metrics.compute(_roic_quarters({"2025-09-30": 80}), 0.264, method)
+    assert one_date["roic_lease_basis"] == "inconsistent"
+    assert one_date["roic"] is None and one_date["incremental_roic"] is None
+
+
+def test_us_roic_never_adds_leases_and_declares_its_basis():
+    method = methods.for_market("US")["roic"]
+    q = _roic_quarters({"2024-09-30": 60, "2025-09-30": 80})
+    result = metrics.compute(q, 0.21, method)
+    assert result["roic_lease_basis"] == "excluded" and result["roic_method"] == "US-ROIC-1"
+    assert result["roic"] == metrics.compute(_roic_quarters(), 0.21, method)["roic"]
+    assert metrics.compute(_roic_quarters(), 0.21)["roic_method"] is None
+
+
+def test_sec_equity_prefers_total_including_noncontrolling_interest():
+    rev = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    def parse(units):
+        return sec.parse({"facts": {"us-gaap": {"Revenues": {"units": {"USD": [rev]}}, **units}}})
+    both = parse({"StockholdersEquity": {"units": {"USD": [_sec_fact(None, "2025-03-31", 80, filed="2025-05-01")]}},
+                  "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest": {"units": {"USD": [
+                      _sec_fact(None, "2025-03-31", 95, filed="2025-05-01")]}}})
+    assert both["quarters"]["2025-03-31"]["equity"] == 95
+    only_parent = parse({"StockholdersEquity": {"units": {"USD": [_sec_fact(None, "2025-03-31", 80, filed="2025-05-01")]}}})
+    assert only_parent["quarters"]["2025-03-31"]["equity"] == 80
+
+
+def test_dart_lease_lines_need_both_halves_or_one_total():
+    def reps(*lines):
+        rows = [_row("IS", "ifrs-full_Revenue", "매출액", 100, 100)]
+        rows += [_row("BS", aid, name, amount) for aid, name, amount in lines]
+        return dart.parse([{"year": 2025, "reprt_code": "11013", "rows": rows}])["quarters"]["2025-03-31"]
+    both = reps(("ifrs-full_CurrentLeaseLiabilities", "유동리스부채", 30), ("x", "비유동리스부채", 70))
+    assert both["lease_liabilities"] == 100
+    assert reps(("x", "리스부채", 120))["lease_liabilities"] == 120
+    assert "lease_liabilities" not in reps(("ifrs-full_CurrentLeaseLiabilities", "유동리스부채", 30))
+    assert "lease_liabilities" not in reps(("x", "리스부채", 5), ("y", "리스부채", 7))
+    assert "lease_liabilities" not in reps(("x", "유동리스부채", "-"), ("y", "비유동리스부채", 7))
+    assert "lease_liabilities" not in reps(("x", "기타유동부채", 9))
+
+
+def test_kr_collection_requests_five_prior_years_and_reports_roic_basis(monkeypatch):
+    import collect
+    seen = {}
+    ends = ["2025-03-31", "2025-06-30", "2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30"]
+    quarters = {e: {"revenue": 100, "operating_income": 40, "net_income": 30, "operating_cash_flow": 35, "capex": 5,
+                    "equity": 500, "cash": 100, "short_term_investments": 0, "debt": 50} for e in ends}
+    monkeypatch.setattr(collect.dart, "fetch", lambda corp, years: seen.setdefault("years", years))
+    monkeypatch.setattr(collect.dart, "parse", lambda reports: {"quarters": quarters, "tags": {}})
+    result = collect.run_one(collect.TARGETS[1])
+    this_year = date.today().year
+    assert seen["years"] == list(range(this_year - 5, this_year + 1))
+    assert result["metrics"]["roic_method"] == "KR-ROIC-1"
+    assert result["metrics"]["tax_rate_used"] == 0.275     # latest quarter is in 2026
+    assert result["methodology"]["roic"]["lease_liabilities"] == "included_if_presented"
+    assert "ROIC 기준: KR-ROIC-1" in collect.render([result])
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

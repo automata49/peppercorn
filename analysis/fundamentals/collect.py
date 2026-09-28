@@ -21,8 +21,8 @@ import reconcile
 import sec
 
 TARGETS = [
-    {"ticker": "NVDA", "market": "US", "name": "NVIDIA", "source": "SEC", "cik": 1045810, "currency": "USD", "tax": 0.21},
-    {"ticker": "005930", "market": "KR", "name": "삼성전자", "source": "DART", "corp_code": "00126380", "currency": "KRW", "tax": 0.24},
+    {"ticker": "NVDA", "market": "US", "name": "NVIDIA", "source": "SEC", "cik": 1045810, "currency": "USD"},
+    {"ticker": "005930", "market": "KR", "name": "삼성전자", "source": "DART", "corp_code": "00126380", "currency": "KRW"},
 ]
 
 
@@ -43,12 +43,13 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
         if as_of is not None:
             raise ValueError("DART historical as-of requires an archived filing snapshot")
         this_year = date.today().year
-        parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - 4, this_year + 1))))
+        parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - dart.HISTORY_YEARS, this_year + 1))))
     q = parsed["quarters"]
     method = methods.for_market(t["market"])
     if method["currency"] != t["currency"]:
         raise ValueError("Market and currency mismatch")
-    m = metrics.compute(q, t["tax"])
+    year = date.fromisoformat(max(q)).year if q else date.today().year
+    m = metrics.compute(q, methods.statutory_tax_rate(t["market"], year), method["roic"])
     check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
     check_results.extend(conflict_checks(parsed, sorted(q)[-8:]))
@@ -104,6 +105,8 @@ def render(results: list[dict]) -> str:
         method = r["methodology"]
         lines += ["", f"**지표 (TTM, 기준 {m.get('as_of')}; {method['version']})**", "",
                   f"FCF 기준: {method['capex_basis']}. 시장별 기준이며 원시 FCF 마진의 시장 간 순위 비교는 제공하지 않습니다.",
+                  f"ROIC 기준: {m.get('roic_method') or '–'}; 리스 {m.get('roic_lease_basis') or '–'}; "
+                  f"세율 {pct(m.get('tax_rate_used'))} ({m.get('tax_rate_source') or '–'}).",
                   "", "| 지표 | 값 |", "|---|---:|",
                   f"| 매출 | {money(m.get('ttm_revenue'), cur)} |",
                   f"| 영업이익 | {money(m.get('ttm_operating_income'), cur)} |",
