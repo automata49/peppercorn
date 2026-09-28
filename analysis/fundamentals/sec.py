@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import os
+import re
 
 import requests
 
@@ -35,7 +36,7 @@ DURATION_TAGS = {
 INSTANT_TAGS = {
     "equity": ["StockholdersEquity"],
     "cash": ["CashAndCashEquivalentsAtCarryingValue"],
-    "short_term_investments": ["AvailableForSaleSecuritiesDebtSecuritiesCurrent", "MarketableSecuritiesCurrent", "ShortTermInvestments"],
+    "short_term_investments": ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "ShortTermInvestments", "OtherShortTermInvestments"],
     "debt": ["LongTermDebt", "LongTermDebtNoncurrent"],
     "debt_current": ["LongTermDebtCurrent", "DebtCurrent"],
 }
@@ -91,22 +92,48 @@ def parse(facts: dict) -> dict:
             q = derive_quarters(vals)
         for end, v in q.items():
             table.setdefault(end, {})[field] = v
+    # 재무상태표 항목: 날짜마다 후보 태그를 순서대로 확인 (회사가 중간에 태그를 바꿔도 이어지도록)
+    all_tags = facts.get("facts", {}).get("us-gaap", {})
     for field, tags in INSTANT_TAGS.items():
-        tag, rows = _pick_tag(facts, tags)
-        used[field] = tag
-        latest: dict[str, tuple[str, float]] = {}
-        for r in rows:
-            if "start" in r:
-                continue
-            if r["end"] not in latest or r["filed"] > latest[r["end"]][0]:
-                latest[r["end"]] = (r["filed"], r["val"])
-        for end, (_, v) in latest.items():
-            if end in table:  # 손익 분기와 같은 날짜만
-                table[end][field] = v
-    # 매출이 있는 분기만 남긴다
-    # LongTermDebt 는 유동성 부분까지 포함한 총액 → 유동성 부분을 또 더하면 이중 계산
-    if used.get("debt") == "LongTermDebt":
-        for v in table.values():
-            v.pop("debt_current", None)
+        per_tag: dict[str, dict[str, float]] = {}
+        for t in tags:
+            latest: dict[str, tuple[str, float]] = {}
+            for r in _entries(facts, t):
+                if "start" in r:
+                    continue
+                if r["end"] not in latest or r["filed"] > latest[r["end"]][0]:
+                    latest[r["end"]] = (r["filed"], r["val"])
+            per_tag[t] = {e: v for e, (_, v) in latest.items()}
+        hits: dict[str, str] = {}
+        for end, row in table.items():
+            for t in tags:
+                if end in per_tag[t]:
+                    row[field] = per_tag[t][end]
+                    hits[end] = t
+                    break
+        rev_ends = [e for e, r in table.items() if "revenue" in r]
+        latest_end = max(rev_ends) if rev_ends else None
+        # 최신 분기에 값이 없으면 비슷한 이름의 태그를 자동 탐색 (단기투자만)
+        if field == "short_term_investments" and latest_end and latest_end not in hits:
+            pat = re.compile(r"(MarketableSecurities|ShortTermInvestments|AvailableForSale\w*|DebtSecurities\w*)Current$")
+            for t in sorted(all_tags):
+                if t in tags or not pat.search(t):
+                    continue
+                vals = {r["end"]: r["val"] for r in _entries(facts, t) if "start" not in r}
+                if latest_end in vals:
+                    for end, row in table.items():
+                        if end not in hits and end in vals:
+                            row[field] = vals[end]
+                            hits[end] = t
+                    break
+        used[field] = hits.get(latest_end) if latest_end else None
+        if field == "debt":
+            # LongTermDebt 는 유동성 부분까지 포함한 총액 → 유동성 부분을 또 더하면 이중 계산
+            for end, t in hits.items():
+                if t == "LongTermDebt":
+                    table[end]["_debt_total"] = True
+    for row in table.values():
+        if row.pop("_debt_total", False):
+            row.pop("debt_current", None)
     table = {k: v for k, v in table.items() if "revenue" in v}
     return {"quarters": dict(sorted(table.items())), "tags": used, "entity": facts.get("entityName")}

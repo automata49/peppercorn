@@ -95,6 +95,10 @@ def checks(q: dict, m: dict, today: date) -> list[tuple[str, bool, str]]:
     out.append(("분기 수 ≥ 8", len(ends) >= 8, f"{len(ends)}개 분기 ({ends[0]} ~ {ends[-1]})"))
     missing = [f for f in REQUIRED if f not in q[ends[-1]]]
     out.append(("필수 항목", not missing, "모두 있음" if not missing else "누락: " + ", ".join(missing)))
+    # 예전 분기엔 있던 재무상태표 항목이 최신 분기에 없으면 태그가 바뀐 것 (순부채·ROIC 왜곡)
+    broken = [f for f in ("cash", "short_term_investments", "debt")
+              if f not in q[ends[-1]] and any(f in q[k] for k in ends[-8:-1])]
+    out.append(("재무상태표 연속성", not broken, "정상" if not broken else "최신 분기 누락: " + ", ".join(broken)))
     neg = [k for k, v in q.items() if v.get("revenue", 0) <= 0]
     out.append(("매출 > 0", not neg, "정상" if not neg else "음수/0: " + ", ".join(neg)))
     gm = m.get("gross_margin")

@@ -46,6 +46,25 @@ def test_sec_parse_fiscal_year_not_calendar():
     assert q["2025-10-26"]["equity"] == 100
 
 
+def test_sec_instant_tag_switch_and_debt_total():
+    ends = ["2025-04-27", "2025-07-27", "2025-10-26"]
+    rev = [_sec_fact(s, e, 10) for s, e in [("2025-01-27", "2025-04-27"), ("2025-04-28", "2025-07-27"), ("2025-07-28", "2025-10-26")]]
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": rev}},
+        # 회사가 3분기부터 단기투자 태그를 바꾼 경우
+        "MarketableSecuritiesCurrent": {"units": {"USD": [_sec_fact(None, e, 40) for e in ends[:2]]}},
+        "DebtSecuritiesAvailableForSaleCurrent": {"units": {"USD": [_sec_fact(None, ends[2], 55)]}},
+        "LongTermDebt": {"units": {"USD": [_sec_fact(None, e, 8) for e in ends]}},
+        "LongTermDebtCurrent": {"units": {"USD": [_sec_fact(None, e, 1) for e in ends]}},
+    }}}
+    p = sec.parse(facts)
+    q = p["quarters"]
+    assert q["2025-07-27"]["short_term_investments"] == 40
+    assert q["2025-10-26"]["short_term_investments"] == 55
+    assert p["tags"]["short_term_investments"] == "DebtSecuritiesAvailableForSaleCurrent"
+    assert "debt_current" not in q["2025-10-26"]      # 총액 태그라 유동성 부분 중복 제외
+
+
 def _row(sj, aid, nm, amt, add=None):
     return {"sj_div": sj, "account_id": aid, "account_nm": nm, "thstrm_amount": str(amt),
             "thstrm_add_amount": "" if add is None else str(add)}
