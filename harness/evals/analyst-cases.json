@@ -1,0 +1,582 @@
+[
+  {
+    "name": "valid evidenced response",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": true
+  },
+  {
+    "name": "unrecognized citation",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "invented",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "missing data passed as complete",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [
+        "FCF"
+      ],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "stale evidence passed as complete",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": true,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "wrong strategy",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "swing",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "provider not configured",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": false
+    },
+    "expected": false
+  },
+  {
+    "name": "safe unavailable result",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "provider_unavailable",
+      "facts": [],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": false
+    },
+    "expected": true
+  },
+  {
+    "name": "safe insufficient result",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "insufficient_data",
+      "facts": [],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": [
+        "FCF"
+      ]
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [
+        "FCF"
+      ],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": true
+  },
+  {
+    "name": "missing model metadata",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "unsupported extra trade instruction",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": [],
+      "execute_trade": true
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "invalid timestamp",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-99-99Tgarbage",
+      "as_of": "2026-09-25",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-09-25",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  },
+  {
+    "name": "invalid calendar day",
+    "output": {
+      "schema_version": "1.0",
+      "criteria_version": "pepper-v1",
+      "prompt_version": "analyst-v1",
+      "provider": "offline-fixture",
+      "model": "fixture-only",
+      "generated_at": "2026-09-28T00:00:00Z",
+      "as_of": "2026-02-30",
+      "market": "US",
+      "ticker": "TEST",
+      "strategy": "position_growth",
+      "status": "ok",
+      "facts": [
+        {
+          "claim": "Synthetic fixture fact",
+          "evidence_id": "filing-1",
+          "source_url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "interpretation": "Fixture, not investment research.",
+      "risks": [
+        "Synthetic data"
+      ],
+      "next_checks": [
+        "Obtain actual filings"
+      ],
+      "missing_data": []
+    },
+    "context": {
+      "ticker": "TEST",
+      "market": "US",
+      "strategy": "position_growth",
+      "as_of": "2026-02-30",
+      "evidence": [
+        {
+          "id": "filing-1",
+          "url": "https://example.com/filing",
+          "as_of": "2026-09-25"
+        }
+      ],
+      "missing_data": [],
+      "stale": false,
+      "provider_available": true
+    },
+    "expected": false
+  }
+]

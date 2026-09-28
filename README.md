@@ -115,3 +115,7 @@ Legacy snapshot before rebuild:
 - `supabase/functions/` — deployed Edge Function source
 - `analysis/` — original Python analysis engine/reference implementation
 - `migration/` — legacy migration snapshots
+
+## Engineering harness
+
+Claude Code and Codex share [the engineering contract](docs/harness/CONTRACT.md), [setup and validation](docs/harness/README.md), and [task handoff](docs/harness/HANDOFF.md). Run `npm run verify` before delivery. AI Analyst evaluation is offline until a real provider is connected and validated.

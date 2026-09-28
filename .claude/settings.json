@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.*.local)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const c=require('child_process'),p=require('path');const r=c.execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim();require(p.join(r,'scripts/harness/hook.cjs'))\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -66,7 +66,7 @@ def compute(q: dict, default_tax: float) -> dict:
         "as_of": e,
         "ttm_revenue": rev, "ttm_operating_income": op, "ttm_net_income": ni,
         "ttm_fcf": fcf, "ttm_sbc": sbc,
-        "owner_earnings": None if fcf is None else fcf - (sbc or 0),
+        "owner_earnings": None if fcf is None or sbc is None else fcf - sbc,
         "gross_margin": _div(T("gross_profit"), rev),
         "operating_margin": _div(op, rev),
         "fcf_margin": _div(fcf, rev),
@@ -75,7 +75,7 @@ def compute(q: dict, default_tax: float) -> dict:
         "roic": roic, "incremental_roic": inc_roic,
         "roe": _div(ni, last.get("equity")),
         "net_debt": net_debt,
-        "revenue_yoy": None if rev_prev in (None, 0) else rev / rev_prev - 1,
+        "revenue_yoy": None if rev is None or rev_prev in (None, 0) else rev / rev_prev - 1,
         "revenue_cagr_3y": None if not rev_3y or rev_3y <= 0 or rev is None else (rev / rev_3y) ** (1 / 3) - 1,
         "net_income_cagr_3y": None if not ni_3y or ni_3y <= 0 or not ni or ni <= 0 else (ni / ni_3y) ** (1 / 3) - 1,
         "dilution_yoy": None if not shares or not shares_prev else shares / shares_prev - 1,
@@ -91,15 +91,15 @@ def checks(q: dict, m: dict, today: date) -> list[tuple[str, bool, str]]:
     if not ends:
         return [("데이터 존재", False, "분기 데이터 0건")]
     age = (today - date.fromisoformat(ends[-1])).days
-    out.append(("최신성", age <= 200, f"최근 분기 {ends[-1]} ({age}일 전)"))
+    out.append(("최신성", 0 <= age <= 200, f"최근 분기 {ends[-1]} ({age}일 전)"))
     out.append(("분기 수 ≥ 8", len(ends) >= 8, f"{len(ends)}개 분기 ({ends[0]} ~ {ends[-1]})"))
-    missing = [f for f in REQUIRED if f not in q[ends[-1]]]
+    missing = [f for f in REQUIRED if q[ends[-1]].get(f) is None]
     out.append(("필수 항목", not missing, "모두 있음" if not missing else "누락: " + ", ".join(missing)))
     # 예전 분기엔 있던 재무상태표 항목이 최신 분기에 없으면 태그가 바뀐 것 (순부채·ROIC 왜곡)
     broken = [f for f in ("cash", "short_term_investments", "debt")
-              if f not in q[ends[-1]] and any(f in q[k] for k in ends[-8:-1])]
+              if q[ends[-1]].get(f) is None and any(f in q[k] for k in ends[-8:-1])]
     out.append(("재무상태표 연속성", not broken, "정상" if not broken else "최신 분기 누락: " + ", ".join(broken)))
-    neg = [k for k, v in q.items() if v.get("revenue", 0) <= 0]
+    neg = [k for k, v in q.items() if v.get("revenue") is None or v["revenue"] <= 0]
     out.append(("매출 > 0", not neg, "정상" if not neg else "음수/0: " + ", ".join(neg)))
     gm = m.get("gross_margin")
     out.append(("매출총이익률 0~100%", gm is None or 0 <= gm <= 1, "없음(해당 항목 미공시)" if gm is None else f"{gm:.1%}"))
