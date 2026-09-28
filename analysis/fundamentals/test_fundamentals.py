@@ -5,6 +5,7 @@ from datetime import date
 
 import dart
 import metrics
+import methods
 import reconcile
 import sec
 from quarters import derive_quarters
@@ -87,8 +88,24 @@ def test_sec_preserves_history_across_duration_tags_and_uses_explicit_units():
 def test_sec_amendment_selects_latest_per_span():
     old = _sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01")
     new = _sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-06-01")
+    old["accn"], new["accn"] = "original", "amended"
     facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [old, new]}}}}}
-    assert sec.parse(facts)["quarters"]["2025-03-31"]["revenue"] == 12
+    parsed = sec.parse(facts)
+    assert parsed["quarters"]["2025-03-31"]["revenue"] == 12
+    assert parsed["source_lineage"]["2025-03-31"]["revenue"]["inputs"][0]["accession"] == "amended"
+
+
+def test_sec_ytd_lineage_includes_both_input_filings():
+    q1 = _sec_fact("2025-01-01", "2025-03-31", 10)
+    q2 = _sec_fact("2025-01-01", "2025-06-30", 30)
+    q1["accn"], q2["accn"] = "first", "second"
+    parsed = sec.parse({"facts": {"us-gaap": {"NetCashProvidedByUsedInOperatingActivities":
+                       {"units": {"USD": [q1, q2]}}, "Revenues": {"units": {"USD": [
+                           _sec_fact("2025-04-01", "2025-06-30", 100)]}}}}})
+    item = parsed["source_lineage"]["2025-06-30"]["operating_cash_flow"]
+    assert parsed["quarters"]["2025-06-30"]["operating_cash_flow"] == 20
+    assert item["operation"] == "subtract"
+    assert [entry["accession"] for entry in item["inputs"]] == ["second", "first"]
 
 
 def test_sec_noncurrent_debt_without_current_portion_is_unknown():
@@ -126,6 +143,64 @@ def test_dart_parse_cumulative():
     assert q["2025-09-30"]["operating_cash_flow"] == 25
     assert q["2025-06-30"]["capex"] == 10          # |−20| − |−10|
     assert q["2025-03-31"]["debt"] == 10
+
+
+def test_dart_cumulative_lineage_has_both_receipts_and_ppe_basis():
+    q1 = _row("CF", "ifrs-full_PurchaseOfPropertyPlantAndEquipment", "유형자산의 취득", -10)
+    q2 = _row("CF", "ifrs-full_PurchaseOfPropertyPlantAndEquipment", "유형자산의 취득", -25)
+    q1["rcept_no"], q2["rcept_no"] = "receipt1", "receipt2"
+    reports = [{"year": 2025, "reprt_code": "11013", "rows": [q1]},
+               {"year": 2025, "reprt_code": "11012", "rows": [q2]}]
+    parsed = dart.parse(reports)
+    item = parsed["source_lineage"].get("2025-06-30", {}).get("capex")
+    # A quarter without revenue is intentionally dropped from the output.
+    assert item is None
+    for rep in reports:
+        rep["rows"].append(_row("IS", "ifrs-full_Revenue", "매출액", 100, 100))
+    parsed = dart.parse(reports)
+    item = parsed["source_lineage"]["2025-06-30"]["capex"]
+    assert parsed["quarters"]["2025-06-30"]["capex"] == 15
+    assert [entry["receipt"] for entry in item["inputs"]] == ["receipt2", "receipt1"]
+    assert methods.for_market("KR")["version"] != methods.for_market("US")["version"]
+    assert "PPE" in methods.for_market("KR")["capex_basis"]
+
+
+def test_dart_filing_dates_match_receipts_and_paginate(monkeypatch):
+    class Response:
+        def __init__(self, body): self.body = body
+        def raise_for_status(self): pass
+        def json(self): return self.body
+    pages = [Response({"status": "000", "total_page": 2, "list": [
+        {"rcept_no": "20260928000001", "rcept_dt": "20260928"}]}),
+             Response({"status": "000", "total_page": 2, "list": [
+                 {"rcept_no": "20260928000002", "rcept_dt": "20260928"}]})]
+    calls = []
+    def get(url, params, timeout):
+        calls.append((url, params["page_no"], params["bgn_de"]))
+        return pages.pop(0)
+    monkeypatch.setattr(dart.requests, "get", get)
+    assert dart._filing_dates("00126380", 2023, {"20260928000002"}, "secret") == {"20260928000002": "20260928"}
+    assert calls == [(dart.DISCLOSURES_URL, "1", "20260928"), (dart.DISCLOSURES_URL, "2", "20260928")]
+
+
+def test_dart_debt_lineage_matches_deduplicated_value():
+    revenue = _row("IS", "ifrs-full_Revenue", "매출액", 100, 100)
+    debt = _row("BS", "x", "단기차입금", 5)
+    parsed = dart.parse([{"year": 2025, "reprt_code": "11013", "rows": [revenue, debt, dict(debt)]}])
+    assert parsed["quarters"]["2025-03-31"]["debt"] == 5
+    inputs = parsed["source_lineage"]["2025-03-31"]["debt"]["inputs"]
+    assert len(inputs) == 1 and sum(i["value"] for i in inputs) == 5
+
+
+def test_lineage_gate_rejects_missing_receipt_date_or_hash():
+    from collect import lineage_checks
+    item = {"operation": "direct", "inputs": [{"receipt": "20250515001922", "filed": "20250515",
+                                              "raw_sha256": "abc"}]}
+    parsed = {"source_lineage": {"2025-03-31": {key: item for key in
+              ("revenue", "operating_cash_flow", "capex")}}}
+    assert lineage_checks(parsed, "KR", ["2025-03-31"])[0][1]
+    del item["inputs"][0]["filed"]
+    assert not lineage_checks(parsed, "KR", ["2025-03-31"])[0][1]
 
 
 def test_dart_missing_or_nested_debt_does_not_create_false_zero_or_double_count():

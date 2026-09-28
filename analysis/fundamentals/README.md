@@ -23,4 +23,4 @@ Actions → **Fundamentals PoC (NVDA + Samsung)** → Run workflow. 실행 요�
 
 로컬: `cd analysis/fundamentals && SEC_USER_AGENT="..." DART_API_KEY=... python collect.py`
 
-과거 PoC 아티팩트 대조: `python analysis/fundamentals/reconcile.py /path/to/fundamentals-poc.zip` (저장소 루트). 기준값과 확인 범위는 `docs/harness/SOURCE_RECONCILIATION.md`를 참고하세요. 현재 FCF는 국가별 CapEx 항목 범위가 달라 종목 간 비교나 자동 Position 판정에 사용할 수 없습니다.
+과거 PoC 아티팩트 대조: `python analysis/fundamentals/reconcile.py /path/to/fundamentals-poc.zip` (저장소 루트). 기준값과 확인 범위는 `docs/harness/SOURCE_RECONCILIATION.md`를 참고하세요. `methods.py`에 US와 KR FCF 방법 버전을 별도로 정의합니다. 출력 JSON에는 방법, 원천 응답 해시와 계산 항목별 입력 자료의 출처를 기록합니다. 서로 다른 방법의 FCF 마진을 하나의 시장 간 순위로 비교하지 않습니다. 각 시장별 자동 Position 판정은 해당 시장의 공시 범위 검증과 별도 기준·임계값 검증이 완료된 뒤에 켭니다.

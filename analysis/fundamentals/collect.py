@@ -16,6 +16,7 @@ from pathlib import Path
 
 import dart
 import metrics
+import methods
 import reconcile
 import sec
 
@@ -42,12 +43,37 @@ def run_one(t: dict) -> dict:
         this_year = date.today().year
         parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - 4, this_year + 1))))
     q = parsed["quarters"]
+    method = methods.for_market(t["market"])
+    if method["currency"] != t["currency"]:
+        raise ValueError("Market and currency mismatch")
     m = metrics.compute(q, t["tax"])
     check_results = metrics.checks(q, m, date.today())
+    check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
     check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
+            "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
+            "raw_sha256": parsed.get("raw_sha256"),
             "tag_by_period": parsed.get("tag_by_period", {}),
             "quarters": q, "metrics": m, "checks": check_results}
+
+
+def lineage_checks(parsed: dict, market: str, periods: list[str]) -> list[tuple[str, bool, str]]:
+    """Reject source facts whose filing identity or derivation inputs cannot be audited."""
+    missing = []
+    hashes = parsed.get("raw_sha256")
+    for end in periods:
+        for field in ("revenue", "operating_cash_flow", "capex"):
+            origin = parsed.get("source_lineage", {}).get(end, {}).get(field)
+            if not origin or not origin.get("inputs"):
+                missing.append(f"{end}/{field}: inputs")
+                continue
+            for item in origin["inputs"]:
+                identity = item.get("accession") if market == "US" else item.get("receipt")
+                digest = hashes if market == "US" else item.get("raw_sha256")
+                if not identity or not item.get("filed") or not digest:
+                    missing.append(f"{end}/{field}: receipt/date/hash")
+    return [("원천 공시 추적 (최근 8분기)", not missing,
+             "완료" if not missing else f"누락 {len(missing)}건: {', '.join(missing[:3])}")]
 
 
 def render(results: list[dict]) -> str:
@@ -61,10 +87,13 @@ def render(results: list[dict]) -> str:
         lines += [f"## {'✅' if ok else '⚠️'} {r['ticker']} {r['name']} ({r['source']})", "",
                   "| 검사 | 결과 | 내용 |", "|---|---|---|"]
         lines += [f"| {n} | {'통과' if p else '실패'} | {d} |" for n, p, d in r["checks"]]
-        lines += ["", f"**지표 (TTM, 기준 {m.get('as_of')})**", "", "| 지표 | 값 |", "|---|---:|",
+        method = r["methodology"]
+        lines += ["", f"**지표 (TTM, 기준 {m.get('as_of')}; {method['version']})**", "",
+                  f"FCF 기준: {method['capex_basis']}. 시장별 기준이며 원시 FCF 마진의 시장 간 순위 비교는 제공하지 않습니다.",
+                  "", "| 지표 | 값 |", "|---|---:|",
                   f"| 매출 | {money(m.get('ttm_revenue'), cur)} |",
                   f"| 영업이익 | {money(m.get('ttm_operating_income'), cur)} |",
-                  f"| FCF (영업CF−수집 CapEx; 국가별 범위 차이) | {money(m.get('ttm_fcf'), cur)} |",
+                  f"| FCF (영업CF−{method['capex_field']}; {method['version']}) | {money(m.get('ttm_fcf'), cur)} |",
                   f"| FCF−SBC 추정치 | {money(m.get('owner_earnings'), cur)} |",
                   f"| 매출총이익률 | {pct(m.get('gross_margin'))} |",
                   f"| 영업이익률 | {pct(m.get('operating_margin'))} |",

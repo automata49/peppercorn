@@ -24,12 +24,18 @@ def derive_quarters(durations: dict[tuple[str, str], float]) -> dict[str, float]
     1) 3개월짜리 값이 있으면 그대로 사용
     2) 없으면 같은 시작일의 누적값끼리 빼서 계산 (예: 9개월 누적 - 6개월 누적)
     """
-    out: dict[str, float] = {}
+    return {end: item["value"] for end, item in derive_quarters_with_sources(durations).items()}
+
+
+def derive_quarters_with_sources(durations: dict[tuple[str, str], float]) -> dict[str, dict]:
+    """Return each quarterly value and the exact source spans used to derive it."""
+    out: dict[str, dict] = {}
     ends = sorted({e for (_, e) in durations})
     for end in ends:
-        direct = [v for (s, e), v in durations.items() if e == end and is_quarter(s, e)]
+        direct = [((s, e), v) for (s, e), v in durations.items() if e == end and is_quarter(s, e)]
         if direct:
-            out[end] = direct[0]
+            span, value = direct[0]
+            out[end] = {"value": value, "spans": [span]}
             continue
         # 누적값: 같은 종료일, 기간이 3개월보다 긴 것 중 가장 긴 것(연초부터)
         ytd = [(s, v) for (s, e), v in durations.items() if e == end and days(s, e) > 100]
@@ -42,14 +48,15 @@ def derive_quarters(durations: dict[tuple[str, str], float]) -> dict[str, float]
             if s == start and e < end and 80 <= days(e, end) <= 100
         ]
         if prev:
-            out[end] = total - prev[0][1]
+            out[end] = {"value": total - prev[0][1], "spans": [(start, end), (start, prev[0][0])]}
             continue
         # 직전 누적값이 없으면: 누적 - (그 기간 안의 3개월 값들의 합)
         inner = [(s, e, v) for (s, e), v in durations.items()
                  if is_quarter(s, e) and s >= start and e < end]
         covered = sum(days(s, e) + 1 for s, e, _ in inner)
         if inner and 80 <= days(start, end) + 1 - covered <= 100:
-            out[end] = total - sum(v for _, _, v in inner)
+            out[end] = {"value": total - sum(v for _, _, v in inner),
+                        "spans": [(start, end)] + [(s, e) for s, e, _ in inner]}
     return out
 
 

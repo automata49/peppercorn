@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import os
 import re
+import hashlib
 
 import requests
 
-from quarters import derive_quarters, is_quarter
+from quarters import derive_quarters_with_sources, is_quarter
 
 URL = "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json"
 
@@ -49,7 +50,9 @@ def fetch(cik: int) -> dict:
         raise SystemExit("SEC_USER_AGENT 가 필요합니다. 예: 'Peppercorn Capital your@email.com'")
     r = requests.get(URL.format(cik=cik), headers={"User-Agent": ua, "Accept-Encoding": "gzip"}, timeout=60)
     r.raise_for_status()
-    return r.json()
+    body = r.json()
+    body["_raw_sha256"] = hashlib.sha256(r.content).hexdigest()
+    return body
 
 
 def _entries(facts: dict, tag: str, unit: str = "USD") -> list[dict]:
@@ -78,16 +81,26 @@ def parse(facts: dict) -> dict:
     table: dict[str, dict[str, float]] = {}
     used: dict[str, str | None] = {}
     tag_by_period: dict[str, dict[str, str]] = {}
+    lineage: dict[str, dict[str, dict]] = {}
     for field, tags in DURATION_TAGS.items():
         selected = _latest_rows(facts, tags, "shares" if field == "diluted_shares" else "USD")
         vals = {span: row["val"] for span, (_, row) in selected.items()}
         if field == "diluted_shares":
             # 주식수는 합산값이 아니라 평균값이므로 빼기 계산을 하지 않는다
-            q = {e: v for (s, e), v in vals.items() if is_quarter(s, e)}
+            derived = {e: {"value": v, "spans": [(s, e)]} for (s, e), v in vals.items() if is_quarter(s, e)}
         else:
-            q = derive_quarters(vals)
+            derived = derive_quarters_with_sources(vals)
+        q = {end: item["value"] for end, item in derived.items()}
         for end, v in q.items():
             table.setdefault(end, {})[field] = v
+            lineage.setdefault(end, {})[field] = {
+                "operation": "direct" if len(derived[end]["spans"]) == 1 else "subtract",
+                "inputs": [{"start": span[0], "end": span[1], "tag": selected[span][0],
+                            "unit": "shares" if field == "diluted_shares" else "USD",
+                            "value": selected[span][1]["val"], "form": selected[span][1].get("form"),
+                            "filed": selected[span][1].get("filed"), "accession": selected[span][1].get("accn")}
+                           for span in derived[end]["spans"]],
+            }
             # A derived quarter may use multiple source spans. Record every tag
             # at this end; full per-field input lineage is required before DB writes.
             matching = [(tag, row) for (_, e), (tag, row) in selected.items() if e == end]
@@ -98,20 +111,21 @@ def parse(facts: dict) -> dict:
     # 재무상태표 항목: 날짜마다 후보 태그를 순서대로 확인 (회사가 중간에 태그를 바꿔도 이어지도록)
     all_tags = facts.get("facts", {}).get("us-gaap", {})
     for field, tags in INSTANT_TAGS.items():
-        per_tag: dict[str, dict[str, float]] = {}
+        per_tag: dict[str, dict[str, dict]] = {}
         for t in tags:
-            latest: dict[str, tuple[str, float]] = {}
+            latest: dict[str, dict] = {}
             for r in _entries(facts, t):
                 if "start" in r:
                     continue
-                if r["end"] not in latest or r["filed"] > latest[r["end"]][0]:
-                    latest[r["end"]] = (r["filed"], r["val"])
-            per_tag[t] = {e: v for e, (_, v) in latest.items()}
+                if r["end"] not in latest or r.get("filed", "") > latest[r["end"]].get("filed", ""):
+                    latest[r["end"]] = r
+            per_tag[t] = latest
         hits: dict[str, str] = {}
         for end, row in table.items():
             for t in tags:
                 if end in per_tag[t]:
-                    row[field] = per_tag[t][end]
+                    row[field] = per_tag[t][end]["val"]
+                    lineage.setdefault(end, {})[field] = _instant_lineage(t, per_tag[t][end])
                     hits[end] = t
                     break
         rev_ends = [e for e, r in table.items() if "revenue" in r]
@@ -130,6 +144,7 @@ def parse(facts: dict) -> dict:
                     for end, row in table.items():
                         if end not in hits and end in vals:
                             row[field] = vals[end]["val"]
+                            lineage.setdefault(end, {})[field] = _instant_lineage(t, vals[end])
                             hits[end] = t
                     break
         used[field] = hits.get(latest_end) if latest_end else None
@@ -147,6 +162,16 @@ def parse(facts: dict) -> dict:
     for end, row in table.items():
         if tag_by_period.get(end, {}).get("debt") == "LongTermDebtNoncurrent" and row.get("debt_current") is None:
             row.pop("debt", None)
+        for field in list(lineage.get(end, {})):
+            if field not in row:
+                lineage[end].pop(field)
     table = {k: v for k, v in table.items() if "revenue" in v}
     return {"quarters": dict(sorted(table.items())), "tags": used, "tag_by_period": tag_by_period,
-            "entity": facts.get("entityName")}
+            "entity": facts.get("entityName"), "source_lineage": {k: lineage[k] for k in table},
+            "raw_sha256": facts.get("_raw_sha256")}
+
+
+def _instant_lineage(tag: str, row: dict) -> dict:
+    return {"operation": "direct", "inputs": [{"end": row["end"], "tag": tag,
+            "unit": "USD", "value": row["val"], "form": row.get("form"),
+            "filed": row.get("filed"), "accession": row.get("accn")}]}

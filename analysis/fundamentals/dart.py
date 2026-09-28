@@ -9,12 +9,14 @@ from __future__ import annotations
 
 import os
 import time
+import hashlib
 
 import requests
 
-from quarters import derive_quarters
+from quarters import derive_quarters_with_sources
 
 URL = "https://opendart.fss.or.kr/api/fnlttSinglAcntAll.json"
+DISCLOSURES_URL = "https://opendart.fss.or.kr/api/list.json"
 # 보고서 코드 → 누적 기간 종료일(월-일)
 REPORTS = {"11013": "03-31", "11012": "06-30", "11014": "09-30", "11011": "12-31"}
 
@@ -52,6 +54,7 @@ def fetch(corp_code: str, years: list[int], fs_div: str = "CFS") -> list[dict]:
         raise SystemExit("DART_API_KEY 가 필요합니다 (opendart.fss.or.kr 에서 무료 발급).")
     reports = []
     for y in years:
+        annual: list[dict] = []
         for code in REPORTS:
             r = requests.get(URL, params={"crtfc_key": key, "corp_code": corp_code, "bsns_year": str(y),
                                           "reprt_code": code, "fs_div": fs_div}, timeout=60)
@@ -62,9 +65,44 @@ def fetch(corp_code: str, years: list[int], fs_div: str = "CFS") -> list[dict]:
                 continue
             if status != "000":
                 raise SystemExit(f"DART 오류 {status}: {body.get('message')} (year={y}, report={code})")
-            reports.append({"year": y, "reprt_code": code, "rows": body["list"]})
+            receipts = {row.get("rcept_no") for row in body["list"] if row.get("rcept_no")}
+            annual.append({"year": y, "reprt_code": code, "fs_div": fs_div,
+                            "rcp_no": next(iter(receipts)) if len(receipts) == 1 else None,
+                            "raw_sha256": hashlib.sha256(r.content).hexdigest(), "rows": body["list"]})
             time.sleep(0.2)
+        if annual:
+            wanted = {rep["rcp_no"] for rep in annual if rep["rcp_no"]}
+            dates = _filing_dates(corp_code, y, wanted, key) if wanted else {}
+            for rep in annual:
+                rep["rcept_dt"] = dates.get(rep["rcp_no"])
+            reports.extend(annual)
     return reports
+
+
+def _filing_dates(corp_code: str, year: int, receipts: set[str], key: str) -> dict[str, str]:
+    """Resolve each receipt against its own submission date, including late amendments."""
+    found: dict[str, str] = {}
+    for receipt_date in sorted({r[:8] for r in receipts if len(r) == 14 and r[:8].isdigit()}):
+        expected = {r for r in receipts if r.startswith(receipt_date)}
+        page = 1
+        while expected - found.keys():
+            response = requests.get(DISCLOSURES_URL, params={"crtfc_key": key, "corp_code": corp_code,
+                                    "bgn_de": receipt_date, "end_de": receipt_date,
+                                    "pblntf_ty": "A", "last_reprt_at": "N",
+                                    "page_count": "100", "page_no": str(page)}, timeout=60)
+            response.raise_for_status()
+            body = response.json()
+            if body.get("status") == "013":
+                break
+            if body.get("status") != "000":
+                raise SystemExit(f"DART 공시검색 오류 {body.get('status')} (year={year})")
+            for row in body.get("list", []):
+                if row.get("rcept_no") in expected:
+                    found[row["rcept_no"]] = row["rcept_dt"]
+            if page >= int(body.get("total_page", 1)):
+                break
+            page += 1
+    return found
 
 
 def _find(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str]) -> dict | None:
@@ -82,6 +120,8 @@ def _find(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str
 
 def parse(reports: list[dict]) -> dict:
     durations: dict[str, dict[tuple[str, str], float]] = {f: {} for f in FLOW}
+    duration_sources: dict[str, dict[tuple[str, str], dict]] = {f: {} for f in FLOW}
+    lineage: dict[str, dict[str, dict]] = {}
     stock: dict[str, dict[str, float]] = {}
     debt_names_by_end: dict[str, set[str]] = {}
     for rep in reports:
@@ -101,14 +141,18 @@ def parse(reports: list[dict]) -> dict:
             if field == "capex":
                 val = abs(val)
             durations[field][(start, end)] = val
+            duration_sources[field][(start, end)] = _input(rep, row, val, start, end)
         snap = stock.setdefault(end, {})
         for field, (ids, names) in STOCK.items():
             row = _find(rows, ("BS",), ids, names)
             if row and _num(row.get("thstrm_amount")) is not None:
                 snap[field] = _num(row["thstrm_amount"])
+                lineage.setdefault(end, {})[field] = {"operation": "direct", "inputs": [
+                    _input(rep, row, snap[field], None, end)]}
         debt_rows = [r for r in rows if r.get("sj_div") == "BS"
                      and (r.get("account_nm") or "").replace(" ", "") in DEBT_NAMES]
         debt_by_name = {}
+        debt_source_by_name = {}
         ambiguous = False
         for row in debt_rows:
             name = (row.get("account_nm") or "").replace(" ", "")
@@ -119,6 +163,7 @@ def parse(reports: list[dict]) -> dict:
             if name in debt_by_name and debt_by_name[name] != amount:
                 ambiguous = True
             debt_by_name[name] = amount
+            debt_source_by_name[name] = row
         # The balance sheet's current portion already contains its loan/bond
         # breakdown. Do not add both the parent and its components.
         if "유동성장기부채" in debt_by_name:
@@ -127,6 +172,9 @@ def parse(reports: list[dict]) -> dict:
         debt_names_by_end[end] = set(debt_by_name)
         if debt_by_name and not ambiguous:
             snap["debt"] = sum(debt_by_name.values())
+            lineage.setdefault(end, {})["debt"] = {"operation": "sum", "inputs": [
+                _input(rep, debt_source_by_name[name], amount, None, end)
+                for name, amount in debt_by_name.items()]}
 
     previous_names: set[str] = set()
     for end in sorted(stock):
@@ -134,15 +182,30 @@ def parse(reports: list[dict]) -> dict:
         # A line that disappears can be a tag/account migration; do not assume zero.
         if previous_names - names:
             stock[end].pop("debt", None)
+            lineage.get(end, {}).pop("debt", None)
         if names:
             previous_names = names
 
     table: dict[str, dict[str, float]] = {}
     for field, d in durations.items():
-        for end, v in derive_quarters(d).items():
-            table.setdefault(end, {})[field] = v
+        for end, item in derive_quarters_with_sources(d).items():
+            table.setdefault(end, {})[field] = item["value"]
+            lineage.setdefault(end, {})[field] = {"operation": "direct" if len(item["spans"]) == 1 else "subtract",
+                                                    "inputs": [duration_sources[field][span] for span in item["spans"]]}
     for end, snap in stock.items():
         if end in table:
             table[end].update(snap)
     table = {k: v for k, v in table.items() if "revenue" in v}
-    return {"quarters": dict(sorted(table.items())), "tags": {"source": "OpenDART fnlttSinglAcntAll (CFS)"}}
+    return {"quarters": dict(sorted(table.items())), "tags": {"source": "OpenDART fnlttSinglAcntAll (CFS)"},
+            "source_lineage": {k: {field: origin for field, origin in lineage.get(k, {}).items() if field in table[k]}
+                               for k in table},
+            "raw_sha256": {f"{rep['year']}-{rep['reprt_code']}": rep.get("raw_sha256") for rep in reports}}
+
+
+def _input(rep: dict, row: dict, value: float, start: str | None, end: str) -> dict:
+    return {"start": start, "end": end, "value": value, "account_id": row.get("account_id"),
+            "account_nm": row.get("account_nm"), "sj_div": row.get("sj_div"),
+            "unit": row.get("currency") or "KRW", "fs_div": rep.get("fs_div", "CFS"),
+            "year": rep["year"], "reprt_code": rep["reprt_code"],
+            "receipt": row.get("rcept_no") or rep.get("rcp_no"), "filed": rep.get("rcept_dt"),
+            "raw_sha256": rep.get("raw_sha256")}
