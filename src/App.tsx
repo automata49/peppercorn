@@ -246,8 +246,7 @@ function MarketMetricCard({tone,icon,label,value,sub,progress}:{tone:'green'|'bl
   const safeProgress=progress==null?null:Math.max(0,Math.min(100,progress))
   return <div className={'market-metric-card '+tone}>
     <div className="market-metric-head"><span className="market-metric-icon" aria-hidden="true">{icon}</span><b>{label}</b></div>
-    <strong>{value}</strong>
-    <small>{sub}</small>
+    <div className="market-metric-reading"><strong>{value}</strong><small>{sub}</small></div>
     {safeProgress!=null&&<div className="market-metric-track" aria-hidden="true"><span style={{width:safeProgress+'%'}}/></div>}
   </div>
 }
@@ -531,6 +530,10 @@ export default function App(){
     return marketRows.filter(r=>!q||[r.ticker,r.name,r.sector,sectorName(r.market,r.sector),r.industry].map(v=>String(v||'')).join(' ').toLowerCase().includes(q))
   },[marketRows,query])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
+  const metricExchanges=[...new Set(stockRows.map(r=>r.exchange?.trim()).filter((name):name is string=>!!name))].sort((a,b)=>a.localeCompare(b,'ko'))
+  const metricIndices=[...new Set(stockRows.flatMap(r=>r.index_memberships||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'))
+  const metricNames=(names:string[])=>names.length?names.slice(0,3).join(' · ')+(names.length>3?` 외 ${names.length-3}`:''):'분류 확인 중'
+  const metricContext=`${market==='ALL'?'전체':market} · 거래소 ${metricNames(metricExchanges)} · 지수 ${metricNames(metricIndices)}`
   const summaryGroups={
     core:stockRows.filter(r=>leadership(r)==='핵심 주도'),
     candidates:stockRows.filter(r=>leadership(r)==='주도 후보'),
@@ -686,7 +689,7 @@ export default function App(){
 
       <section className="dashboard-section market-internals">
         <div className="dashboard-section-head">
-          <div><h2>시장 내부 지표</h2><p>시장의 전반적인 강도와 모멘텀을 확인하세요.</p></div>
+          <div><h2>시장 내부 지표</h2><p className="market-context" title={metricContext}>{metricContext}</p></div>
           <button className="dashboard-section-action" onClick={()=>setPage('leaderboard')}>지표 자세히 보기 →</button>
         </div>
         <div className="market-metric-grid">
@@ -725,6 +728,13 @@ export default function App(){
             </tr>)}
             {!dashboardTopSectors.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
           </tbody></table></div>
+        </div>
+        <div className="panel dashboard-stock-panel">
+          <div className="panel-head"><div><h2>주도 종목</h2><p>RS 순위 기준 · 선택한 분류의 상위 종목</p></div></div>
+          <div className="dashboard-leader-tabs" role="group" aria-label="주도 종목 분류">
+            {(['core','candidates','turns','corrections'] as const).map(tab=><button key={tab} className={stockTab===tab?'on':''} onClick={()=>setStockTab(tab)}>{({core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중'} as const)[tab]} <b>{stockGroups[tab].length}</b></button>)}
+          </div>
+          <DashboardStockRows rows={tabStocks.slice(0,12)} onSelect={row=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}}/>
         </div>
       </section>
     </>
