@@ -29,6 +29,34 @@
         }
       },
       {
+        "period_end": "2025-01-26",
+        "filed": "2025-02-26",
+        "source": "SEC 10-K accession 0001045810-25-000023 filed 2025-02-26 (FY2025 totals); nine-month cumulative from the Q3 FY25 10-Q 0001045810-24-000316 and the Q3 FY26 10-Q prior-year columns",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R3.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R9.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000023/R5.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581024000316/nvda-20241027.htm"
+        ],
+        "verification": "Read through a summarizing web fetch of the 10-K XBRL statement pages (R3 income, R5 balance sheet, R9 cash flow); fiscal Q4 is derived by subtracting nine-month cumulative figures. The FY2025 totals and January 2025 balance sheet also appear unchanged as prior-year columns in the FY2026 10-K and 2025-11-19 10-Q; the nine-month cash flow figures are from a single 10-Q read. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 130,497 minus nine months 91,166 (nine-month figure from the Q3 FY26 10-Q prior-year column)",
+          "operating_income": "FY 81,453 minus nine months 57,419",
+          "operating_cash_flow": "FY 64,089 minus nine months 47,460",
+          "capex": "FY 3,236 minus nine months 2,159, purchases related to PPE and intangibles",
+          "cash": "10-K balance sheet at fiscal year end",
+          "equity": "10-K balance sheet total shareholders' equity at fiscal year end"
+        },
+        "values": {
+          "revenue": 39331000000,
+          "operating_income": 24034000000,
+          "operating_cash_flow": 16629000000,
+          "capex": 1077000000,
+          "cash": 8589000000,
+          "equity": 79327000000
+        }
+      },
+      {
         "period_end": "2025-04-27",
         "filed": "2025-05-28",
         "source": "SEC 10-Q accession 0001045810-25-000116 filed 2025-05-28",
@@ -97,6 +125,34 @@
           "capex": 1636000000,
           "cash": 11486000000,
           "equity": 118897000000
+        }
+      },
+      {
+        "period_end": "2026-01-25",
+        "filed": "2026-02-25",
+        "source": "SEC 10-K accession 0001045810-26-000021 filed 2026-02-25 (FY2026 totals); nine-month cumulative from the Q3 FY26 10-Q 0001045810-25-000230",
+        "urls": [
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R3.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R9.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/R5.htm",
+          "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000230/nvda-20251026.htm"
+        ],
+        "verification": "Read through a summarizing web fetch of the 10-K XBRL statement pages (R3 income, R5 balance sheet, R9 cash flow); fiscal Q4 is derived by subtracting nine-month cumulative figures. The January 25, 2026 balance sheet values match those printed as comparative columns in both 2026 10-Qs; the nine-month figures were read twice from the Q3 FY26 10-Q. Not yet spot-checked by a person.",
+        "methods": {
+          "revenue": "FY 215,938 minus nine months 147,811 (nine-month revenue equals the sum of the three reported quarters)",
+          "operating_income": "FY 130,387 minus nine months 86,088",
+          "operating_cash_flow": "FY 102,718 minus nine months 66,530",
+          "capex": "FY 6,042 minus nine months 4,758, purchases related to PPE and intangibles",
+          "cash": "10-K balance sheet at fiscal year end",
+          "equity": "10-K balance sheet total shareholders' equity at fiscal year end"
+        },
+        "values": {
+          "revenue": 68127000000,
+          "operating_income": 44299000000,
+          "operating_cash_flow": 36188000000,
+          "capex": 1284000000,
+          "cash": 10605000000,
+          "equity": 157293000000
         }
       },
       {
