@@ -929,7 +929,7 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 }
 
 /* Use the phone navigation shell on iPad in both orientations. Detail sheets keep their own layout. */
-@media(min-width:651px) and (max-width:1279px){
+@media(min-width:651px) and (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
   body{background:#f3f6fa}
   .shell,.shell>main{display:block;min-width:0}
   .shell>.sidebar,.menu-trigger{display:none!important}
@@ -953,7 +953,7 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 }
 
 /* Summary cards share the same readable two-column layout on phone and iPad. */
-@media(max-width:1279px){
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
   .dashboard-section{min-width:0}
   .dashboard-section-head{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px}
   .dashboard-section-head>div{flex:1 1 210px;min-width:0}
