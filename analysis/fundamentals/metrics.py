@@ -99,8 +99,14 @@ def checks(q: dict, m: dict, today: date) -> list[tuple[str, bool, str]]:
     out.append(("매출 > 0", not neg, "정상" if not neg else "음수/0: " + ", ".join(neg)))
     gm = m.get("gross_margin")
     out.append(("매출총이익률 0~100%", gm is None or 0 <= gm <= 1, "없음(해당 항목 미공시)" if gm is None else f"{gm:.1%}"))
-    gaps = [(a, b) for a, b in zip(ends, ends[1:]) if (date.fromisoformat(b) - date.fromisoformat(a)).days > 100]
-    out.append(("분기 연속성", not gaps, "빠진 분기 없음" if not gaps else f"공백 {len(gaps)}곳: {gaps[:3]}"))
+    # 지표 계산에 쓰는 최근 16개 분기(4년)만 연속성 검사. 그 이전 공백은 참고로만 표시
+    recent = ends[-16:]
+    gaps = [(a, b) for a, b in zip(recent, recent[1:]) if (date.fromisoformat(b) - date.fromisoformat(a)).days > 100]
+    old = [(a, b) for a, b in zip(ends[:-15], ends[1:-15]) if (date.fromisoformat(b) - date.fromisoformat(a)).days > 100]
+    note = "빠진 분기 없음" if not gaps else f"공백 {len(gaps)}곳: {gaps[:3]}"
+    if old:
+        note += f" (참고: 4년 이전 공백 {len(old)}곳)"
+    out.append(("분기 연속성 (최근 16분기)", not gaps, note))
     for key in ("roic", "fcf_margin", "revenue_yoy"):
         out.append((f"{key} 계산", m.get(key) is not None, "계산됨" if m.get(key) is not None else "계산 불가"))
     return out

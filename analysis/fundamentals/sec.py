@@ -104,5 +104,9 @@ def parse(facts: dict) -> dict:
             if end in table:  # 손익 분기와 같은 날짜만
                 table[end][field] = v
     # 매출이 있는 분기만 남긴다
+    # LongTermDebt 는 유동성 부분까지 포함한 총액 → 유동성 부분을 또 더하면 이중 계산
+    if used.get("debt") == "LongTermDebt":
+        for v in table.values():
+            v.pop("debt_current", None)
     table = {k: v for k, v in table.items() if "revenue" in v}
     return {"quarters": dict(sorted(table.items())), "tags": used, "entity": facts.get("entityName")}
