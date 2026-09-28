@@ -927,3 +927,52 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
     font-size:var(--pepper-section-title-size)!important;
   }
 }
+
+/* Use the phone navigation shell on iPad in both orientations. Detail sheets keep their own layout. */
+@media(min-width:651px) and (max-width:1279px){
+  body{background:#f3f6fa}
+  .shell,.shell>main{display:block;min-width:0}
+  .shell>.sidebar,.menu-trigger{display:none!important}
+  .mobile-brandbar{position:sticky;top:0;z-index:18;display:flex;align-items:center;justify-content:space-between;height:62px;padding:8px 20px;background:rgba(255,255,255,.96);border-bottom:1px solid #e6ebf0;backdrop-filter:blur(12px)}
+  .mobile-brand-home{display:flex;align-items:center;gap:9px;padding:0;border:0;background:transparent;color:#18314f;cursor:pointer}
+  .mobile-brand-home img{width:32px;height:32px;object-fit:contain}
+  .mobile-brand-menu{display:grid;place-items:center;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer}
+  .topbar{position:sticky;top:62px;z-index:14;height:auto;min-height:74px;padding:12px 20px;background:rgba(255,255,255,.96)}
+  .topbar>div:first-child{min-width:0}
+  .topbar p{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .top-actions{display:none!important}
+  .content{padding:18px 20px calc(96px + env(safe-area-inset-bottom))}
+  .mobile-bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 12px calc(6px + env(safe-area-inset-bottom));border-top:1px solid #dfe5ec;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);box-shadow:0 -6px 18px rgba(36,50,68,.07)}
+  .mobile-bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;border:0;background:transparent;color:#7b899b;cursor:pointer}
+  .mobile-bottom-nav button span{font-size:19px;line-height:1}
+  .mobile-bottom-nav button b{font-size:11px}
+  .mobile-bottom-nav button.active{color:#17375f}
+  .dashboard-sector-filter{display:none}
+  .dashboard-lower-grid{display:block}
+  .dashboard-lower-grid>.panel{margin-bottom:14px}
+}
+
+/* Summary cards share the same readable two-column layout on phone and iPad. */
+@media(max-width:1279px){
+  .dashboard-section{min-width:0}
+  .dashboard-section-head{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px}
+  .dashboard-section-head>div{flex:1 1 210px;min-width:0}
+  .dashboard-section-head p{max-width:none;white-space:normal!important;overflow:visible;text-overflow:clip;word-break:keep-all}
+  .dashboard-section-head .dashboard-section-action{flex:none;margin-left:auto;font-size:13px}
+  .leadership-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .market-internals{container-type:inline-size}
+  .market-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .market-metric-card:nth-child(n){grid-column:auto}
+  .market-metric-card:last-child{grid-column:1/-1}
+  .market-metric-card{min-width:0;padding:clamp(12px,2.2vw,18px)}
+  .market-metric-head{align-items:flex-start;gap:9px}
+  .market-metric-icon{width:32px;height:32px;font-size:17px}
+  .market-metric-head b{min-width:0;overflow:visible;text-overflow:clip;white-space:normal!important;word-break:keep-all;font-size:clamp(13px,1.7vw,17px);line-height:1.35}
+  .market-metric-card>strong{font-size:clamp(23px,3vw,32px);line-height:1.2}
+  .market-metric-card>small{min-height:0;font-size:clamp(11px,1.5vw,14px);line-height:1.45;white-space:normal!important;word-break:keep-all}
+  .market-metric-track{margin-top:12px}
+}
+@container(max-width:360px){
+  .market-metric-grid{grid-template-columns:minmax(0,1fr)}
+  .market-metric-card:last-child{grid-column:auto}
+}
