@@ -16,6 +16,7 @@ from pathlib import Path
 
 import dart
 import metrics
+import reconcile
 import sec
 
 TARGETS = [
@@ -42,8 +43,11 @@ def run_one(t: dict) -> dict:
         parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - 4, this_year + 1))))
     q = parsed["quarters"]
     m = metrics.compute(q, t["tax"])
+    check_results = metrics.checks(q, m, date.today())
+    check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
-            "quarters": q, "metrics": m, "checks": metrics.checks(q, m, date.today())}
+            "tag_by_period": parsed.get("tag_by_period", {}),
+            "quarters": q, "metrics": m, "checks": check_results}
 
 
 def render(results: list[dict]) -> str:
@@ -60,8 +64,8 @@ def render(results: list[dict]) -> str:
         lines += ["", f"**지표 (TTM, 기준 {m.get('as_of')})**", "", "| 지표 | 값 |", "|---|---:|",
                   f"| 매출 | {money(m.get('ttm_revenue'), cur)} |",
                   f"| 영업이익 | {money(m.get('ttm_operating_income'), cur)} |",
-                  f"| FCF | {money(m.get('ttm_fcf'), cur)} |",
-                  f"| Owner Earnings (FCF−SBC) | {money(m.get('owner_earnings'), cur)} |",
+                  f"| FCF (영업CF−수집 CapEx; 국가별 범위 차이) | {money(m.get('ttm_fcf'), cur)} |",
+                  f"| FCF−SBC 추정치 | {money(m.get('owner_earnings'), cur)} |",
                   f"| 매출총이익률 | {pct(m.get('gross_margin'))} |",
                   f"| 영업이익률 | {pct(m.get('operating_margin'))} |",
                   f"| FCF 마진 | {pct(m.get('fcf_margin'))} |",
@@ -71,7 +75,7 @@ def render(results: list[dict]) -> str:
                   f"| 순부채 (음수=순현금) | {money(m.get('net_debt'), cur)} |",
                   f"| └ 현금 | {money(r['quarters'][m['as_of']].get('cash'), cur)} |",
                   f"| └ 단기투자 | {money(r['quarters'][m['as_of']].get('short_term_investments'), cur)} |",
-                  f"| └ 차입금 | {money((r['quarters'][m['as_of']].get('debt') or 0) + (r['quarters'][m['as_of']].get('debt_current') or 0), cur)} |",
+                  f"| └ 차입금 | {money(None if r['quarters'][m['as_of']].get('debt') is None else r['quarters'][m['as_of']]['debt'] + r['quarters'][m['as_of']].get('debt_current', 0), cur)} |",
                   f"| └ 자본 | {money(r['quarters'][m['as_of']].get('equity'), cur)} |",
                   f"| 매출 YoY | {pct(m.get('revenue_yoy'))} |",
                   f"| 매출 3년 CAGR | {pct(m.get('revenue_cagr_3y'))} |",

@@ -17,10 +17,10 @@ def _ttm_field(q: dict, field: str, end: str):
 
 def _ic(row: dict):
     """투하자본 = 자본 + 차입금 - 현금 - 단기투자 (간이 정의)"""
-    if row.get("equity") is None:
+    if any(row.get(field) is None for field in ("equity", "debt", "cash", "short_term_investments")):
         return None
-    return (row["equity"] + row.get("debt", 0) + row.get("debt_current", 0)
-            - row.get("cash", 0) - row.get("short_term_investments", 0))
+    return (row["equity"] + row["debt"] + row.get("debt_current", 0)
+            - row["cash"] - row["short_term_investments"])
 
 
 def compute(q: dict, default_tax: float) -> dict:
@@ -47,7 +47,7 @@ def compute(q: dict, default_tax: float) -> dict:
 
     ic_now = _ic(q[e])
     ic_prev = _ic(q[e1]) if e1 else None
-    avg_ic = (ic_now + ic_prev) / 2 if ic_now is not None and ic_prev is not None else ic_now
+    avg_ic = (ic_now + ic_prev) / 2 if ic_now is not None and ic_prev is not None else None
     roic = _div(nopat(e), avg_ic) if avg_ic and avg_ic > 0 else None
     inc_roic = None
     if e1 and nopat(e1) is not None and ic_now is not None and ic_prev is not None and ic_now - ic_prev > 0:
@@ -59,8 +59,8 @@ def compute(q: dict, default_tax: float) -> dict:
     shares, shares_prev = q[e].get("diluted_shares"), (q[e1].get("diluted_shares") if e1 else None)
     last = q[e]
     net_debt = None
-    if last.get("cash") is not None:
-        net_debt = last.get("debt", 0) + last.get("debt_current", 0) - last["cash"] - last.get("short_term_investments", 0)
+    if all(last.get(field) is not None for field in ("debt", "cash", "short_term_investments")):
+        net_debt = last["debt"] + last.get("debt_current", 0) - last["cash"] - last["short_term_investments"]
 
     return {
         "as_of": e,

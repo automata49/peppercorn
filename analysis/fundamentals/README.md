@@ -10,6 +10,7 @@ NVDA(SEC EDGAR)와 삼성전자(OpenDART)의 분기 재무를 수집해 Position
 | `metrics.py` | 지표 계산 + 수집 품질 검사 |
 | `collect.py` | 실행 진입점, 결과 JSON/요약 출력 |
 | `test_fundamentals.py` | 네트워크 없이 도는 변환 로직 테스트 |
+| `official_reference_2025.json`, `reconcile.py` | SEC·삼성전자 공시의 과거 기준 행과 수집 결과 대조 |
 
 ## 준비 (GitHub → Settings → Secrets and variables → Actions)
 
@@ -21,3 +22,5 @@ NVDA(SEC EDGAR)와 삼성전자(OpenDART)의 분기 재무를 수집해 Position
 Actions → **Fundamentals PoC (NVDA + Samsung)** → Run workflow. 실행 요약 화면에 검사표와 지표가 나오고, `fundamentals-poc` 아티팩트로 JSON을 받을 수 있습니다.
 
 로컬: `cd analysis/fundamentals && SEC_USER_AGENT="..." DART_API_KEY=... python collect.py`
+
+과거 PoC 아티팩트 대조: `python analysis/fundamentals/reconcile.py /path/to/fundamentals-poc.zip` (저장소 루트). 기준값과 확인 범위는 `docs/harness/SOURCE_RECONCILIATION.md`를 참고하세요. 현재 FCF는 국가별 CapEx 항목 범위가 달라 종목 간 비교나 자동 Position 판정에 사용할 수 없습니다.
