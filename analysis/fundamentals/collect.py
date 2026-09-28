@@ -36,10 +36,12 @@ def pct(v):
     return "–" if v is None else f"{v:.1%}"
 
 
-def run_one(t: dict) -> dict:
+def run_one(t: dict, as_of: str | None = None) -> dict:
     if t["source"] == "SEC":
-        parsed = sec.parse(sec.fetch(t["cik"]))
+        parsed = sec.parse(sec.fetch(t["cik"]), as_of=as_of)
     else:
+        if as_of is not None:
+            raise ValueError("DART historical as-of requires an archived filing snapshot")
         this_year = date.today().year
         parsed = dart.parse(dart.fetch(t["corp_code"], list(range(this_year - 4, this_year + 1))))
     q = parsed["quarters"]
@@ -47,12 +49,14 @@ def run_one(t: dict) -> dict:
     if method["currency"] != t["currency"]:
         raise ValueError("Market and currency mismatch")
     m = metrics.compute(q, t["tax"])
-    check_results = metrics.checks(q, m, date.today())
+    check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
-    check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
+    if not as_of or as_of >= "2025-08-27":
+        check_results.extend(reconcile.compare({"ticker": t["ticker"], "quarters": q}))
     return {**t, "fetched_at": datetime.now(timezone.utc).isoformat(), "tags": parsed["tags"],
             "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
-            "raw_sha256": parsed.get("raw_sha256"),
+            "raw_sha256": parsed.get("raw_sha256"), "source_revisions": parsed.get("source_revisions", {}),
+            "as_of": as_of,
             "tag_by_period": parsed.get("tag_by_period", {}),
             "quarters": q, "metrics": m, "checks": check_results}
 
@@ -84,6 +88,7 @@ def render(results: list[dict]) -> str:
             continue
         ok = all(c[1] for c in r["checks"])
         m, cur = r["metrics"], r["currency"]
+        last_row = r["quarters"].get(m.get("as_of"), {})
         lines += [f"## {'✅' if ok else '⚠️'} {r['ticker']} {r['name']} ({r['source']})", "",
                   "| 검사 | 결과 | 내용 |", "|---|---|---|"]
         lines += [f"| {n} | {'통과' if p else '실패'} | {d} |" for n, p, d in r["checks"]]
@@ -102,10 +107,10 @@ def render(results: list[dict]) -> str:
                   f"| 증분 ROIC | {pct(m.get('incremental_roic'))} |",
                   f"| ROE | {pct(m.get('roe'))} |",
                   f"| 순부채 (음수=순현금) | {money(m.get('net_debt'), cur)} |",
-                  f"| └ 현금 | {money(r['quarters'][m['as_of']].get('cash'), cur)} |",
-                  f"| └ 단기투자 | {money(r['quarters'][m['as_of']].get('short_term_investments'), cur)} |",
-                  f"| └ 차입금 | {money(None if r['quarters'][m['as_of']].get('debt') is None else r['quarters'][m['as_of']]['debt'] + r['quarters'][m['as_of']].get('debt_current', 0), cur)} |",
-                  f"| └ 자본 | {money(r['quarters'][m['as_of']].get('equity'), cur)} |",
+                  f"| └ 현금 | {money(last_row.get('cash'), cur)} |",
+                  f"| └ 단기투자 | {money(last_row.get('short_term_investments'), cur)} |",
+                  f"| └ 차입금 | {money(None if last_row.get('debt') is None else last_row['debt'] + last_row.get('debt_current', 0), cur)} |",
+                  f"| └ 자본 | {money(last_row.get('equity'), cur)} |",
                   f"| 매출 YoY | {pct(m.get('revenue_yoy'))} |",
                   f"| 매출 3년 CAGR | {pct(m.get('revenue_cagr_3y'))} |",
                   f"| 순이익 3년 CAGR | {pct(m.get('net_income_cagr_3y'))} |",
@@ -130,7 +135,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="out")
     ap.add_argument("--only", choices=["US", "KR"])
+    ap.add_argument("--as-of", help="Historical filing cutoff YYYY-MM-DD (US only)")
     a = ap.parse_args()
+    if a.as_of:
+        sec.validate_as_of(a.as_of)
+        if a.only != "US":
+            ap.error("--as-of requires --only US; DART historical snapshots are not yet available")
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     results = []
@@ -138,7 +148,7 @@ def main():
         if a.only and t["market"] != a.only:
             continue
         try:
-            r = run_one(t)
+            r = run_one(t, as_of=a.as_of)
         except SystemExit as e:
             r = {**t, "error": str(e)}
         except Exception as e:  # 네트워크·형식 오류도 결과에 남긴다 (API 키는 가림)

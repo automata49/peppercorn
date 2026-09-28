@@ -93,6 +93,64 @@ def test_sec_amendment_selects_latest_per_span():
     parsed = sec.parse(facts)
     assert parsed["quarters"]["2025-03-31"]["revenue"] == 12
     assert parsed["source_lineage"]["2025-03-31"]["revenue"]["inputs"][0]["accession"] == "amended"
+    earlier = sec.parse(facts, as_of="2025-05-31")
+    assert earlier["quarters"]["2025-03-31"]["revenue"] == 10
+    assert [r["accession"] for r in earlier["source_revisions"]["2025-03-31"]["revenue"]] == ["original"]
+    assert [r["accession"] for r in parsed["source_revisions"]["2025-03-31"]["revenue"]] == ["original", "amended"]
+    assert sec.parse(facts, as_of="2025-04-30")["quarters"] == {}
+    import pytest
+    for noncanonical in ("20250531", "2025-W22-6"):
+        with pytest.raises(ValueError, match="YYYY-MM-DD"):
+            sec.parse(facts, as_of=noncanonical)
+
+
+def test_sec_as_of_excludes_future_instant_and_fallback_tag():
+    revenue = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    cash_old = _sec_fact(None, "2025-03-31", 50, filed="2025-05-01")
+    cash_new = _sec_fact(None, "2025-03-31", 60, filed="2025-06-01")
+    fallback = _sec_fact(None, "2025-03-31", 40, filed="2025-06-01")
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": [revenue]}},
+        "CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": [cash_old, cash_new]}},
+        "DebtSecuritiesAvailableForSaleCurrent": {"units": {"USD": [fallback]}}}}}
+    early = sec.parse(facts, as_of="2025-05-31")
+    assert early["quarters"]["2025-03-31"]["cash"] == 50
+    assert "short_term_investments" not in early["quarters"]["2025-03-31"]
+    late = sec.parse(facts, as_of="2025-06-01")
+    assert late["quarters"]["2025-03-31"]["cash"] == 60
+    assert late["quarters"]["2025-03-31"]["short_term_investments"] == 40
+    assert [v["value"] for v in late["source_revisions"]["2025-03-31"]["cash"]] == [50, 60]
+
+
+def test_sec_instant_tag_amendment_prefers_newer_filing_even_if_old_tag_remains():
+    rev = _sec_fact("2025-01-01", "2025-03-31", 100, filed="2025-05-01")
+    old = _sec_fact(None, "2025-03-31", 10, filed="2025-05-01")
+    new = _sec_fact(None, "2025-03-31", 20, filed="2025-06-01")
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": [rev]}},
+        "MarketableSecuritiesCurrent": {"units": {"USD": [old]}},
+        "DebtSecuritiesAvailableForSaleCurrent": {"units": {"USD": [new]}}}}}
+    early = sec.parse(facts, as_of="2025-05-01")
+    late = sec.parse(facts, as_of="2025-06-01")
+    assert early["quarters"]["2025-03-31"]["short_term_investments"] == 10
+    assert late["quarters"]["2025-03-31"]["short_term_investments"] == 20
+    assert late["source_lineage"]["2025-03-31"]["short_term_investments"]["inputs"][0]["tag"] == "DebtSecuritiesAvailableForSaleCurrent"
+    assert [r["value"] for r in late["source_revisions"]["2025-03-31"]["short_term_investments"]] == [10, 20]
+
+
+def test_historical_collection_rejects_dart_without_archived_snapshot():
+    from collect import TARGETS, run_one
+    import pytest
+    with pytest.raises(ValueError, match="archived filing snapshot"):
+        run_one(TARGETS[1], as_of="2025-05-15")
+
+
+def test_render_historical_cutoff_with_no_filing_does_not_crash():
+    from collect import TARGETS, render, results_failed
+    result = {**TARGETS[0], "quarters": {}, "metrics": {}, "methodology": methods.for_market("US"),
+              "tags": {}, "checks": metrics.checks({}, {}, date(2025, 1, 1))}
+    assert "데이터 존재 | 실패" in render([result])
+    assert results_failed([result])
 
 
 def test_sec_ytd_lineage_includes_both_input_filings():
