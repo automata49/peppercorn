@@ -223,6 +223,46 @@ def test_dart_cumulative_lineage_has_both_receipts_and_ppe_basis():
     assert "PPE" in methods.for_market("KR")["capex_basis"]
 
 
+def _samsung_capex_reports(grants_line_in_fy2025=True):
+    ppe = "ifrs-full_PurchaseOfPropertyPlantAndEquipment"
+
+    def rep(year, code, revenue, cumulative, gross, grant=None):
+        rows = [_row("IS", "ifrs-full_Revenue", "매출액", revenue, cumulative),
+                _row("CF", ppe, "유형자산의 취득", -gross)]
+        if grant is not None:
+            rows.append(_row("CF", "-표준계정코드 미사용-", "정부보조금의 수취", grant))
+        return {"year": year, "reprt_code": code, "rows": rows}
+
+    return [rep(2025, "11013", 79_140_503, 79_140_503, 12_127_934),
+            rep(2025, "11012", 74_566_317, 153_706_820, 25_163_382),
+            rep(2025, "11014", 86_061_747, 239_768_567, 35_972_891),
+            rep(2025, "11011", 333_605_938, None, 47_522_179, 1_722_357 if grants_line_in_fy2025 else None),
+            rep(2026, "11013", 133_873_444, 133_873_444, 17_127_003, 1_586_919),
+            rep(2026, "11012", 171_499_470, 305_372_914, 31_234_818, 1_592_914)]
+
+
+def test_dart_capex_uses_one_net_basis_across_grant_line_presentation_change():
+    parsed = dart.parse(_samsung_capex_reports())
+    q = parsed["quarters"]
+    # Filed net through nine months; the FY2025 report is gross plus a separate grants line.
+    assert q["2025-09-30"]["capex"] == 35_972_891 - 25_163_382
+    assert q["2025-12-31"]["capex"] == (47_522_179 - 1_722_357) - 35_972_891 == 9_826_931
+    assert q["2026-03-31"]["capex"] == 17_127_003 - 1_586_919
+    assert q["2026-06-30"]["capex"] == (31_234_818 - 1_592_914) - (17_127_003 - 1_586_919) == 14_101_820
+    inputs = parsed["source_lineage"]["2025-12-31"]["capex"]["inputs"]
+    fy = next(item for item in inputs if item["reprt_code"] == "11011")
+    assert fy["gross_value"] == 47_522_179 and fy["government_grants"]["value"] == 1_722_357
+    assert fy["value"] == 45_799_822
+    assert "government_grants" not in next(item for item in inputs if item["reprt_code"] == "11014")
+
+
+def test_dart_grant_line_without_amount_is_zero_and_absent_line_leaves_gross_unchanged():
+    reports = _samsung_capex_reports()
+    reports[3]["rows"][-1]["thstrm_amount"] = "-"
+    assert dart.parse(reports)["quarters"]["2025-12-31"]["capex"] == 47_522_179 - 35_972_891
+    assert dart.parse(_samsung_capex_reports(False))["quarters"]["2025-12-31"]["capex"] == 47_522_179 - 35_972_891
+
+
 def test_dart_filing_dates_match_receipts_and_paginate(monkeypatch):
     class Response:
         def __init__(self, body): self.body = body
@@ -366,10 +406,12 @@ def test_official_reference_periods_are_ordered_and_complete():
         ends = [p['period_end'] for p in expected['periods']]
         assert ends == sorted(set(ends))
         for p in expected['periods']:
-            assert p['filed'] > p['period_end'] and p['values'] and p['source'] and p['urls']
+            assert p['filed'] is None or p['filed'] > p['period_end']
+            assert p['values'] and p['source'] and p['urls']
             assert set(p['methods']) == set(p['values'])
             assert all(isinstance(v, int) and v > 0 for v in p['values'].values())
     assert len(reconcile.REFERENCE['NVDA']['periods']) >= 6
+    assert len(reconcile.REFERENCE['005930']['periods']) >= 8
 
 
 def test_official_reference_skips_quarters_not_yet_filed_at_as_of():
@@ -378,6 +420,14 @@ def test_official_reference_skips_quarters_not_yet_filed_at_as_of():
     assert not all(ok for _, ok, _ in reconcile.compare(only_first))
     assert all(ok for _, ok, _ in reconcile.compare(only_first, as_of=periods[0]['filed']))
     assert reconcile.compare(only_first, as_of='2000-01-01') == []
+
+
+def test_official_reference_with_unknown_filing_date_is_only_checked_without_as_of(monkeypatch):
+    period = {'period_end': '2025-06-30', 'filed': None, 'values': {'revenue': 5}}
+    monkeypatch.setattr(reconcile, 'REFERENCE', {'X': {'currency': 'KRW', 'periods': [period]}})
+    result = {'ticker': 'X', 'quarters': {'2025-06-30': {'revenue': 6}}}
+    assert not reconcile.compare(result)[0][1]
+    assert reconcile.compare(result, as_of='2030-01-01') == []
 
 
 def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):

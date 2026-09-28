@@ -13,9 +13,9 @@ METHODS = {
         "currency": "USD",
     },
     "KR": {
-        "version": "KR-FCF-PPE-1",
-        "fcf_formula": "TTM operating cash flow minus TTM purchases of property, plant and equipment",
-        "capex_basis": "OpenDART consolidated purchase of PPE; intangible acquisitions excluded",
+        "version": "KR-FCF-PPE-2",
+        "fcf_formula": "TTM operating cash flow minus TTM purchases of property, plant and equipment net of government grants received",
+        "capex_basis": "OpenDART consolidated purchase of PPE minus the separate government-grant line when a report presents it; intangible acquisitions excluded",
         "capex_field": "capex",
         "currency": "KRW",
     },

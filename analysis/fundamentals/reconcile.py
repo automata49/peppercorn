@@ -10,13 +10,16 @@ REFERENCE = json.loads(Path(__file__).with_name("official_reference_2025.json").
 
 
 def compare(result: dict, as_of: str | None = None) -> list[tuple[str, bool, str]]:
-    """Check every reference quarter filed on or before `as_of` (all when None)."""
+    """Check every reference quarter filed on or before `as_of` (all when None).
+
+    A quarter whose filing date was not captured (null) cannot be shown to precede `as_of`, so it is skipped then.
+    """
     expected = REFERENCE.get(result.get("ticker"))
     if not expected:
         return []
     outcome = []
     for ref in expected["periods"]:
-        if as_of is not None and ref["filed"] > as_of:
+        if as_of is not None and (ref["filed"] is None or ref["filed"] > as_of):
             continue
         period = ref["period_end"]
         row = result.get("quarters", {}).get(period)

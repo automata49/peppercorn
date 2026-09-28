@@ -36,6 +36,7 @@ STOCK = {
     "cash": (["ifrs-full_CashAndCashEquivalents"], ["현금및현금성자산"]),
     "short_term_investments": (["ifrs-full_ShortTermDepositsNotClassifiedAsCashEquivalents"], ["단기금융상품"]),
 }
+GRANT_NAME = "정부보조금의수취"
 DEBT_NAMES = {"단기차입금", "유동성장기부채", "유동성장기차입금", "유동성사채", "사채", "장기차입금"}
 
 
@@ -138,10 +139,20 @@ def parse(reports: list[dict]) -> dict:
                 val = _num(row.get("thstrm_amount"))
             if val is None:
                 continue
+            grant = None
             if field == "capex":
-                val = abs(val)
+                gross = abs(val)
+                # From FY2025 Samsung reports grants received on a separate investing line while the
+                # acquisition line turns gross; earlier reports netted them. Net both to one basis.
+                grant = _find(rows, ("CF",), [], [GRANT_NAME])
+                grant_amount = 0.0 if not grant else (_num(grant.get("thstrm_amount")) or 0.0)
+                val = gross - grant_amount
             durations[field][(start, end)] = val
-            duration_sources[field][(start, end)] = _input(rep, row, val, start, end)
+            source = _input(rep, row, val, start, end)
+            if grant:
+                source["gross_value"] = gross
+                source["government_grants"] = _input(rep, grant, grant_amount, start, end)
+            duration_sources[field][(start, end)] = source
         snap = stock.setdefault(end, {})
         for field, (ids, names) in STOCK.items():
             row = _find(rows, ("BS",), ids, names)
