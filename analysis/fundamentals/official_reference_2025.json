@@ -378,14 +378,16 @@
           "operating_income": "Q1 2026 income statement PDF p.8",
           "operating_cash_flow": "Q1 2026 cash flow PDF p.11",
           "capex": "PPE acquisition 17,127,003 minus separate government grants received 1,586,919 (net basis, KR-FCF-PPE-2)",
-          "cash": "Q1 2026 balance sheet PDF p.6"
+          "cash": "Q1 2026 balance sheet PDF p.6",
+          "debt": "PDF p.6: short-term 19,546,315 + current long-term 1,191,168 + bonds 7,515 + long-term 7,393,796"
         },
         "values": {
           "revenue": 133873444000000,
           "operating_income": 57232797000000,
           "operating_cash_flow": 40274106000000,
           "capex": 15540084000000,
-          "cash": 73306751000000
+          "cash": 73306751000000,
+          "debt": 28138794000000
         }
       },
       {
@@ -402,14 +404,16 @@
           "operating_income": "H1 income statement three months (89,492,412); H1 146,725,209 minus Q1 57,232,797 agrees",
           "operating_cash_flow": "H1 145,355,192 minus Q1 40,274,106",
           "capex": "H1 PPE acquisition 31,234,818 minus grants received 1,592,914, minus Q1 net 15,540,084 (net basis, KR-FCF-PPE-2)",
-          "cash": "H1 2026 balance sheet PDF p.6"
+          "cash": "H1 2026 balance sheet PDF p.6",
+          "debt": "PDF p.6: short-term 13,710,121 + current long-term 1,205,829 + bonds 7,668 + long-term 7,485,103"
         },
         "values": {
           "revenue": 171499470000000,
           "operating_income": 89492412000000,
           "operating_cash_flow": 105081086000000,
           "capex": 14101820000000,
-          "cash": 92916382000000
+          "cash": 92916382000000,
+          "debt": 22408721000000
         }
       }
     ]
