@@ -1,0 +1,4 @@
+{
+  "writable": ["fundamentals_q", "position_snapshot", "valuation_scenarios", "industry_kpis", "filings", "ai_runs"],
+  "protected": ["price_daily", "market_metrics", "stock_analyses", "watchlist", "portfolio_positions", "user_thresholds", "theses", "thesis_breaks"]
+}

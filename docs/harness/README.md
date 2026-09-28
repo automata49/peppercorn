@@ -6,6 +6,8 @@ Run `npm ci`, then `npm run harness:check`. For UI work, run `npm run build` and
 
 Claude Code reads CLAUDE.md; Codex reads AGENTS.md. Both lead to CONTRACT.md. Canonical skills are in harness/skills; `npm run harness:sync` generates .claude/skills, .agents/skills and plugin copies. CI rejects drift.
 
+For Position Growth, read `POSITION_GROWTH.md` before changing collection, valuation, labels, UI, or thesis. It maps the supplied requirements to the current app and lists phase-by-phase acceptance checks. `npm run harness:check` also validates Position AI evidence fixtures and allowed database write targets; these offline checks do not activate a Position pipeline.
+
 Default division: Claude plans/refactors, Codex implements/tests, then the other reviews only the diff and acceptance criteria. Reverse when useful. Avoid two simultaneous writers on the same branch/files. Reviewer definitions are in .claude/agents (Markdown) and .codex/agents (TOML); model selection inherits the user's client configuration, with no hard-coded paid model.
 
 ## Hooks and permissions
