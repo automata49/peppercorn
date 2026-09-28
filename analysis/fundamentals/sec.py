@@ -52,39 +52,35 @@ def fetch(cik: int) -> dict:
     return r.json()
 
 
-def _entries(facts: dict, tag: str) -> list[dict]:
+def _entries(facts: dict, tag: str, unit: str = "USD") -> list[dict]:
     node = facts.get("facts", {}).get("us-gaap", {}).get(tag)
     if not node:
         return []
-    unit = next(iter(node["units"].values()))
-    return [f for f in unit if f.get("form") in FORMS]
+    return [f for f in node.get("units", {}).get(unit, []) if f.get("form") in FORMS]
 
 
-def _pick_tag(facts: dict, tags: list[str]) -> tuple[str | None, list[dict]]:
-    best = (None, [])
-    for t in tags:
-        rows = _entries(facts, t)
-        if rows and (not best[1] or max(r["end"] for r in rows) > max(r["end"] for r in best[1])):
-            best = (t, rows)
-    return best
+def _latest_rows(facts: dict, tags: list[str], unit: str) -> dict[tuple[str, str], tuple[str, dict]]:
+    """Select latest amendment for each span, retaining historical tag changes."""
+    selected = {}
+    for tag in tags:
+        for row in _entries(facts, tag, unit):
+            if "start" not in row:
+                continue
+            span = (row["start"], row["end"])
+            prior = selected.get(span)
+            if prior is None or row.get("filed", "") > prior[1].get("filed", ""):
+                selected[span] = (tag, row)
+    return selected
 
 
 def parse(facts: dict) -> dict:
     """→ {"quarters": {종료일: {항목: 값}}, "tags": {항목: 사용한 태그}}"""
     table: dict[str, dict[str, float]] = {}
     used: dict[str, str | None] = {}
+    tag_by_period: dict[str, dict[str, str]] = {}
     for field, tags in DURATION_TAGS.items():
-        tag, rows = _pick_tag(facts, tags)
-        used[field] = tag
-        durations: dict[tuple[str, str], tuple[str, float]] = {}
-        for r in rows:
-            if "start" not in r:
-                continue
-            key = (r["start"], r["end"])
-            # 정정 공시가 있으면 가장 늦게 제출된 값 사용
-            if key not in durations or r["filed"] > durations[key][0]:
-                durations[key] = (r["filed"], r["val"])
-        vals = {k: v for k, (_, v) in durations.items()}
+        selected = _latest_rows(facts, tags, "shares" if field == "diluted_shares" else "USD")
+        vals = {span: row["val"] for span, (_, row) in selected.items()}
         if field == "diluted_shares":
             # 주식수는 합산값이 아니라 평균값이므로 빼기 계산을 하지 않는다
             q = {e: v for (s, e), v in vals.items() if is_quarter(s, e)}
@@ -92,6 +88,13 @@ def parse(facts: dict) -> dict:
             q = derive_quarters(vals)
         for end, v in q.items():
             table.setdefault(end, {})[field] = v
+            # A derived quarter may use multiple source spans. Record every tag
+            # at this end; full per-field input lineage is required before DB writes.
+            matching = [(tag, row) for (_, e), (tag, row) in selected.items() if e == end]
+            if matching:
+                tag_by_period.setdefault(end, {})[field] = max(matching, key=lambda hit: hit[1].get("filed", ""))[0]
+        recent = max(q) if q else None
+        used[field] = tag_by_period.get(recent, {}).get(field) if recent else None
     # 재무상태표 항목: 날짜마다 후보 태그를 순서대로 확인 (회사가 중간에 태그를 바꿔도 이어지도록)
     all_tags = facts.get("facts", {}).get("us-gaap", {})
     for field, tags in INSTANT_TAGS.items():
@@ -119,14 +122,19 @@ def parse(facts: dict) -> dict:
             for t in sorted(all_tags):
                 if t in tags or not pat.search(t):
                     continue
-                vals = {r["end"]: r["val"] for r in _entries(facts, t) if "start" not in r}
+                vals = {}
+                for r in _entries(facts, t):
+                    if "start" not in r and (r["end"] not in vals or r.get("filed", "") > vals[r["end"]].get("filed", "")):
+                        vals[r["end"]] = r
                 if latest_end in vals:
                     for end, row in table.items():
                         if end not in hits and end in vals:
-                            row[field] = vals[end]
+                            row[field] = vals[end]["val"]
                             hits[end] = t
                     break
         used[field] = hits.get(latest_end) if latest_end else None
+        for end, tag in hits.items():
+            tag_by_period.setdefault(end, {})[field] = tag
         if field == "debt":
             # LongTermDebt 는 유동성 부분까지 포함한 총액 → 유동성 부분을 또 더하면 이중 계산
             for end, t in hits.items():
@@ -135,5 +143,10 @@ def parse(facts: dict) -> dict:
     for row in table.values():
         if row.pop("_debt_total", False):
             row.pop("debt_current", None)
+    # A noncurrent-only debt tag does not establish that the current portion is zero.
+    for end, row in table.items():
+        if tag_by_period.get(end, {}).get("debt") == "LongTermDebtNoncurrent" and row.get("debt_current") is None:
+            row.pop("debt", None)
     table = {k: v for k, v in table.items() if "revenue" in v}
-    return {"quarters": dict(sorted(table.items())), "tags": used, "entity": facts.get("entityName")}
+    return {"quarters": dict(sorted(table.items())), "tags": used, "tag_by_period": tag_by_period,
+            "entity": facts.get("entityName")}

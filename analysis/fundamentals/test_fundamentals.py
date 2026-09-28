@@ -5,6 +5,7 @@ from datetime import date
 
 import dart
 import metrics
+import reconcile
 import sec
 from quarters import derive_quarters
 
@@ -65,6 +66,41 @@ def test_sec_instant_tag_switch_and_debt_total():
     assert "debt_current" not in q["2025-10-26"]      # 총액 태그라 유동성 부분 중복 제외
 
 
+def test_sec_preserves_history_across_duration_tags_and_uses_explicit_units():
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"EUR": [_sec_fact("2025-01-01", "2025-03-31", 999)],
+                                "USD": [_sec_fact("2025-01-01", "2025-03-31", 10)]}},
+        "RevenueFromContractWithCustomerExcludingAssessedTax": {"units": {"USD": [
+            _sec_fact("2025-04-01", "2025-06-30", 20)]}},
+        "WeightedAverageNumberOfDilutedSharesOutstanding": {"units": {"USD": [
+            _sec_fact("2025-01-01", "2025-03-31", 100)],
+            "shares": [_sec_fact("2025-01-01", "2025-03-31", 1000)]}},
+    }}}
+    parsed = sec.parse(facts)
+    assert parsed["quarters"]["2025-03-31"]["revenue"] == 10
+    assert parsed["quarters"]["2025-06-30"]["revenue"] == 20
+    assert parsed["quarters"]["2025-03-31"]["diluted_shares"] == 1000
+    assert parsed["tag_by_period"]["2025-03-31"]["revenue"] == "Revenues"
+    assert parsed["tag_by_period"]["2025-06-30"]["revenue"] == "RevenueFromContractWithCustomerExcludingAssessedTax"
+
+
+def test_sec_amendment_selects_latest_per_span():
+    old = _sec_fact("2025-01-01", "2025-03-31", 10, filed="2025-05-01")
+    new = _sec_fact("2025-01-01", "2025-03-31", 12, form="10-Q/A", filed="2025-06-01")
+    facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [old, new]}}}}}
+    assert sec.parse(facts)["quarters"]["2025-03-31"]["revenue"] == 12
+
+
+def test_sec_noncurrent_debt_without_current_portion_is_unknown():
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": [_sec_fact("2025-01-01", "2025-03-31", 100)]}},
+        "LongTermDebtNoncurrent": {"units": {"USD": [_sec_fact(None, "2025-03-31", 20)]}},
+    }}}
+    assert "debt" not in sec.parse(facts)["quarters"]["2025-03-31"]
+    facts["facts"]["us-gaap"]["LongTermDebtCurrent"] = {"units": {"USD": [_sec_fact(None, "2025-03-31", 0)]}}
+    assert sec.parse(facts)["quarters"]["2025-03-31"]["debt"] == 20
+
+
 def _row(sj, aid, nm, amt, add=None):
     return {"sj_div": sj, "account_id": aid, "account_nm": nm, "thstrm_amount": str(amt),
             "thstrm_add_amount": "" if add is None else str(add)}
@@ -92,12 +128,32 @@ def test_dart_parse_cumulative():
     assert q["2025-03-31"]["debt"] == 10
 
 
+def test_dart_missing_or_nested_debt_does_not_create_false_zero_or_double_count():
+    base = [_row("IS", "ifrs-full_Revenue", "매출액", 100, 100)]
+    empty = dart.parse([{"year": 2025, "reprt_code": "11013", "rows": base}])["quarters"]["2025-03-31"]
+    assert "debt" not in empty
+    rows = base + [_row("BS", "x", "단기차입금", 5),
+                   _row("BS", "x", "유동성장기부채", 10),
+                   _row("BS", "x", "유동성장기차입금", 8),
+                   _row("BS", "x", "유동성사채", 2),
+                   _row("BS", "x", "장기차입금", 20)]
+    nested = dart.parse([{"year": 2025, "reprt_code": "11013", "rows": rows}])["quarters"]["2025-03-31"]
+    assert nested["debt"] == 35
+    blank = base + [_row("BS", "x", "단기차입금", "-")]
+    assert "debt" not in dart.parse([{"year": 2025, "reprt_code": "11013", "rows": blank}])["quarters"]["2025-03-31"]
+    following = base + [_row("BS", "x", "단기차입금", 5)]
+    reports = [{"year": 2025, "reprt_code": "11013", "rows": rows},
+               {"year": 2025, "reprt_code": "11012", "rows": following}]
+    assert "debt" not in dart.parse(reports)["quarters"]["2025-06-30"]
+
+
 def test_metrics_and_checks():
     q = {}
     ends = ["2024-03-31", "2024-06-30", "2024-09-30", "2024-12-31", "2025-03-31", "2025-06-30", "2025-09-30", "2025-12-31"]
     for i, e in enumerate(ends):
         q[e] = {"revenue": 100 + 10 * i, "operating_income": 30 + 5 * i, "net_income": 25, "operating_cash_flow": 35,
-                "capex": 5, "equity": 500 + 20 * i, "cash": 100, "debt": 50, "gross_profit": 60 + 5 * i}
+                "capex": 5, "equity": 500 + 20 * i, "cash": 100, "short_term_investments": 0,
+                "debt": 50, "gross_profit": 60 + 5 * i}
     m = metrics.compute(q, 0.21)
     assert round(m["fcf_margin"], 4) == round(120 / sum(100 + 10 * i for i in range(4, 8)), 4)
     assert m["roic"] and m["roic"] > 0
@@ -132,6 +188,18 @@ def test_missing_sbc_is_unknown_not_zero():
     assert metrics.compute(q, .21)['owner_earnings'] == 100
 
 
+def test_missing_balance_sheet_fields_suppress_roic_and_net_debt():
+    q = {e: {'revenue': 100, 'operating_income': 20, 'net_income': 10,
+             'operating_cash_flow': 30, 'capex': 5, 'equity': 100, 'cash': 30,
+             'short_term_investments': 10, 'debt': 20}
+         for e in ['2024-12-31', '2025-03-31', '2025-06-30', '2025-09-30', '2025-12-31']}
+    m = metrics.compute(q, .21)
+    assert m['roic'] is not None and m['net_debt'] == -20
+    del q['2025-12-31']['debt']
+    m = metrics.compute(q, .21)
+    assert m['roic'] is None and m['net_debt'] is None
+
+
 def test_missing_latest_revenue_does_not_crash_growth():
     q = {e: {'revenue': 100} for e in ['2024-12-31', '2025-03-31', '2025-06-30', '2025-09-30', '2025-12-31']}
     q['2025-12-31'] = {}
@@ -143,6 +211,29 @@ def test_checks_reject_future_date_and_null_required():
     result = {name: passed for name, passed, _ in metrics.checks(q, {}, date(2026, 9, 28))}
     assert result['최신성'] is False
     assert result['필수 항목'] is False
+
+
+def test_official_reference_rejects_changed_value_and_missing_period():
+    expected = reconcile.REFERENCE['NVDA']
+    result = {'ticker': 'NVDA', 'quarters': {expected['period_end']: dict(expected['values'])}}
+    assert all(ok for _, ok, _ in reconcile.compare(result))
+    result['quarters'][expected['period_end']]['operating_cash_flow'] += 1_000_000
+    assert not all(ok for _, ok, _ in reconcile.compare(result))
+    assert not reconcile.compare({'ticker': 'NVDA', 'quarters': {}})[0][1]
+
+
+def test_reconcile_cli_rejects_mislabeled_artifact(tmp_path):
+    import json
+    import subprocess
+    import sys
+    script = reconcile.__file__
+    for ticker, expected in reconcile.REFERENCE.items():
+        (tmp_path / f'{ticker}.json').write_text(json.dumps({
+            'ticker': 'NVDA', 'currency': expected['currency'],
+            'quarters': {expected['period_end']: dict(expected['values'])}}), encoding='utf-8')
+    result = subprocess.run([sys.executable, script, str(tmp_path)], capture_output=True, text=True)
+    assert result.returncode == 1
+    assert '005930: artifact identity' in result.stdout
 
 
 if __name__ == "__main__":

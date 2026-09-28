@@ -83,6 +83,7 @@ def _find(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str
 def parse(reports: list[dict]) -> dict:
     durations: dict[str, dict[tuple[str, str], float]] = {f: {} for f in FLOW}
     stock: dict[str, dict[str, float]] = {}
+    debt_names_by_end: dict[str, set[str]] = {}
     for rep in reports:
         y, rows = rep["year"], rep["rows"]
         start, end = f"{y}-01-01", f"{y}-{REPORTS[rep['reprt_code']]}"
@@ -105,9 +106,36 @@ def parse(reports: list[dict]) -> dict:
             row = _find(rows, ("BS",), ids, names)
             if row and _num(row.get("thstrm_amount")) is not None:
                 snap[field] = _num(row["thstrm_amount"])
-        debt = [_num(r.get("thstrm_amount")) for r in rows
-                if r.get("sj_div") == "BS" and (r.get("account_nm") or "").replace(" ", "") in DEBT_NAMES]
-        snap["debt"] = sum(d for d in debt if d is not None)
+        debt_rows = [r for r in rows if r.get("sj_div") == "BS"
+                     and (r.get("account_nm") or "").replace(" ", "") in DEBT_NAMES]
+        debt_by_name = {}
+        ambiguous = False
+        for row in debt_rows:
+            name = (row.get("account_nm") or "").replace(" ", "")
+            amount = _num(row.get("thstrm_amount"))
+            if amount is None:
+                ambiguous = True
+                continue
+            if name in debt_by_name and debt_by_name[name] != amount:
+                ambiguous = True
+            debt_by_name[name] = amount
+        # The balance sheet's current portion already contains its loan/bond
+        # breakdown. Do not add both the parent and its components.
+        if "유동성장기부채" in debt_by_name:
+            debt_by_name.pop("유동성장기차입금", None)
+            debt_by_name.pop("유동성사채", None)
+        debt_names_by_end[end] = set(debt_by_name)
+        if debt_by_name and not ambiguous:
+            snap["debt"] = sum(debt_by_name.values())
+
+    previous_names: set[str] = set()
+    for end in sorted(stock):
+        names = debt_names_by_end[end]
+        # A line that disappears can be a tag/account migration; do not assume zero.
+        if previous_names - names:
+            stock[end].pop("debt", None)
+        if names:
+            previous_names = names
 
     table: dict[str, dict[str, float]] = {}
     for field, d in durations.items():

@@ -1,0 +1,48 @@
+{
+  "NVDA": {
+    "period_end": "2025-07-27",
+    "currency": "USD",
+    "source": "SEC 10-Q, accession 0001045810-25-000209, filed 2025-08-27; Q1 10-Q accession 0001045810-25-000116, filed 2025-05-28",
+    "urls": [
+      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
+      "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000116/nvda-20250427.htm"
+    ],
+    "methods": {
+      "revenue": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+      "operating_income": "Q2 10-Q three months ended July 27, 2025; USD millions times 1e6",
+      "operating_cash_flow": "Q2 six months 42,779 minus Q1 three months 27,414; USD millions times 1e6",
+      "capex": "Q2 six months 3,122 minus Q1 three months 1,227, purchases related to PPE and intangibles; USD millions times 1e6"
+    },
+    "values": {
+      "revenue": 46743000000,
+      "operating_income": 28440000000,
+      "operating_cash_flow": 15365000000,
+      "capex": 1895000000
+    }
+  },
+  "005930": {
+    "period_end": "2025-03-31",
+    "currency": "KRW",
+    "source": "Samsung Electronics consolidated Q1 statements, DART report 20250515001922, filed 2025-05-15; KRW millions times 1e6",
+    "urls": [
+      "https://images.samsung.com/kdp/ir/financial-info/2025/2025_con_quarter01_all.pdf",
+      "https://opendart.fss.or.kr/xbrl/viewer/main.do?rcpNo=20250515001922"
+    ],
+    "methods": {
+      "revenue": "Consolidated income statement page 7",
+      "operating_income": "Consolidated income statement page 7",
+      "operating_cash_flow": "Consolidated cash flow statement page 10",
+      "capex": "Consolidated cash flow statement page 10, PPE purchases only; intangible purchases 1,257,544 KRW millions excluded",
+      "cash": "Consolidated balance sheet page 5",
+      "debt": "Balance sheet pages 5-6: short-term 5,333,859 + current long-term 2,035,992 + bonds 14,518 + long-term 3,759,579 KRW millions"
+    },
+    "values": {
+      "revenue": 79140503000000,
+      "operating_income": 6685272000000,
+      "operating_cash_flow": 16580866000000,
+      "capex": 12127934000000,
+      "cash": 53161004000000,
+      "debt": 11143948000000
+    }
+  }
+}
