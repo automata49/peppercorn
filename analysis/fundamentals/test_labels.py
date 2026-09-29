@@ -328,6 +328,8 @@ def test_backtest_universe_and_dates_are_fixed_and_disjoint():
     assert len(tickers) == len(set(tickers)) == 114
     b = backtest.tickers("B")
     assert len(b) == len(set(b)) == 118 and not set(b) & set(tickers)
+    c = backtest.tickers("C")
+    assert len(c) == len(set(c)) == 106 and not set(c) & (set(tickers) | set(b))
     assert not set(backtest.AS_OF) & set(backtest.HOLDOUT) and max(backtest.HOLDOUT) < min(backtest.AS_OF)
 
 
@@ -358,3 +360,41 @@ def test_v12_differs_from_v11_only_in_version_and_gate_notes():
     notes = {"version", "active", "active_note", "supersedes"}
     assert {k: v for k, v in v11.items() if k not in notes} == {k: v for k, v in v12.items() if k not in notes}
     assert v12["active"] is False
+
+
+V2 = labels.load_rules("position-rules-v2")
+
+
+def test_v2_changes_only_value_names_and_test():
+    v12 = labels.load_rules("position-rules-v1.2")
+    notes = {"version", "active", "active_note", "supersedes", "value"}
+    assert {k: v for k, v in v12.items() if k not in notes} == {k: v for k, v in V2.items() if k not in notes}
+    same = {k: v for k, v in v12["value"].items() if k not in ("labels", "labels_rule")}
+    assert all(V2["value"][k] == v for k, v in same.items()) and V2["active"] is False
+
+
+def test_v2_value_labels_are_expectations_not_buy_signals():
+    v, f = V2["value"], feats(ttm_fcf=12.0, ttm_sbc=2.0, revenue_cagr_3y=0.10, net_debt=0.0)
+    assert labels.classify_value(f, "Stalwart", price_for(labels.dcf(10.0, 0.05, v, R)), V2)[0] == "Undemanding"
+    assert labels.classify_value(f, "Stalwart", price_for(labels.dcf(10.0, 0.10, v, R)), V2)[0] == "Reasonable"
+    assert labels.classify_value(f, "Stalwart", price_for(labels.dcf(10.0, 0.151, v, R)), V2)[0] == "Demanding"
+    assert not {"Attractive", "Expensive", "Fair"} & set(v["labels"])
+
+
+def test_expectations_gate_needs_order_and_majorities():
+    import backtest
+
+    def rows(shares):
+        out = []
+        for label, share in zip(("Undemanding", "Reasonable", "Demanding"), shares):
+            for i in range(20):
+                met = i < share * 20
+                out.append({"ticker": f"{label}{i}", "as_of": "2019-06-30", "status": "ok",
+                            "labels": {"type": "Stalwart", "quality": "High", "growth": "Durable", "value": label},
+                            "outcomes": {"fwd_revenue_cagr": 0.10 if met else 0.0, "fwd_return": 0.1,
+                                         "fwd_roic": 0.2, "fwd_revenue_drawdown": 0.0},
+                            "value_detail": {"implied_growth": 0.05}})
+        return out
+    assert backtest.summarize(rows((0.8, 0.5, 0.2)), V2)["value_expectations_pass"] is True
+    assert backtest.summarize(rows((0.45, 0.4, 0.2)), V2)["value_expectations_pass"] is False   # Undemanding not a majority
+    assert backtest.summarize(rows((0.8, 0.5, 0.55)), V2)["value_expectations_pass"] is False   # Demanding a majority

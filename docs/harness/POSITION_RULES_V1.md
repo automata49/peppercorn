@@ -116,3 +116,22 @@ Value, informational (realized growth reached implied): 76% / 38% / 17% (2018–
 - Value's return ordering held in one of four tests. Attractive beat Fair on forward returns only in universe A 2018–2022. What held in all four is the claim the label actually computes: realized growth reached the price-implied growth far more often for Attractive (69–90%) than Fair (38–69%) or Expensive (10–24%). As a forecast of excess returns the label is not supported.
 
 Consequence. Because the contract requires all four labels together, no rule version can be activated while Value fails. Every sample prepared so far (both universes, both periods) has now been used; a revised Value definition — for example one judged on implied versus realized growth instead of returns — needs its claim, gate and fresh data (a third universe or matured post-2022 dates) fixed before it runs.
+
+## position-rules-v2: Value as an expectations label (pre-registered 2026-09-30, before any run on universe C)
+
+Decision (user, 2026-09-30): Value is redefined as what it computes — how much growth today's price requires relative to the company's own record — not as a forecast of returns.
+
+Change from v1.2, and nothing else: Value labels are renamed Undemanding / Reasonable / Demanding / Speculative (same DCF, discount rate, bear/base/bull and thresholds as v1.2), and Value's acceptance test is replaced. Type, Quality and Growth rules and their tests are unchanged.
+
+Sample: `UNIVERSE_C` in `backtest.py`, 106 US non-financial companies in neither earlier universe, still listed, same exclusions, fixed before any run on them. All 17 half-year dates (2014-06-30 … 2022-06-30) are pooled, because both earlier 2014–2017 Quality failures came from a Low group of 5 observations.
+
+Activation requires all of, on that pooled sample:
+
+- A1 Quality, A2 Growth, A4 Type, A5 Coverage: unchanged definitions.
+- A3′ Value expectations: the share of observations whose realized 3-year forward revenue CAGR reached the price-implied growth is strictly ordered Undemanding > Reasonable > Demanding, each group n ≥ 10, with Undemanding above 50% and Demanding below 50% (the label points the right way more often than not in both directions).
+
+Limitation stated in advance: implied growth is for owner earnings (FCF minus SBC) and is compared with realized revenue growth, a proxy; base growth comes from past revenue growth, so the test partly reflects growth persistence. Forward excess returns stay in the report as information only. Per-period results are reported but not gated.
+
+## Result of position-rules-v2
+
+Pending the run recorded below.
