@@ -159,3 +159,19 @@ Reading. The redefined Value claim held on a third, untouched universe in both p
 | Value expectations (v2 A3′ definition) | 69/51/14 | 90/69/24 | 76/38/17 | 71/51/10 | 71/44/26 |
 
 No rule version has passed a full pre-registered gate. All remain `"active": false`, and no Position label may be written or shown.
+
+## Walk-forward improvement (from 2026-09-30)
+
+Decision (user, 2026-09-30): rules cannot be perfect, so they improve continuously on post-2022 outcomes as they mature, with minimal model-token use. Implementation: `analysis/fundamentals/forward.py`, monthly workflow `.github/workflows/position-forward.yml`, ledger on the `position-ledger` branch (runs from other branches write `position-ledger-test`). No LLM is called; a person or assistant is involved only when the workflow opens a review issue.
+
+Protocol, fixed before the first step:
+
+- Universe: the 338 companies of universes A, B and C. Label dates: every quarter end from 2023-03-31 up to the run date, using only filings up to that date.
+- Outcome harness v2: forward ROIC now applies the same `not_presented` convention as the labels (v1 dropped companies without a debt or short-term investment line, which shrank the Quality groups). For information only, not as validation: re-running v2 on universe C with harness v2 gave Quality groups of 160 / 177 / 125 (A1 ordered), Growth and Type still failed.
+- Seal: each candidate's labels per date are written once to `predictions/<candidate>/<date>.json` and never rewritten; git history on the ledger branch shows when.
+- Maturity: a date's 3-year outcome counts from date + 3 years + 120 days. A candidate is evaluated only on dates that matured after it was frozen. The first forward outcome matures on 2026-10-28 (the 2023-06-30 labels).
+- Gate: the same A1–A5 as the v2 gate (A3 = expectations) on the pooled forward dates. With at least 4 forward dates, a failing candidate is retired; a passing one is reported as ready for review and an issue is opened. Nothing is activated automatically.
+- Improvement: when fewer than 6 candidates are live, the best candidate by fitness on already-matured history (2014–2022 backtest dates plus matured forward dates) is mutated one grid step per parameter (`MUTATION_SPACE`); up to 2 neighbours that score at least as well are frozen. Fitness = acceptance criteria passed + a bounded separation margin + a small type-stability term. Only thresholds in the grid change; the rule structure, windows, SIC industries and data rules do not.
+- Seed: `position-rules-v2` as candidate `wf-…` (its id is a hash of the rule content).
+
+Limits stated in advance: several candidates are tested on the same forward dates, so a pass is weaker evidence than a single pre-registered test; the review should weigh how many candidates were live. Forward dates overlap (quarterly labels, 3-year outcomes), so consecutive dates are not independent. The earliest possible review is after 2024-03-31 matures (2027-07-29), later for candidates frozen afterwards.

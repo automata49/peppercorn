@@ -76,6 +76,7 @@ UNIVERSE_C = {
     "media": ["FOXA", "NWSA", "WBD", "OMC", "LYV", "MTCH", "IPG"],
 }
 UNIVERSES = {"A": UNIVERSE, "B": UNIVERSE_B, "C": UNIVERSE_C}
+UNIVERSES["ALL"] = {f"{name}:{group}": members for name in ("A", "B", "C") for group, members in UNIVERSES[name].items()}
 CIK_OVERRIDE = {"XOM": 34088}
 AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "2020-12-31",
          "2021-06-30", "2021-12-31", "2022-06-30"]
@@ -83,6 +84,8 @@ AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "
 HOLDOUT = ["2014-06-30", "2014-12-31", "2015-06-30", "2015-12-31", "2016-06-30", "2016-12-31",
            "2017-06-30", "2017-12-31"]
 HORIZON_YEARS = 3
+# 1: forward ROIC ignored not_presented (runs up to 2026-09-30). 2: forward ROIC uses it, like the labels.
+OUTCOME_HARNESS = 2
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
 
@@ -137,15 +140,21 @@ def _upto(q: dict, end: str) -> dict:
     return {k: v for k, v in q.items() if k <= end}
 
 
-def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_method: dict) -> dict:
-    """Forward outcomes measured on today's data, starting at the as-of date's latest quarter."""
+def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_method: dict, facts: dict | None = None) -> dict:
+    """Forward outcomes measured on today's data, starting at the as-of date's latest quarter.
+
+    Forward ROIC applies the same not-presented convention as the labels (outcome harness v2); without `facts`
+    it falls back to harness v1, where a company with no debt line had no forward ROIC."""
     ends = sorted(full)
     if start_quarter not in ends:
         return {}
     i = ends.index(start_quarter)
     fwd = [ends[i + n] if i + n < len(ends) else None for n in (4, 8, 12)]
     out: dict = {}
-    roics = [metrics.compute(_upto(full, e), methods.statutory_tax_rate("US", int(e[:4])), roic_method).get("roic")
+
+    def absent(e):
+        return sec.not_presented_at(facts, ends[max(0, ends.index(e) - 7):ends.index(e) + 1]) if facts else ()
+    roics = [metrics.compute(_upto(full, e), methods.statutory_tax_rate("US", int(e[:4])), roic_method, absent(e)).get("roic")
              for e in fwd if e]
     roics = [r for r in roics if r is not None]
     out["fwd_roic"] = statistics.mean(roics) if len(roics) == 3 else None
@@ -158,11 +167,14 @@ def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_metho
     return out
 
 
-def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF, universe: str = "A") -> dict:
+def build_panel(cache: Path, ticker_list: list[str], dates: list[str], rules: dict) -> list[dict]:
+    """Features, price basis and forward outcomes per (company, date); labels are decided later per rule set.
+
+    Only `rules["window"]` affects the panel, so every candidate sharing that window can reuse it."""
     method = methods.for_market("US")["roic"]
     tnx = json.loads((cache / "prices" / "_risk_free.json").read_text(encoding="utf-8"))
     rows = []
-    for ticker in tickers(universe):
+    for ticker in ticker_list:
         if not (cache / "sec" / f"{ticker}.json.gz").exists():
             rows.append({"ticker": ticker, "error": "not fetched"})
             continue
@@ -183,22 +195,39 @@ def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF, unive
             tax = methods.statutory_tax_rate("US", int(latest[:4]))
             absent = parsed.get("not_presented", [])
             m = metrics.compute(q, tax, method, absent)
-            failed = [c[0] for c in metrics.checks(q, m, date.fromisoformat(as_of)) if not c[1]]
-            result = labels.evaluate(q, "US", None, rules, tax, method, absent, profile)
-            share_end = result["features"].get("shares_quarter")
+            f, missing = labels.features(q, rules, tax, method, absent)
+            price = None
+            share_end = f.get("shares_quarter")
             if share_end:
                 share_input = (parsed["source_lineage"].get(share_end, {}).get("diluted_shares") or {}).get("inputs") or [{}]
                 price = prices.market_cap(quote, as_of, q[share_end]["diluted_shares"], share_input[0].get("filed"))
                 if price:
                     price["risk_free"] = prices.risk_free_on(tnx, as_of)
-                result = labels.evaluate(q, "US", price, rules, tax, method, absent, profile)
-            row |= {"status": "check_failed" if failed else result["status"], "failed_checks": failed,
-                    "labels": result["labels"] if not failed else {}, "missing": result["missing"],
-                    "features": result["features"], "value_detail": result["value_detail"],
-                    "reasons": result["reasons"] if not failed else {}}
-            row["outcomes"] = outcomes(full, latest, as_of, quote, method)
+            row |= {"status": "panel", "failed_checks": [c[0] for c in metrics.checks(q, m, date.fromisoformat(as_of)) if not c[1]],
+                    "features": f, "missing": missing, "price": price, "industry": profile,
+                    "outcomes": outcomes(full, latest, as_of, quote, method, facts if OUTCOME_HARNESS >= 2 else None)}
             rows.append(row)
-        print(ticker, sum(1 for r in rows if r["ticker"] == ticker and r.get("status") == "ok"), "labelled")
+    return rows
+
+
+def label_panel(panel: list[dict], rules: dict) -> list[dict]:
+    """Rows in the shape `summarize` reads: a collector check failure suppresses every label."""
+    out = []
+    for row in panel:
+        if row.get("status") != "panel":
+            out.append(row)
+            continue
+        result = labels.decide(row["features"], row["missing"], row["price"], rules, row["industry"])
+        failed = row["failed_checks"]
+        out.append({**{k: v for k, v in row.items() if k not in ("price", "industry")},
+                    "status": "check_failed" if failed else result["status"],
+                    "labels": {} if failed else result["labels"], "reasons": {} if failed else result["reasons"],
+                    "missing": result["missing"], "value_detail": result["value_detail"]})
+    return out
+
+
+def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF, universe: str = "A") -> dict:
+    rows = label_panel(build_panel(cache, tickers(universe), dates, rules), rules)
     report = summarize(rows, rules)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "rows.json").write_text(json.dumps(rows, indent=1, default=str), encoding="utf-8")

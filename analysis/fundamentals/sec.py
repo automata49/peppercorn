@@ -251,8 +251,7 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
         if row.pop("_debt_total", False):
             row.pop("debt_current", None)
     recent_ends = sorted(table)[-NOT_PRESENTED_QUARTERS:]
-    not_presented = [field for field in PRESENTABLE if len(recent_ends) == NOT_PRESENTED_QUARTERS
-                     and not _presented_at(facts, field, set(recent_ends), as_of)]
+    not_presented = not_presented_at(facts, recent_ends, as_of)
     # A noncurrent-only debt tag does not establish that the current portion is zero, unless no current-portion
     # concept has appeared for the last NOT_PRESENTED_QUARTERS quarters.
     for end, row in table.items():
@@ -277,6 +276,13 @@ _STI_PATTERN = re.compile(r"(MarketableSecurities|ShortTermInvestments|Available
 _DEBT_PATTERN = re.compile(r"(Debt|Borrowing|NotesPayable|CommercialPaper|ConvertibleNotes|SeniorNotes)")
 _NOT_DEBT = re.compile(r"(Securit|Investment|Receivable|Forgiveness|Extinguishment|OtherThan)")
 _CURRENT_DEBT_PATTERN = re.compile(r"((Debt|Borrowing|NotesPayable|Notes|Obligations)\w*Current|ShortTermBorrowings|CommercialPaper)$")
+
+
+def not_presented_at(facts: dict, ends: list[str], as_of: str | None = None) -> list[str]:
+    """PRESENTABLE lines with no candidate concept at any of `ends` (which must be NOT_PRESENTED_QUARTERS long)."""
+    if len(ends) != NOT_PRESENTED_QUARTERS:
+        return []
+    return [field for field in PRESENTABLE if not _presented_at(facts, field, set(ends), as_of)]
 
 
 def _presented_at(facts: dict, field: str, ends: set[str], as_of: str | None) -> bool:
