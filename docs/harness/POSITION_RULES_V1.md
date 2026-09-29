@@ -46,6 +46,33 @@ The share of observations whose realized growth reached the price-implied growth
 
 History. The first full run (fixed 9% discount rate, drawdown-based cyclicals) is recorded here because it motivated two design changes made before this gate was set: Quality and Growth were ordered, Type passed its drawdown test but classified KO, PG, ABT, DHR (divestitures), MSFT (impairment) and ADBE (subscription transition) as cyclical, and Value was not ordered (Attractive +0.5%, Fair +6.1%, Expensive −2.5%) with 59% of observations Expensive under a 9% rate that ignored 2018–2022 yields. The changes: cyclicals by SIC industry (Lynch's definition) with drawdowns kept as evidence, and a point-in-time discount rate. Thresholds were not tuned to returns.
 
-## Result
+## Result of position-rules-v1 (run 36574949420, commit 952d635)
+
+386 of 1,018 observations labelled across 60 companies. Activation: **no**.
+
+| Test | Result |
+|---|---|
+| A1 Quality, forward ROIC | pass: High 40.4% (n 116) > Average 14.4% (39) > Low 6.6% (22) |
+| A2 Growth, forward revenue CAGR | **fail**: Durable 9.3% (205) > Moderate 5.1% (110), but Weak 5.2% (71) |
+| A3 Value, forward excess return | pass: Attractive +5.5% (74) > Fair +2.3% (134) > Expensive −4.0% (159) |
+| A4 Type | pass: Cyclical forward drawdown 12.3% vs 2.5%; stability 88% |
+| A5 Coverage | pass: 60 companies |
+
+Value, informational: realized growth reached the implied growth in 69% of Attractive, 51% of Fair and 14% of Expensive observations.
+
+Diagnosis. v1 made growth Weak whenever the latest TTM change was negative. Many such observations were 2020 shocks (for example SBUX, MCD, BKNG) that rebounded, so Weak and Moderate had the same forward growth.
+
+## position-rules-v1.1 (pre-registered before any v1.1 run)
+
+Single change: Weak requires sustained weakness — 3-year TTM revenue CAGR below 0%, or fewer than 50% of the last 12 TTM changes positive. A negative latest change still prevents Durable. Every other rule and threshold is identical to v1. `position-rules-v1` stays in the repository as the failed candidate.
+
+Because this change was informed by the in-sample result, v1.1 is activated only if A1–A5 pass on both:
+
+1. the in-sample dates (2018-06-30 … 2022-06-30), and
+2. holdout dates never used for any design decision: 2014-06-30, 2014-12-31, … 2017-12-31 (eight half-year ends).
+
+If either fails, v1.1 stays inactive and no label is shown.
+
+## Result of position-rules-v1.1
 
 Pending the run recorded below.

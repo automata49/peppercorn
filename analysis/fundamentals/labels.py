@@ -15,7 +15,7 @@ from quarters import days, ttm
 RULES_DIR = Path(__file__).resolve().parent / "rules"
 
 
-def load_rules(version: str = "position-rules-v1") -> dict:
+def load_rules(version: str = "position-rules-v1.1") -> dict:
     rules = json.loads((RULES_DIR / f"{version.replace('-', '_')}.json").read_text(encoding="utf-8"))
     if rules["version"] != version:
         raise ValueError(f"rule file version mismatch: {rules['version']}")
@@ -161,9 +161,13 @@ def classify_growth(f: dict, kind: str, rules: dict) -> tuple[str | None, str]:
         return label, f"latest 12-quarter revenue vs the prior 12 quarters: {g:+.1%} a year"
     cagr, share, yoy = f["revenue_cagr_3y"], f["positive_yoy_share"], f["latest_revenue_yoy"]
     text = f"3-year CAGR {cagr:.1%}, latest TTM growth {yoy:+.1%}, {share:.0%} of the last 12 TTM changes positive"
-    if yoy < 0 or share < r["weak_min_positive_share"]:
+    if "weak_max_cagr" in r:     # v1.1: only sustained weakness is Weak
+        if cagr < r["weak_max_cagr"] or share < r["weak_min_positive_share"]:
+            return "Weak", text
+    elif yoy < 0 or share < r["weak_min_positive_share"]:
         return "Weak", text
-    if cagr >= r["durable_min_cagr"] and share >= r["durable_min_positive_share"] and yoy >= r["durable_min_momentum"] * cagr:
+    if (cagr >= r["durable_min_cagr"] and share >= r["durable_min_positive_share"] and yoy > 0
+            and yoy >= r["durable_min_momentum"] * cagr):
         return "Durable", text
     return "Moderate", text
 

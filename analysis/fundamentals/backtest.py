@@ -48,6 +48,9 @@ UNIVERSE = {
 CIK_OVERRIDE = {"XOM": 34088}
 AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "2020-12-31",
          "2021-06-30", "2021-12-31", "2022-06-30"]
+# Out-of-sample dates, first run only after position-rules-v1.1 was fixed; never used to design any rule.
+HOLDOUT = ["2014-06-30", "2014-12-31", "2015-06-30", "2015-12-31", "2016-06-30", "2016-12-31",
+           "2017-06-30", "2017-12-31"]
 HORIZON_YEARS = 3
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
@@ -124,7 +127,7 @@ def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_metho
     return out
 
 
-def run(cache: Path, out_dir: Path, rules: dict) -> dict:
+def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF) -> dict:
     method = methods.for_market("US")["roic"]
     tnx = json.loads((cache / "prices" / "_risk_free.json").read_text(encoding="utf-8"))
     rows = []
@@ -134,7 +137,7 @@ def run(cache: Path, out_dir: Path, rules: dict) -> dict:
             continue
         facts, quote, profile = _load(cache, ticker)
         full = sec.parse(facts)["quarters"]
-        for as_of in AS_OF:
+        for as_of in dates:
             row = {"ticker": ticker, "as_of": as_of}
             parsed = sec.parse(facts, as_of=as_of)
             q = parsed["quarters"]
@@ -281,12 +284,16 @@ def main():
     ap.add_argument("command", choices=["fetch", "run"])
     ap.add_argument("--cache", default="cache")
     ap.add_argument("--out", default="bt")
-    ap.add_argument("--rules", default="position-rules-v1")
+    ap.add_argument("--rules", default="position-rules-v1.1")
+    ap.add_argument("--dates", choices=["in-sample", "holdout"], default="in-sample")
     a = ap.parse_args()
     if a.command == "fetch":
         fetch(Path(a.cache))
     else:
-        print(render(run(Path(a.cache), Path(a.out), labels.load_rules(a.rules)), labels.load_rules(a.rules)))
+        rules = labels.load_rules(a.rules)
+        report = run(Path(a.cache), Path(a.out), rules, HOLDOUT if a.dates == "holdout" else AS_OF)
+        print(f"{a.dates} dates
+" + render(report, rules))
 
 
 if __name__ == "__main__":

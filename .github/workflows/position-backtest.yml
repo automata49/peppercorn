@@ -32,12 +32,14 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python backtest.py run --cache cache --out bt | tee -a "$GITHUB_STEP_SUMMARY"
+          python backtest.py run --cache cache --out bt --dates in-sample | tee -a "$GITHUB_STEP_SUMMARY"
+          python backtest.py run --cache cache --out bt-holdout --dates holdout | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: position-backtest
           path: |
             analysis/fundamentals/bt/
+            analysis/fundamentals/bt-holdout/
             analysis/fundamentals/cache/
           if-no-files-found: warn

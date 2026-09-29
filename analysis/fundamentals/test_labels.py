@@ -81,7 +81,22 @@ def test_same_input_gives_identical_output():
 
 
 def test_rules_are_inactive_until_the_backtest_passes():
-    assert RULES["active"] is False and RULES["version"] == "position-rules-v1"
+    assert RULES["active"] is False and RULES["version"] == "position-rules-v1.1"
+    assert labels.load_rules("position-rules-v1")["active"] is False
+
+
+V1 = labels.load_rules("position-rules-v1")
+
+
+def test_v1_made_a_single_negative_change_weak_but_v11_does_not():
+    dip = feats(latest_revenue_yoy=-0.02, revenue_cagr_3y=0.06, positive_yoy_share=0.9)
+    assert labels.classify_growth(dip, "Stalwart", V1)[0] == "Weak"
+    assert labels.classify_growth(dip, "Stalwart", RULES)[0] == "Moderate"
+
+
+@pytest.mark.parametrize("cagr,expected", [(0.0, "Moderate"), (-0.0001, "Weak")])
+def test_v11_shrinking_revenue_is_weak(cagr, expected):
+    assert labels.classify_growth(feats(revenue_cagr_3y=cagr, latest_revenue_yoy=0.01), "Stalwart", RULES)[0] == expected
 
 
 # --- missing data suppresses all four labels
@@ -214,8 +229,8 @@ def test_cyclical_quality_uses_cycle_mean_not_peak():
 
 # --- growth boundaries
 
-def test_negative_latest_growth_is_weak():
-    assert labels.classify_growth(feats(latest_revenue_yoy=-0.001), "Stalwart", RULES)[0] == "Weak"
+def test_negative_latest_growth_is_never_durable():
+    assert labels.classify_growth(feats(latest_revenue_yoy=-0.001), "Stalwart", RULES)[0] == "Moderate"
 
 
 @pytest.mark.parametrize("share,expected", [(0.5, "Moderate"), (0.4999, "Weak"), (0.75, "Durable"), (0.7499, "Moderate")])

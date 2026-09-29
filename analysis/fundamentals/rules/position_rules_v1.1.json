@@ -1,7 +1,7 @@
 {
-  "version": "position-rules-v1",
+  "version": "position-rules-v1.1",
   "active": false,
-  "active_note": "Candidate that failed pre-registered acceptance A2 on 2026-09-29 (see docs/harness/POSITION_RULES_V1.md); superseded by position-rules-v1.1. Kept as the record of what was tested.",
+  "active_note": "Labels are emitted only when active is true. v1.1 activation requires acceptance A1-A5 on both the in-sample dates and the untouched holdout dates in docs/harness/POSITION_RULES_V1.md.",
   "markets": [
     "US"
   ],
@@ -115,8 +115,9 @@
     "weak_min_positive_share": 0.5,
     "cyclical_durable_min": 0.05,
     "cyclical_weak_max": 0.0,
-    "basis": "Non-cyclical: durability is consistency (share of the last 12 TTM year-over-year changes that are positive) and momentum (latest TTM growth at least half the 3-year CAGR), with a 3% floor so a flat business is not called durable. Cyclical: growth of the latest 12-quarter revenue sum over the previous 12-quarter sum, annualised, so a single peak or trough does not decide the label.",
-    "not_covered": "reinvestment runway and competitive evidence; they need cited filing text and are not computed"
+    "basis": "Non-cyclical: durability is consistency (share of the last 12 TTM year-over-year changes that are positive) and momentum (latest TTM growth positive and at least half the 3-year CAGR), with a 3% floor so a flat business is not called durable. Weak means sustained weakness (shrinking over 3 years or mostly negative changes), because v1 showed that one negative TTM change, often a shock such as 2020, reverts. Cyclical: growth of the latest 12-quarter revenue sum over the previous 12-quarter sum, annualised, so a single peak or trough does not decide the label.",
+    "not_covered": "reinvestment runway and competitive evidence; they need cited filing text and are not computed",
+    "weak_max_cagr": 0.0
   },
   "value": {
     "labels": [
@@ -144,5 +145,10 @@
     "labels_rule": "Implied growth is the first-5-year growth that makes the DCF equal the enterprise value. Attractive when implied growth is at least 5 points below base growth; Expensive when implied growth is above bull growth; otherwise Fair. Speculative when the cash flow base is not positive, since a DCF on it is undefined.",
     "basis": "Discount rate is a point-in-time cost of equity: the 10-year Treasury yield plus a 5% equity risk premium (Damodaran's implied US ERP has mostly ranged 4-6% since 2010); the first backtest with a fixed 9% ignored the 2018-2022 rate environment. Terminal growth 2.5% stays below long-run nominal GDP and at or below the risk-free floor. Base growth is the 3-year revenue CAGR (cyclicals: through-cycle growth), bounded to -5%..20%; bear is half, bull 1.5x (at most 30%). Mauboussin and Rappaport's expectations investing frames value as implied versus expected growth.",
     "bear_rule": "bear = base - |base| x (1 - bear_multiplier); bull = min(base + |base| x (bull_multiplier - 1), bull_growth_max), so a negative base gets a worse bear case"
+  },
+  "supersedes": {
+    "version": "position-rules-v1",
+    "result": "failed A2 (Growth Moderate vs Weak not ordered); never activated",
+    "change": "Weak growth now requires sustained weakness: 3-year CAGR below weak_max_cagr or fewer than weak_min_positive_share of the last 12 TTM changes positive. A single negative latest TTM change no longer makes growth Weak; it still prevents Durable."
   }
 }
