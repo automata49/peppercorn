@@ -5,8 +5,6 @@ name: Position staging verify (test Supabase only)
 # 운영 프로젝트(mhbcchegrbakearqptdr)를 가리키면 즉시 중단한다.
 on:
   workflow_dispatch:
-  push:  # TEMPORARY: dispatch needs the file on main; removed after the first run
-    branches: [claude/position-staging-verify]
 
 permissions:
   contents: read
