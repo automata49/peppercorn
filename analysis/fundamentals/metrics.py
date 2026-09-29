@@ -15,6 +15,11 @@ def _ttm_field(q: dict, field: str, end: str):
     return ttm(series, end)
 
 
+def _fill(row: dict, absent: frozenset) -> dict:
+    """Lines the company never presented (sec.parse `not_presented`) count as zero; everything else stays unknown."""
+    return {**row, **{field: 0 for field in absent if row.get(field) is None}} if absent else row
+
+
 def _ic(row: dict, with_leases: bool = False):
     """투하자본 = 자본 + 차입금 (+ 리스부채) - 현금 - 단기투자 (간이 정의)"""
     if any(row.get(field) is None for field in ("equity", "debt", "cash", "short_term_investments")):
@@ -34,7 +39,9 @@ def _lease_basis(policy: str, now: dict, prev: dict | None) -> str:
     return "excluded_not_presented" if not any(present) else "inconsistent"
 
 
-def compute(q: dict, default_tax: float, roic_method: dict | None = None) -> dict:
+def compute(q: dict, default_tax: float, roic_method: dict | None = None, absent=()) -> dict:
+    absent = frozenset(absent) & set((roic_method or {}).get("zero_if_never_presented", []))
+    q = {end: _fill(row, absent) for end, row in q.items()}
     ends = sorted(q)
     if len(ends) < 4:
         return {}
@@ -67,7 +74,8 @@ def compute(q: dict, default_tax: float, roic_method: dict | None = None) -> dic
     avg_ic = (ic_now + ic_prev) / 2 if ic_now is not None and ic_prev is not None else None
     roic = _div(nopat(e), avg_ic) if avg_ic and avg_ic > 0 else None
     inc_roic = None
-    if e1 and nopat(e1) is not None and ic_now is not None and ic_prev is not None and ic_now - ic_prev > 0:
+    if (e1 and nopat(e) is not None and nopat(e1) is not None and ic_now is not None and ic_prev is not None
+            and ic_now - ic_prev > 0):
         inc_roic = (nopat(e) - nopat(e1)) / (ic_now - ic_prev)
 
     rev_prev = T("revenue", e1) if e1 else None
@@ -90,6 +98,7 @@ def compute(q: dict, default_tax: float, roic_method: dict | None = None) -> dic
         "fcf_conversion": _div(fcf, ni),
         "tax_rate_used": tax_rate, "tax_rate_source": tax_source,
         "roic_method": roic_method.get("version"), "roic_lease_basis": lease_basis,
+        "roic_zero_not_presented": sorted(absent),
         "roic": roic, "incremental_roic": inc_roic,
         "roe": _div(ni, last.get("equity")),
         "net_debt": net_debt,

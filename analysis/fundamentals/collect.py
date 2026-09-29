@@ -49,7 +49,7 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
     if method["currency"] != t["currency"]:
         raise ValueError("Market and currency mismatch")
     year = date.fromisoformat(max(q)).year if q else date.today().year
-    m = metrics.compute(q, methods.statutory_tax_rate(t["market"], year), method["roic"])
+    m = metrics.compute(q, methods.statutory_tax_rate(t["market"], year), method["roic"], parsed.get("not_presented", ()))
     check_results = metrics.checks(q, m, date.fromisoformat(as_of) if as_of else date.today())
     check_results.extend(lineage_checks(parsed, t["market"], sorted(q)[-8:]))
     check_results.extend(conflict_checks(parsed, sorted(q)[-8:]))
@@ -58,6 +58,7 @@ def run_one(t: dict, as_of: str | None = None) -> dict:
             "methodology": method, "source_lineage": parsed.get("source_lineage", {}),
             "raw_sha256": parsed.get("raw_sha256"), "source_revisions": parsed.get("source_revisions", {}),
             "source_conflicts": parsed.get("source_conflicts", {}),
+            "not_presented": parsed.get("not_presented", []),
             "as_of": as_of,
             "tag_by_period": parsed.get("tag_by_period", {}),
             "quarters": q, "metrics": m, "checks": check_results}

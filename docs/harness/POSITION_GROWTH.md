@@ -31,7 +31,7 @@ Source: [Pepper Position Growth 요구 정의서 v0.1 (2026-09-28)](https://driv
 
 | Source question / ambiguity | Decision gate |
 |---|---|
-| Q-01 ROIC invested capital; FR-CALC-05 Owner Earnings | ROIC conventions are decided per market below (`US-ROIC-1`, `KR-ROIC-1`). Owner Earnings remains open: define cash exclusion and average capital; name FCF minus SBC as a proxy, not Buffett's maintenance CapEx based Owner Earnings. Preserve missing SBC. Apply versioned, market-specific FCF inputs and independent local thresholds; never infer common cross-market ranking. |
+| Q-01 ROIC invested capital; FR-CALC-05 Owner Earnings | ROIC conventions are decided per market below (`US-ROIC-2`, `KR-ROIC-1`). Owner Earnings remains open: define cash exclusion and average capital; name FCF minus SBC as a proxy, not Buffett's maintenance CapEx based Owner Earnings. Preserve missing SBC. Apply versioned, market-specific FCF inputs and independent local thresholds; never infer common cross-market ranking. |
 | Q-02/Q-03 type thresholds and Pepper growth | Backtest proposed type-specific thresholds and growth assumptions against historical filings without lookahead before publishing verdicts. |
 | Q-04 existing `stock_analyses` | Keep owner-controlled notes separate; decide any migration of user content with a dedicated privacy review. |
 | Q-05/Q-07 targets and fiscal calendar | Agree instrument scope and non-December reporting periods before AC-1-1; 8 quarters for QC does not guarantee 3-year CAGR. |
@@ -46,7 +46,7 @@ The source document's PoC figures and 10/10 checks are historical examples, not 
 
 Declared per market in `analysis/fundamentals/methods.py` (`roic` block) and emitted with every result as `roic_method`, `roic_lease_basis`, `tax_rate_used` and `tax_rate_source`. Values are compared only within a market.
 
-| Item | US-ROIC-1 | KR-ROIC-1 |
+| Item | US-ROIC-2 | KR-ROIC-1 |
 |---|---|---|
 | NOPAT | TTM operating income × (1 − t) | same |
 | Tax t | TTM effective rate when within 0–40%, else federal statutory 21% (state tax not added) | TTM effective rate when within 0–40%, else top-bracket statutory including local income tax: 26.4% for 2025, 27.5% from 2026; other years, including 2023 and 2024, are rejected until sourced |
@@ -72,3 +72,7 @@ Verification. `npm run harness:check` statically reviews the SQL against `positi
 The unapplied migration also rejects `reported` rows when any source input lacks a nonempty SEC accession or DART receipt, filing date or period, when no valid SHA-256 covers the response, or when source/operation is absent or mismatched. Its offline PGlite checks do not establish live PostgREST/JWT behavior. The production project is on Supabase Free; a development branch creation attempt was rejected because Branching requires Pro or above. Do not apply the migration to production just to bypass that isolation gate.
 
 Verified offline: 14 unit tests, and a one-off run that loaded the 580 fact rows and 2 snapshots generated from the live artifact into the migrated database in PGlite as `position_pipeline`. Every row passed the constraints and grants, a re-run added nothing, and a simulated amendment added exactly one fact row and one snapshot. Not verified: the PostgREST request shape and `on_conflict` behavior against a real Supabase project, and how the JWT maps to the role there. No workflow runs it and it has never written to a deployed database.
+
+## US-ROIC-2 and label rules — 2026-09-29
+
+`US-ROIC-2` differs from `US-ROIC-1` only in that short-term investments, debt or the current portion of debt count as zero when no candidate concept has a value at any of the latest 8 quarter ends (`sec.parse` `not_presented`); NVDA and Samsung values are unchanged, and the zero is never stored as a fact. SEC extraction gained fallback tags that fill only periods without a primary tag. Deterministic label rules (`position-rules-v1`, `position-rules-v1.1`), the engine `labels.py`, prices `prices.py` and the point-in-time backtest are recorded in `POSITION_RULES_V1.md`. Neither rule version passed its pre-registered gate, so both stay inactive, `persist.py` still writes label-free snapshots, and no Position label may be shown.

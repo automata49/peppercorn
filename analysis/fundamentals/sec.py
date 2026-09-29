@@ -43,6 +43,26 @@ INSTANT_TAGS = {
     "debt": ["LongTermDebt", "LongTermDebtNoncurrent"],
     "debt_current": ["LongTermDebtCurrent", "DebtCurrent"],
 }
+# Fallback tags fill only periods (spans or dates) where no primary tag above was reported, so a narrower
+# concept (goods-only revenue, continuing-operations cash flow) never replaces a broader primary one.
+FALLBACK_DURATION_TAGS = {
+    "revenue": ["RevenueFromContractWithCustomerIncludingAssessedTax", "SalesRevenueGoodsNet"],
+    "net_income": ["NetIncomeLossAvailableToCommonStockholdersBasic"],
+    "operating_cash_flow": ["NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"],
+}
+FALLBACK_INSTANT_TAGS = {
+    "cash": ["CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"],
+    "debt": ["LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities", "LongTermDebtAndCapitalLeaseObligations"],
+    "debt_current": ["LongTermDebtAndCapitalLeaseObligationsCurrent"],
+}
+# Debt tags that already include the current portion, and tags that exclude it (need debt_current).
+DEBT_TOTAL_TAGS = {"LongTermDebt", "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities"}
+DEBT_NONCURRENT_TAGS = {"LongTermDebtNoncurrent", "LongTermDebtAndCapitalLeaseObligations"}
+# Balance sheet lines a company may simply not have. When no candidate tag has a value at any of the latest
+# NOT_PRESENTED_QUARTERS quarter ends (so the absence is sustained, not a one-quarter tag switch), the line is
+# listed in `not_presented`; metrics may then count it as zero. It is never written as a fact.
+PRESENTABLE = ("short_term_investments", "debt", "debt_current")
+NOT_PRESENTED_QUARTERS = 8
 FORMS = {"10-Q", "10-K", "10-Q/A", "10-K/A"}
 
 
@@ -55,6 +75,22 @@ def fetch(cik: int) -> dict:
     body = r.json()
     body["_raw_sha256"] = hashlib.sha256(r.content).hexdigest()
     return body
+
+
+SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
+
+
+def fetch_profile(cik: int) -> dict:
+    """Registrant SIC code from EDGAR submissions (current code; SEC does not publish a point-in-time history)."""
+    ua = os.environ.get("SEC_USER_AGENT", "").strip()
+    if "@" not in ua:
+        raise SystemExit("SEC_USER_AGENT 가 필요합니다. 예: 'Peppercorn Capital your@email.com'")
+    r = requests.get(SUBMISSIONS_URL.format(cik=cik), headers={"User-Agent": ua, "Accept-Encoding": "gzip"}, timeout=60)
+    r.raise_for_status()
+    body = r.json()
+    return {"sic": int(body["sic"]) if str(body.get("sic") or "").isdigit() else None,
+            "description": body.get("sicDescription"), "source": "SEC EDGAR submissions",
+            "raw_sha256": hashlib.sha256(r.content).hexdigest()}
 
 
 def _entries(facts: dict, tag: str, unit: str = "USD", as_of: str | None = None) -> list[dict]:
@@ -110,8 +146,11 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
     for field, tags in DURATION_TAGS.items():
         unit = "shares" if field == "diluted_shares" else "USD"
         selected = _latest_rows(facts, tags, unit, as_of)
+        fallback = FALLBACK_DURATION_TAGS.get(field, [])
+        for span, hit in _latest_rows(facts, fallback, unit, as_of).items():
+            selected.setdefault(span, hit)
         by_span: dict[tuple[str, str], list[dict]] = {}
-        for tag in tags:
+        for tag in tags + fallback:
             for row in _entries(facts, tag, unit, as_of):
                 if row.get("start"):
                     by_span.setdefault((row["start"], row["end"]), []).append({
@@ -151,7 +190,8 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
         used[field] = tag_by_period.get(recent, {}).get(field) if recent else None
     # 재무상태표 항목: 날짜마다 후보 태그를 순서대로 확인 (회사가 중간에 태그를 바꿔도 이어지도록)
     all_tags = facts.get("facts", {}).get("us-gaap", {})
-    for field, tags in INSTANT_TAGS.items():
+    for field, primary in INSTANT_TAGS.items():
+        tags = primary + FALLBACK_INSTANT_TAGS.get(field, [])
         per_tag: dict[str, dict[str, dict]] = {}
         for t in tags:
             latest: dict[str, dict] = {}
@@ -163,7 +203,9 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             per_tag[t] = latest
         hits: dict[str, str] = {}
         for end, row in table.items():
-            candidates = [(t, per_tag[t][end], i) for i, t in enumerate(tags) if end in per_tag[t]]
+            candidates = [(t, per_tag[t][end], i) for i, t in enumerate(primary) if end in per_tag[t]]
+            if not candidates:
+                candidates = [(t, per_tag[t][end], i) for i, t in enumerate(tags) if t not in primary and end in per_tag[t]]
             if candidates:
                 t, fact, _ = max(candidates, key=lambda item: (*_rank(item[1]), -item[2]))
                 row[field] = fact["val"]
@@ -203,14 +245,19 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
         if field == "debt":
             # LongTermDebt 는 유동성 부분까지 포함한 총액 → 유동성 부분을 또 더하면 이중 계산
             for end, t in hits.items():
-                if t == "LongTermDebt":
+                if t in DEBT_TOTAL_TAGS:
                     table[end]["_debt_total"] = True
     for row in table.values():
         if row.pop("_debt_total", False):
             row.pop("debt_current", None)
-    # A noncurrent-only debt tag does not establish that the current portion is zero.
+    recent_ends = sorted(table)[-NOT_PRESENTED_QUARTERS:]
+    not_presented = [field for field in PRESENTABLE if len(recent_ends) == NOT_PRESENTED_QUARTERS
+                     and not _presented_at(facts, field, set(recent_ends), as_of)]
+    # A noncurrent-only debt tag does not establish that the current portion is zero, unless no current-portion
+    # concept has appeared for the last NOT_PRESENTED_QUARTERS quarters.
     for end, row in table.items():
-        if tag_by_period.get(end, {}).get("debt") == "LongTermDebtNoncurrent" and row.get("debt_current") is None:
+        if (tag_by_period.get(end, {}).get("debt") in DEBT_NONCURRENT_TAGS and row.get("debt_current") is None
+                and not ("debt_current" in not_presented and end in recent_ends)):
             row.pop("debt", None)
         for field in list(lineage.get(end, {})):
             if field not in row:
@@ -222,7 +269,28 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             "entity": facts.get("entityName"), "source_lineage": {k: lineage[k] for k in table},
             "source_revisions": {k: revisions.get(k, {}) for k in table},
             "source_conflicts": {k: conflicts[k] for k in table if conflicts.get(k)}, "as_of": as_of,
+            "not_presented": not_presented,
             "raw_sha256": facts.get("_raw_sha256")}
+
+
+_STI_PATTERN = re.compile(r"(MarketableSecurities|ShortTermInvestments|AvailableForSale\w*|DebtSecurities\w*)Current$")
+_DEBT_PATTERN = re.compile(r"(Debt|Borrowing|NotesPayable|CommercialPaper|ConvertibleNotes|SeniorNotes)")
+_NOT_DEBT = re.compile(r"(Securit|Investment|Receivable|Forgiveness|Extinguishment|OtherThan)")
+_CURRENT_DEBT_PATTERN = re.compile(r"((Debt|Borrowing|NotesPayable|Notes|Obligations)\w*Current|ShortTermBorrowings|CommercialPaper)$")
+
+
+def _presented_at(facts: dict, field: str, ends: set[str], as_of: str | None) -> bool:
+    """Whether any candidate concept for a balance sheet line has an instant value at one of `ends`."""
+    tags = INSTANT_TAGS[field] + FALLBACK_INSTANT_TAGS.get(field, [])
+    every = facts.get("facts", {}).get("us-gaap", {})
+    if field == "short_term_investments":
+        tags = tags + [t for t in every if _STI_PATTERN.search(t)]
+    if field == "debt":
+        # Any borrowing-like concept counts as presented, so only a company with no borrowing at all qualifies.
+        tags = tags + [t for t in every if _DEBT_PATTERN.search(t) and not _NOT_DEBT.search(t)]
+    if field == "debt_current":
+        tags = tags + [t for t in every if _CURRENT_DEBT_PATTERN.search(t) and not _NOT_DEBT.search(t)]
+    return any("start" not in row and row["end"] in ends for tag in tags for row in _entries(facts, tag, as_of=as_of))
 
 
 def _conflict_record(chosen: dict, competing: list[dict]) -> dict:
