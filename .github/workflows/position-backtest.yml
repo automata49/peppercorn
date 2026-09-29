@@ -3,6 +3,16 @@ name: Position rules backtest
 # 수동 실행 전용. SEC companyfacts 와 Yahoo 가격을 받아 라벨 규칙을 과거 시점별로 백테스트한다. DB 쓰기 없음.
 on:
   workflow_dispatch:
+    inputs:
+      universe:
+        description: 기업군 (A 설계용, B·C 재현 검증용)
+        type: choice
+        options: [A, B, C]
+        default: C
+      rules:
+        description: 규칙 버전
+        type: string
+        default: position-rules-v2
 
 permissions:
   contents: read
@@ -24,18 +34,24 @@ jobs:
       - name: Fetch SEC facts and prices
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
-        run: python backtest.py fetch --cache cache
+          UNIVERSE: ${{ inputs.universe || 'C' }}
+        run: python backtest.py fetch --cache cache --universe "$UNIVERSE"
       - name: Backtest
         shell: bash
+        env:
+          UNIVERSE: ${{ inputs.universe || 'C' }}
+          RULES: ${{ inputs.rules || 'position-rules-v2' }}
         run: |
           set -o pipefail
-          python backtest.py run --cache cache --out bt --dates in-sample | tee -a "$GITHUB_STEP_SUMMARY"
-          python backtest.py run --cache cache --out bt-holdout --dates holdout | tee -a "$GITHUB_STEP_SUMMARY"
+          python backtest.py run --cache cache --out bt-all --dates all --universe "$UNIVERSE" --rules "$RULES" | tee -a "$GITHUB_STEP_SUMMARY"
+          python backtest.py run --cache cache --out bt --dates in-sample --universe "$UNIVERSE" --rules "$RULES" | tee -a "$GITHUB_STEP_SUMMARY"
+          python backtest.py run --cache cache --out bt-holdout --dates holdout --universe "$UNIVERSE" --rules "$RULES" | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: position-backtest
           path: |
+            analysis/fundamentals/bt-all/
             analysis/fundamentals/bt/
             analysis/fundamentals/bt-holdout/
             analysis/fundamentals/cache/

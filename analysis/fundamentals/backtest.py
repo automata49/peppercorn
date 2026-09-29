@@ -45,6 +45,37 @@ UNIVERSE = {
 }
 # The SEC ticker list maps a ticker to its current registrant; these reorganized companies filed their history
 # under an earlier CIK.
+# Replication universe, fixed on 2026-09-30 before any run on it: US non-financial S&P 500 members not in UNIVERSE
+# and still listed; banks, insurers, REITs and utilities are excluded because ROIC is not meaningful for them.
+# Used only to test position-rules-v1.2 (content identical to v1.1); never used to design a rule.
+UNIVERSE_B = {
+    "technology": ["ANET", "CDNS", "SNPS", "FTNT", "PANW", "ADSK", "MCHP", "NXPI", "ON", "MPWR", "TER", "KEYS",
+                   "ZBRA", "CDW", "IT", "FICO", "VRSN", "AKAM", "HPQ", "NTAP", "WDC", "STX", "GLW", "APH", "CTSH"],
+    "health": ["REGN", "VRTX", "BIIB", "ILMN", "IQV", "A", "WAT", "MTD", "RMD", "BDX", "BAX", "HOLX", "ALGN",
+               "DXCM", "STE", "LH", "DGX", "HCA", "MCK", "ZBH"],
+    "consumer": ["ORLY", "AZO", "TSCO", "DG", "DLTR", "BBY", "ULTA", "DRI", "MAR", "HLT", "EXPE", "POOL", "GPC",
+                 "LULU", "DECK", "NVR", "KR", "SYY", "ADM", "TSN", "HRL", "CAG", "MNST", "CHD", "STZ", "MO", "PM"],
+    "industrial": ["ETN", "PH", "ROK", "DOV", "AME", "XYL", "JCI", "CMI", "PCAR", "ODFL", "JBHT", "EXPD", "FAST",
+                   "GWW", "URI", "CTAS", "RSG", "CPRT", "LHX", "TXT", "TDG", "SNA", "SWK", "FDX", "DAL", "UAL", "LUV"],
+    "materials_energy": ["ECL", "PPG", "ALB", "CF", "MOS", "VMC", "MLM", "IP", "PKG", "AVY", "EMN", "PSX", "DVN", "BKR"],
+    "media": ["CMCSA", "CHTR", "TMUS", "EA", "TTWO"],
+}
+# Second replication universe, fixed on 2026-09-30 before any run on it: US non-financial companies in neither
+# UNIVERSE nor UNIVERSE_B, still listed, same exclusions. Used only to test position-rules-v2.
+UNIVERSE_C = {
+    "health": ["LLY", "ABBV", "MRK", "BMY", "RVTY", "TECH", "CRL", "WST", "PODD", "INCY", "VTRS", "HSIC", "DVA",
+               "UHS", "CAH"],
+    "technology": ["WDAY", "CRWD", "DDOG", "SMCI", "ENPH", "FSLR", "GEN", "JKHY", "BR", "GPN", "CPAY", "TRMB",
+                   "TYL", "PTC", "ROP", "GRMN", "TEL", "JBL", "SWKS", "QRVO", "EPAM", "FFIV"],
+    "consumer": ["TPR", "RL", "HAS", "LVS", "WYNN", "MGM", "CCL", "RCL", "NCLH", "DPZ", "MHK", "KMX", "EBAY",
+                 "KDP", "TAP", "BG", "SJM", "MKC", "CPB", "LW", "WSM", "LKQ"],
+    "industrial": ["GE", "RTX", "HWM", "ALLE", "AOS", "BLDR", "CHRW", "J", "LDOS", "PWR", "GNRC", "IEX", "PNR",
+                   "RHI", "NDSN", "ROL", "VRSK", "WAB", "HUBB", "LII", "TT", "IR", "EFX", "AXON", "PAYC"],
+    "materials_energy": ["LIN", "DD", "CE", "IFF", "BALL", "AMCR", "RS", "APA", "CTRA", "FANG", "EQT", "OKE",
+                         "KMI", "WMB", "TRGP"],
+    "media": ["FOXA", "NWSA", "WBD", "OMC", "LYV", "MTCH", "IPG"],
+}
+UNIVERSES = {"A": UNIVERSE, "B": UNIVERSE_B, "C": UNIVERSE_C}
 CIK_OVERRIDE = {"XOM": 34088}
 AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "2020-12-31",
          "2021-06-30", "2021-12-31", "2022-06-30"]
@@ -55,11 +86,11 @@ HORIZON_YEARS = 3
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
 
-def tickers() -> list[str]:
-    return [t for group in UNIVERSE.values() for t in group]
+def tickers(universe: str = "A") -> list[str]:
+    return [t for group in UNIVERSES[universe].values() for t in group]
 
 
-def fetch(cache: Path) -> None:
+def fetch(cache: Path, universe: str = "A") -> None:
     ua = os.environ.get("SEC_USER_AGENT", "").strip()
     if "@" not in ua:
         raise SystemExit("SEC_USER_AGENT is required")
@@ -67,8 +98,8 @@ def fetch(cache: Path) -> None:
     (cache / "prices").mkdir(parents=True, exist_ok=True)
     mapping = requests.get(TICKERS_URL, headers={"User-Agent": ua}, timeout=60).json()
     cik = {row["ticker"]: row["cik_str"] for row in mapping.values()} | CIK_OVERRIDE
-    manifest = {"fetched_at": datetime.now(timezone.utc).isoformat(), "companies": {}}
-    for ticker in tickers():
+    manifest = {"fetched_at": datetime.now(timezone.utc).isoformat(), "universe": universe, "companies": {}}
+    for ticker in tickers(universe):
         if ticker not in cik:
             manifest["companies"][ticker] = {"error": "ticker not in SEC mapping"}
             continue
@@ -127,11 +158,11 @@ def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_metho
     return out
 
 
-def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF) -> dict:
+def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF, universe: str = "A") -> dict:
     method = methods.for_market("US")["roic"]
     tnx = json.loads((cache / "prices" / "_risk_free.json").read_text(encoding="utf-8"))
     rows = []
-    for ticker in tickers():
+    for ticker in tickers(universe):
         if not (cache / "sec" / f"{ticker}.json.gz").exists():
             rows.append({"ticker": ticker, "error": "not fetched"})
             continue
@@ -168,7 +199,7 @@ def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF) -> di
             row["outcomes"] = outcomes(full, latest, as_of, quote, method)
             rows.append(row)
         print(ticker, sum(1 for r in rows if r["ticker"] == ticker and r.get("status") == "ok"), "labelled")
-    report = summarize(rows)
+    report = summarize(rows, rules)
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "rows.json").write_text(json.dumps(rows, indent=1, default=str), encoding="utf-8")
     (out_dir / "summary.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -189,8 +220,16 @@ TESTS = {
 }
 
 
-def summarize(rows: list[dict]) -> dict:
+def _value_order(rules: dict | None) -> list[str]:
+    names = ((rules or {}).get("value") or {}).get("label_names", {"low": "Attractive", "mid": "Fair", "high": "Expensive"})
+    return [names["low"], names["mid"], names["high"]]
+
+
+def summarize(rows: list[dict], rules: dict | None = None) -> dict:
     ok = [r for r in rows if r.get("status") == "ok"]
+    value_order = _value_order(rules)
+    expectations = ((rules or {}).get("value") or {}).get("test") == "expectations"
+    tests = {**TESTS, "value": ("excess_return", value_order)}
     by_date: dict[str, list[float]] = {}
     for r in ok:
         if r["outcomes"].get("fwd_return") is not None:
@@ -202,7 +241,7 @@ def summarize(rows: list[dict]) -> dict:
     for r in rows:
         status[r.get("status", "error")] = status.get(r.get("status", "error"), 0) + 1
     report: dict = {"observations": len(rows), "status": status, "tests": {}, "type": {}}
-    for dim, (metric, order) in TESTS.items():
+    for dim, (metric, order) in tests.items():
         groups = {}
         for label in order:
             vals = [r["outcomes"][metric] for r in ok if r["labels"].get(dim) == label and r["outcomes"].get(metric) is not None]
@@ -232,17 +271,22 @@ def summarize(rows: list[dict]) -> dict:
     report["type_stability"] = stable / (stable + changed) if stable + changed else None
     # Informational, not an acceptance test: how often realized revenue growth reached the growth the price implied.
     report["value_expectations"] = {}
-    for label in TESTS["value"][1]:
+    for label in value_order:
         pairs = [(r["outcomes"]["fwd_revenue_cagr"], r["value_detail"]["implied_growth"]) for r in ok
                  if r["labels"].get("value") == label and r["outcomes"].get("fwd_revenue_cagr") is not None
                  and "implied_growth" in r["value_detail"]]
         report["value_expectations"][label] = {
             "n": len(pairs), "met_share": sum(a >= b for a, b in pairs) / len(pairs) if pairs else None}
+    shares = [report["value_expectations"][label]["met_share"] for label in value_order]
+    report["value_expectations_pass"] = (
+        all(report["value_expectations"][label]["n"] >= MIN_GROUP for label in value_order)
+        and all(a > b for a, b in zip(shares, shares[1:])) and shares[0] > 0.5 and shares[-1] < 0.5)
+    report["value_test"] = "expectations" if expectations else "returns"
     report["companies_labelled"] = len({r["ticker"] for r in ok})
     report["acceptance"] = {
         "A1 quality": report["tests"]["quality"]["monotonic"],
         "A2 growth": report["tests"]["growth"]["monotonic"],
-        "A3 value": report["tests"]["value"]["monotonic"],
+        "A3 value": report["value_expectations_pass"] if expectations else report["tests"]["value"]["monotonic"],
         "A4 type": report["type_test"]["passes"] and (report["type_stability"] or 0) >= MIN_TYPE_STABILITY,
         "A5 coverage": report["companies_labelled"] >= MIN_COMPANIES,
     }
@@ -269,7 +313,8 @@ def render(report: dict, rules: dict) -> str:
     lines += ["", f"Cyclical median {_pct(t['cyclical_median'])} vs others {_pct(t['other_median'])} — "
               f"{'passes' if t['passes'] else 'fails'}; type stability between consecutive dates "
               f"{report['type_stability']:.0%}" if report["type_stability"] is not None else "", ""]
-    lines += ["## value expectations (informational)", "", "| label | n | realized growth reached implied |", "|---|---|---|"]
+    kind = "acceptance test A3" if report["value_test"] == "expectations" else "informational"
+    lines += [f"## value expectations ({kind})", "", "| label | n | realized growth reached implied |", "|---|---|---|"]
     for label, g in report["value_expectations"].items():
         share = "—" if g["met_share"] is None else f"{g['met_share']:.0%}"
         lines.append(f"| {label} | {g['n']} | {share} |")
@@ -285,14 +330,16 @@ def main():
     ap.add_argument("--cache", default="cache")
     ap.add_argument("--out", default="bt")
     ap.add_argument("--rules", default="position-rules-v1.1")
-    ap.add_argument("--dates", choices=["in-sample", "holdout"], default="in-sample")
+    ap.add_argument("--dates", choices=["in-sample", "holdout", "all"], default="in-sample")
+    ap.add_argument("--universe", choices=sorted(UNIVERSES), default="A")
     a = ap.parse_args()
     if a.command == "fetch":
-        fetch(Path(a.cache))
+        fetch(Path(a.cache), a.universe)
     else:
         rules = labels.load_rules(a.rules)
-        report = run(Path(a.cache), Path(a.out), rules, HOLDOUT if a.dates == "holdout" else AS_OF)
-        print(f"{a.dates} dates")
+        dates = {"in-sample": AS_OF, "holdout": HOLDOUT, "all": HOLDOUT + AS_OF}[a.dates]
+        report = run(Path(a.cache), Path(a.out), rules, dates, a.universe)
+        print(f"universe {a.universe}, {a.dates} dates")
         print(render(report, rules))
 
 

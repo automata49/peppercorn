@@ -76,3 +76,5 @@ Verified offline: 14 unit tests, and a one-off run that loaded the 580 fact rows
 ## US-ROIC-2 and label rules — 2026-09-29
 
 `US-ROIC-2` differs from `US-ROIC-1` only in that short-term investments, debt or the current portion of debt count as zero when no candidate concept has a value at any of the latest 8 quarter ends (`sec.parse` `not_presented`); NVDA and Samsung values are unchanged, and the zero is never stored as a fact. SEC extraction gained fallback tags that fill only periods without a primary tag. Deterministic label rules (`position-rules-v1`, `position-rules-v1.1`), the engine `labels.py`, prices `prices.py` and the point-in-time backtest are recorded in `POSITION_RULES_V1.md`. Neither rule version passed its pre-registered gate, so both stay inactive, `persist.py` still writes label-free snapshots, and no Position label may be shown.
+
+Production: `supabase/position_growth.sql` was applied on 2026-09-29 by `position-production.yml` (run 36590254392, 47/47 checks, Swing/user access unchanged). Tables are empty and no production credential for `position_pipeline` exists yet.

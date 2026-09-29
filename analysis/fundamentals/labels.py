@@ -223,11 +223,12 @@ def classify_value(f: dict, kind: str, price: dict | None, rules: dict) -> tuple
                "equity_value": equity, "margin_of_safety": equity["base"] / price["market_cap"] - 1}
     text = (f"price implies {implied:.1%} growth vs base {base:.1%} (bear {bear:.1%}, bull {bull:.1%}) "
             f"at a {r:.1%} discount rate")
+    names = v.get("label_names", {"low": "Attractive", "mid": "Fair", "high": "Expensive"})
     if implied <= base - v["attractive_gap"]:
-        return "Attractive", text, detail
+        return names["low"], text, detail
     if implied > bull:
-        return "Expensive", text, detail
-    return "Fair", text, detail
+        return names["high"], text, detail
+    return names["mid"], text, detail
 
 
 def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax: float, roic_method: dict,

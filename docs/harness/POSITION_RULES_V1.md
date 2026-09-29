@@ -88,3 +88,74 @@ Activation: **no**. The in-sample gate passed; the holdout gate failed A1 and A3
 Value, informational (realized growth reached implied): in-sample 69% / 51% / 14%, holdout 90% / 69% / 24% for Attractive / Fair / Expensive. The implied-growth ordering held in both periods; the return ordering did not hold between Attractive and Fair in 2014–2017.
 
 Reading. High Quality and Durable Growth separate clearly in both periods, cyclical typing predicts drawdowns, and Expensive is the weakest return group in both. What did not replicate is the top of Value (Attractive vs Fair returns) and a Low Quality group large enough to test. The holdout has now been used, so it cannot validate a further revision: the next candidate needs fresh out-of-sample data (for example a different universe of companies, or post-2022 dates as they mature), and its acceptance must again be fixed before it runs.
+
+## position-rules-v1.2: replication on a new universe (pre-registered 2026-09-30, before any run on it)
+
+v1.2 has the same rules and thresholds as v1.1; only the version and gate differ, so its snapshots can be told apart from the failed candidate. It is tested on `UNIVERSE_B` in `backtest.py`: 118 US non-financial S&P 500 members that are not in the first universe and are still listed (banks, insurers, REITs and utilities excluded), fixed before any run on them.
+
+Activation requires A1–A5, unchanged, on universe B at both date sets: 2018-06-30 … 2022-06-30 and 2014-06-30 … 2017-12-31. If either fails, v1.2 stays inactive. If both pass, v1.2 may be activated with the universe A 2014–2017 failure (A1 Quality: too few Low observations; A3 Value: Attractive below Fair) recorded here as a known limitation.
+
+## Result of position-rules-v1.2 (run 36587461497, commit 30911a8)
+
+Activation: **no**. Universe B: 116 of 118 fetched (HOLX and EA are no longer in the SEC ticker list).
+
+| Test | Universe B 2018–2022 (438 labelled, 67 companies) | Universe B 2014–2017 (276 labelled, 58 companies) |
+|---|---|---|
+| A1 Quality, forward ROIC | pass: 18.1% (27) > 8.2% (23) > 5.4% (27) | **fail**: 18.3% (21) > 10.6% (17) > 3.2%, but Low has only 5 |
+| A2 Growth, forward revenue CAGR | pass: 9.1% (253) > 6.1% (118) > 5.7% (67) | pass: 8.0% (170) > 4.7% (69) > 1.7% (37) |
+| A3 Value, forward excess return | **fail**: Attractive +0.9% (87) < Fair +2.1% (133); Expensive −0.8% (193) | **fail**: Attractive −6.6% (63) < Fair +8.3% (90); Expensive +2.7% (111) |
+| A4 Type | pass: drawdown 7.6% vs 2.8%, stability 89% | pass: 1.5% vs 0.3%, stability 88% |
+| A5 Coverage | pass: 67 | pass: 58 |
+
+Value, informational (realized growth reached implied): 76% / 38% / 17% (2018–2022) and 71% / 51% / 10% (2014–2017) for Attractive / Fair / Expensive.
+
+## What four tests say (universe A and B, two periods each)
+
+- Growth (A2) and Type (A4) passed all four tests.
+- Quality ordered High > Average > Low in every test; it failed only where the Low group had 5 observations (both 2014–2017 tests), so its evidence is limited by sample size, not contradicted.
+- Value's return ordering held in one of four tests. Attractive beat Fair on forward returns only in universe A 2018–2022. What held in all four is the claim the label actually computes: realized growth reached the price-implied growth far more often for Attractive (69–90%) than Fair (38–69%) or Expensive (10–24%). As a forecast of excess returns the label is not supported.
+
+Consequence. Because the contract requires all four labels together, no rule version can be activated while Value fails. Every sample prepared so far (both universes, both periods) has now been used; a revised Value definition — for example one judged on implied versus realized growth instead of returns — needs its claim, gate and fresh data (a third universe or matured post-2022 dates) fixed before it runs.
+
+## position-rules-v2: Value as an expectations label (pre-registered 2026-09-30, before any run on universe C)
+
+Decision (user, 2026-09-30): Value is redefined as what it computes — how much growth today's price requires relative to the company's own record — not as a forecast of returns.
+
+Change from v1.2, and nothing else: Value labels are renamed Undemanding / Reasonable / Demanding / Speculative (same DCF, discount rate, bear/base/bull and thresholds as v1.2), and Value's acceptance test is replaced. Type, Quality and Growth rules and their tests are unchanged.
+
+Sample: `UNIVERSE_C` in `backtest.py`, 106 US non-financial companies in neither earlier universe, still listed, same exclusions, fixed before any run on them. All 17 half-year dates (2014-06-30 … 2022-06-30) are pooled, because both earlier 2014–2017 Quality failures came from a Low group of 5 observations.
+
+Activation requires all of, on that pooled sample:
+
+- A1 Quality, A2 Growth, A4 Type, A5 Coverage: unchanged definitions.
+- A3′ Value expectations: the share of observations whose realized 3-year forward revenue CAGR reached the price-implied growth is strictly ordered Undemanding > Reasonable > Demanding, each group n ≥ 10, with Undemanding above 50% and Demanding below 50% (the label points the right way more often than not in both directions).
+
+Limitation stated in advance: implied growth is for owner earnings (FCF minus SBC) and is compared with realized revenue growth, a proxy; base growth comes from past revenue growth, so the test partly reflects growth persistence. Forward excess returns stay in the report as information only. Per-period results are reported but not gated.
+
+## Result of position-rules-v2 (run 36589951886, commit c442aa2)
+
+Activation: **no**. Universe C: 104 of 106 fetched (CTRA and IPG are no longer in the SEC ticker list). Pooled 2014–2022: 670 of 1,770 observations labelled, 70 companies.
+
+| Test (gated: pooled) | Pooled 2014–2022 | 2018–2022 (info) | 2014–2017 (info) |
+|---|---|---|---|
+| A1 Quality, forward ROIC | **fail**: 17.6% (37) > 14.1% (27) > 13.7% (7): Low n below 10 | 18.2% > 14.5% > 13.7% (Low 7) | 15.3% > 13.6%, Low 0 |
+| A2 Growth, forward revenue CAGR | **fail**: Durable 6.2% (300), Moderate 5.8% (230), Weak 6.6% (136) | 7.4% / 5.0% / 8.8% | 5.0% / 6.6% / 6.0% |
+| A3′ Value, realized reached implied | pass: 71% (161) > 44% (159) > 26% (273) | 76% / 42% / 25% | 65% / 47% / 28% |
+| A4 Type | **fail**: drawdown 5.5% vs 3.7%, but stability 78% (< 80%) | stability 76% | pass (83%) |
+| A5 Coverage | pass: 70 | 67 | 55 |
+
+Forward excess return (information only): Undemanding +2.9%, Reasonable +3.0%, Demanding −3.9% pooled.
+
+Reading. The redefined Value claim held on a third, untouched universe in both periods. Growth, which passed all four earlier tests, did not separate on universe C, and Type was less stable there; Quality kept its order, but the Low group again had too few observations. A defect in the test harness was noticed while reading this result and is recorded, not fixed retroactively: forward ROIC outcomes are computed without the `not_presented` convention that the labels use, so companies with no debt or no short-term investments drop out of the Quality outcome (hence the small Quality groups). Correcting it changes the test and must be validated on data not yet seen.
+
+## Evidence across all five runs
+
+| | A 2018–22 | A 2014–17 | B 2018–22 | B 2014–17 | C pooled |
+|---|---|---|---|---|---|
+| Quality order High > Average > Low | yes | yes (Low n 5) | yes | yes (Low n 5) | yes (Low n 7) |
+| Growth (A2) | pass | pass | pass | pass | **fail** |
+| Type (A4) | pass | pass | pass | pass | **fail** (stability 78%) |
+| Value returns (v1.x A3) | pass | fail | fail | fail | not gated |
+| Value expectations (v2 A3′ definition) | 69/51/14 | 90/69/24 | 76/38/17 | 71/51/10 | 71/44/26 |
+
+No rule version has passed a full pre-registered gate. All remain `"active": false`, and no Position label may be written or shown.
