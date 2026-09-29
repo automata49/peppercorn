@@ -261,3 +261,8 @@ def test_cli_rejects_empty_folder_and_nonpositive_quarters(monkeypatch, tmp_path
     with pytest.raises(SystemExit) as stop:
         persist.main()
     assert stop.value.code == 2 and "--quarters must be positive" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("given", ["https://proj.example.co", "https://proj.example.co/rest/v1", " https://proj.example.co/rest/v1/ "])
+def test_client_accepts_project_url_or_rest_endpoint(given):
+    assert persist.Client(given, "t").url == "https://proj.example.co"

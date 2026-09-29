@@ -1,0 +1,103 @@
+name: Position staging verify (test Supabase only)
+
+# 수동 실행 전용. Actions 탭 → "Position staging verify" → Run workflow
+# 격리된 테스트 Supabase 프로젝트에만 스키마를 적용하고 position_pipeline 권한과 persist.py 쓰기를 검증한다.
+# 운영 프로젝트(mhbcchegrbakearqptdr)를 가리키면 즉시 중단한다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: position-staging
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+  TEST_SUPABASE_APIKEY: ${{ secrets.TEST_SUPABASE_APIKEY }}
+  TEST_SUPABASE_JWT_SECRET: ${{ secrets.TEST_SUPABASE_JWT_SECRET }}
+  TEST_SUPABASE_DB_URL: ${{ secrets.TEST_SUPABASE_DB_URL }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2'
+
+      - name: Refuse production and missing secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in TEST_SUPABASE_URL TEST_SUPABASE_APIKEY TEST_SUPABASE_JWT_SECRET TEST_SUPABASE_DB_URL; do
+            [ -n "${!name}" ] || { echo "::error::repository secret $name is not set"; exit 1; }
+          done
+          case "$TEST_SUPABASE_URL $TEST_SUPABASE_DB_URL" in
+            *"$PRODUCTION_REF"*) echo "::error::secrets point at the production project; refusing"; exit 1 ;;
+          esac
+          echo "Target is not the production project."
+
+      - name: Apply schema.sql (empty project only) and position_growth.sql (twice, to prove re-runs)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # schema.sql is not re-runnable (plain create policy), so apply it only to an empty project.
+          if [ "$(psql "$TEST_SUPABASE_DB_URL" -X -A -t -c "select to_regclass('public.instruments') is not null")" = "t" ]; then
+            echo "public.instruments exists; schema.sql not re-applied"
+          else
+            psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/schema.sql
+          fi
+          psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/position_growth.sql
+          psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/position_growth.sql
+          psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+          insert into public.instruments(market, ticker, name, currency) values
+            ('US', 'NVDA', 'NVIDIA', 'USD'), ('KR', '005930', '삼성전자', 'KRW')
+          on conflict (market, ticker) do nothing;
+          notify pgrst, 'reload schema';
+          SQL
+          sleep 5
+
+      - name: Role, grant and token checks through the Data API
+        run: python supabase/tests/position_growth_staging.py roles
+
+      - name: Collect NVDA and Samsung fundamentals
+        working-directory: analysis/fundamentals
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python collect.py --out out
+
+      - name: persist.py dry run, apply, and idempotent re-apply
+        shell: bash
+        run: |
+          set -euo pipefail
+          python analysis/fundamentals/persist.py analysis/fundamentals/out
+          POSITION_PIPELINE_JWT=$(python supabase/tests/position_growth_staging.py token)
+          echo "::add-mask::$POSITION_PIPELINE_JWT"
+          export POSITION_PIPELINE_JWT POSITION_SUPABASE_URL="$TEST_SUPABASE_URL" POSITION_SUPABASE_APIKEY="$TEST_SUPABASE_APIKEY"
+          python analysis/fundamentals/persist.py analysis/fundamentals/out --apply
+          FIRST=$(python supabase/tests/position_growth_staging.py counts)
+          python analysis/fundamentals/persist.py analysis/fundamentals/out --apply
+          SECOND=$(python supabase/tests/position_growth_staging.py counts)
+          echo "after first apply:  $FIRST"
+          echo "after second apply: $SECOND"
+          {
+            echo "## Position staging verify"
+            echo "- after first apply: \`$FIRST\`"
+            echo "- after second apply: \`$SECOND\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+          python - "$FIRST" "$SECOND" <<'PY'
+          import json, sys
+          first, second = (json.loads(arg) for arg in sys.argv[1:])
+          if first["facts"] == 0 or first["snapshots"] == 0:
+              raise SystemExit("apply wrote no facts or no snapshots")
+          if first != second:
+              raise SystemExit(f"re-apply was not idempotent: {first} -> {second}")
+          print("PASS re-apply added no rows")
+          PY
