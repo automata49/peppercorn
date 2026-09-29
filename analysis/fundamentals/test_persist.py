@@ -80,7 +80,8 @@ def test_facts_without_complete_lineage_are_skipped_and_reported():
     del result["source_lineage"]["2026-07-26"]["equity"]
     result["source_lineage"]["2026-07-26"]["capex"]["inputs"][0]["filed"] = None
     rows, skipped = persist.fact_rows(result)
-    assert sorted(skipped) == ["2026-07-26/capex: no complete filing lineage", "2026-07-26/equity: no complete filing lineage"]
+    assert len(skipped) == 2 and all("no complete filing lineage" in item for item in skipped)
+    assert {item.split(":")[0] for item in skipped} == {"2026-07-26/capex", "2026-07-26/equity"}
     assert not any(r["period_end"] == "2026-07-26" and r["field"] in ("capex", "equity") and r["status"] == "reported" for r in rows)
 
 
@@ -98,7 +99,16 @@ def test_snapshot_status_follows_checks_and_never_has_labels():
     assert persist.snapshot_row(result, ["h1", "h2"], "2026-09-28")["status"] == "check_failed"
     assert not {"score", "position_score", "composite_score", "total_score"} & set(ok["metrics"])
     other_day = persist.snapshot_row(_result(), ["h1", "h2"], "2026-09-29")
-    assert other_day["input_hash"] != ok["input_hash"]
+    assert other_day["input_hash"] == ok["input_hash"]
+    changed = _result()
+    changed["metrics"]["roic"] = 0.31
+    assert persist.snapshot_row(changed, ["h1", "h2"], "2026-09-28")["input_hash"] != ok["input_hash"]
+    changed = _result()
+    changed["checks"][0][1] = False
+    assert persist.snapshot_row(changed, ["h1", "h2"], "2026-09-28")["input_hash"] != ok["input_hash"]
+    changed = _result()
+    changed["checks"][0][2] = "65 days ago"
+    assert persist.snapshot_row(changed, ["h1", "h2"], "2026-09-29")["input_hash"] == ok["input_hash"]
     assert persist.snapshot_row(_result(), ["h2", "h1"], "2026-09-28")["input_hash"] == ok["input_hash"]
     assert persist.snapshot_row({**_result(), "metrics": {}}, [], "2026-09-28") is None
 
@@ -107,6 +117,43 @@ def test_plan_refuses_error_results_and_historical_reconstructions():
     assert persist.plan({"ticker": "T", "error": "boom"}, 20, "2026-09-28")["refused"]
     assert "as_of" in persist.plan({**_result(), "as_of": "2025-08-27"}, 20, "2026-09-28")["refused"]
     assert "facts" in persist.plan(_result(), 20, "2026-09-28")
+
+
+def test_plan_refuses_partial_lineage_and_unauditable_snapshots():
+    missing = _result()
+    del missing["source_lineage"]["2026-07-26"]["equity"]
+    refused = persist.plan(missing, 20, "2026-09-28")
+    assert "facts" not in refused and "2026-07-26/equity" in refused["refused"]
+    missing = _result()
+    for fields in missing["source_lineage"].values():
+        for origin in fields.values():
+            del origin["inputs"][0]["accession"]
+    assert "lineage" in persist.plan(missing, 20, "2026-09-28")["refused"]
+    missing = _result()
+    del missing["raw_sha256"]
+    for fields in missing["source_lineage"].values():
+        for origin in fields.values():
+            del origin["inputs"][0]["raw_sha256"]
+    assert "lineage" in persist.plan(missing, 20, "2026-09-28")["refused"]
+    for result in ({**_result(), "checks": []}, {**_result(), "metrics": {}}):
+        assert "no auditable collector snapshot" in persist.plan(result, 20, "2026-09-28")["refused"]
+    assert "positive" in persist.plan(_result(), 0, "2026-09-28")["refused"]
+    assert "latest quarter" in persist.plan({**_result(), "quarters": {}}, 20, "2026-09-28")["refused"]
+    mismatched = _result()
+    mismatched["metrics"]["as_of"] = "2026-09-01"
+    assert "latest quarter" in persist.plan(mismatched, 20, "2026-09-28")["refused"]
+
+
+def test_plan_is_stable_across_daily_reruns_and_changes_for_an_amendment():
+    baseline = persist.plan(_result(), 20, "2026-09-28")
+    retry = persist.plan(_result(), 20, "2026-09-29")
+    assert baseline["snapshot"]["input_hash"] == retry["snapshot"]["input_hash"]
+    assert [f["input_hash"] for f in baseline["facts"]] == [f["input_hash"] for f in retry["facts"]]
+    amendment = persist.plan(_result(accession="0001-26-000099"), 20, "2026-09-29")
+    assert amendment["snapshot"]["input_hash"] != baseline["snapshot"]["input_hash"]
+    changed_unknown = _result()
+    changed_unknown["source"] = "SEC amendment"
+    assert persist.plan(changed_unknown, 20, "2026-09-29")["snapshot"]["input_hash"] != baseline["snapshot"]["input_hash"]
 
 
 class _Response:
@@ -204,3 +251,13 @@ def test_cli_exits_nonzero_when_a_result_is_refused(monkeypatch, tmp_path, capsy
     with pytest.raises(SystemExit) as stop:
         persist.main()
     assert stop.value.code == 1 and "REFUSED T" in capsys.readouterr().out
+
+
+def test_cli_rejects_empty_folder_and_nonpositive_quarters(monkeypatch, tmp_path, capsys):
+    monkeypatch.setattr("sys.argv", ["persist.py", str(tmp_path)])
+    with pytest.raises(SystemExit, match="No collector JSON results"):
+        persist.main()
+    monkeypatch.setattr("sys.argv", ["persist.py", str(tmp_path), "--quarters", "0"])
+    with pytest.raises(SystemExit) as stop:
+        persist.main()
+    assert stop.value.code == 2 and "--quarters must be positive" in capsys.readouterr().err

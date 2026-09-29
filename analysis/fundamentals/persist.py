@@ -68,8 +68,11 @@ def fact_rows(result: dict, quarters: int = 20) -> tuple[list[dict], list[str]]:
             origin = result.get("source_lineage", {}).get(end, {}).get(field)
             inputs = (origin or {}).get("inputs") or []
             filed = [_iso(i["filed"]) for i in inputs if i.get("filed")]
-            if not inputs or len(filed) != len(inputs):
-                skipped.append(f"{end}/{field}: no complete filing lineage")
+            identity_key = {"US": "accession", "KR": "receipt"}.get(market)
+            if (not inputs or len(filed) != len(inputs) or not identity_key
+                    or any(not item.get(identity_key) or not item.get("end") for item in inputs)
+                    or not (result.get("raw_sha256") or all(item.get("raw_sha256") for item in inputs))):
+                skipped.append(f"{end}/{field}: no complete filing lineage (date, identity, period, raw hash)")
                 continue
             method = capex_method if field == "capex" else EXTRACT_VERSION
             identity = {"field": field, "period_end": end, "value": value, "operation": origin["operation"],
@@ -108,8 +111,12 @@ def snapshot_row(result: dict, fact_hashes: list[str], computed_on: str) -> dict
             "checks": [list(check) for check in result["checks"]], "metrics": metrics,
             "type_label": None, "quality_label": None, "growth_label": None, "value_label": None,
             "label_reasons": {}, "pipeline_version": PIPELINE_VERSION,
+            # A wall-clock retry is the same input. Changed facts, methods, checks,
+            # metrics or pipeline version create a distinct immutable snapshot.
             "input_hash": digest({"facts": sorted(fact_hashes), "fcf": method["version"], "rules": RULES_VERSION,
-                                  "roic": metrics.get("roic_method"), "computed_on": computed_on})}
+                                  "roic": metrics.get("roic_method"),
+                                  "checks": [[check[0], check[1]] for check in result["checks"]],
+                                  "metrics": metrics, "pipeline_version": PIPELINE_VERSION})}
 
 
 def plan(result: dict, quarters: int, computed_on: str) -> dict:
@@ -118,10 +125,21 @@ def plan(result: dict, quarters: int, computed_on: str) -> dict:
         return {"ticker": result.get("ticker"), "refused": "collector reported an error"}
     if result.get("as_of"):
         return {"ticker": result["ticker"], "refused": "historical as_of reconstruction is not persisted"}
+    if quarters < 1:
+        return {"ticker": result.get("ticker"), "refused": "quarters must be positive"}
+    if not result.get("checks") or not (result.get("metrics") or {}).get("as_of"):
+        return {"ticker": result.get("ticker"), "refused": "no auditable collector snapshot"}
+    if (not result.get("quarters") or result["metrics"]["as_of"] != max(result["quarters"])):
+        return {"ticker": result.get("ticker"), "refused": "no matching latest quarter for collector snapshot"}
     facts, skipped = fact_rows(result, quarters)
-    reported = [row["input_hash"] for row in facts if row["status"] == "reported"]
+    if skipped:
+        return {"ticker": result.get("ticker"), "refused":
+                f"{len(skipped)} present facts lack complete lineage: {', '.join(skipped[:3])}"}
+    if not any(row["status"] == "reported" for row in facts):
+        return {"ticker": result.get("ticker"), "refused": "no reported facts support collector snapshot"}
+    fact_hashes = [row["input_hash"] for row in facts]
     return {"ticker": result["ticker"], "market": result["market"], "facts": facts, "skipped": skipped,
-            "snapshot": snapshot_row(result, reported, computed_on)}
+            "snapshot": snapshot_row(result, fact_hashes, computed_on)}
 
 
 class Client:
@@ -179,6 +197,11 @@ def main():
     ap.add_argument("--quarters", type=int, default=20, help="newest quarters to persist (default 20)")
     ap.add_argument("--apply", action="store_true", help="write to the database; default is a dry run")
     args = ap.parse_args()
+    if args.quarters < 1:
+        ap.error("--quarters must be positive")
+    results = load_results(Path(args.out))
+    if not results:
+        raise SystemExit("No collector JSON results found")
     client = None
     if args.apply:
         url, token = os.environ.get("POSITION_SUPABASE_URL", ""), os.environ.get("POSITION_PIPELINE_JWT", "")
@@ -186,7 +209,7 @@ def main():
             raise SystemExit("--apply needs POSITION_SUPABASE_URL and POSITION_PIPELINE_JWT (server side only)")
         client = Client(url, token, os.environ.get("POSITION_SUPABASE_APIKEY") or None)
     failed = False
-    for result in load_results(Path(args.out)):
+    for result in results:
         planned = plan(result, args.quarters, date.today().isoformat())
         if "refused" in planned:
             print(f"REFUSED {planned['ticker']}: {planned['refused']}")
