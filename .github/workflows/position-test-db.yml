@@ -4,6 +4,9 @@ name: Position test DB (migration + ingestion)
 # Actions 탭 → "Position test DB" → Run workflow
 on:
   workflow_dispatch:
+  push:  # TEMPORARY: dispatch needs the file on main; remove before merging
+    branches: [feat/position-reference-metadata-ingestion]
+    paths: [.github/workflows/position-test-db.yml]
 
 permissions:
   contents: read
