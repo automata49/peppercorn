@@ -1,0 +1,41 @@
+name: Position rules backtest
+
+# 수동 실행 전용. SEC companyfacts 와 Yahoo 가격을 받아 라벨 규칙을 과거 시점별로 백테스트한다. DB 쓰기 없음.
+on:
+  workflow_dispatch:
+  push:  # TEMPORARY: dispatch needs the file on main; remove before merging
+    branches: [claude/position-rules-v1]
+    paths: [.github/workflows/position-backtest.yml]
+
+permissions:
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: analysis/fundamentals
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2'
+      - run: python -m pytest -q
+      - name: Fetch SEC facts and prices
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: python backtest.py fetch --cache cache
+      - name: Backtest
+        run: |
+          python backtest.py run --cache cache --out bt | tee -a "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: position-backtest
+          path: |
+            analysis/fundamentals/bt/
+            analysis/fundamentals/cache/
+          if-no-files-found: warn

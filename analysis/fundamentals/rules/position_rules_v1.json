@@ -1,0 +1,90 @@
+{
+  "version": "position-rules-v1",
+  "active": false,
+  "active_note": "Labels are emitted only when active is true, which requires the backtest in docs/harness/POSITION_RULES_V1.md to pass its acceptance checks.",
+  "markets": [
+    "US"
+  ],
+  "market_note": "KR is not covered: DART has no point-in-time archive for a lookahead-free backtest and no weighted diluted share basis for Value. KR snapshots stay insufficient_data under this version.",
+  "window": {
+    "quarters": 24,
+    "min_ttm_points": 16,
+    "note": "Rules read up to 24 consecutive quarter ends (6 years). Type, Quality and non-cyclical Growth need at least 16 TTM points (19 quarters, so 12 year-over-year changes); cyclical through-cycle growth needs all 24 quarters. A gap longer than 100 days between quarter ends inside the window makes the data insufficient."
+  },
+  "type": {
+    "order": [
+      "Unprofitable",
+      "Cyclical",
+      "Fast Grower",
+      "Stalwart",
+      "Slow Grower"
+    ],
+    "unprofitable": {
+      "ttm_operating_income_max": 0
+    },
+    "cyclical": {
+      "revenue_drawdown_min": 0.15,
+      "operating_margin_drawdown_min": 0.15,
+      "note": "Peak-to-later-trough decline of TTM revenue (relative) or TTM operating margin (percentage points) inside the window. Either triggers Cyclical."
+    },
+    "growth_classes": {
+      "fast_min_cagr": 0.15,
+      "stalwart_min_cagr": 0.05
+    },
+    "basis": "Lynch, One Up on Wall Street (1989): slow growers grow about as fast as GDP, stalwarts 10-12%, fast growers 20-25%; cyclicals rise and fall with the cycle. Bands are widened so the categories are exhaustive."
+  },
+  "quality": {
+    "labels": [
+      "High",
+      "Average",
+      "Low"
+    ],
+    "high_roic_min": 0.15,
+    "low_roic_max": 0.08,
+    "high_fcf_conversion_min": 0.7,
+    "high_dilution_max": 0.03,
+    "fcf_window_quarters": 12,
+    "cyclical_roic": "mean of TTM ROIC at the latest quarter and every fourth quarter before it inside the window (at least 3 points)",
+    "basis": "ROIC below about 8% does not clear a typical US cost of capital (Damodaran's annual cost-of-capital data put the US market WACC near 7-8%); 15% is roughly the top third of US non-financial companies in McKinsey's long-run ROIC distribution (Koller et al., Valuation). FCF conversion uses cumulative 12-quarter FCF over cumulative net income to damp timing noise. Share count growth above 3% a year signals capital allocation that transfers value from holders.",
+    "not_covered": "incremental ROIC and a qualitative capital allocation review"
+  },
+  "growth": {
+    "labels": [
+      "Durable",
+      "Moderate",
+      "Weak"
+    ],
+    "durable_min_cagr": 0.03,
+    "durable_min_positive_share": 0.75,
+    "durable_min_momentum": 0.5,
+    "weak_min_positive_share": 0.5,
+    "cyclical_durable_min": 0.05,
+    "cyclical_weak_max": 0.0,
+    "basis": "Non-cyclical: durability is consistency (share of the last 12 TTM year-over-year changes that are positive) and momentum (latest TTM growth at least half the 3-year CAGR), with a 3% floor so a flat business is not called durable. Cyclical: growth of the latest 12-quarter revenue sum over the previous 12-quarter sum, annualised, so a single peak or trough does not decide the label.",
+    "not_covered": "reinvestment runway and competitive evidence; they need cited filing text and are not computed"
+  },
+  "value": {
+    "labels": [
+      "Attractive",
+      "Fair",
+      "Expensive",
+      "Speculative"
+    ],
+    "discount_rate": 0.09,
+    "terminal_growth": 0.025,
+    "high_growth_years": 5,
+    "fade_years": 5,
+    "base_growth_min": -0.05,
+    "base_growth_max": 0.2,
+    "bear_multiplier": 0.5,
+    "bull_multiplier": 1.5,
+    "bull_growth_max": 0.3,
+    "attractive_gap": 0.05,
+    "cash_flow": "TTM free cash flow minus stock-based compensation (owner earnings proxy, not Buffett maintenance-CapEx owner earnings); cyclicals use the 12-quarter average",
+    "share_basis": "latest quarter weighted-average diluted shares, moved to the price's split basis",
+    "price_basis": "Yahoo chart close on the valuation day (last trading day within 7 days), split-adjusted",
+    "labels_rule": "Implied growth is the first-5-year growth that makes the DCF equal the enterprise value. Attractive when implied growth is at least 5 points below base growth; Expensive when implied growth is above bull growth; otherwise Fair. Speculative when the cash flow base is not positive, since a DCF on it is undefined.",
+    "basis": "Discount rate 9% approximates a US equity cost of capital (risk-free about 4% plus Damodaran's implied equity risk premium of about 4.5-5%); terminal growth 2.5% stays below long-run nominal GDP. Base growth is the 3-year revenue CAGR (cyclicals: through-cycle growth), bounded to -5%..20%; bear is half, bull 1.5x (at most 30%). Mauboussin and Rappaport's expectations investing frames value as implied versus expected growth.",
+    "bear_rule": "bear = base - |base| x (1 - bear_multiplier); bull = min(base + |base| x (bull_multiplier - 1), bull_growth_max), so a negative base gets a worse bear case"
+  }
+}
