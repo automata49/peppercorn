@@ -42,7 +42,7 @@ Validation: `python -m pytest -q analysis/fundamentals` (33 passed), `npm run ha
 
 ## Samsung reference extension and KR CapEx basis — 2026-09-28
 Samsung now has 8 reference quarters (2024-09-30 to 2026-06-30) read directly from official PDFs (pypdf, scratch install only); `filed` is null for the new rows (not captured), so they are skipped under `as_of`. Found that Samsung's PPE acquisition line switched from net to gross of government grants in the FY2025 report, which would have overstated fiscal Q4 2025 CapEx by about 1.7 trillion KRW. `dart.py` nets the separate grants line and KR is now `KR-FCF-PPE-2`; details, assumptions and recalculation impact in `SOURCE_RECONCILIATION.md`.
-Open: NVIDIA fiscal Q4 quarters (10-K fetch truncated); DART receipt numbers and filing dates for Samsung; a person should spot-check both companies' 2026 rows; live collector and DART account name `정부보조금의 수취` not yet compared with the new rows (first `fundamentals-poc` run will, and a failure should be inspected, not loosened); bond line disappearance in 2026 makes KR debt unknown by design.
+Open: NVIDIA fiscal Q4 quarters (10-K fetch truncated); DART receipt numbers and filing dates for Samsung; a person should spot-check both companies' 2026 rows; live collector and DART account name `정부보조금의 수취` not yet compared with the new rows (first `fundamentals-poc` run will, and a failure should be inspected, not loosened).
 Validation: `python -m pytest -q analysis/fundamentals` (36 passed), `npm run harness:check`.
 
 ## NVIDIA fiscal Q4 added — 2026-09-28
@@ -54,3 +54,8 @@ Market ROIC methods `US-ROIC-1` and `KR-ROIC-1` are declared in `methods.py` and
 Not done: nothing has been applied to a deployed Supabase project; no ingestion job writes the new tables; `filings`, valuation, KPI, AI and thesis tables are deferred; label vocabularies and thresholds are uncalibrated. KR lease account ids/names and the `정부보조금의 수취` account name are unverified against live DART. The Korean tax rates rest on two secondary sources.
 Next: review the migration against a real Supabase branch database (JWT role mapping, default privileges), then write the idempotent server-side ingestion using `assertPositionWriteTarget` and the `input_hash` key, then compare the live collector with the reference rows.
 Validation: `python -m pytest -q analysis/fundamentals` (43 passed), `npm run harness:check`.
+
+## First live poc run and a correction — 2026-09-28
+`fundamentals-poc` run 36432983094 on main `136a1c8` passed: 58 checks per company, 46 official reference rows each, NVIDIA 74 quarters and Samsung 22 (2021-03-31 to 2026-06-30). The DART account `정부보조금의 수취` matched live data, so KR CapEx is netted as designed; NVIDIA `US-ROIC-1` and Samsung `KR-ROIC-1` (lease basis `excluded_not_presented`) were emitted. Corrects an earlier note: Samsung's 2026 balance sheets still list a bond line, so 2026 debt is known and now in the reference.
+Still open: a person's spot-check of the 2026 reference rows and the single-source 2024 NVIDIA cash flow inputs; Samsung DART receipt numbers and filing dates; live DART lease account ids (none appeared); Korean tax rates from secondary sources; migration not applied to any Supabase project and no ingestion job yet.
+Validation: `python -m pytest -q analysis/fundamentals`, `npm run harness:check`.
