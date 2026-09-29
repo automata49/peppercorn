@@ -1,0 +1,23 @@
+name: TMP db check on test project
+on:
+  push:
+    branches: [claude/position-production-migrate]
+    paths: [.github/workflows/tmp-db-check.yml]
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      PROD_SUPABASE_DB_URL: ${{ secrets.TEST_SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          case "$PROD_SUPABASE_DB_URL" in *mhbcchegrbakearqptdr*) exit 1 ;; esac
+          python supabase/tests/position_growth_db_check.py swing-acl > "$RUNNER_TEMP/before.json"
+          python -c "import json;d=json.load(open('$RUNNER_TEMP/before.json'));print({k:len(v) for k,v in d.items()})"
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/position_growth.sql
+          python supabase/tests/position_growth_db_check.py verify "$RUNNER_TEMP/before.json"

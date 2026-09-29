@@ -1,0 +1,58 @@
+name: Position migration (production)
+
+# 수동 실행 전용. Actions 탭 → "Position migration (production)" → Run workflow, confirm 칸에 apply 입력.
+# supabase/position_growth.sql 만 한 트랜잭션으로 적용하고, 읽기 전용 SQL로 권한과 Swing 테이블 무변경을 확인한다.
+# 데이터 적재(persist.py)는 하지 않는다. 운영 파이프라인 자격 증명은 별도 결정 사항이다.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 운영 DB에 적용하려면 apply 입력
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: position-production
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm target
+        shell: bash
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          [ "$CONFIRM" = "apply" ] || { echo "::error::confirm input must be 'apply'"; exit 1; }
+          [ -n "$PROD_SUPABASE_DB_URL" ] || { echo "::error::repository secret PROD_SUPABASE_DB_URL is not set"; exit 1; }
+          case "$PROD_SUPABASE_DB_URL" in
+            *"$PRODUCTION_REF"*) echo "Target is the production project." ;;
+            *) echo "::error::PROD_SUPABASE_DB_URL does not point at the production project"; exit 1 ;;
+          esac
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+          psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select 'instruments present: ' || (to_regclass('public.instruments') is not null)"
+
+      - name: Record Swing/user grants and policies before
+        run: python supabase/tests/position_growth_db_check.py swing-acl > "$RUNNER_TEMP/before.json"
+
+      - name: Apply position_growth.sql in one transaction
+        run: |
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/position_growth.sql
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -c "notify pgrst, 'reload schema'"
+
+      - name: Verify roles, grants and unchanged Swing tables
+        run: python supabase/tests/position_growth_db_check.py verify "$RUNNER_TEMP/before.json"
