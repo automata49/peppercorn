@@ -1,7 +1,7 @@
 {
   "version": "position-rules-v2",
   "active": false,
-  "active_note": "Activation requires pre-registered A1, A2, A3 (expectations), A4 and A5 on universe C (backtest.UNIVERSE_C) pooled over 2014-06-30..2022-06-30; see docs/harness/POSITION_RULES_V1.md.",
+  "active_note": "Failed the pre-registered universe C gate on 2026-09-30 (A1 Quality Low n 7, A2 Growth order, A4 Type stability 78%); A3 expectations passed. Stays inactive; see docs/harness/POSITION_RULES_V1.md.",
   "markets": [
     "US"
   ],

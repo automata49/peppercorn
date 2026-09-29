@@ -132,6 +132,30 @@ Activation requires all of, on that pooled sample:
 
 Limitation stated in advance: implied growth is for owner earnings (FCF minus SBC) and is compared with realized revenue growth, a proxy; base growth comes from past revenue growth, so the test partly reflects growth persistence. Forward excess returns stay in the report as information only. Per-period results are reported but not gated.
 
-## Result of position-rules-v2
+## Result of position-rules-v2 (run 36589951886, commit c442aa2)
 
-Pending the run recorded below.
+Activation: **no**. Universe C: 104 of 106 fetched (CTRA and IPG are no longer in the SEC ticker list). Pooled 2014–2022: 670 of 1,770 observations labelled, 70 companies.
+
+| Test (gated: pooled) | Pooled 2014–2022 | 2018–2022 (info) | 2014–2017 (info) |
+|---|---|---|---|
+| A1 Quality, forward ROIC | **fail**: 17.6% (37) > 14.1% (27) > 13.7% (7): Low n below 10 | 18.2% > 14.5% > 13.7% (Low 7) | 15.3% > 13.6%, Low 0 |
+| A2 Growth, forward revenue CAGR | **fail**: Durable 6.2% (300), Moderate 5.8% (230), Weak 6.6% (136) | 7.4% / 5.0% / 8.8% | 5.0% / 6.6% / 6.0% |
+| A3′ Value, realized reached implied | pass: 71% (161) > 44% (159) > 26% (273) | 76% / 42% / 25% | 65% / 47% / 28% |
+| A4 Type | **fail**: drawdown 5.5% vs 3.7%, but stability 78% (< 80%) | stability 76% | pass (83%) |
+| A5 Coverage | pass: 70 | 67 | 55 |
+
+Forward excess return (information only): Undemanding +2.9%, Reasonable +3.0%, Demanding −3.9% pooled.
+
+Reading. The redefined Value claim held on a third, untouched universe in both periods. Growth, which passed all four earlier tests, did not separate on universe C, and Type was less stable there; Quality kept its order, but the Low group again had too few observations. A defect in the test harness was noticed while reading this result and is recorded, not fixed retroactively: forward ROIC outcomes are computed without the `not_presented` convention that the labels use, so companies with no debt or no short-term investments drop out of the Quality outcome (hence the small Quality groups). Correcting it changes the test and must be validated on data not yet seen.
+
+## Evidence across all five runs
+
+| | A 2018–22 | A 2014–17 | B 2018–22 | B 2014–17 | C pooled |
+|---|---|---|---|---|---|
+| Quality order High > Average > Low | yes | yes (Low n 5) | yes | yes (Low n 5) | yes (Low n 7) |
+| Growth (A2) | pass | pass | pass | pass | **fail** |
+| Type (A4) | pass | pass | pass | pass | **fail** (stability 78%) |
+| Value returns (v1.x A3) | pass | fail | fail | fail | not gated |
+| Value expectations (v2 A3′ definition) | 69/51/14 | 90/69/24 | 76/38/17 | 71/51/10 | 71/44/26 |
+
+No rule version has passed a full pre-registered gate. All remain `"active": false`, and no Position label may be written or shown.

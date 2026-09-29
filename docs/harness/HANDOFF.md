@@ -111,3 +111,8 @@ PR #41 merged (`f7c15b7`). `position-rules-v1.2` (identical to v1.1) was pre-reg
 Production migration: `PROD_SUPABASE_DB_URL` is registered, but the Claude Code auto-mode permission check refused to dispatch the production workflow, so it has not run. A person must run Actions → "Position migration (production)" with confirm `apply` and check its 47 checks.
 Next: decide a Value label definition (return forecast vs implied-growth expectation) and a fresh validation sample before any activation.
 Validation: `python -m pytest -q analysis/fundamentals` (146 passed), `npm run harness:check`.
+
+## Value as an expectations label (position-rules-v2) — 2026-09-30
+By user decision, Value is redefined as how much growth the price requires (Undemanding / Reasonable / Demanding / Speculative) and judged on whether realized growth reached the implied growth. Pre-registered on a third universe (106 companies, run 36589951886): the Value expectations test passed (71% / 44% / 26%), but Growth (A2) and Type stability (A4, 78%) failed and Quality's Low group had 7 observations. v2 stays inactive. A harness defect was found: forward ROIC outcomes ignore `not_presented`, shrinking the Quality groups; fixing it needs fresh validation data. Five-run summary: `POSITION_RULES_V1.md`.
+Production migration: the first manual run (36588386136) failed at login (`password authentication failed`); the secret was corrected on 2026-09-29 15:19 UTC but the workflow has not been re-run.
+Validation: `python -m pytest -q analysis/fundamentals` (149 passed), `npm run harness:check`.
