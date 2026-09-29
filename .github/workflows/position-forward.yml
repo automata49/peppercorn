@@ -6,9 +6,6 @@ on:
   schedule:
     - cron: '0 7 3 * *'
   workflow_dispatch:
-  push:  # TEMPORARY: dispatch needs the file on main; remove before merging
-    branches: [claude/position-walk-forward]
-    paths: [.github/workflows/position-forward.yml]
 
 permissions:
   contents: write
