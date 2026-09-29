@@ -154,5 +154,35 @@ await as('anon', async () => ok('anon still reads market_metrics', (await tryQ('
 ok('pipeline is a member of authenticator only through the migration',
   (await db.query(`select pg_has_role('authenticator','position_pipeline','member') m`)).rows[0].m === true);
 
+// --- position-ingest Edge Function path: the function's own SQL under SET LOCAL ROLE position_pipeline
+const fnSource = readFileSync('supabase/functions/position-ingest/index.ts', 'utf8');
+const fnSql = name => new RegExp(`export const ${name} = \`([\\s\\S]*?)\`;`).exec(fnSource)[1];
+async function underPipeline(fn) {
+  await exec('begin');
+  try { await exec('set local role position_pipeline'); return await fn(); }
+  finally { await exec('rollback'); }
+}
+const edgeFact = fact({input_hash: h('f1')});
+delete edgeFact.instrument_id;
+const edgeSnap = snap({input_hash: h('f2'), status: 'unavailable', type_label: null, quality_label: null, growth_label: null,
+  value_label: null, label_reasons: {}});
+delete edgeSnap.instrument_id;
+await underPipeline(async () => {
+  const f1 = await tryQ(fnSql('FACT_INSERT'), [inst, JSON.stringify([edgeFact])]);
+  ok('edge fact insert works under the pipeline role', f1.ok && f1.rows.length === 1, f1.msg ?? JSON.stringify(f1));
+  const f2 = await tryQ(fnSql('FACT_INSERT'), [inst, JSON.stringify([edgeFact])]);
+  ok('edge fact insert is idempotent', f2.ok && f2.rows.length === 0, f2.msg);
+  const s1 = await tryQ(fnSql('SNAPSHOT_INSERT'), [inst, JSON.stringify([edgeSnap])]);
+  ok('edge snapshot insert works under the pipeline role', s1.ok && s1.rows.length === 1, s1.msg);
+});
+await underPipeline(async () => {
+  const bad = await tryQ(fnSql('FACT_INSERT'), [inst, JSON.stringify([{...edgeFact, input_hash: h('f3'), value: null}])]);
+  ok('edge path still enforces fact constraints', !bad.ok && bad.msg.includes('fundamentals_q_reported_has_evidence'), bad.msg);
+});
+await underPipeline(async () => ok('edge role cannot write price_daily', denied(await tryQ('delete from public.price_daily'))));
+await underPipeline(async () => ok('edge role cannot read stock_analyses', denied(await tryQ('select 1 from public.stock_analyses'))));
+ok('postgres can step down to position_pipeline (SET granted by the migration)',
+  (await db.query(`select pg_has_role('postgres','position_pipeline','member') m`)).rows[0].m === true);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

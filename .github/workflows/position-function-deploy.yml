@@ -1,0 +1,48 @@
+name: Position function deploy
+
+# 수동 실행 전용. position-ingest Edge Function 을 테스트 또는 운영 프로젝트에 배포한다.
+# SUPABASE_ACCESS_TOKEN (Supabase 개인 액세스 토큰) 시크릿이 필요하다. 운영은 confirm 에 deploy 를 입력해야 한다.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 배포 대상
+        type: choice
+        options: [test, prod]
+        default: test
+      confirm:
+        description: 운영 배포 시 deploy 입력
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Deploy
+        shell: bash
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          TARGET: ${{ inputs.target }}
+          CONFIRM: ${{ inputs.confirm }}
+          TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "::error::repository secret SUPABASE_ACCESS_TOKEN is not set"; exit 1; }
+          if [ "$TARGET" = "prod" ]; then
+            [ "$CONFIRM" = "deploy" ] || { echo "::error::production deploy needs confirm=deploy"; exit 1; }
+            ref=mhbcchegrbakearqptdr
+          else
+            ref=$(printf '%s' "$TEST_SUPABASE_URL" | sed -E 's#https://([a-z0-9]+)\.supabase\.co.*#\1#')
+            [ "$ref" != "mhbcchegrbakearqptdr" ] || { echo "::error::test target resolves to production"; exit 1; }
+          fi
+          # The caller authenticates with a GitHub OIDC token, not a Supabase JWT, as the Swing functions do.
+          supabase functions deploy position-ingest --project-ref "$ref" --no-verify-jwt

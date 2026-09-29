@@ -266,3 +266,23 @@ def test_cli_rejects_empty_folder_and_nonpositive_quarters(monkeypatch, tmp_path
 @pytest.mark.parametrize("given", ["https://proj.example.co", "https://proj.example.co/rest/v1", " https://proj.example.co/rest/v1/ "])
 def test_client_accepts_project_url_or_rest_endpoint(given):
     assert persist.Client(given, "t").url == "https://proj.example.co"
+
+
+def test_edge_client_sends_one_company_and_hides_the_token(monkeypatch):
+    sent = {}
+
+    def post(url, **kwargs):
+        sent.update(url=url, **kwargs)
+        return _Response(body={"ok": True, "facts_inserted": 2})
+    monkeypatch.setattr(persist.requests, "post", post)
+    client = persist.EdgeClient("https://proj.example.co/functions/v1/position-ingest/", "oidc-secret")
+    planned = {"market": "US", "ticker": "NVDA", "facts": [{"field": "revenue"}], "snapshot": None, "skipped": []}
+    assert persist.apply(planned, client) == {"ok": True, "facts_inserted": 2}
+    assert sent["url"] == "https://proj.example.co/functions/v1/position-ingest"
+    assert sent["headers"]["Authorization"] == "Bearer oidc-secret"
+    assert json.loads(sent["data"]) == {"market": "US", "ticker": "NVDA", "facts": [{"field": "revenue"}], "snapshot": None}
+
+    monkeypatch.setattr(persist.requests, "post", lambda url, **kw: _Response(status=422, text="bad oidc-secret"))
+    with pytest.raises(RuntimeError) as error:
+        client.send(planned)
+    assert "oidc-secret" not in str(error.value) and "***" in str(error.value)

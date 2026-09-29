@@ -184,7 +184,30 @@ class Client:
         return len(rows)
 
 
-def apply(planned: dict, client: Client) -> dict:
+class EdgeClient:
+    """Sends one company's rows to the position-ingest Edge Function, which writes them as position_pipeline.
+
+    The bearer token is the workflow's GitHub OIDC token; it never appears in messages."""
+
+    def __init__(self, url: str, token: str):
+        self.url = url.strip().rstrip("/")
+        self.token = token
+
+    def send(self, planned: dict) -> dict:
+        for table in ("fundamentals_q", "position_snapshot"):
+            assert_position_write_target(table)
+        body = {"market": planned["market"], "ticker": planned["ticker"], "facts": planned["facts"],
+                "snapshot": planned["snapshot"]}
+        response = requests.post(self.url, timeout=180, data=json.dumps(body, allow_nan=False),
+                                 headers={"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"})
+        if response.status_code >= 300:
+            raise RuntimeError(f"position-ingest failed: HTTP {response.status_code} {response.text.replace(self.token, '***')[:300]}")
+        return response.json()
+
+
+def apply(planned: dict, client: Client | EdgeClient) -> dict:
+    if isinstance(client, EdgeClient):
+        return client.send(planned)
     instrument = client.instrument_id(planned["market"], planned["ticker"])
     facts = [{**row, "instrument_id": instrument} for row in planned["facts"]]
     counts = {"facts": client.insert("fundamentals_q", facts)}
@@ -202,6 +225,8 @@ def main():
     ap.add_argument("out", help="collector output folder (NVDA.json, 005930.json)")
     ap.add_argument("--quarters", type=int, default=20, help="newest quarters to persist (default 20)")
     ap.add_argument("--apply", action="store_true", help="write to the database; default is a dry run")
+    ap.add_argument("--via", choices=["rest", "edge"], default="rest",
+                    help="rest: PostgREST with a pipeline JWT (test project); edge: position-ingest Edge Function with a GitHub OIDC token")
     args = ap.parse_args()
     if args.quarters < 1:
         ap.error("--quarters must be positive")
@@ -209,7 +234,12 @@ def main():
     if not results:
         raise SystemExit("No collector JSON results found")
     client = None
-    if args.apply:
+    if args.apply and args.via == "edge":
+        url, token = os.environ.get("POSITION_EDGE_URL", ""), os.environ.get("POSITION_OIDC_TOKEN", "")
+        if not url or not token:
+            raise SystemExit("--via edge needs POSITION_EDGE_URL and POSITION_OIDC_TOKEN (GitHub Actions only)")
+        client = EdgeClient(url, token)
+    elif args.apply:
         url, token = os.environ.get("POSITION_SUPABASE_URL", ""), os.environ.get("POSITION_PIPELINE_JWT", "")
         if not url or not token:
             raise SystemExit("--apply needs POSITION_SUPABASE_URL and POSITION_PIPELINE_JWT (server side only)")
