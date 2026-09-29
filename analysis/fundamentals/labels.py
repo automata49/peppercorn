@@ -58,8 +58,10 @@ def features(q: dict, rules: dict, default_tax: float, roic_method: dict, absent
         return f, [f"at least {rules['window']['min_ttm_points']} consecutive TTM points ending at the latest quarter"]
     latest = ends[-1]
     f["ttm_revenue"], f["ttm_operating_income"] = rev[latest], op[latest]
-    f["revenue_drawdown"] = _drawdown([rev[e] for e in points], relative=True)
-    f["operating_margin_drawdown"] = _drawdown([op[e] / rev[e] for e in points], relative=False)
+    recent = points[-(rules["window"]["drawdown_quarters"] - 3):]
+    f["drawdown_since"] = recent[0]
+    f["revenue_drawdown"] = _drawdown([rev[e] for e in recent], relative=True)
+    f["operating_margin_drawdown"] = _drawdown([op[e] / rev[e] for e in recent], relative=False)
     idx = {e: i for i, e in enumerate(ends)}
     back = lambda e, n: ends[idx[e] - n] if idx[e] - n >= 0 else None  # noqa: E731
     base3 = back(latest, 12)
@@ -111,14 +113,18 @@ def features(q: dict, rules: dict, default_tax: float, roic_method: dict, absent
     return f, missing
 
 
-def classify_type(f: dict, rules: dict) -> tuple[str, str]:
+def is_cyclical_industry(sic: int, rules: dict) -> bool:
+    return any(lo <= sic <= hi for lo, hi in rules["type"]["cyclical"]["sic_ranges"])
+
+
+def classify_type(f: dict, rules: dict, industry: dict) -> tuple[str, str]:
     t = rules["type"]
     if f["ttm_operating_income"] <= t["unprofitable"]["ttm_operating_income_max"]:
         return "Unprofitable", f"TTM operating income is {f['ttm_operating_income']:,.0f}, not positive"
-    c = t["cyclical"]
-    if f["revenue_drawdown"] >= c["revenue_drawdown_min"] or f["operating_margin_drawdown"] >= c["operating_margin_drawdown_min"]:
-        return "Cyclical", (f"TTM revenue fell up to {f['revenue_drawdown']:.0%} and operating margin up to "
-                            f"{f['operating_margin_drawdown'] * 100:.0f} points from a peak since {f['window_start']}")
+    if is_cyclical_industry(industry["sic"], rules):
+        return "Cyclical", (f"SIC {industry['sic']} ({industry.get('description') or 'industry'}) is a cyclical industry; "
+                            f"since {f['drawdown_since']} TTM revenue fell up to {f['revenue_drawdown']:.0%} and "
+                            f"operating margin up to {f['operating_margin_drawdown'] * 100:.0f} points from a peak")
     g = f["revenue_cagr_3y"]
     if g >= t["growth_classes"]["fast_min_cagr"]:
         return "Fast Grower", f"3-year TTM revenue CAGR {g:.1%}"
@@ -162,9 +168,13 @@ def classify_growth(f: dict, kind: str, rules: dict) -> tuple[str | None, str]:
     return "Moderate", text
 
 
-def dcf(cash_flow: float, g1: float, v: dict) -> float:
+def discount_rate(risk_free: float, v: dict) -> float:
+    return max(risk_free, v["risk_free_floor"]) + v["equity_risk_premium"]
+
+
+def dcf(cash_flow: float, g1: float, v: dict, r: float) -> float:
     """Present value of cash_flow growing at g1 for high_growth_years, fading linearly to terminal growth."""
-    r, gt, n1, n2 = v["discount_rate"], v["terminal_growth"], v["high_growth_years"], v["fade_years"]
+    gt, n1, n2 = v["terminal_growth"], v["high_growth_years"], v["fade_years"]
     value, cf = 0.0, cash_flow
     for year in range(1, n1 + n2 + 1):
         g = g1 if year <= n1 else g1 + (gt - g1) * (year - n1) / n2
@@ -173,14 +183,14 @@ def dcf(cash_flow: float, g1: float, v: dict) -> float:
     return value + cf * (1 + gt) / (r - gt) / (1 + r) ** (n1 + n2)
 
 
-def implied_growth(cash_flow: float, enterprise_value: float, v: dict, lo: float = -0.5, hi: float = 1.0) -> float:
-    if dcf(cash_flow, lo, v) >= enterprise_value:
+def implied_growth(cash_flow: float, enterprise_value: float, v: dict, r: float, lo: float = -0.5, hi: float = 1.0) -> float:
+    if dcf(cash_flow, lo, v, r) >= enterprise_value:
         return lo
-    if dcf(cash_flow, hi, v) <= enterprise_value:
+    if dcf(cash_flow, hi, v, r) <= enterprise_value:
         return hi
     for _ in range(80):
         mid = (lo + hi) / 2
-        lo, hi = (mid, hi) if dcf(cash_flow, mid, v) < enterprise_value else (lo, mid)
+        lo, hi = (mid, hi) if dcf(cash_flow, mid, v, r) < enterprise_value else (lo, mid)
     return round((lo + hi) / 2, 6)
 
 
@@ -195,18 +205,20 @@ def classify_value(f: dict, kind: str, price: dict | None, rules: dict) -> tuple
     detail = {"cash_flow_base": cash_flow}
     if kind == "Unprofitable" or cash_flow <= 0:
         return "Speculative", f"cash flow base (FCF minus SBC) is {cash_flow:,.0f}; a DCF on it is undefined", detail
-    if price is None:
-        return None, "no price or share basis on the valuation day", detail
+    if price is None or price.get("risk_free") is None:
+        return None, "no price, share basis or risk-free rate on the valuation day", detail
+    r = discount_rate(price["risk_free"], v)
     base = min(max(growth, v["base_growth_min"]), v["base_growth_max"])
     bear = base - abs(base) * (1 - v["bear_multiplier"])
     bull = min(base + abs(base) * (v["bull_multiplier"] - 1), v["bull_growth_max"])
     ev = price["market_cap"] + f["net_debt"]
-    implied = implied_growth(cash_flow, ev, v)
-    equity = {name: dcf(cash_flow, g, v) - f["net_debt"] for name, g in (("bear", bear), ("base", base), ("bull", bull))}
-    detail |= {"growth_bear": bear, "growth_base": base, "growth_bull": bull, "implied_growth": implied,
+    implied = implied_growth(cash_flow, ev, v, r)
+    equity = {name: dcf(cash_flow, g, v, r) - f["net_debt"] for name, g in (("bear", bear), ("base", base), ("bull", bull))}
+    detail |= {"discount_rate": r, "risk_free": price["risk_free"], "growth_bear": bear, "growth_base": base, "growth_bull": bull, "implied_growth": implied,
                "enterprise_value": ev, "market_cap": price["market_cap"],
                "equity_value": equity, "margin_of_safety": equity["base"] / price["market_cap"] - 1}
-    text = f"price implies {implied:.1%} growth vs base {base:.1%} (bear {bear:.1%}, bull {bull:.1%})"
+    text = (f"price implies {implied:.1%} growth vs base {base:.1%} (bear {bear:.1%}, bull {bull:.1%}) "
+            f"at a {r:.1%} discount rate")
     if implied <= base - v["attractive_gap"]:
         return "Attractive", text, detail
     if implied > bull:
@@ -215,7 +227,7 @@ def classify_value(f: dict, kind: str, price: dict | None, rules: dict) -> tuple
 
 
 def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax: float, roic_method: dict,
-             absent=()) -> dict:
+             absent=(), industry: dict | None = None) -> dict:
     """Four independent labels with one reason each, or insufficient_data with no labels."""
     out = {"rules_version": rules["version"], "status": "insufficient_data", "labels": {}, "reasons": {},
            "features": {}, "value_detail": {}, "missing": []}
@@ -224,10 +236,12 @@ def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax:
         return out
     f, missing = features(q, rules, default_tax, roic_method, absent)
     out["features"] = f
+    if not industry or not isinstance(industry.get("sic"), int):
+        missing = missing + ["industry SIC code"]
     if missing:
         out["missing"] = missing
         return out
-    kind, type_reason = classify_type(f, rules)
+    kind, type_reason = classify_type(f, rules, industry)
     quality, quality_reason = classify_quality(f, kind, rules)
     growth, growth_reason = classify_growth(f, kind, rules)
     value, value_reason, detail = classify_value(f, kind, price, rules)

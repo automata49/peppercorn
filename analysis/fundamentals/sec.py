@@ -77,6 +77,22 @@ def fetch(cik: int) -> dict:
     return body
 
 
+SUBMISSIONS_URL = "https://data.sec.gov/submissions/CIK{cik:010d}.json"
+
+
+def fetch_profile(cik: int) -> dict:
+    """Registrant SIC code from EDGAR submissions (current code; SEC does not publish a point-in-time history)."""
+    ua = os.environ.get("SEC_USER_AGENT", "").strip()
+    if "@" not in ua:
+        raise SystemExit("SEC_USER_AGENT 가 필요합니다. 예: 'Peppercorn Capital your@email.com'")
+    r = requests.get(SUBMISSIONS_URL.format(cik=cik), headers={"User-Agent": ua, "Accept-Encoding": "gzip"}, timeout=60)
+    r.raise_for_status()
+    body = r.json()
+    return {"sic": int(body["sic"]) if str(body.get("sic") or "").isdigit() else None,
+            "description": body.get("sicDescription"), "source": "SEC EDGAR submissions",
+            "raw_sha256": hashlib.sha256(r.content).hexdigest()}
+
+
 def _entries(facts: dict, tag: str, unit: str = "USD", as_of: str | None = None) -> list[dict]:
     node = facts.get("facts", {}).get("us-gaap", {}).get(tag)
     if not node:

@@ -15,6 +15,7 @@ import requests
 
 URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
 MAX_STALE_DAYS = 7
+RISK_FREE_SYMBOL = "^TNX"               # CBOE 10-year Treasury yield index, quoted in percent
 
 
 def _iso(ts: int) -> str:
@@ -23,7 +24,7 @@ def _iso(ts: int) -> str:
 
 def fetch(symbol: str, start: str = "2014-01-01") -> dict:
     begin = int(datetime.fromisoformat(start).replace(tzinfo=timezone.utc).timestamp())
-    response = requests.get(URL.format(symbol=symbol), headers={"User-Agent": "Mozilla/5.0"}, timeout=60, params={
+    response = requests.get(URL.format(symbol=requests.utils.quote(symbol, safe="")), headers={"User-Agent": "Mozilla/5.0"}, timeout=60, params={
         "period1": begin, "period2": int(datetime.now(timezone.utc).timestamp()), "interval": "1d", "events": "split,div"})
     response.raise_for_status()
     return parse(response.json(), symbol, hashlib.sha256(response.content).hexdigest())
@@ -31,7 +32,8 @@ def fetch(symbol: str, start: str = "2014-01-01") -> dict:
 
 def parse(body: dict, symbol: str, raw_sha256: str | None = None) -> dict:
     result = body["chart"]["result"][0]
-    quote, adj = result["indicators"]["quote"][0], result["indicators"]["adjclose"][0]["adjclose"]
+    quote = result["indicators"]["quote"][0]
+    adj = (result["indicators"].get("adjclose") or [{}])[0].get("adjclose") or quote["close"]  # indices have none
     rows = [(_iso(ts), c, a) for ts, c, a in zip(result.get("timestamp", []), quote["close"], adj)
             if c is not None and a is not None and c > 0 and a > 0]
     splits = sorted(({"date": _iso(int(s["date"])), "ratio": s["numerator"] / s["denominator"]}
@@ -85,3 +87,9 @@ def market_cap(prices: dict, day: str, shares: float | None, shares_filed: str |
     return {"price_date": price_day, "close_split_adjusted": close, "shares": shares, "shares_filed": shares_filed,
             "split_factor": factor, "market_cap": close * shares * factor, "source": prices["source"],
             "symbol": prices["symbol"], "raw_sha256": prices.get("raw_sha256")}
+
+
+def risk_free_on(tnx: dict, day: str) -> float | None:
+    """10-year Treasury yield as a fraction on the last trading day within MAX_STALE_DAYS."""
+    hit = close_on(tnx, day)
+    return None if hit is None else hit[1] / 100

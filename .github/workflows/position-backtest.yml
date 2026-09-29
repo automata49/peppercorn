@@ -29,7 +29,9 @@ jobs:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
         run: python backtest.py fetch --cache cache
       - name: Backtest
+        shell: bash
         run: |
+          set -o pipefail
           python backtest.py run --cache cache --out bt | tee -a "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()

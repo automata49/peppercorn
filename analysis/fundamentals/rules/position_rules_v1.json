@@ -9,7 +9,8 @@
   "window": {
     "quarters": 24,
     "min_ttm_points": 16,
-    "note": "Rules read up to 24 consecutive quarter ends (6 years). Type, Quality and non-cyclical Growth need at least 16 TTM points (19 quarters, so 12 year-over-year changes); cyclical through-cycle growth needs all 24 quarters. A gap longer than 100 days between quarter ends inside the window makes the data insufficient."
+    "note": "Rules read up to 24 consecutive quarter ends (6 years). Type, Quality and non-cyclical Growth need at least 16 TTM points (19 quarters, so 12 year-over-year changes); cyclical through-cycle growth needs all 24 quarters. A gap longer than 100 days between quarter ends inside the window makes the data insufficient.",
+    "drawdown_quarters": 20
   },
   "type": {
     "order": [
@@ -23,15 +24,69 @@
       "ttm_operating_income_max": 0
     },
     "cyclical": {
-      "revenue_drawdown_min": 0.15,
-      "operating_margin_drawdown_min": 0.15,
-      "note": "Peak-to-later-trough decline of TTM revenue (relative) or TTM operating margin (percentage points) inside the window. Either triggers Cyclical."
+      "sic_ranges": [
+        [
+          1000,
+          1499
+        ],
+        [
+          1520,
+          1799
+        ],
+        [
+          2600,
+          2699
+        ],
+        [
+          2810,
+          2829
+        ],
+        [
+          2860,
+          2899
+        ],
+        [
+          2910,
+          2911
+        ],
+        [
+          3310,
+          3399
+        ],
+        [
+          3510,
+          3569
+        ],
+        [
+          3630,
+          3639
+        ],
+        [
+          3674,
+          3674
+        ],
+        [
+          3711,
+          3716
+        ],
+        [
+          3720,
+          3729
+        ],
+        [
+          4400,
+          4599
+        ]
+      ],
+      "industries": "mining and oil and gas extraction, construction and homebuilding, paper, basic and industrial chemicals, petroleum refining, primary metals, industrial and farm machinery (incl. semiconductor equipment), household appliances, semiconductors, motor vehicles, aircraft, water and air transport",
+      "source": "SEC EDGAR submissions `sic` for the registrant (current code, not point-in-time)",
+      "note": "Cyclical is decided by industry, as Lynch defines it, because revenue drawdowns alone confused divestitures (KO, PG, ABT, DHR), one-off impairments (MSFT) and business-model transitions (ADBE) with cycles in the first backtest. Drawdowns inside the latest 20 quarters are reported in the reason as evidence only."
     },
     "growth_classes": {
       "fast_min_cagr": 0.15,
       "stalwart_min_cagr": 0.05
     },
-    "basis": "Lynch, One Up on Wall Street (1989): slow growers grow about as fast as GDP, stalwarts 10-12%, fast growers 20-25%; cyclicals rise and fall with the cycle. Bands are widened so the categories are exhaustive."
+    "basis": "Lynch, One Up on Wall Street (1989): slow growers grow about as fast as GDP, stalwarts 10-12%, fast growers 20-25%; cyclicals are companies in industries whose sales and profits rise and fall with the economy or commodity prices. Growth bands are widened so the categories are exhaustive."
   },
   "quality": {
     "labels": [
@@ -70,7 +125,10 @@
       "Expensive",
       "Speculative"
     ],
-    "discount_rate": 0.09,
+    "risk_free": "US 10-year Treasury yield on the valuation day (Yahoo ^TNX close, last trading day within 7 days)",
+    "risk_free_floor": 0.025,
+    "equity_risk_premium": 0.05,
+    "discount_rule": "discount rate = max(risk-free, risk_free_floor) + equity_risk_premium; the floor equals terminal growth so terminal growth never exceeds the risk-free rate",
     "terminal_growth": 0.025,
     "high_growth_years": 5,
     "fade_years": 5,
@@ -84,7 +142,7 @@
     "share_basis": "latest quarter weighted-average diluted shares, moved to the price's split basis",
     "price_basis": "Yahoo chart close on the valuation day (last trading day within 7 days), split-adjusted",
     "labels_rule": "Implied growth is the first-5-year growth that makes the DCF equal the enterprise value. Attractive when implied growth is at least 5 points below base growth; Expensive when implied growth is above bull growth; otherwise Fair. Speculative when the cash flow base is not positive, since a DCF on it is undefined.",
-    "basis": "Discount rate 9% approximates a US equity cost of capital (risk-free about 4% plus Damodaran's implied equity risk premium of about 4.5-5%); terminal growth 2.5% stays below long-run nominal GDP. Base growth is the 3-year revenue CAGR (cyclicals: through-cycle growth), bounded to -5%..20%; bear is half, bull 1.5x (at most 30%). Mauboussin and Rappaport's expectations investing frames value as implied versus expected growth.",
+    "basis": "Discount rate is a point-in-time cost of equity: the 10-year Treasury yield plus a 5% equity risk premium (Damodaran's implied US ERP has mostly ranged 4-6% since 2010); the first backtest with a fixed 9% ignored the 2018-2022 rate environment. Terminal growth 2.5% stays below long-run nominal GDP and at or below the risk-free floor. Base growth is the 3-year revenue CAGR (cyclicals: through-cycle growth), bounded to -5%..20%; bear is half, bull 1.5x (at most 30%). Mauboussin and Rappaport's expectations investing frames value as implied versus expected growth.",
     "bear_rule": "bear = base - |base| x (1 - bear_multiplier); bull = min(base + |base| x (bull_multiplier - 1), bull_growth_max), so a negative base gets a worse bear case"
   }
 }

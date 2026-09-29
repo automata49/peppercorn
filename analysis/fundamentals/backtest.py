@@ -70,21 +70,28 @@ def fetch(cache: Path) -> None:
             manifest["companies"][ticker] = {"error": "ticker not in SEC mapping"}
             continue
         try:
-            facts, quote = sec.fetch(cik[ticker]), prices.fetch(ticker)
+            facts, quote, profile = sec.fetch(cik[ticker]), prices.fetch(ticker), sec.fetch_profile(cik[ticker])
         except Exception as error:  # noqa: BLE001 - one company's outage must not stop the fetch
             manifest["companies"][ticker] = {"error": f"{type(error).__name__}: {str(error)[:120]}"}
             continue
         (cache / "sec" / f"{ticker}.json.gz").write_bytes(gzip.compress(json.dumps(facts).encode()))
         (cache / "prices" / f"{ticker}.json").write_text(json.dumps(quote), encoding="utf-8")
-        manifest["companies"][ticker] = {"cik": cik[ticker], "sec_sha256": facts.get("_raw_sha256"),
+        (cache / "profiles").mkdir(exist_ok=True)
+        (cache / "profiles" / f"{ticker}.json").write_text(json.dumps(profile), encoding="utf-8")
+        manifest["companies"][ticker] = {"cik": cik[ticker], "sic": profile["sic"], "sec_sha256": facts.get("_raw_sha256"),
                                          "price_sha256": quote["raw_sha256"], "price_days": len(quote["dates"])}
         print(ticker, manifest["companies"][ticker])
+    tnx = prices.fetch(prices.RISK_FREE_SYMBOL)
+    (cache / "prices" / "_risk_free.json").write_text(json.dumps(tnx), encoding="utf-8")
+    manifest["risk_free"] = {"symbol": prices.RISK_FREE_SYMBOL, "sha256": tnx["raw_sha256"], "days": len(tnx["dates"])}
     (cache / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
-def _load(cache: Path, ticker: str) -> tuple[dict, dict]:
+def _load(cache: Path, ticker: str) -> tuple[dict, dict, dict | None]:
     facts = json.loads(gzip.decompress((cache / "sec" / f"{ticker}.json.gz").read_bytes()))
-    return facts, json.loads((cache / "prices" / f"{ticker}.json").read_text(encoding="utf-8"))
+    profile = cache / "profiles" / f"{ticker}.json"
+    return (facts, json.loads((cache / "prices" / f"{ticker}.json").read_text(encoding="utf-8")),
+            json.loads(profile.read_text(encoding="utf-8")) if profile.exists() else None)
 
 
 def _plus_years(day: str, years: int) -> str:
@@ -119,12 +126,13 @@ def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_metho
 
 def run(cache: Path, out_dir: Path, rules: dict) -> dict:
     method = methods.for_market("US")["roic"]
+    tnx = json.loads((cache / "prices" / "_risk_free.json").read_text(encoding="utf-8"))
     rows = []
     for ticker in tickers():
         if not (cache / "sec" / f"{ticker}.json.gz").exists():
             rows.append({"ticker": ticker, "error": "not fetched"})
             continue
-        facts, quote = _load(cache, ticker)
+        facts, quote, profile = _load(cache, ticker)
         full = sec.parse(facts)["quarters"]
         for as_of in AS_OF:
             row = {"ticker": ticker, "as_of": as_of}
@@ -142,12 +150,14 @@ def run(cache: Path, out_dir: Path, rules: dict) -> dict:
             absent = parsed.get("not_presented", [])
             m = metrics.compute(q, tax, method, absent)
             failed = [c[0] for c in metrics.checks(q, m, date.fromisoformat(as_of)) if not c[1]]
-            result = labels.evaluate(q, "US", None, rules, tax, method, absent)
+            result = labels.evaluate(q, "US", None, rules, tax, method, absent, profile)
             share_end = result["features"].get("shares_quarter")
             if share_end:
                 share_input = (parsed["source_lineage"].get(share_end, {}).get("diluted_shares") or {}).get("inputs") or [{}]
                 price = prices.market_cap(quote, as_of, q[share_end]["diluted_shares"], share_input[0].get("filed"))
-                result = labels.evaluate(q, "US", price, rules, tax, method, absent)
+                if price:
+                    price["risk_free"] = prices.risk_free_on(tnx, as_of)
+                result = labels.evaluate(q, "US", price, rules, tax, method, absent, profile)
             row |= {"status": "check_failed" if failed else result["status"], "failed_checks": failed,
                     "labels": result["labels"] if not failed else {}, "missing": result["missing"],
                     "features": result["features"], "value_detail": result["value_detail"],
@@ -163,6 +173,11 @@ def run(cache: Path, out_dir: Path, rules: dict) -> dict:
     return report
 
 
+# Pre-registered acceptance (docs/harness/POSITION_RULES_V1.md): every group needs MIN_GROUP observations and
+# strictly ordered medians; cyclicals must show larger forward drawdowns; types must be stable; coverage must hold.
+MIN_GROUP = 10
+MIN_TYPE_STABILITY = 0.8
+MIN_COMPANIES = 40
 # Each label is judged on the outcome it claims to anticipate; the expected order is best first.
 TESTS = {
     "quality": ("fwd_roic", ["High", "Average", "Low"]),
@@ -190,9 +205,10 @@ def summarize(rows: list[dict]) -> dict:
             vals = [r["outcomes"][metric] for r in ok if r["labels"].get(dim) == label and r["outcomes"].get(metric) is not None]
             groups[label] = {"n": len(vals), "median": statistics.median(vals) if vals else None,
                              "tickers": sorted({r["ticker"] for r in ok if r["labels"].get(dim) == label})}
-        medians = [groups[label]["median"] for label in order if groups[label]["n"] >= 5]
+        enough = all(groups[label]["n"] >= MIN_GROUP for label in order)
+        medians = [groups[label]["median"] for label in order]
         report["tests"][dim] = {"metric": metric, "order": order, "groups": groups,
-                                "monotonic": len(medians) >= 2 and all(a > b for a, b in zip(medians, medians[1:]))}
+                                "monotonic": enough and all(a > b for a, b in zip(medians, medians[1:]))}
     for kind in ["Unprofitable", "Cyclical", "Fast Grower", "Stalwart", "Slow Grower"]:
         members = [r for r in ok if r["labels"].get("type") == kind]
         dd = [r["outcomes"]["fwd_revenue_drawdown"] for r in members if r["outcomes"].get("fwd_revenue_drawdown") is not None]
@@ -211,6 +227,23 @@ def summarize(rows: list[dict]) -> dict:
         stable += sum(1 for a, b in zip(seq, seq[1:]) if a == b)
         changed += sum(1 for a, b in zip(seq, seq[1:]) if a != b)
     report["type_stability"] = stable / (stable + changed) if stable + changed else None
+    # Informational, not an acceptance test: how often realized revenue growth reached the growth the price implied.
+    report["value_expectations"] = {}
+    for label in TESTS["value"][1]:
+        pairs = [(r["outcomes"]["fwd_revenue_cagr"], r["value_detail"]["implied_growth"]) for r in ok
+                 if r["labels"].get("value") == label and r["outcomes"].get("fwd_revenue_cagr") is not None
+                 and "implied_growth" in r["value_detail"]]
+        report["value_expectations"][label] = {
+            "n": len(pairs), "met_share": sum(a >= b for a, b in pairs) / len(pairs) if pairs else None}
+    report["companies_labelled"] = len({r["ticker"] for r in ok})
+    report["acceptance"] = {
+        "A1 quality": report["tests"]["quality"]["monotonic"],
+        "A2 growth": report["tests"]["growth"]["monotonic"],
+        "A3 value": report["tests"]["value"]["monotonic"],
+        "A4 type": report["type_test"]["passes"] and (report["type_stability"] or 0) >= MIN_TYPE_STABILITY,
+        "A5 coverage": report["companies_labelled"] >= MIN_COMPANIES,
+    }
+    report["activate"] = all(report["acceptance"].values())
     return report
 
 
@@ -233,6 +266,13 @@ def render(report: dict, rules: dict) -> str:
     lines += ["", f"Cyclical median {_pct(t['cyclical_median'])} vs others {_pct(t['other_median'])} — "
               f"{'passes' if t['passes'] else 'fails'}; type stability between consecutive dates "
               f"{report['type_stability']:.0%}" if report["type_stability"] is not None else "", ""]
+    lines += ["## value expectations (informational)", "", "| label | n | realized growth reached implied |", "|---|---|---|"]
+    for label, g in report["value_expectations"].items():
+        share = "—" if g["met_share"] is None else f"{g['met_share']:.0%}"
+        lines.append(f"| {label} | {g['n']} | {share} |")
+    lines += ["", f"Companies labelled: {report['companies_labelled']}", "", "## acceptance", "",
+              *[f"- {name}: {'pass' if passed else 'FAIL'}" for name, passed in report["acceptance"].items()],
+              "", f"Activate: {'yes' if report['activate'] else 'no'}", ""]
     return "\n".join(lines)
 
 

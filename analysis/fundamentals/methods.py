@@ -42,6 +42,7 @@ METHODS = {
 # Top-bracket statutory income tax including local income tax. Years without a reviewed
 # source are rejected rather than guessed.
 _US_FEDERAL = 0.21                      # US federal statutory rate, tax years 2018 onward
+_US_FEDERAL_PRE_TCJA = 0.35             # top rate before TCJA s.13001 (tax years beginning before 2018); backtests only
 _KR_TOP_LOCAL_INCLUDED = {2025: 0.264}                                # 24% national x 1.1
 _KR_TOP_FROM_2026 = 0.275                                          # 25% national x 1.1
 
@@ -55,6 +56,8 @@ def for_market(market: str) -> dict:
 def statutory_tax_rate(market: str, year: int) -> float:
     if market == "US" and year >= 2018:
         return _US_FEDERAL
+    if market == "US" and 1993 <= year <= 2017:
+        return _US_FEDERAL_PRE_TCJA
     if market == "KR":
         if year >= 2026:
             return _KR_TOP_FROM_2026

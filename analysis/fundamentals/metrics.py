@@ -74,7 +74,8 @@ def compute(q: dict, default_tax: float, roic_method: dict | None = None, absent
     avg_ic = (ic_now + ic_prev) / 2 if ic_now is not None and ic_prev is not None else None
     roic = _div(nopat(e), avg_ic) if avg_ic and avg_ic > 0 else None
     inc_roic = None
-    if e1 and nopat(e1) is not None and ic_now is not None and ic_prev is not None and ic_now - ic_prev > 0:
+    if (e1 and nopat(e) is not None and nopat(e1) is not None and ic_now is not None and ic_prev is not None
+            and ic_now - ic_prev > 0):
         inc_roic = (nopat(e) - nopat(e1)) / (ic_now - ic_prev)
 
     rev_prev = T("revenue", e1) if e1 else None

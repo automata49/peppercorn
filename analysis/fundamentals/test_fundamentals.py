@@ -516,8 +516,9 @@ def test_statutory_tax_schedule_only_returns_reviewed_years():
     assert methods.statutory_tax_rate("US", 2026) == 0.21
     assert methods.statutory_tax_rate("KR", 2025) == 0.264
     assert methods.statutory_tax_rate("KR", 2026) == 0.275
+    assert methods.statutory_tax_rate("US", 2017) == 0.35      # pre-TCJA top rate
     import pytest
-    for market, year in (("US", 2017), ("KR", 2022), ("KR", 2023), ("KR", 2024), ("XX", 2026)):
+    for market, year in (("US", 1992), ("KR", 2022), ("KR", 2023), ("KR", 2024), ("XX", 2026)):
         with pytest.raises(ValueError, match="reviewed statutory"):
             methods.statutory_tax_rate(market, year)
 
@@ -677,3 +678,12 @@ def test_metrics_zero_only_for_declared_not_presented_lines():
     assert filled["roic"] is not None and filled["roic_zero_not_presented"] == ["short_term_investments"]
     kr = metrics.compute(q, 0.264, methods.for_market("KR")["roic"], ["short_term_investments"])
     assert kr["roic"] is None     # KR declares no zero-if-not-presented lines
+
+
+def test_metrics_missing_latest_operating_income_does_not_crash():
+    q = {e: {"revenue": 100, "operating_income": 20, "pretax_income": 20, "income_tax": 4, "net_income": 16,
+             "operating_cash_flow": 18, "capex": 2, "equity": 100 + i, "debt": 10, "cash": 5, "short_term_investments": 1}
+         for i, e in enumerate(_QENDS)}
+    q[_QENDS[-1]].pop("operating_income")
+    m = metrics.compute(q, 0.21, methods.for_market("US")["roic"])
+    assert m["roic"] is None and m["incremental_roic"] is None

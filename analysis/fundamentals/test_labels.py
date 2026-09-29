@@ -41,17 +41,23 @@ def company(n=24, growth=0.08, margin=0.25, equity=300.0, dilution=0.0, sbc=2.0,
     return q
 
 
-def price_for(market_cap: float) -> dict:
-    return {"market_cap": market_cap, "price_date": "2025-12-31"}
+SOFTWARE = {"sic": 7372, "description": "Services-Prepackaged Software"}
+SEMIS = {"sic": 3674, "description": "Semiconductors & Related Devices"}
+RF = 0.04                     # discount rate 9%
+R = labels.discount_rate(RF, RULES["value"])
 
 
-def run(q, price=None, market="US", rules=RULES):
-    return labels.evaluate(q, market, price, rules, 0.21, ROIC)
+def price_for(market_cap: float, risk_free: float | None = RF) -> dict:
+    return {"market_cap": market_cap, "price_date": "2025-12-31", "risk_free": risk_free}
+
+
+def run(q, price=None, market="US", rules=RULES, industry=SOFTWARE):
+    return labels.evaluate(q, market, price, rules, 0.21, ROIC, (), industry)
 
 
 def feats(**over):
     base = {"ttm_operating_income": 10.0, "revenue_drawdown": 0.0, "operating_margin_drawdown": 0.0,
-            "window_start": "2020-03-31", "revenue_cagr_3y": 0.08, "roic": 0.2, "roic_cycle_mean": 0.2,
+            "window_start": "2020-03-31", "drawdown_since": "2021-03-31", "revenue_cagr_3y": 0.08, "roic": 0.2, "roic_cycle_mean": 0.2,
             "roic_cycle_points": 6, "fcf_12q": 100.0, "fcf_conversion_12q": 0.9, "dilution_yoy": 0.0,
             "positive_yoy_share": 1.0, "latest_revenue_yoy": 0.08, "through_cycle_growth": 0.06,
             "ttm_fcf": 40.0, "ttm_sbc": 2.0, "sbc_12q": 6.0, "net_debt": 0.0}
@@ -126,6 +132,15 @@ def test_missing_price_suppresses_labels():
     assert any("price" in item for item in out["missing"])
 
 
+def test_missing_risk_free_suppresses_labels():
+    assert run(company(), price_for(400.0, risk_free=None))["status"] == "insufficient_data"
+
+
+@pytest.mark.parametrize("rf,expected", [(0.04, 0.09), (0.025, 0.075), (0.01, 0.075)])
+def test_discount_rate_is_risk_free_plus_premium_with_floor(rf, expected):
+    assert labels.discount_rate(rf, RULES["value"]) == pytest.approx(expected)
+
+
 def test_kr_is_not_covered_by_v1():
     out = run(company(), price_for(400.0), market="KR")
     assert out["status"] == "insufficient_data" and "not covered" in out["missing"][0]
@@ -133,35 +148,42 @@ def test_kr_is_not_covered_by_v1():
 
 def test_cyclical_growth_needs_24_quarters():
     path = [100 * (0.8 if 8 <= k <= 11 else 1.0) for k in range(20)]
-    out = run(company(n=20, revenue_path=path), price_for(400.0))
+    out = run(company(n=20, revenue_path=path), price_for(400.0), industry=SEMIS)
     assert out["status"] == "insufficient_data"
 
 
 # --- type boundaries
 
-@pytest.mark.parametrize("value,expected", [(0.15, "Cyclical"), (0.1499, "Stalwart")])
-def test_revenue_drawdown_boundary(value, expected):
-    assert labels.classify_type(feats(revenue_drawdown=value), RULES)[0] == expected
+@pytest.mark.parametrize("sic,expected", [(3674, "Cyclical"), (3673, "Stalwart"), (1000, "Cyclical"), (999, "Stalwart"),
+                                          (4599, "Cyclical"), (4600, "Stalwart"), (2830, "Stalwart"), (2911, "Cyclical")])
+def test_cyclical_industry_boundaries(sic, expected):
+    assert labels.classify_type(feats(), RULES, {"sic": sic})[0] == expected
 
 
-@pytest.mark.parametrize("value,expected", [(0.15, "Cyclical"), (0.1499, "Stalwart")])
-def test_margin_drawdown_boundary(value, expected):
-    assert labels.classify_type(feats(operating_margin_drawdown=value), RULES)[0] == expected
+def test_drawdown_alone_does_not_make_a_company_cyclical():
+    # a divestiture or impairment: large drawdowns in a non-cyclical industry
+    assert labels.classify_type(feats(revenue_drawdown=0.4, operating_margin_drawdown=0.3), RULES, SOFTWARE)[0] == "Stalwart"
 
 
 @pytest.mark.parametrize("cagr,expected", [(0.15, "Fast Grower"), (0.1499, "Stalwart"), (0.05, "Stalwart"), (0.0499, "Slow Grower")])
 def test_growth_class_boundaries(cagr, expected):
-    assert labels.classify_type(feats(revenue_cagr_3y=cagr), RULES)[0] == expected
+    assert labels.classify_type(feats(revenue_cagr_3y=cagr), RULES, SOFTWARE)[0] == expected
 
 
 def test_zero_operating_income_is_unprofitable_before_cyclical():
-    assert labels.classify_type(feats(ttm_operating_income=0.0, revenue_drawdown=0.5), RULES)[0] == "Unprofitable"
+    assert labels.classify_type(feats(ttm_operating_income=0.0), RULES, SEMIS)[0] == "Unprofitable"
 
 
-def test_real_downturn_is_classified_cyclical_end_to_end():
+def test_cyclical_industry_end_to_end_reports_drawdown_evidence():
     path = [100 * (1.02 ** k) * (0.75 if 12 <= k <= 15 else 1.0) for k in range(24)]
-    out = run(company(revenue_path=path), price_for(400.0))
-    assert out["labels"]["type"] == "Cyclical" and "fell" in out["reasons"]["type"]
+    out = run(company(revenue_path=path), price_for(400.0), industry=SEMIS)
+    assert out["labels"]["type"] == "Cyclical" and "SIC 3674" in out["reasons"]["type"]
+    assert out["features"]["revenue_drawdown"] > 0.15 and "revenue fell up to" in out["reasons"]["type"]
+
+
+def test_missing_industry_suppresses_labels():
+    assert run(company(), price_for(400.0), industry=None)["status"] == "insufficient_data"
+    assert run(company(), price_for(400.0), industry={"sic": None})["status"] == "insufficient_data"
 
 
 # --- quality boundaries
@@ -220,16 +242,16 @@ def test_cyclical_growth_boundaries(g, expected):
 
 def test_dcf_round_trip_recovers_implied_growth():
     v = RULES["value"]
-    ev = labels.dcf(10.0, 0.12, v)
-    assert labels.implied_growth(10.0, ev, v) == pytest.approx(0.12, abs=1e-5)
+    ev = labels.dcf(10.0, 0.12, v, R)
+    assert labels.implied_growth(10.0, ev, v, R) == pytest.approx(0.12, abs=1e-5)
 
 
 def test_value_labels_follow_implied_versus_base_and_bull():
     v, f = RULES["value"], feats(ttm_fcf=12.0, ttm_sbc=2.0, revenue_cagr_3y=0.10, net_debt=0.0)
-    cheap = labels.dcf(10.0, 0.10 - 0.05, v)
-    rich = labels.dcf(10.0, 0.15 + 0.001, v)
+    cheap = labels.dcf(10.0, 0.10 - 0.05, v, R)
+    rich = labels.dcf(10.0, 0.15 + 0.001, v, R)
     assert labels.classify_value(f, "Stalwart", price_for(cheap), RULES)[0] == "Attractive"
-    assert labels.classify_value(f, "Stalwart", price_for(labels.dcf(10.0, 0.10, v)), RULES)[0] == "Fair"
+    assert labels.classify_value(f, "Stalwart", price_for(labels.dcf(10.0, 0.10, v, R)), RULES)[0] == "Fair"
     assert labels.classify_value(f, "Stalwart", price_for(rich), RULES)[0] == "Expensive"
 
 
