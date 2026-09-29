@@ -1,0 +1,95 @@
+name: Position test DB (migration + ingestion)
+
+# 수동 실행 전용. 운영 프로젝트가 아닌 TEST_SUPABASE_* 테스트 프로젝트에만 쓴다.
+# Actions 탭 → "Position test DB" → Run workflow
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: position-test-db
+  cancel-in-progress: false
+
+jobs:
+  apply-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+      TEST_SUPABASE_APIKEY: ${{ secrets.TEST_SUPABASE_APIKEY }}
+      TEST_SUPABASE_JWT_SECRET: ${{ secrets.TEST_SUPABASE_JWT_SECRET }}
+      TEST_SUPABASE_DB_URL: ${{ secrets.TEST_SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: |
+          python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2'
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+
+      - name: Refuse production and missing secrets
+        run: |
+          for v in TEST_SUPABASE_URL TEST_SUPABASE_APIKEY TEST_SUPABASE_JWT_SECRET TEST_SUPABASE_DB_URL; do
+            [ -n "${!v}" ] || { echo "$v is not set" >&2; exit 1; }
+          done
+          case "$TEST_SUPABASE_URL$TEST_SUPABASE_DB_URL" in
+            *mhbcchegrbakearqptdr*) echo "TEST_SUPABASE_* points at production; refusing" >&2; exit 1 ;;
+          esac
+
+      - name: Base schema (only on an empty project)
+        run: |
+          exists=$(psql "$TEST_SUPABASE_DB_URL" -X -A -t -c "select to_regclass('public.instruments') is not null")
+          if [ "$exists" = "t" ]; then echo "public.instruments exists; schema.sql not re-applied"; exit 0; fi
+          psql "$TEST_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -f supabase/schema.sql
+
+      - name: Position migration, applied twice
+        run: |
+          psql "$TEST_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -f supabase/position_growth.sql
+          psql "$TEST_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -f supabase/position_growth.sql
+          psql "$TEST_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -c "notify pgrst, 'reload schema'"
+
+      - name: Seed the two PoC instruments if absent
+        run: |
+          psql "$TEST_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 -c "
+            insert into public.instruments(market,ticker,name,currency) values
+              ('US','NVDA','NVIDIA','USD'), ('KR','005930','삼성전자','KRW')
+            on conflict (market,ticker) do nothing"
+
+      - name: Collect (SEC + DART)
+        working-directory: analysis/fundamentals
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python collect.py --out out
+
+      - name: Persist twice through the pipeline JWT
+        env:
+          POSITION_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
+          POSITION_SUPABASE_APIKEY: ${{ secrets.TEST_SUPABASE_APIKEY }}
+        run: |
+          sleep 3  # PostgREST schema reload
+          POSITION_PIPELINE_JWT=$(python supabase/tests/position_growth_remote.py token position_pipeline)
+          echo "::add-mask::$POSITION_PIPELINE_JWT"
+          export POSITION_PIPELINE_JWT
+          echo "before: $(python supabase/tests/position_growth_remote.py counts)"
+          python analysis/fundamentals/persist.py analysis/fundamentals/out --apply
+          first=$(python supabase/tests/position_growth_remote.py counts)
+          python analysis/fundamentals/persist.py analysis/fundamentals/out --apply
+          second=$(python supabase/tests/position_growth_remote.py counts)
+          echo "after first: $first"; echo "after second: $second"
+          [ "$first" = "$second" ] || { echo "second run added rows; ingestion is not idempotent" >&2; exit 1; }
+
+      - name: Verify roles, grants, RLS and data rules
+        run: python supabase/tests/position_growth_remote.py verify
+
+      - name: Upload collector output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: position-test-db
+          path: analysis/fundamentals/out/
+          if-no-files-found: warn
