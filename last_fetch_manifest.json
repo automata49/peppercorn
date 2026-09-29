@@ -1,0 +1,2357 @@
+{
+  "fetched_at": "2026-09-29T22:58:44.939632+00:00",
+  "universe": "ALL",
+  "companies": {
+    "AAPL": {
+      "cik": 320193,
+      "sic": 3571,
+      "sec_sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
+      "price_sha256": "37c99e9fd259afc8b69aff0cee27b210c7c93cb2f5f8a29bd8cfb6e07f3bcae2",
+      "price_days": 3204
+    },
+    "MSFT": {
+      "cik": 789019,
+      "sic": 7372,
+      "sec_sha256": "f8aae2965b20ad0df44bdf7ccbedf797d275b6b8dc030154a7a311361bb7246f",
+      "price_sha256": "8d1cf71d91777950bbe11f299aea299172c204976853a948ef28ffbb6a0e54bc",
+      "price_days": 3204
+    },
+    "NVDA": {
+      "cik": 1045810,
+      "sic": 3674,
+      "sec_sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff",
+      "price_sha256": "c9f4c647defe1f783a42656c14a8c5a337aa0605d364d37ed557947c85428417",
+      "price_days": 3204
+    },
+    "GOOGL": {
+      "cik": 1652044,
+      "sic": 7370,
+      "sec_sha256": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
+      "price_sha256": "6abbf8947c5ef920ec6db0e070939becbff81db80c8b7158648ec8f87b1b28cf",
+      "price_days": 3204
+    },
+    "META": {
+      "cik": 1326801,
+      "sic": 7370,
+      "sec_sha256": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
+      "price_sha256": "4130573eb4fd01738d25e2e9b1a4df75116d9eba6403c5bccf765ad7dbbca105",
+      "price_days": 3204
+    },
+    "AMZN": {
+      "cik": 1018724,
+      "sic": 5961,
+      "sec_sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4",
+      "price_sha256": "1bdeb19d756918aae2dba359458e06ab7a5385d44d1ab02edec3c43911dec476",
+      "price_days": 3204
+    },
+    "ADBE": {
+      "cik": 796343,
+      "sic": 7372,
+      "sec_sha256": "86a5689aa9aa7b0f9e95be21b48b0305376e014c8dbf3b8bb3b4b131f1b6a0c4",
+      "price_sha256": "668d187786e47c75b6b4ac66c65d125de6c0a9ba98e1fde3fe3feec7a97dc155",
+      "price_days": 3204
+    },
+    "CRM": {
+      "cik": 1108524,
+      "sic": 7372,
+      "sec_sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "price_sha256": "a8e20ee8b64a1df798ee317c5002d5a4f310f0fea955b6d001bd3e78a4ce1202",
+      "price_days": 3204
+    },
+    "NOW": {
+      "cik": 1373715,
+      "sic": 7372,
+      "sec_sha256": "1131b67e8d2d6cd6415cafa82c8874cb2139016e4c8d7e04b1728837a8bbec2c",
+      "price_sha256": "d906d4211ab0dc8eb37bda23592364ba600fa30fbeb2806c06dd54de6a924315",
+      "price_days": 3204
+    },
+    "ISRG": {
+      "cik": 1035267,
+      "sic": 3842,
+      "sec_sha256": "b386a39dc2989008a01e4be5e12444e330e3a98b86c714e3b063b246235db44b",
+      "price_sha256": "79da904a5301d0dff1bbc3d22bd9ee6304225443d46f6a8be93f06d10c62b4da",
+      "price_days": 3204
+    },
+    "AVGO": {
+      "cik": 1730168,
+      "sic": 3674,
+      "sec_sha256": "3bdb6644c12addf1e63c4dc861008d7804fbf3d3f5aa6eb9b97f72c0e89a7adf",
+      "price_sha256": "bc8622aab9fad6b4bee06d4d2a2b8e613505c68f23fa4d861d6ab8f120f72dee",
+      "price_days": 3204
+    },
+    "NFLX": {
+      "cik": 1065280,
+      "sic": 7841,
+      "sec_sha256": "00f3449073d90dfa3aec4e384de24b70d92d897f90c67d6bca61f23e33d38634",
+      "price_sha256": "5913649b81c0c77dd5b47b9ac8883e1fb036f3000bb9acbe2c6f1ee34d5abdcc",
+      "price_days": 3204
+    },
+    "ORCL": {
+      "cik": 1341439,
+      "sic": 7372,
+      "sec_sha256": "65523545f040abaea1dfcf321da2a5aec85e7f34387244b0ffcb26e4c8707f7d",
+      "price_sha256": "1a1577279f3854f20754c2eee69f1985cd116332a0f5ccffa9a87cfeb94758a1",
+      "price_days": 3204
+    },
+    "CSCO": {
+      "cik": 858877,
+      "sic": 3576,
+      "sec_sha256": "f9f6cfb3c04bb8102552f121868831471a474165074ccc7c539f6f80f19d1b99",
+      "price_sha256": "acd0f7625d05b9316c3aadec7d538356e80006dd8822f6dede6f0806d19b2a56",
+      "price_days": 3204
+    },
+    "TXN": {
+      "cik": 97476,
+      "sic": 3674,
+      "sec_sha256": "5ee95bf56949988a4beaf0598e3acb0a012867228760cd9462a1c9e72526446f",
+      "price_sha256": "bac3bf7a45645a98ea15408d881cd0151311df33b3ab89150d424305681b646c",
+      "price_days": 3204
+    },
+    "QCOM": {
+      "cik": 804328,
+      "sic": 3663,
+      "sec_sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7",
+      "price_sha256": "363ba3119cc44d9f8ad7877593dc59c4c4ab3335dc62b9cd125b081959e2b1a7",
+      "price_days": 3204
+    },
+    "INTU": {
+      "cik": 896878,
+      "sic": 7372,
+      "sec_sha256": "456f89ae1757bb5a6ee0990f8b759e3d694222b0107c33ee4b163ee85a478d8a",
+      "price_sha256": "330873c597fadef104b9e78ee8fa352cb356ab11010159ec176de4a62ce11877",
+      "price_days": 3204
+    },
+    "ADI": {
+      "cik": 6281,
+      "sic": 3674,
+      "sec_sha256": "f468425da29412efbec29798ecd0f9cc719edd5766d734c5c3fc1092a3fe237c",
+      "price_sha256": "d46e3015281a9160a0bd4f13973d709eaffcd3713e29fc4c75a378f598375e77",
+      "price_days": 3204
+    },
+    "ACN": {
+      "cik": 1467373,
+      "sic": 7389,
+      "sec_sha256": "3344df347f78eef6b760f2a9160190d35dd225079775f573d341b94e9b82e783",
+      "price_sha256": "0f1b6d92f0acf2ad6043114a580efba1931e17e5b952573c21f61b17dd0c9f48",
+      "price_days": 3204
+    },
+    "TMO": {
+      "cik": 97745,
+      "sic": 3829,
+      "sec_sha256": "4d98ebd4c91521f5d90f032834b8dec04f78b30758a214be33e6cbba68fa766a",
+      "price_sha256": "23cbaf41e0ab6b475d7b957316e84edd5788a7912a0aa09195e28e75d905f267",
+      "price_days": 3204
+    },
+    "DHR": {
+      "cik": 313616,
+      "sic": 3823,
+      "sec_sha256": "4a686be88c501054fa141624a0b0cf61d46be16390113a430631f8f11f5a1cf0",
+      "price_sha256": "928f6f5f441d295463e68b2854a8478b677d080edfb22e7efa8698ebec2d260a",
+      "price_days": 3204
+    },
+    "SYK": {
+      "cik": 310764,
+      "sic": 3841,
+      "sec_sha256": "bad750877f22f14d07b23936d4750cb56275f184b0766a02336d59abef077666",
+      "price_sha256": "996f5a9f7ced7c9d7ac927cb8e1617b410fa65262d586cc594fd2a46b7dcee85",
+      "price_days": 3204
+    },
+    "ZTS": {
+      "cik": 1555280,
+      "sic": 2834,
+      "sec_sha256": "b07a62edd0c62eecc2fb932a17063b7f406b6355ca6ec9a658407a39c1b87445",
+      "price_sha256": "42270fad8f5b57123833f4c64c847f1eb34fc512e2b5a6618e6615ee6ecb681c",
+      "price_days": 3204
+    },
+    "AMGN": {
+      "cik": 318154,
+      "sic": 2836,
+      "sec_sha256": "fdf5906752dbed7151b14f5e765db25e75393cedef4a2582d976623b49e2e4c7",
+      "price_sha256": "4a8d7873a13f967e1cde72060f9d2a838def5349c09e2f05748a8ed65c360935",
+      "price_days": 3204
+    },
+    "GILD": {
+      "cik": 882095,
+      "sic": 2836,
+      "sec_sha256": "5703fd84d6e3d00697ac60bc3d7ded9306be2a9f36170a342858b8e6417506f0",
+      "price_sha256": "25712ebd78891e9a942035aab96ef8f56c650251ced3629c2b9c09c60ebb597a",
+      "price_days": 3204
+    },
+    "BSX": {
+      "cik": 885725,
+      "sic": 3841,
+      "sec_sha256": "06fbd22345eaba9b752251c5e485a8a67a53a54d553376a44919d4724a40c786",
+      "price_sha256": "d519de4d65d01f2c016cbc26279b7168204c23db35c5443053f8ca51c54a9349",
+      "price_days": 3204
+    },
+    "MDT": {
+      "cik": 1613103,
+      "sic": 3845,
+      "sec_sha256": "38fb8ec4139e6db2fa9bcd6cce1c3de5d9fcb3838ad9a63a2e3c74a7afc79b27",
+      "price_sha256": "b563bbb07a1055c19da92c723ad694b1bd4349264dc821b71b339ef010e5bd7a",
+      "price_days": 3204
+    },
+    "EW": {
+      "cik": 1099800,
+      "sic": 3842,
+      "sec_sha256": "5e8f751fbec9a0a1ff653c4d2070ea46d6cde3f7ccf35f9c1d7367a126bc76c1",
+      "price_sha256": "74590ca24c7c873430bbb7e6a4a0eefb7ea971b2e9e6a7ef798bff4be1e8ffd9",
+      "price_days": 3204
+    },
+    "IDXX": {
+      "cik": 874716,
+      "sic": 2835,
+      "sec_sha256": "0e6062dd20371329a7570315c03bbe5ae0b5c7ae89af18e7309e1b26e3ab4260",
+      "price_sha256": "24304d675481714d6fee2fe95e485c1ca156cf157add5fbc422c0734f59a3710",
+      "price_days": 3204
+    },
+    "CMG": {
+      "cik": 1058090,
+      "sic": 5812,
+      "sec_sha256": "93c81e4ccae99f0420863a88e05765e0dc20f043cc7bb9ec03f3c0d4b75709e5",
+      "price_sha256": "0178013194dd546e7691ca837d17b2404b2e5d413bfc95208e0a789ad79e93bf",
+      "price_days": 3204
+    },
+    "BKNG": {
+      "cik": 1075531,
+      "sic": 4700,
+      "sec_sha256": "e4f4e13340718de01f6c966cc4c4ab09f037826023b7f20b9e969eb3ef7cb76c",
+      "price_sha256": "eed85ece3f9dc91c1628ca487f42949ac233c93ac32b93219caa4ac5af0cc9b6",
+      "price_days": 3204
+    },
+    "ADP": {
+      "cik": 8670,
+      "sic": 7374,
+      "sec_sha256": "bf7d53d14fa29530fa1dd594ace14438282b8b6117069a8b3550e5c46059e034",
+      "price_sha256": "3052d234d3b35b0764889b0232132673764bd940298d3a3fcb0aa0ffb4904047",
+      "price_days": 3204
+    },
+    "PAYX": {
+      "cik": 723531,
+      "sic": 8700,
+      "sec_sha256": "c14cf3666260c537a546e8e471039bf0b28c1cf9200eb2a1365668647b8c8328",
+      "price_sha256": "1535175203ce011584aafd770c2684c2c01d67fa91f1cdf33b00acd8116afac7",
+      "price_days": 3204
+    },
+    "V": {
+      "cik": 1403161,
+      "sic": 7389,
+      "sec_sha256": "df3caf7c5667296569fc3074ce2ff13629c9a555184a06c5ea9925b43e63971d",
+      "price_sha256": "30828e1a3746b6e5369de52f557407a3e45189705ea0a579dea53fe2bd5fc05c",
+      "price_days": 3204
+    },
+    "MA": {
+      "cik": 1141391,
+      "sic": 7389,
+      "sec_sha256": "78082e9cbae91bfa8c1480d214bd20c8d35fcbbcc72d71eaf01739c48b1e9511",
+      "price_sha256": "aa4c09ae389bd39b8a07114e4181aa28d81404aec6a861d1dab29e9dd24c2ce2",
+      "price_days": 3204
+    },
+    "KO": {
+      "cik": 21344,
+      "sic": 2080,
+      "sec_sha256": "53d363a9aa3071406cda9857654358f4dca42e174a1defb8cc1ce9ad2a4c9e40",
+      "price_sha256": "c87d70c1a6b358d4bb501342356f47ce47f029744630b9d64f46bbf182dce41b",
+      "price_days": 3204
+    },
+    "PG": {
+      "cik": 80424,
+      "sic": 2840,
+      "sec_sha256": "606ad7056b611e91cfab9f7568b747404405772add188600efa5ccda5824f3d8",
+      "price_sha256": "8a2bc64d322a2aaab36783cbeb14a7b84f461c08ddc726814521c4a49eebd112",
+      "price_days": 3204
+    },
+    "PEP": {
+      "cik": 77476,
+      "sic": 2080,
+      "sec_sha256": "7694c322779ef273d15b3791729e5f2d261ce6ed1839be8ff014a33f537375be",
+      "price_sha256": "6eab47110e176c2afba19c127f80f06a12000dce56540c093768550bb6811806",
+      "price_days": 3204
+    },
+    "JNJ": {
+      "cik": 200406,
+      "sic": 2834,
+      "sec_sha256": "7141c0c988fa1d30f779687b4c78ab561e19aa5990a58ad86a66467d0a783980",
+      "price_sha256": "0318a5b00146d6bd865f3ded41aac3adfe921b6daba11fbdf1f802b5dea39cd3",
+      "price_days": 3204
+    },
+    "MCD": {
+      "cik": 63908,
+      "sic": 5812,
+      "sec_sha256": "0394e814d75510be107679b026e2df6e5d02d4f2029166911aa4924f9556681f",
+      "price_sha256": "95c5d839a93a90ca7ea1bfea7702ddae49d59783eb4ef1567e51840c158618bd",
+      "price_days": 3204
+    },
+    "COST": {
+      "cik": 909832,
+      "sic": 5331,
+      "sec_sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f",
+      "price_sha256": "8906662428b65240208d3157a07026678d238c004e9f6db7db742034854bdd92",
+      "price_days": 3204
+    },
+    "WMT": {
+      "cik": 104169,
+      "sic": 5331,
+      "sec_sha256": "54ec3fbf36dc203dd00a0333396b3df2b6695ecdf6cbb19b6ec41b053d86b517",
+      "price_sha256": "5cbd9d9eb56868e9edfb4a43fb1cc183e82139d9748ac894d16bae8b4d98a13a",
+      "price_days": 3204
+    },
+    "HD": {
+      "cik": 354950,
+      "sic": 5211,
+      "sec_sha256": "aaf03befa1695d87ce1252bc08ca278b65be63782e46dc0b2858aab7a32c1be2",
+      "price_sha256": "7dcc743ec9de651a87fd946a76f15143798e089785b6807fec411d8aaf097b02",
+      "price_days": 3204
+    },
+    "UNH": {
+      "cik": 731766,
+      "sic": 6324,
+      "sec_sha256": "6c9dff59732b7c597542b2d5eadaae0313ca0de03defdba2c00203e693632d76",
+      "price_sha256": "8c2cd0cb83bd47e4a06d3905e0595956340792e5255e268cb1f18afb491dad30",
+      "price_days": 3204
+    },
+    "ABT": {
+      "cik": 1800,
+      "sic": 2834,
+      "sec_sha256": "5d751f73769f5c0a1f9bee0de16cb39d8961cf3f1ebb5558d555bb2678afb4ff",
+      "price_sha256": "1608bb01ce7e681dc76530dd5c933a1a6d7e28789bc9ee94506d4e8855395846",
+      "price_days": 3204
+    },
+    "LOW": {
+      "cik": 60667,
+      "sic": 5211,
+      "sec_sha256": "7912551d61433f5e7e863ac602ebf24ee1484699e10aa556534f0055fff2ea7d",
+      "price_sha256": "cf4e98cf40d88a656a850478f78564513a5bc6c98f92e2e2682ef642fa728d07",
+      "price_days": 3204
+    },
+    "TGT": {
+      "cik": 27419,
+      "sic": 5331,
+      "sec_sha256": "eb15a2cd524e99ff27675db78840d039ec4a68b9cc2dcb10accbcb299933a487",
+      "price_sha256": "93d414c3d5912c7e8ccdbd81c6c7ce90ee47dc5d248b9939d337dc8eaf2a4fb7",
+      "price_days": 3204
+    },
+    "SBUX": {
+      "cik": 829224,
+      "sic": 5810,
+      "sec_sha256": "2488674b57020c5281665b0ff271a29da71da64a2c9fa66bec6a9118772970bb",
+      "price_sha256": "d1c38a6173b8d877dabe633eae7eb71d256ec39130fb509729462b7153e1fe2a",
+      "price_days": 3204
+    },
+    "CL": {
+      "cik": 21665,
+      "sic": 2844,
+      "sec_sha256": "450c2668961565047c7745ff5df5d38b40cc57d6940c48fe8f32dca13100f96d",
+      "price_sha256": "c42a377c7e583ef15764cc1527263840845f644461d69bae0f8aeb47852bc3bd",
+      "price_days": 3204
+    },
+    "KMB": {
+      "cik": 55785,
+      "sic": 2670,
+      "sec_sha256": "20a44ed6a1f55fa51c786121735a8e3de8269d63c3584ad87844514756d04e18",
+      "price_sha256": "5f6bbebdceb3e794dc4c72ccf2f3f38cb00d90966a827542b0fa4316e14cc09b",
+      "price_days": 3204
+    },
+    "GIS": {
+      "cik": 40704,
+      "sic": 2040,
+      "sec_sha256": "3dd0552f7e909fcef40d3d99b413e9fa360fd1110ebbce0ce507ed71e611aeda",
+      "price_sha256": "e3fa992878732317fb9bc711b9ca0b61fb6583918a5e2381c498c43a96e43cb0",
+      "price_days": 3204
+    },
+    "HSY": {
+      "cik": 47111,
+      "sic": 2060,
+      "sec_sha256": "83d796de405903e86aacc31ab69ba5c0071939fe1195754576c1ba9b03cdf52c",
+      "price_sha256": "64df3c6611f100e79ed473a36b87726764ad23d941ef113bf95b78d8aa3feb65",
+      "price_days": 3204
+    },
+    "MDLZ": {
+      "cik": 1103982,
+      "sic": 2000,
+      "sec_sha256": "c66054b213ead15f0a177910e8d265dc12e917fa82b51c99c2eb5b20c6acf8df",
+      "price_sha256": "576012fc3ac49c60090c6c47cf0393c06c17ee5f9a993003f9a3a865b8dee1b0",
+      "price_days": 3204
+    },
+    "YUM": {
+      "cik": 1041061,
+      "sic": 5812,
+      "sec_sha256": "5562a1496decb21dc8129dff0af281d50da52344a638def297e879eda6f35bf9",
+      "price_sha256": "e5022d9eaf34f6e0b923b9e001d4cc6815675f9ec28fcca4877fc11d433de6f0",
+      "price_days": 3204
+    },
+    "TJX": {
+      "cik": 109198,
+      "sic": 5651,
+      "sec_sha256": "1b8f7be3fed954f682ae56ebe9c56a245f4df3640b92181a2d44d6e086a4905b",
+      "price_sha256": "70a1baccb762b80009ef3e06cb8245b57c4f6ece5c6ef005b0e633dcbcbed3ba",
+      "price_days": 3204
+    },
+    "ROST": {
+      "cik": 745732,
+      "sic": 5651,
+      "sec_sha256": "6310bb034c7b7b228799f757b5117d1e6a173af3ff6304b656e851f492ccfaf9",
+      "price_sha256": "69279eb45d5e6b7a499aecfbf8fb919aa0c16f712933ef35645ebd14ff5f25f4",
+      "price_days": 3204
+    },
+    "CLX": {
+      "cik": 21076,
+      "sic": 2842,
+      "sec_sha256": "ca18495c5ee7465ad58862a368813a9f2aeb8880344c014f6188c36ffc38976f",
+      "price_sha256": "2b2f772622ce09b992e356af760bb66f860fc2bb1dea260a8584d4cc30d919c9",
+      "price_days": 3204
+    },
+    "HON": {
+      "cik": 773840,
+      "sic": 3724,
+      "sec_sha256": "3ec36b94bcfb6c163227a5568ea524a2d714baae79e205929933cdb69ae3bcf7",
+      "price_sha256": "489c152554dd67e759ca43d120ff4f43a46ccc42695fb34e0e5c11be7967f414",
+      "price_days": 3204
+    },
+    "UNP": {
+      "cik": 100885,
+      "sic": 4011,
+      "sec_sha256": "99d22f8aa6dd31f102b2691ce5c53ef872908bb7b50860d153e6efbc6eef2b61",
+      "price_sha256": "ac2297fea0ae5d26adab95d2cef4a6f42d6eca3c6df1690343f6175367ccc29e",
+      "price_days": 3204
+    },
+    "UPS": {
+      "cik": 1090727,
+      "sic": 4210,
+      "sec_sha256": "19a5c39708df843df0ecefb17c8a53b8920ee8e43f64d0572b5dac0c167da90d",
+      "price_sha256": "e5aa65f25ddc61ce11d8c6292d895bd3b75ba7dd46c6338a69a4ccf01ea269ec",
+      "price_days": 3204
+    },
+    "LMT": {
+      "cik": 936468,
+      "sic": 3760,
+      "sec_sha256": "aedb683271d2c57451a89db5afa42af45eaaa74c57bc544ddfb427762f785c01",
+      "price_sha256": "0aecaace62251e1c290fe305d0f77b205de2e519d830f622a73d0a09cd345cd1",
+      "price_days": 3204
+    },
+    "GD": {
+      "cik": 40533,
+      "sic": 3730,
+      "sec_sha256": "7fff513c1ae0c64ca16a673a15823a850bcb4d097506eaea38c8b540fa4708ff",
+      "price_sha256": "fd9d4b9b708b74bc40951fe21e7591f3510bd152e929c99236c9bf38770e3fbf",
+      "price_days": 3204
+    },
+    "NOC": {
+      "cik": 1133421,
+      "sic": 3812,
+      "sec_sha256": "5d35e456d5a983567698b3053fa7440a7eea6a8de698d9de9be041e4a6d6d6b7",
+      "price_sha256": "a118b022923fcdbf298af14958750a60777ce987e936e5d777dc33457052a00c",
+      "price_days": 3204
+    },
+    "ITW": {
+      "cik": 49826,
+      "sic": 3560,
+      "sec_sha256": "93020fcf7c220cd160cf54605d3290782169ab1d62d0cc787988c7520bd4bf9a",
+      "price_sha256": "624fafbf4f4f228466f6bd3560db6545d4c86a48eaeb7242648ccd9407fd17a5",
+      "price_days": 3204
+    },
+    "EMR": {
+      "cik": 32604,
+      "sic": 3600,
+      "sec_sha256": "195bcbf29fba4dfc4715c44e24c71f9da3bbca9c4d04f1166fd3a9ec661df27b",
+      "price_sha256": "c9bf4d5e88a9a2f072a279e7a0d4ef90e8675e88016976328e6de94ce53a2fa4",
+      "price_days": 3204
+    },
+    "CSX": {
+      "cik": 277948,
+      "sic": 4011,
+      "sec_sha256": "85aa75ecd9ce76a5596f7973f2b41e953e022e056f9883bf9aec2190b7f43d0e",
+      "price_sha256": "f020110b772d02a67be30d50d3d9cae1f3a8f21b7575f3adad2acb1b1c0938da",
+      "price_days": 3204
+    },
+    "NSC": {
+      "cik": 702165,
+      "sic": 4011,
+      "sec_sha256": "19e2b893fa81e7209a06aa2c2c327b0ca912a9a6bcb5c535439c80475eed4759",
+      "price_sha256": "3b09d9c4aae9fa5359e3233c860c8975e25a2fac4ee2fe2e1a588dd56b157063",
+      "price_days": 3204
+    },
+    "WM": {
+      "cik": 823768,
+      "sic": 4953,
+      "sec_sha256": "83672003d7cb177ccd772467684a05c7471ded8af93c0f7ed59b9e7a2cd97119",
+      "price_sha256": "a7cbb28a91553d1eda1054f518cd079a34757a563be3c153aa38002b3f1b5418",
+      "price_days": 3204
+    },
+    "SHW": {
+      "cik": 89800,
+      "sic": 5200,
+      "sec_sha256": "75ef555a24c3fad594f062ed70e1c36a9163efc4f86d0ae7b77281686593fad3",
+      "price_sha256": "ebc756a981ae24009ce52c52015f46bd9cdfec81a8b1007659dd3f59bb45f151",
+      "price_days": 3204
+    },
+    "APD": {
+      "cik": 2969,
+      "sic": 2810,
+      "sec_sha256": "b950a51ccd6520b9874e8452b9be9d2a43736bf24b7ea2413c44d34cf72a623a",
+      "price_sha256": "3b355d4ee74c5bf28c4b64d913575a12ed4eab6fce36b3a157ac2bfbdba60e06",
+      "price_days": 3204
+    },
+    "MU": {
+      "cik": 723125,
+      "sic": 3674,
+      "sec_sha256": "a8b088c2111daef36536e53c81fef4c0f01220c64933e126a665b00a9257f882",
+      "price_sha256": "a1cfa2c179b2965f4200d1234cacfbd9c17ac0002ecc5515a25e0b8d42d7652a",
+      "price_days": 3204
+    },
+    "INTC": {
+      "cik": 50863,
+      "sic": 3674,
+      "sec_sha256": "70056711b8b04d3a27e4a42b6d86e26f85ddaa3d59e480039d66ccfb353eb0b8",
+      "price_sha256": "2762a191db09b45fceccb6da82f881a6424ab1b435c5209896d9d3abb607cd89",
+      "price_days": 3204
+    },
+    "CAT": {
+      "cik": 18230,
+      "sic": 3531,
+      "sec_sha256": "01ddc6ffa741f0a7da440e2949b2ed19cec14fab35435a398e3f3d0100019715",
+      "price_sha256": "1ec99ccd95784669fbed54485abc699fdae0a2664e5be6d535594d8684df76bf",
+      "price_days": 3204
+    },
+    "DE": {
+      "cik": 315189,
+      "sic": 3523,
+      "sec_sha256": "b845478ca3e2c2a83471cfb92524b33d83ec47fd3c1c68614f3f2487f1606b6c",
+      "price_sha256": "7bfa7c07fa7595efc65c1ef8d2969c1d7f54528d41c620d484fe97375de90b51",
+      "price_days": 3204
+    },
+    "DOW": {
+      "cik": 1751788,
+      "sic": 2821,
+      "sec_sha256": "ff212d1e276fc1525ccac4101dadeadea5bb44ba5237a584a53d06d89535b823",
+      "price_sha256": "e33e1b3b6f9fb4d2f4ed67434dd7834bc3946800f94d1088d90b3c36d67d6734",
+      "price_days": 1893
+    },
+    "NUE": {
+      "cik": 73309,
+      "sic": 3312,
+      "sec_sha256": "9265f148393edf83f2797761e24c52bc061277a636d7df476b888ffaf6c74f3a",
+      "price_sha256": "5b477325fdb452c6061d65cf092e9f81d25d86bd97d69487cc7084cef99af5cf",
+      "price_days": 3204
+    },
+    "FCX": {
+      "cik": 831259,
+      "sic": 1000,
+      "sec_sha256": "9e88803b7e6f52764f09394cef2c020aa7f8fa50a494c551471a448c1c943d11",
+      "price_sha256": "722fcb2bc0c9c6d35d8837efa68996446895493792594438d45d2156a205e521",
+      "price_days": 3204
+    },
+    "XOM": {
+      "cik": 34088,
+      "sic": 2911,
+      "sec_sha256": "9b95535419e5662e3deed01de803e83deead477a4c81316e1c45186368fdd8b8",
+      "price_sha256": "e6b1ad910c998efb00d416c712fdfd4b2b1e9c12be91cfd783e7dc6b2b17c485",
+      "price_days": 3204
+    },
+    "CVX": {
+      "cik": 93410,
+      "sic": 2911,
+      "sec_sha256": "c09b160603412cb45acf1bb9bf3732e531dedfb548afa0e275fd8aefd7ab397e",
+      "price_sha256": "51bce1a631703e6b84d47cca9a1f1c6690f73d0f00508259f604a92dff93524a",
+      "price_days": 3204
+    },
+    "F": {
+      "cik": 37996,
+      "sic": 3711,
+      "sec_sha256": "db9621054cffb365bcb65cde1f53e4161fb26ac56ebf8a95b9066b3d2375203e",
+      "price_sha256": "4fca4d89f9e5652164c602a303aa09290eda03f6d6d747418824d9c6bacddfea",
+      "price_days": 3204
+    },
+    "GM": {
+      "cik": 1467858,
+      "sic": 3711,
+      "sec_sha256": "0aadbfd12c0d97ba9743acec6b3ad5b0b6082fab7fbc8f1edbbb7d38fe050e38",
+      "price_sha256": "8dc1fdc75900a560e6c2f4bd9650bbb037f14a53b82e53f5121318fb2e4e188a",
+      "price_days": 3204
+    },
+    "AMAT": {
+      "cik": 6951,
+      "sic": 3674,
+      "sec_sha256": "65ecfedd5bfd3768d30286b52badee080c655cc8d1077524bdb6ca8928380fa7",
+      "price_sha256": "00f61cc35e578d3dc5083c5aba2f6395216d1fdab83e4c769459f24f4a749e0a",
+      "price_days": 3204
+    },
+    "LRCX": {
+      "cik": 707549,
+      "sic": 3559,
+      "sec_sha256": "7ba34e55ee4bb0512afd14805895a554951f4d948ee28e2db41b44f44ad0b1dc",
+      "price_sha256": "1fcf7c4e1e7ef8e0de4b0a93fcdcdeefb2ee679c2caefc76a08206f42719d665",
+      "price_days": 3204
+    },
+    "KLAC": {
+      "cik": 319201,
+      "sic": 3827,
+      "sec_sha256": "2198d006cb99f6983557cb6747cbcc7802b6c72eef9eacd482840607d97995df",
+      "price_sha256": "5fdc4b20b1f89944b683586df018c75fe91854b57a8dff153538eb6bca093967",
+      "price_days": 3204
+    },
+    "AMD": {
+      "cik": 2488,
+      "sic": 3674,
+      "sec_sha256": "21a29c75076d90fced568785d855fc427a15c7458bc0bb153a9dedd88ad3349e",
+      "price_sha256": "855725687757d89243aeef2e2465457828c98945f48ff449855a1524f2abb7a3",
+      "price_days": 3204
+    },
+    "LYB": {
+      "cik": 1489393,
+      "sic": 2860,
+      "sec_sha256": "27ee253a4417f5bbb0d9ed46ca8570aa39ac15267850cd2b7cf39f4cb7524c92",
+      "price_sha256": "a45ca9a92610127429c7fb13d260caa51ceaccb468008644bbd52b0b33c6df8b",
+      "price_days": 3204
+    },
+    "STLD": {
+      "cik": 1022671,
+      "sic": 3312,
+      "sec_sha256": "05faeb3700549a72e77fc8cdb107ba5bc36b73512de61c7a9a9c0e305a5d5943",
+      "price_sha256": "881b551ea0c15e5e3a3dd6dbd0aa908d1efa6d3cf349ff9e9e9b2449bafaef8b",
+      "price_days": 3204
+    },
+    "CLF": {
+      "cik": 764065,
+      "sic": 1000,
+      "sec_sha256": "6ac4f4ac47ed70babca129141a29e7aa6021bdac5bddcb0da437d1547a71c400",
+      "price_sha256": "ee39f72e155d6743fc7295613b904561b9605563a4d9d5bb7b32daab51136d55",
+      "price_days": 3204
+    },
+    "COP": {
+      "cik": 1163165,
+      "sic": 2911,
+      "sec_sha256": "cccc8afe3602880e8f2909266e778aa195b42e745da669a801925c593720d2fc",
+      "price_sha256": "587d148491d58d86952d59689f03dd3e46f6eadb3ea76d59af674d1d8ea547d6",
+      "price_days": 3204
+    },
+    "EOG": {
+      "cik": 821189,
+      "sic": 1311,
+      "sec_sha256": "79f3107794b95507caaecb0a0817c98eca48a6cf6986fa1e01879c164c7b3da3",
+      "price_sha256": "beeac4979d6af9b7065182c4be38942a7a02af69c8b56f6d206bff5edb267eb8",
+      "price_days": 3204
+    },
+    "OXY": {
+      "cik": 797468,
+      "sic": 1311,
+      "sec_sha256": "4b911cbb64fe1b78f022a147470bd4376ebf25ec71897240d6ed85654d8bd410",
+      "price_sha256": "39bf0ffe153774192134c2a15cc5d14d9bb15095f8f63a8d4f89378417113be6",
+      "price_days": 3204
+    },
+    "SLB": {
+      "cik": 87347,
+      "sic": 1389,
+      "sec_sha256": "8ae73ad4b096441afa9626e414020b112e1b1f3434938b01d26ea0aae504a822",
+      "price_sha256": "cb6ea413471bb5460cf3f6dd7a97ff091156a394a00a931b0e125075d6369652",
+      "price_days": 3204
+    },
+    "HAL": {
+      "cik": 45012,
+      "sic": 1389,
+      "sec_sha256": "586e132869fe199342468488d1d9d9cd61b51b292dab063b5dd5d11ac70d79c5",
+      "price_sha256": "0e7d4b8d4f8cf8e463bd19ef864adab493ada5292c391f3a4f6cd5103764149e",
+      "price_days": 3204
+    },
+    "MPC": {
+      "cik": 1510295,
+      "sic": 2911,
+      "sec_sha256": "959e8816abb188a8475cc8bdaca0862c7fbe5e3bba650152fcb4f83ea821d849",
+      "price_sha256": "6e8dbb248d87edd52c4ddaa14a7d328e3eafada2822e959bef65b9d181f3b8b9",
+      "price_days": 3204
+    },
+    "VLO": {
+      "cik": 1035002,
+      "sic": 2911,
+      "sec_sha256": "d58ab6797025bd0f4e03b03c90f34905c2234e9f28749500726ec867d5443eb5",
+      "price_sha256": "5729a2262d75b9d64a8ffcac35745d6cb9b712228c750b94f9c8bfcf518e9656",
+      "price_days": 3204
+    },
+    "WHR": {
+      "cik": 106640,
+      "sic": 3630,
+      "sec_sha256": "16ddb67390ae21ae266b630bd7f87f02c7209dffb05e2e93587536a3cc4885e1",
+      "price_sha256": "3ffcddf835fcbadd89ed47843b7249bfc9efef32fdb87cb842715753462e62d4",
+      "price_days": 3204
+    },
+    "LEN": {
+      "cik": 920760,
+      "sic": 1520,
+      "sec_sha256": "cb10c886bc492bab4461cc6a2d86b08eda2e5714ef2ed29e38fccbb8bea87a56",
+      "price_sha256": "59c2c10159211f18626522dc03c61452fffad83c2eb932cc7406ffdb350b6e5b",
+      "price_days": 3204
+    },
+    "DHI": {
+      "cik": 882184,
+      "sic": 1531,
+      "sec_sha256": "d354326179bcea875450e68de79204f60b14ba93a6fb679d0ed9c8b70e3322f7",
+      "price_sha256": "e6d16cffff7698ff19b2c5ed4c38dbb2e87b9b77f2f70c8e8f3b30bf4f44dea4",
+      "price_days": 3204
+    },
+    "PHM": {
+      "cik": 822416,
+      "sic": 1531,
+      "sec_sha256": "270f1d3f97ce3e72b5ca00c5416d1544ef9cdd72c09fcee63497c8e3e173dc14",
+      "price_sha256": "14e87f2af55875245c17af478aa5573ac0815b9c4c14578484c0a25ec80cf173",
+      "price_days": 3204
+    },
+    "NEM": {
+      "cik": 1164727,
+      "sic": 1040,
+      "sec_sha256": "ea025dc937baa0c5647ad84941e423225c6c59485d9b7b27c4f1d87305739e77",
+      "price_sha256": "9949918cbce68f4c646e8f3fed094df6586f4352c10e140fcde9534f326d2e17",
+      "price_days": 3204
+    },
+    "IBM": {
+      "cik": 51143,
+      "sic": 3570,
+      "sec_sha256": "1660477fa5713e5749c3038cf22b3c776414acfc6e1e721d1772c91101dc5e5c",
+      "price_sha256": "b8730a61a25cf5bfc4640bc1c69625b8b8bd7bdd56ab65daea3df24bd11dfa2a",
+      "price_days": 3204
+    },
+    "T": {
+      "cik": 732717,
+      "sic": 4813,
+      "sec_sha256": "483db761a498797a4ba14df701a0404a8cc8d21b7409984eb1e722cb089f3dbb",
+      "price_sha256": "2aea99f0bc05922f2e6741e8f0e8d2fb1498c3dda53900a0fb56ea9275587aca",
+      "price_days": 3204
+    },
+    "VZ": {
+      "cik": 732712,
+      "sic": 4813,
+      "sec_sha256": "e319d31a81cf3f17423edbb3e18d129653b348cfd8c902034e5a329bf2bf0624",
+      "price_sha256": "853477df1af1b859b07f552ac858b426969142b44179b45902a7ef974722e681",
+      "price_days": 3204
+    },
+    "PFE": {
+      "cik": 78003,
+      "sic": 2834,
+      "sec_sha256": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
+      "price_sha256": "2e94f1193eb2639e706c58b1317a0cadffff995d0ba31b273449d3538c2a859b",
+      "price_days": 3204
+    },
+    "MMM": {
+      "cik": 66740,
+      "sic": 3841,
+      "sec_sha256": "571391ded2a92e8cb1e7be5c22f3ac192f7fe9d4cada2dbdb985261297e6ecd4",
+      "price_sha256": "122287adfb1f487c83de72b2e495965fbba3d0ade0690290535349bb0bda0360",
+      "price_days": 3204
+    },
+    "BA": {
+      "cik": 12927,
+      "sic": 3721,
+      "sec_sha256": "0c63f1ae7cc10b3c27e0c94f2add0c461e6293036dd4e52e52ae6dbb6f206e15",
+      "price_sha256": "be2fe21a698f032adde5e384653469ccffedcf7d50c528d9c1a8d133368355b9",
+      "price_days": 3204
+    },
+    "NKE": {
+      "cik": 320187,
+      "sic": 3021,
+      "sec_sha256": "54abad8b001c9e08bb81b83c12f30e36867f6462a12e040cc329e94d46e6fc5c",
+      "price_sha256": "6dfc6b9f7f8227d7c21e5fcfa6e48dfaf0000b02c88b535e5767e445f2e1d042",
+      "price_days": 3204
+    },
+    "KHC": {
+      "cik": 1637459,
+      "sic": 2030,
+      "sec_sha256": "8fad66c16e535f7749f19126a986a9f43a087ca2472d063fa7742106196d88ac",
+      "price_sha256": "98d9296934274de39999f35052929db1d7517e24631d8c2dddc7d88b2e686ef5",
+      "price_days": 2826
+    },
+    "CVS": {
+      "cik": 64803,
+      "sic": 5912,
+      "sec_sha256": "5c08d55a669ee073f26bb7dc68826076bf640f0a2b5ac5b2161408f67f96e3ff",
+      "price_sha256": "a5c70b575dee1b14cee64a390565eda864a8572ec9fcbd755559ba00d2c880bf",
+      "price_days": 3204
+    },
+    "DIS": {
+      "cik": 1744489,
+      "sic": 7990,
+      "sec_sha256": "f737e2272b6fb76cda801a8a5d493621a917ad4f73e0752b4ab14ffda694a57b",
+      "price_sha256": "353633382b450345f377b8c9b5bb3eadc7e760e04b51676edce91d209b9a5438",
+      "price_days": 3204
+    },
+    "TSLA": {
+      "cik": 1318605,
+      "sic": 3711,
+      "sec_sha256": "d0c2b9288d027a6d735039a6fe874a348b65a7fdbc6c133130666c777c885204",
+      "price_sha256": "3a7c3cb1ce7acd0b76b5d82ae1da708beace578007a5f899fd6a6f3f35c7f0c0",
+      "price_days": 3204
+    },
+    "UBER": {
+      "cik": 1543151,
+      "sic": 7389,
+      "sec_sha256": "98e804db35b92010096d3eccc692cf3bda5082ca8648bbf2f55d0b7be0f3830f",
+      "price_sha256": "a6d1fe7137237883858f40c1937fa7f8ca72a61d89066a15e8c98d799d4f81ce",
+      "price_days": 1857
+    },
+    "EL": {
+      "cik": 1001250,
+      "sic": 2844,
+      "sec_sha256": "a4cc1f0ee262122a9ec5b2e5b558e5fe2f4e63e075449a11b54ebd5fef1f664d",
+      "price_sha256": "2c47797d624e06cf9804c2233f23fc4b2b800baad5f6c2797f209c1e434db01d",
+      "price_days": 3204
+    },
+    "WBA": {
+      "error": "ticker not in SEC mapping"
+    },
+    "ANET": {
+      "cik": 1596532,
+      "sic": 3576,
+      "sec_sha256": "e548756a238d794e61322ba2d70b913b5d2f925c161fba73236f54a13df85c2f",
+      "price_sha256": "bcb67528c7837b142a485568d8dd29c269a1fff6c5d9a8c08cbab4a11720d2f1",
+      "price_days": 3097
+    },
+    "CDNS": {
+      "cik": 813672,
+      "sic": 7372,
+      "sec_sha256": "0bfb80dcfb082f1368b0f19c256ca5b35585e20bda411cea2163627b55f0955b",
+      "price_sha256": "c253b44c9c6ce9479c006d271768394c1c0581e4b10e5104b0b6983608f84400",
+      "price_days": 3204
+    },
+    "SNPS": {
+      "cik": 883241,
+      "sic": 7372,
+      "sec_sha256": "7e9b6e13ac2481586b56f1db93af14b9b014a1b7f92af2a09075d7cbd51526d4",
+      "price_sha256": "0e73804ff6441ef32428bbd9701aa39288d89cdad4bac88ccdd72c66d2d00e99",
+      "price_days": 3204
+    },
+    "FTNT": {
+      "cik": 1262039,
+      "sic": 3577,
+      "sec_sha256": "59391fcf61ddfa58093873acd02d39b714d88ff78987ce7e749fcc6a62f4c7f8",
+      "price_sha256": "2a73f8d9284ba7a4d5df90ef049398ff91a3c189344f04f90033d96797985a7f",
+      "price_days": 3204
+    },
+    "PANW": {
+      "cik": 1327567,
+      "sic": 3577,
+      "sec_sha256": "0fce8129e237331262a97979fde517a19797896a44f4d4eeab2a0767aaa6029f",
+      "price_sha256": "1a7b6d68013ad8f1254842feffb3765fba42f81a08a49d14593511b307018e98",
+      "price_days": 3204
+    },
+    "ADSK": {
+      "cik": 769397,
+      "sic": 7372,
+      "sec_sha256": "4ee4631abb3cf3cb502a212c2a96745aea77cf4ba857a702f6dd5d6f39d0c991",
+      "price_sha256": "d8577ef9884fdd1dcfebb1e993763de7eec9909e27b5f3211a85fc6d466c4b2d",
+      "price_days": 3204
+    },
+    "MCHP": {
+      "cik": 827054,
+      "sic": 3674,
+      "sec_sha256": "e8f8817e99e806f3052c70002d235eaa3eeec2fa0eb661c137dcb7b8f337173a",
+      "price_sha256": "d9065e6ae0c1bd2867aeb6655e84ebd733daf06eee8c316acc44d7f3d25c3e06",
+      "price_days": 3204
+    },
+    "NXPI": {
+      "cik": 1413447,
+      "sic": 3674,
+      "sec_sha256": "a069c3704f51d391209f1bf8c496dabfc6f8c86ac587da6b50cf255b79feedfc",
+      "price_sha256": "62f5c757f2fa19a0fad07f731dd63c97c44230a90859bd4816e84c2152f0386f",
+      "price_days": 3204
+    },
+    "ON": {
+      "cik": 1097864,
+      "sic": 3674,
+      "sec_sha256": "d9996c2b958223c9b3342fe2733bfefa877d8afc22beb803742ae1ba050fd3dd",
+      "price_sha256": "b6401508256592bd4a89af7adb93a07aa8c2c2a79c3eaccb240323a47e643e01",
+      "price_days": 3204
+    },
+    "MPWR": {
+      "cik": 1280452,
+      "sic": 3674,
+      "sec_sha256": "d113f0b9ecf74dfae04a49933d00e71a4eafe0e40dfc94318f978ceace1d4e92",
+      "price_sha256": "9c11b721197d63ce6d048d25d488ca420fd8af34c8076a778d5ee8d765bc0851",
+      "price_days": 3204
+    },
+    "TER": {
+      "cik": 97210,
+      "sic": 3825,
+      "sec_sha256": "e63938f59166b737c6c5aec9f42095752ee968c24e9c7f8c2fd4053f51572e41",
+      "price_sha256": "c4f916d7efc49e905b3b49648b4a4db782b34bbbbb9288902347180e60bed829",
+      "price_days": 3204
+    },
+    "KEYS": {
+      "cik": 1601046,
+      "sic": 3823,
+      "sec_sha256": "fc20f41fcc4d4de7f2e33ed60fcffa45e3da2e4f2222876522fbe5e9eed35b51",
+      "price_sha256": "9c79162969271083e9ea26a4c41338d9b38c2b54665095a14ec4041c0daa19db",
+      "price_days": 3003
+    },
+    "ZBRA": {
+      "cik": 877212,
+      "sic": 3560,
+      "sec_sha256": "088b7ddd8e1833b9c11a792460a164736754bd47928fbabf9917ae20d8ae064c",
+      "price_sha256": "949023fa2bc8699186dc2657ad657fbe33c387a54c7d7658053f25707c438f74",
+      "price_days": 3204
+    },
+    "CDW": {
+      "cik": 1402057,
+      "sic": 5961,
+      "sec_sha256": "ca3eb3622f3a1565073331430226b5cf0c5c0afcc01a4eb85e9152c7aa5105b8",
+      "price_sha256": "ee193019963bc93f4098fd63ae44593ce1e70543de5bf732bbe6f5def5e3ffaa",
+      "price_days": 3204
+    },
+    "IT": {
+      "cik": 749251,
+      "sic": 8741,
+      "sec_sha256": "0e02cc608a472e3a846f99505a6088cd7c6fd0eb39c6d03813d90697a7d35529",
+      "price_sha256": "63a96ddb680c31d6d00fb72cf7b93df87f7b72ee8c8c09091d17861efd5cd9b5",
+      "price_days": 3204
+    },
+    "FICO": {
+      "cik": 814547,
+      "sic": 7389,
+      "sec_sha256": "164900f63f418ba0aa023d98fc2088055279c33419ed413f5c17f48b380b97dc",
+      "price_sha256": "b5f4a1fb059954a1be27220751abe517d156db19ccd923fc41bb499a78226218",
+      "price_days": 3204
+    },
+    "VRSN": {
+      "cik": 1014473,
+      "sic": 7371,
+      "sec_sha256": "0daf9f81f407ada0f94b564eddb47e9307f0c327426afef91d9cbfd4307af530",
+      "price_sha256": "d69bc0633052b7a997ce6b2274d469ad4971f446c74a4d81bf5b3f48bbab32fc",
+      "price_days": 3204
+    },
+    "AKAM": {
+      "cik": 1086222,
+      "sic": 7389,
+      "sec_sha256": "c68c8db25a5b809ca1ae6dfafac44bd2bf2cd13a8c7bd86a985ef1baf236b641",
+      "price_sha256": "d5e075ded56dbb2e4d4aeda2c503afcc9b68bd374502f2d2149248199acc808a",
+      "price_days": 3204
+    },
+    "HPQ": {
+      "cik": 47217,
+      "sic": 3570,
+      "sec_sha256": "351d1874f2847fe331549968693423be2a4374a7731422f86687ac66da7af5f4",
+      "price_sha256": "16ea4bc9a7fe804b4c3541c2a543345833e0469ccd62a2a6acba7d5074cee479",
+      "price_days": 3204
+    },
+    "NTAP": {
+      "cik": 1002047,
+      "sic": 3572,
+      "sec_sha256": "544e1e648485597c97423e20161c693df3b6ee55c6a2d38a1e8e2539bedfbfdb",
+      "price_sha256": "d0ac51afe272746f8013709a5bc64109bee57ad46f389993c8c2e82a74b5dd86",
+      "price_days": 3204
+    },
+    "WDC": {
+      "cik": 106040,
+      "sic": 3572,
+      "sec_sha256": "f8689b298d872df51bf0db3227551dcb459fe9d5577984397f6cb0f7a21dc5fc",
+      "price_sha256": "aa4da01cc82a87146039cff1564e6c63b18de1dc916ff0e1a59a7d87cf9a0819",
+      "price_days": 3204
+    },
+    "STX": {
+      "cik": 1137789,
+      "sic": 3572,
+      "sec_sha256": "4af11baa8aecbd802dbbd5d47709d7e94d89ad47876ca5ac62c1729e21f08a9d",
+      "price_sha256": "64ac3a659e846dfd25d22d4a73d5cc2df9bf1e6e0f8ccc0f70175ec49537a78c",
+      "price_days": 3204
+    },
+    "GLW": {
+      "cik": 24741,
+      "sic": 3357,
+      "sec_sha256": "487d70eef80b3fbb401d95db03a770afb80c6f733c3b509579fb070899792d39",
+      "price_sha256": "4aab14503951155a0e2e1bfd6c347d57f3d81b02862fa05019e076a1ae499054",
+      "price_days": 3204
+    },
+    "APH": {
+      "cik": 820313,
+      "sic": 3678,
+      "sec_sha256": "eaa224da664e1fd6673c58a8b4dc3b4ca6bcf564591b967e057947f50bf46d23",
+      "price_sha256": "19b2e961c6893ff75d1b0089c02fb114b7bbdadbd5e27a782962bdae70eb6c80",
+      "price_days": 3204
+    },
+    "CTSH": {
+      "cik": 1058290,
+      "sic": 7371,
+      "sec_sha256": "64a285f6a2f6c49fe7f4b138cfbeedab076c49a3f213ca8c5d53fdd1b43678fc",
+      "price_sha256": "fbf4398d47ee988017c24c4c9153881ec7b6b6b9257ff13468695a9daa424436",
+      "price_days": 3204
+    },
+    "REGN": {
+      "cik": 872589,
+      "sic": 2834,
+      "sec_sha256": "8ac8537cd8b5e571e7f527aae3e223c6a7cdab1260fd8035e278ac184b4901b4",
+      "price_sha256": "a47fba6b6b01e5c644496e517f84bdc2f11930e2b8621aa6a7176b743fc7e731",
+      "price_days": 3204
+    },
+    "VRTX": {
+      "cik": 875320,
+      "sic": 2834,
+      "sec_sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8",
+      "price_sha256": "0dffcb4f027a99281e35c6172f994aa3985969e925216ee39fdde0113c0ca1c1",
+      "price_days": 3204
+    },
+    "BIIB": {
+      "cik": 875045,
+      "sic": 2836,
+      "sec_sha256": "e49b5a3bbf14de0fb7d239cc7824bd2fd0df6e7d76ccea2ef08421f0f26763e0",
+      "price_sha256": "a3027a84b411324c847f37e43e182ca5c442a07b16910b9dfb0076dbb1856d91",
+      "price_days": 3204
+    },
+    "ILMN": {
+      "cik": 1110803,
+      "sic": 3826,
+      "sec_sha256": "82178ff1416d5bfc93713c949da8e5c1b5f3abae2f34a3db4e98a04b87f82592",
+      "price_sha256": "354e4b63a29091c5ea92df0fb12e0afa958bb25b4554cb7b2a28f5dcb79766e2",
+      "price_days": 3204
+    },
+    "IQV": {
+      "cik": 1478242,
+      "sic": 8731,
+      "sec_sha256": "70859cc9dcf4dfc30768c753d394b5f5bd69800d5e7753308315302240f9d56e",
+      "price_sha256": "336de40953044ada44a49f4a7e9e84bd667c5531d161bb8c48cd7e2347451275",
+      "price_days": 3204
+    },
+    "A": {
+      "cik": 1090872,
+      "sic": 3826,
+      "sec_sha256": "c1dc449b186de4294c8dbdbb9e3b0f74eee3628c3fc5836652ff7ab8c2040ac9",
+      "price_sha256": "3e4b269ad65c7aada625185160820c1021b5f8ded50ceb93abdc2109390674db",
+      "price_days": 3204
+    },
+    "WAT": {
+      "cik": 1000697,
+      "sic": 3826,
+      "sec_sha256": "f36772e3c932728e55fc7b158a25d0ab2189ad8ffc3a3e02408c7bfd3ae0b8ed",
+      "price_sha256": "2f47b609c96c685a52a69b1a89fc8fa0abdfae80561f42103d6c8527b0291734",
+      "price_days": 3204
+    },
+    "MTD": {
+      "cik": 1037646,
+      "sic": 3826,
+      "sec_sha256": "96802dbb20a5201bd0b672df752020b95041823f06bb80399a4ee58971f0933d",
+      "price_sha256": "be21b3d8d1bdd181406c8d257bd43e13432c97b3a7f3f6b625e02ccc8568907f",
+      "price_days": 3204
+    },
+    "RMD": {
+      "cik": 943819,
+      "sic": 3841,
+      "sec_sha256": "e34475f86d51c5a2a7c037bcf07aaa6b9a48ac8827a8fbde2be0b6c1cbc3ac74",
+      "price_sha256": "8f6ca1de169ddda5e41d08e221fb1f6a99368af03db17941e97d281205d01a42",
+      "price_days": 3204
+    },
+    "BDX": {
+      "cik": 10795,
+      "sic": 3841,
+      "sec_sha256": "2412ff584fd74aa61f919bc5813a0bb523fdf03f20d6104f3167cc19c3ba84b9",
+      "price_sha256": "ce63261fbbc8c4c3dc907ceea2d4c3b33ec143d54f7bf32d59d318a5ab093e97",
+      "price_days": 3204
+    },
+    "BAX": {
+      "cik": 10456,
+      "sic": 3841,
+      "sec_sha256": "98f10c840740ee257cb08b485f7842d702890e9b7ef20df2e3673fca2bb12297",
+      "price_sha256": "f256f86200a2ed967bf4c4f6ba8a13231fa790dcea6e40f3333afba75880b434",
+      "price_days": 3204
+    },
+    "HOLX": {
+      "error": "ticker not in SEC mapping"
+    },
+    "ALGN": {
+      "cik": 1097149,
+      "sic": 3842,
+      "sec_sha256": "5ad933a808d717ac885a7e416d10b9cce8fc1b0abd920234d9695307ca2f832f",
+      "price_sha256": "24774af8cdd6c76b294af643b172bb4d4daa29eff35633e11eec9a753de254ce",
+      "price_days": 3204
+    },
+    "DXCM": {
+      "cik": 1093557,
+      "sic": 3841,
+      "sec_sha256": "f0b2cf49d2b134e3515bb193a36e6dd32858eb179fe55c6b56af8f33873f3956",
+      "price_sha256": "c8107a7b0db28cb80c7f1aba20b321ff9425ef0dde8313c967607cd3b6a4cb2d",
+      "price_days": 3204
+    },
+    "STE": {
+      "cik": 1757898,
+      "sic": 3842,
+      "sec_sha256": "1e7f3150c0cae1f0b976f5424b71c1ee51584399ee4162841d6db8063319b089",
+      "price_sha256": "13fbc013c77cfea155c111adcaed1b5828a73d68e4029b446d019ffa7d234f58",
+      "price_days": 3204
+    },
+    "LH": {
+      "cik": 920148,
+      "sic": 8071,
+      "sec_sha256": "870099f23ed7598e05f405c7b5db78de7f4e413de290bf898fe02180fd87bdd8",
+      "price_sha256": "8c7c5257e09e091fc61a888eb653b0176746e50c442e89babcee85806ee1c10b",
+      "price_days": 3204
+    },
+    "DGX": {
+      "cik": 1022079,
+      "sic": 8071,
+      "sec_sha256": "adbcd1ab76a0f4e97550d23fe491dd7925c24a4e382bdc83c78850bdff87d14f",
+      "price_sha256": "ab5dbc8a34767b5512a002e8555b2f8ca5abe4b5c9d8640a8ecffd6410d21a4b",
+      "price_days": 1
+    },
+    "HCA": {
+      "cik": 860730,
+      "sic": 8062,
+      "sec_sha256": "1dd9e5ce23f330228b212385f04a44a5a303622fc026c82d9edda66092dcb49a",
+      "price_sha256": "04fa0ea4f9b359fe49ff6e22ea70795e39578b6cb7538e4dad6f25988f4ded6e",
+      "price_days": 3204
+    },
+    "MCK": {
+      "cik": 927653,
+      "sic": 5122,
+      "sec_sha256": "435891f1a2c1f818252726af1c515add6885f06b80cc11aceeffc620f32c103d",
+      "price_sha256": "341c2ee3b5fa2286a822e10e381a99f5b93d1c3cc1ffbef0a062a3abf7874b79",
+      "price_days": 3204
+    },
+    "ZBH": {
+      "cik": 1136869,
+      "sic": 3842,
+      "sec_sha256": "b0d94fd0d04415e1186c4cd88ea979b5075083c5846391ee1ffe80f41319afd2",
+      "price_sha256": "a00e044df1dd0cd129d540c14c7cfd6427667b28c4b11c91e6d09254719b7f28",
+      "price_days": 3204
+    },
+    "ORLY": {
+      "cik": 898173,
+      "sic": 5531,
+      "sec_sha256": "29a5e7ccfb4acae0edb20b5c9f9bd6dd8c68ca08da883bb2ae34ad1c5e43ec77",
+      "price_sha256": "07b6e762b1166f07289e79f7feb178c6e87c1dac944ef3bb7260cb81e027f574",
+      "price_days": 3204
+    },
+    "AZO": {
+      "cik": 866787,
+      "sic": 5531,
+      "sec_sha256": "0e652965cdc4fd7aa88190116e50474ffbf31ea6b4451b50b3b784af0eadc4d6",
+      "price_sha256": "41094942d715383aeb07bb7ba03bd431a86db3501b25ebba078608a7d40fdebc",
+      "price_days": 3204
+    },
+    "TSCO": {
+      "cik": 916365,
+      "sic": 5200,
+      "sec_sha256": "800c0941fb0f475697aacc63f4d287b0cf89b57c556e2d717cbbb4e6d7975b6c",
+      "price_sha256": "5df64c0f84e89bdd376c9fb2f055b3f668452a83fba37f3274adacb033376e57",
+      "price_days": 3204
+    },
+    "DG": {
+      "cik": 29534,
+      "sic": 5331,
+      "sec_sha256": "16157a14c6c91f04a8b3e89ccedfc91ee0d5ea6978f8c6ed1d25d8cfe73541cf",
+      "price_sha256": "fa3ca8cd8066c041844877ad7284dddd1ce0c66382247d1c47137af1863cfbfe",
+      "price_days": 3204
+    },
+    "DLTR": {
+      "cik": 935703,
+      "sic": 5331,
+      "sec_sha256": "e848ce86b0df51740450fc079721862fb958621c0c62a59a739af96ff8bdb5ab",
+      "price_sha256": "2e40b19748d5b55c1d91dc8bac2b06bae32bfcae65067f7699e7ea40298a5464",
+      "price_days": 3204
+    },
+    "BBY": {
+      "cik": 764478,
+      "sic": 5731,
+      "sec_sha256": "c9cd833d8edc99921ff5d5fb26d6b5b7ef2a2109ebbba7107fb1a4127c3c7149",
+      "price_sha256": "2889843599d4e1238b2dd41012aa3c183824659632be4cfbefd4fd680254ae88",
+      "price_days": 3204
+    },
+    "ULTA": {
+      "cik": 1403568,
+      "sic": 5990,
+      "sec_sha256": "61331566ead1af34f46eabe3278cb4d986819bf8c6c06c60e41b11e80365c69f",
+      "price_sha256": "e0daea21fc815f6914b6598173d94926be2b95ed47558f71f21104f47b335e7d",
+      "price_days": 3204
+    },
+    "DRI": {
+      "cik": 940944,
+      "sic": 5812,
+      "sec_sha256": "f927e022bbe6a9645c3a272e6fef71bc01ce321732380ed98356756cb871a347",
+      "price_sha256": "3141e2fb245db176cad49bfc213929f9552ed083162430ac8818b34511c5e2fb",
+      "price_days": 3204
+    },
+    "MAR": {
+      "cik": 1048286,
+      "sic": 7011,
+      "sec_sha256": "af2fea717f696acfa6f5f2436aa6e4175c3c56ab1628a2e3198964300f32422a",
+      "price_sha256": "2b07452cb40f727806ea92922814a559d68fb840d6f2a85c7eb10f58e1fc30f6",
+      "price_days": 3204
+    },
+    "HLT": {
+      "cik": 1585689,
+      "sic": 7011,
+      "sec_sha256": "a7ea3c8478a4585a74b82cad81b3125472c10ae74ce54ec25d08e4de33007e9e",
+      "price_sha256": "db02427f11d4b6f39619ce94cb0883b8691be4d213fea78fae96ceac79386b2a",
+      "price_days": 3204
+    },
+    "EXPE": {
+      "cik": 1324424,
+      "sic": 4700,
+      "sec_sha256": "4af44d83f624debf00c30657f3e7753ec05806b108029432edbdcf291c18d163",
+      "price_sha256": "250567dd2f1d0282a98c4fab186ed5cb979071b8c0f401a4fe395fb9a9de31cd",
+      "price_days": 3204
+    },
+    "POOL": {
+      "cik": 945841,
+      "sic": 5090,
+      "sec_sha256": "7b868b687bf03c0ec6e1c91e0b331cd90bb08b4ae5b6cb4731fc141f8eef6abb",
+      "price_sha256": "1f1962b843849c802b32f33b4775c9529d10abd4b60539bf2f808fb762e10f9a",
+      "price_days": 3204
+    },
+    "GPC": {
+      "cik": 40987,
+      "sic": 5013,
+      "sec_sha256": "d683bb80d340a8e8e77d2b1069a5df9fb984ba0a77ccf31d3124d4952e597c8a",
+      "price_sha256": "cfec0de9cb9ac0944c1609b6b23ab644c05186a2777c2de4ce304b110e0f19ba",
+      "price_days": 3204
+    },
+    "LULU": {
+      "cik": 1397187,
+      "sic": 2300,
+      "sec_sha256": "89f7c4fd2ad8016bb521a2a2999da6515819d628d61ea81c773d838ba2addfaf",
+      "price_sha256": "1ebf228678517ea216d235f8e95e44f5270963c9f0466413cd76648f938dfcf3",
+      "price_days": 3204
+    },
+    "DECK": {
+      "cik": 910521,
+      "sic": 3021,
+      "sec_sha256": "4b5b5238bd4a48c7a7685ec5a86501fb7ae19943f2a8fc09843380076fd3dc1e",
+      "price_sha256": "0dc99ff2ecf9827a19c81c1833e628a081a04d790add7628707d2b5f834024a5",
+      "price_days": 3204
+    },
+    "NVR": {
+      "cik": 906163,
+      "sic": 1531,
+      "sec_sha256": "fd4d2725c8de5bbcb217563fbb81ece606eef0671a7f6931be44c1d01baad6e7",
+      "price_sha256": "12b660fe65019cd23bdb0895981d4ecbead55a9baa30d1e38fa145b6c209440d",
+      "price_days": 3204
+    },
+    "KR": {
+      "cik": 56873,
+      "sic": 5411,
+      "sec_sha256": "f960cd5977a109fbba07f6fbb5da02280c3c4b71e4f89e01f7e46bd4610fe1a0",
+      "price_sha256": "6eb5d7c9f17aedc227118a18d269756314bc6979895f73e29a82f8a38648665c",
+      "price_days": 3204
+    },
+    "SYY": {
+      "cik": 96021,
+      "sic": 5140,
+      "sec_sha256": "7358a5dbcdd4e5fb99b84e4ce7221b2e96c698b58560a4b9a676b1fc7933d824",
+      "price_sha256": "7a715e70f73109c56dcf2428de7cbacf51d227cf410099d1b2ba3d17366d0004",
+      "price_days": 3204
+    },
+    "ADM": {
+      "cik": 7084,
+      "sic": 2070,
+      "sec_sha256": "143a6bf88adeafcd9eeb218722dd5059584ff25dd15b7d056712930c735567ea",
+      "price_sha256": "a3a190d7bb32076ce9b22484f8d6cd0d05401f3ac8aaeba16ef8f436f07ac93b",
+      "price_days": 3204
+    },
+    "TSN": {
+      "cik": 100493,
+      "sic": 2015,
+      "sec_sha256": "24a6a5c4789b2f7a7b07b229d2158838c030e4cccd2ff08f8158ec56c35b96b1",
+      "price_sha256": "bf79a59881c58932e89c5bf11d3e6bd82c72ab1544d3096a110033c2c19a7c0c",
+      "price_days": 3204
+    },
+    "HRL": {
+      "cik": 48465,
+      "sic": 2011,
+      "sec_sha256": "bc5b56b2f0760d26b7c4c348e3ad6bad5f5fb9895066a0336d7ea47107c9a8cb",
+      "price_sha256": "7bbddd83073e122762736cce0fc8fe2a45ff73ae232c33e987dc30ef96a1bdb1",
+      "price_days": 3204
+    },
+    "CAG": {
+      "cik": 23217,
+      "sic": 2000,
+      "sec_sha256": "7f122d7d40634aa2fe0aff202caf19a4c99011f9bc0f96f89abdaeb5ed8df7d3",
+      "price_sha256": "4f6fdb2cab1e7e431a087be0977ed2bff2ee8b81dff167cf7bc6e32e427b9405",
+      "price_days": 3204
+    },
+    "MNST": {
+      "cik": 865752,
+      "sic": 2086,
+      "sec_sha256": "64144475e8bf6500e75b335c46c775c2f1f9d1c8e708b9d71f43f1d6eb3eed07",
+      "price_sha256": "a1b4b22fc7d3a68f9e27ee38683ae2aa7831433f17563fd1b75988760f3917ed",
+      "price_days": 3204
+    },
+    "CHD": {
+      "cik": 313927,
+      "sic": 2840,
+      "sec_sha256": "0b84a4359cd88c00bd767e8d40c6cf2f80cc1097cf62ff278219c328e9b3e747",
+      "price_sha256": "e0a3542c7bd76bbd08630bc8681093435e411074c3ad47deb2ca2d46de8c1bae",
+      "price_days": 3204
+    },
+    "STZ": {
+      "cik": 16918,
+      "sic": 2080,
+      "sec_sha256": "d9d8d3d23f255afc4fc6c38eb72a4b3c83d0f51046cb9c6cb2f2cbdf26e2a35f",
+      "price_sha256": "cf31ce1e58b5241dcb3f3fd78dca73fdff97b2ca51a6023fec246819c0bbd2ba",
+      "price_days": 3204
+    },
+    "MO": {
+      "cik": 764180,
+      "sic": 2111,
+      "sec_sha256": "582b5eb5dbbe9b567af2d187a19d9a7d59f7d7dda6a37a5037ac7b6972262c3d",
+      "price_sha256": "c4c7f1b3f78c2b1ffbf225ebf7dec7f5aedb84b2f9823b74a0cf560ecb86b2f0",
+      "price_days": 3204
+    },
+    "PM": {
+      "cik": 1413329,
+      "sic": 2111,
+      "sec_sha256": "5388c14226952dd9d1f0d193f5915164425afa76ff09b69203e3b66b609026bc",
+      "price_sha256": "8b8cf9e7c1ba16dbc793a84ce222191f52f422683d01f3a733d9d336cfff2259",
+      "price_days": 3204
+    },
+    "ETN": {
+      "cik": 1551182,
+      "sic": 3590,
+      "sec_sha256": "109482303c686ea9a3927143981559f7285115a0d15e7baa226d3c705c664e02",
+      "price_sha256": "da59ef32e3c3c52c2ee7e0878d11cf05f82ac3b0e8f44ca7b4a784f0288338fd",
+      "price_days": 3204
+    },
+    "PH": {
+      "cik": 76334,
+      "sic": 3490,
+      "sec_sha256": "68a9b3259484f47aa5f0c1556cb4446e0cd100821ad6c66be8064a1b7026df0e",
+      "price_sha256": "4533a3a5b3b698590ee6fb500b0d45e4c8b764ac626bc8b48be70759fc09b86a",
+      "price_days": 3204
+    },
+    "ROK": {
+      "cik": 1024478,
+      "sic": 3829,
+      "sec_sha256": "3a514cb5eea60c9984f6597cd4eafdc6500a57af0307461f00d4f2dccfaa1446",
+      "price_sha256": "3fc0651501dea14492a3f88ca3dcb9a658dd01106c0bd197f7ed59b959862daf",
+      "price_days": 3204
+    },
+    "DOV": {
+      "cik": 29905,
+      "sic": 3530,
+      "sec_sha256": "a91cc758b810966dc29303a97a401b26ab5a5467973cff6c8c61472536abdc4c",
+      "price_sha256": "e42e793b97057f340988b49a8771446536a6561256b41a873fd936dd9ac8dfbe",
+      "price_days": 3204
+    },
+    "AME": {
+      "cik": 1037868,
+      "sic": 3823,
+      "sec_sha256": "8a1f593d3101b4530831d0fb0f37784796810616d3d50a9047a60b80fea4761c",
+      "price_sha256": "9079a3121fd1b451ceb7abab06d379d5c56c0fe7a04a782550c8759d3ea2f32c",
+      "price_days": 3204
+    },
+    "XYL": {
+      "cik": 1524472,
+      "sic": 3561,
+      "sec_sha256": "a43b8f8814be1c0925a7c05aafd782947b7432971c89c3f900d08f43e2c0af26",
+      "price_sha256": "1cb2daa7a739e221694ba824d6571bc8c040bdba3f020c8df954cb7209e105ac",
+      "price_days": 3204
+    },
+    "JCI": {
+      "cik": 833444,
+      "sic": 3585,
+      "sec_sha256": "3c0ad147e5626029fe80ae5e25c85c43cb27a4b1f2d620a8e1b4e6e896fd910f",
+      "price_sha256": "c50e1bbc787526bde4b8f8096c3569a84fbddc72fc9caf205ce6abb3c3921263",
+      "price_days": 3204
+    },
+    "CMI": {
+      "cik": 26172,
+      "sic": 3510,
+      "sec_sha256": "febe85c161aed592fcb06cca2a6f2446a3769ee07fc12eefec882dd3044db19e",
+      "price_sha256": "ae79f845141f6a3524f1636dac18264884dc4c12fbfc80fb5cb361c1734ea882",
+      "price_days": 3204
+    },
+    "PCAR": {
+      "cik": 75362,
+      "sic": 3711,
+      "sec_sha256": "bdfaab49160ead388203df5f35ae036b2c1dd61fc73bde65b46ee07706a4c891",
+      "price_sha256": "1476b0c01e842559914af9be23402ae696bcd435a4e7a3716a2f40e6885f383d",
+      "price_days": 3204
+    },
+    "ODFL": {
+      "cik": 878927,
+      "sic": 4213,
+      "sec_sha256": "cfe7fd09a23eb4d6d7bb463f37abe15444151e095b394a457b7e41b69d6f3046",
+      "price_sha256": "1569056b8c4bc326089b227764a5e1caa62cb34bc333ab452d07029001969c67",
+      "price_days": 3204
+    },
+    "JBHT": {
+      "cik": 728535,
+      "sic": 4213,
+      "sec_sha256": "eccf1a7b1d2d22679ccf882106106a1c5f28a54537256e4d13f32d6554b1f788",
+      "price_sha256": "d775573b0b129c92dd6edb143cd929406181c32dc03c8f1a71e4097a91f0a56e",
+      "price_days": 3204
+    },
+    "EXPD": {
+      "cik": 746515,
+      "sic": 4731,
+      "sec_sha256": "19281891caa89fcfc469369498a89e7ff9ea37fa213a76e73c5a00d4c58c5b7d",
+      "price_sha256": "007855319df92b9c53c7906a343aaffd381fa3768f055628565b3afaf661ead6",
+      "price_days": 3204
+    },
+    "FAST": {
+      "cik": 815556,
+      "sic": 5200,
+      "sec_sha256": "d2fa9f1d63d2647f81b2e1c9c080efffd9b37c2c7e56f933502b6f6b2d724a6e",
+      "price_sha256": "047488ca1d0fb4cf89795269faf216627447e93513b5a4117e7d091b3fff4b18",
+      "price_days": 3204
+    },
+    "GWW": {
+      "cik": 277135,
+      "sic": 5000,
+      "sec_sha256": "8d3ec595bc350ee93c25f411d8403337bf3535f81f761009d232be61774bb52b",
+      "price_sha256": "22b4aaa65d4bb5f170bc24909d57ad8c4575ca1d454f38d3685c00d05fccdcd3",
+      "price_days": 3204
+    },
+    "URI": {
+      "cik": 1067701,
+      "sic": 7359,
+      "sec_sha256": "5ddcf2df8f2e74caa52a12353f0481cab3474d4886857cc84e286855752a1d9a",
+      "price_sha256": "344ac3a566851a724b3ab8c73ec730983302c1d89b0e4f193957badaf63cb69e",
+      "price_days": 3204
+    },
+    "CTAS": {
+      "cik": 723254,
+      "sic": 2320,
+      "sec_sha256": "79129b8759529ee1a588dc5aa5fc43837af2eeab90dcec6388f22ce81a63c5c9",
+      "price_sha256": "f1ae5ed07c57ec78d8bc02d710fb4d1b1857754c075b06861d62e0db8eaea911",
+      "price_days": 3204
+    },
+    "RSG": {
+      "cik": 1060391,
+      "sic": 4953,
+      "sec_sha256": "f67b0cf72f216d6d4a76e78284d303c36c91131314eaf251b9c00627e8821f90",
+      "price_sha256": "e6545db8e65437228b7f12609940093c52f9bb50f1180aba6f0d8bb87d498999",
+      "price_days": 3204
+    },
+    "CPRT": {
+      "cik": 900075,
+      "sic": 5500,
+      "sec_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
+      "price_sha256": "4950ea0ba3600829d7071d108e5b707c6461f448213872c0685989c4e97b8627",
+      "price_days": 3204
+    },
+    "LHX": {
+      "cik": 202058,
+      "sic": 3812,
+      "sec_sha256": "42fd17c34242f68b8fcd3bed7c20bd186d8d39249e8e4d915414899a805ec753",
+      "price_sha256": "3fd72614428cf70f7cf58789e080ec6b87c729992f2b2a17ae41df072cf9f829",
+      "price_days": 3204
+    },
+    "TXT": {
+      "cik": 217346,
+      "sic": 3720,
+      "sec_sha256": "75148505b22932b44af59187e898df45196a3a3fe59eb71c4c5f6818bf0810da",
+      "price_sha256": "838c8f67a84e7c44b583408926d022b98d4b95b707e7feef312eaf00d6746ffd",
+      "price_days": 3204
+    },
+    "TDG": {
+      "cik": 1260221,
+      "sic": 3728,
+      "sec_sha256": "74a8d46bf913c5464b41d705af26fc749725d4375dec095885d3053603bdd9d9",
+      "price_sha256": "386806523616af78d413e2164f74a261f699b87762d6d4a7ad00bfb172a4faca",
+      "price_days": 3204
+    },
+    "SNA": {
+      "cik": 91440,
+      "sic": 3420,
+      "sec_sha256": "c8771eeadfa1e6d7568627e43bbefa431815e951d93c3fe4cf9b9d275483c9bc",
+      "price_sha256": "343c5ce7e82d25e7bff7a55d4bf6ea1c0ce74863ce1a35d3cf66465c5662b4e3",
+      "price_days": 3204
+    },
+    "SWK": {
+      "cik": 93556,
+      "sic": 3420,
+      "sec_sha256": "63a55694d2d46597c3e460e71c41164115e3b96dd585af6150863b099611b476",
+      "price_sha256": "845ba21cd43a7d4e610c8d6ba2619ab9e5b67c305dbd0d02ff0bf91289ab71ce",
+      "price_days": 3204
+    },
+    "FDX": {
+      "cik": 1048911,
+      "sic": 4513,
+      "sec_sha256": "58923c65a8c280db392ba069685c0fca42538dcece88cc22b8a6492f838923c2",
+      "price_sha256": "d968858348a9dad1ee226579962cdea984563895db4028894b2dc674fff1c0ee",
+      "price_days": 3204
+    },
+    "DAL": {
+      "cik": 27904,
+      "sic": 4512,
+      "sec_sha256": "9cee00021ec9032b910b0a1f69f66eb1a73bab9ca8427f8aae9030be3a0225b0",
+      "price_sha256": "c6234f5a299aa94e4525f66d9b90a9ec7750dc99fddad3dd951644d4f3da30b6",
+      "price_days": 3204
+    },
+    "UAL": {
+      "cik": 100517,
+      "sic": 4512,
+      "sec_sha256": "6621f43f61efe96e02f2aada43fbed7ea989332e4fad2c6c453f9abe139e6d32",
+      "price_sha256": "3149cc67f706894c2389edfdad4a957d48a1e3eec805909f117ab905377c40b8",
+      "price_days": 3204
+    },
+    "LUV": {
+      "cik": 92380,
+      "sic": 4512,
+      "sec_sha256": "7c2768fa2d6bfc2aee4a9f17ac6e0814434a45623283a8a8da8218ddc6cf678b",
+      "price_sha256": "ee40b20387f7ba160b6295dc7d4e4442bb34498fed4555a90965c14df69f04df",
+      "price_days": 3204
+    },
+    "ECL": {
+      "cik": 31462,
+      "sic": 2840,
+      "sec_sha256": "d1bde94130ee5039309a29a510152a8ae865bac9075851449780c3c9fcd6c135",
+      "price_sha256": "2526911c05af955b4ae765ba904492321e7edd46aafabe3a453b6e1b310a53b0",
+      "price_days": 3204
+    },
+    "PPG": {
+      "cik": 79879,
+      "sic": 2851,
+      "sec_sha256": "d2115215c7b5332e873631ef48ba58e08b126192b275c4f6043c31c439948a74",
+      "price_sha256": "7a2e615549d06ea9f2bd3391b110d498a6439a4c5171af70a12e677c33ef7d63",
+      "price_days": 3204
+    },
+    "ALB": {
+      "cik": 915913,
+      "sic": 2821,
+      "sec_sha256": "5cd3ca4cf5c31719acb1e076eff8056e414212076adbd68b05da1b6bd65b57d2",
+      "price_sha256": "bd491145e27babff907612bbd69f1afcfa40dc07281c02c9fdbc985c60a2e7ad",
+      "price_days": 3204
+    },
+    "CF": {
+      "cik": 1324404,
+      "sic": 2870,
+      "sec_sha256": "a17d78818af617b7046483b5e76f2a85e1bf6a960c21a6f598ba0ee8d33d48b2",
+      "price_sha256": "99329e3133d62c928fabf51e8b1f531530dc7bafaee5d04fce10dbb32f49dfc9",
+      "price_days": 3204
+    },
+    "MOS": {
+      "cik": 1285785,
+      "sic": 2870,
+      "sec_sha256": "81961120680bcecc68f72fdf37219002dfb1e69b1fab6f3063ef9ee375feee90",
+      "price_sha256": "b87dd10f59c330c3a8a143b73686609b62c04757e6323cff41ca235b2d81cb71",
+      "price_days": 3204
+    },
+    "VMC": {
+      "cik": 1396009,
+      "sic": 1400,
+      "sec_sha256": "de76d44410d152213a10eacbbe63ef8cd32c330665614a88fe25ce432e1d4d01",
+      "price_sha256": "883ab62740f1fb93d9d1c9b3d441541755ced060ffd912ff1acc606772e14ba3",
+      "price_days": 3204
+    },
+    "MLM": {
+      "cik": 916076,
+      "sic": 1400,
+      "sec_sha256": "661148956ef2ebbd1186248565de5e7c432ac61be4b647bbd82f49b82f7917f3",
+      "price_sha256": "e8d358d7098c19eff93bb28674bc5261a831b0e5159ad02da0d67535d74e3e89",
+      "price_days": 3204
+    },
+    "IP": {
+      "cik": 51434,
+      "sic": 2621,
+      "sec_sha256": "cf67a703e8b724e484e37109a20dac6c11705d2a7ec62c22f00ec42b5ab53107",
+      "price_sha256": "97327129f27077918018abacfbec4f38979a28f2f56f33a24b5f43d5043e075e",
+      "price_days": 3204
+    },
+    "PKG": {
+      "cik": 75677,
+      "sic": 2650,
+      "sec_sha256": "38e773e6abd23b37c1b3a772902b2adb00173643d5fde1103fbc1c333ee938f7",
+      "price_sha256": "8dd638ebbf4a23c8d9e2ae7514f633878b3c24cc11810671e433368f7a7fde93",
+      "price_days": 3204
+    },
+    "AVY": {
+      "cik": 8818,
+      "sic": 2670,
+      "sec_sha256": "6387595009294d51ddf0917bd6dfebe06523f55fc359bcc96f4776522b77fcbc",
+      "price_sha256": "f33ac1ac285d598f57f89592e798f6133db3e6c1d8b8277ea84776a9caf39160",
+      "price_days": 3204
+    },
+    "EMN": {
+      "cik": 915389,
+      "sic": 2821,
+      "sec_sha256": "683d07157bc9a69e765ca966a5544eb96d90ace51a503175a874caf514e3b901",
+      "price_sha256": "6d70dd7c5f6ab4afc6a1e9353b75005a57491bf84d68a15eaa448802fdc0062c",
+      "price_days": 3204
+    },
+    "PSX": {
+      "cik": 1534701,
+      "sic": 2911,
+      "sec_sha256": "3028219aae0a803439eec9cf0b3d541801320ce121e9d404858405ee31de09e6",
+      "price_sha256": "1052807a8f9ad9bd01072bc534167c4535dfc3590e43ae7dcfd9de608848fc79",
+      "price_days": 3204
+    },
+    "DVN": {
+      "cik": 1090012,
+      "sic": 1311,
+      "sec_sha256": "7ccaf0b7dc92d898ebca44247d00321a5af90be6df04208f46a9a7db977b9b20",
+      "price_sha256": "dd8272d5638d242fd95b26a882d0e8a97fbae1b5c9ff66e29e03a4a15c11e43e",
+      "price_days": 3204
+    },
+    "BKR": {
+      "cik": 1701605,
+      "sic": 3533,
+      "sec_sha256": "987c100407bbbfa22e4a753baf8a903b0e4820079a6502acd13b3aab48a36fd3",
+      "price_sha256": "e327b9d78ada87e05f3f4bca3ffae71cad791e96bf13207c52c9a3a5c48e1035",
+      "price_days": 3204
+    },
+    "CMCSA": {
+      "cik": 1166691,
+      "sic": 4841,
+      "sec_sha256": "4931cbdeb5c78061844fd07853321766ae28733a65d5aab5b39175943ce45dfc",
+      "price_sha256": "e9fed3be12f81650f84a03e57130458d6fce213c6446082e4176359ff82f3e3e",
+      "price_days": 3204
+    },
+    "CHTR": {
+      "cik": 1091667,
+      "sic": 4841,
+      "sec_sha256": "57117166ffdbd8ad488ad0dda5cc92a3645da7fc957c4e4365cadd123bce0421",
+      "price_sha256": "75f5ba86b821cd7d9d7a90cf3a835c238a1353d24b6aa6523fdd4a2c6cf696f8",
+      "price_days": 3204
+    },
+    "TMUS": {
+      "cik": 1283699,
+      "sic": 4812,
+      "sec_sha256": "a215b5c2834cf16e8a065a5eb16bfe2c4ba2fb0f93422437b2215c8b371ec052",
+      "price_sha256": "c3e6c2ad521d3e96fa3b223bffc1e8c4c9a87840d0ef833eb4541cdb24c46f91",
+      "price_days": 3204
+    },
+    "EA": {
+      "error": "ticker not in SEC mapping"
+    },
+    "TTWO": {
+      "cik": 946581,
+      "sic": 7372,
+      "sec_sha256": "e3358efb285aba62ca9e2c073849ca6411f9a0c04599048a118dde0ab2bb0e07",
+      "price_sha256": "ebefdaaf60f4491ae389a766e24f8b69dafd40b109b398656356a0740054edbd",
+      "price_days": 3204
+    },
+    "LLY": {
+      "cik": 59478,
+      "sic": 2834,
+      "sec_sha256": "3fe29099e6efaef9acac95711c271de1a644602939ea18487e29708310985942",
+      "price_sha256": "d6d19e8be8ccbe08ab6c91cca4af9c6799f9697498969dbd16dec20eaf1e70c9",
+      "price_days": 3204
+    },
+    "ABBV": {
+      "cik": 1551152,
+      "sic": 2834,
+      "sec_sha256": "1fa00a2de3a0434fb2ebba8b1678cc379b16dc435a4f3e5c696efb7f9029698a",
+      "price_sha256": "0e4b8e04238242a5f2b803c7fe735be98f78dc79328e8e675485ce767ad77a21",
+      "price_days": 3204
+    },
+    "MRK": {
+      "cik": 310158,
+      "sic": 2834,
+      "sec_sha256": "de2e92301923703e6aee247c42c0cf2f1b741118ebca221fbaa5dc0e47644bd7",
+      "price_sha256": "7af8e13892d6ecf29de1e3d6be0a1a260c8f2d2ae63aa58a47fe8fb4d7137878",
+      "price_days": 3204
+    },
+    "BMY": {
+      "cik": 14272,
+      "sic": 2834,
+      "sec_sha256": "a18ba88ed8f92b7f0cbc4d83a6db14b8fba95a5721f7f83a6306ca843ad40c2f",
+      "price_sha256": "da7d85f574654f5d147e979c30df94adc81f590e1c23748500732230e78953f4",
+      "price_days": 3204
+    },
+    "RVTY": {
+      "cik": 31791,
+      "sic": 3826,
+      "sec_sha256": "f45a596a61b554e66a7d360f5a1dc23d1b6e311b51445a0169ead135a00d3ab1",
+      "price_sha256": "19ed0dd8e7c0ef05c4685ac5f98f57e53bb44bf86d0359af760fc54356ba1e36",
+      "price_days": 3204
+    },
+    "TECH": {
+      "cik": 842023,
+      "sic": 2836,
+      "sec_sha256": "5f064cd631289049236c7ddafd76f1bc2824b0b55936587bf5e0bb2cc7a0f677",
+      "price_sha256": "0764f3353af9ef0c408364b0bae7d494ea7b3a31b874590ce90660b44946b488",
+      "price_days": 3204
+    },
+    "CRL": {
+      "cik": 1100682,
+      "sic": 8731,
+      "sec_sha256": "22884da0d898a58bf99c4f5d4c2de6e1fe324d32bdaa4d1b1ffb0a2a61e1a4cd",
+      "price_sha256": "6c010271c76b6ca70f94682df528cc4783ff2f2c4fcd69b9d5f08f50e3c22176",
+      "price_days": 3204
+    },
+    "WST": {
+      "cik": 105770,
+      "sic": 3841,
+      "sec_sha256": "c3a7f52d8bbdb9a06145973d83c1f4190a4d6619d572e4e3ede7677b74c530b5",
+      "price_sha256": "b24845bfa22e377e789492ee4d1505b300fc2d4497e43a6f741ba8515d0b7985",
+      "price_days": 3204
+    },
+    "PODD": {
+      "cik": 1145197,
+      "sic": 3841,
+      "sec_sha256": "6584a0c4ea0b5c1a6bd593893ae4b27b3d0ac6340c3e20d635b8488d32e2ebea",
+      "price_sha256": "c78932044189ce8979bcf645d5be5040aa95470ff35fa26281eeae32f8eeaa4e",
+      "price_days": 3204
+    },
+    "INCY": {
+      "cik": 879169,
+      "sic": 8731,
+      "sec_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
+      "price_sha256": "677bc1f8033777644728988d6708e6e7a6e04325a66ddd3f0325f20ac846c30b",
+      "price_days": 3204
+    },
+    "VTRS": {
+      "cik": 1792044,
+      "sic": 2834,
+      "sec_sha256": "f571b7cae2539ee573b69694e8028858b328b92cb38cc4c27fc4a6082aba440a",
+      "price_sha256": "9ebe444ac3dc33d44a34a4a7444111cfcee2f98c9166e4c3953318adeb9dda70",
+      "price_days": 3204
+    },
+    "HSIC": {
+      "cik": 1000228,
+      "sic": 5047,
+      "sec_sha256": "50148e36e397577fc93db58179bb339de4eb49591361390427b10df5e6e9c4e4",
+      "price_sha256": "6aacd6e0b18bcde36a74712a2cd8aa31861ec94751d71686b6649b94d8f4594c",
+      "price_days": 3204
+    },
+    "DVA": {
+      "cik": 927066,
+      "sic": 8090,
+      "sec_sha256": "b07a8bd0a807cb92d1ace1e4d6f3b566bc65733dbd8322b4be82ad6cdf12867f",
+      "price_sha256": "9654396bce9e301a76874df33f273e350b8282d175adff2cc0e522326a250873",
+      "price_days": 3204
+    },
+    "UHS": {
+      "cik": 352915,
+      "sic": 8062,
+      "sec_sha256": "28b3be74d323b7cd7c28559ef0b22713d4354cb39b348fd66abc292bc903b1de",
+      "price_sha256": "a921e10a5bf94139c43be9d3e3fd691151eab220bde322ec45d5d628b9e3e623",
+      "price_days": 3204
+    },
+    "CAH": {
+      "cik": 721371,
+      "sic": 5122,
+      "sec_sha256": "194e5c99b43f403ca00a341eb7f330b5343e481f1d31148aa68f7f10bb6dec5d",
+      "price_sha256": "456caf2448c09f3d3e1215588266fca28c179f6f45fd67272da7569c324d7151",
+      "price_days": 3204
+    },
+    "WDAY": {
+      "cik": 1327811,
+      "sic": 7374,
+      "sec_sha256": "831819baad53b4b4f5b72b5d1f24144e90c5cd42ff9e6263eecdd0dff87c648d",
+      "price_sha256": "cf254a4063de9b21ba6082c981e750e3ddf1af665e007fdbfd1c8601130bbe5e",
+      "price_days": 3204
+    },
+    "CRWD": {
+      "cik": 1535527,
+      "sic": 7372,
+      "sec_sha256": "a71a92f1f11bd3032271ca55be7a7770a96a846ec809f925829ef952fd5f3fa1",
+      "price_sha256": "e1abaf7b7186535e335709fbf0acd69feab1b638fd35f09f6da8f0c1520abd29",
+      "price_days": 1835
+    },
+    "DDOG": {
+      "cik": 1561550,
+      "sic": 7372,
+      "sec_sha256": "d3c4561fd839e25b1cde245ff3ca1f821b2a70e70d34688c5ede40bbc0f600a2",
+      "price_sha256": "1d72190171e7966bc87a7284cf7d10ad1fee15e0210898a3235512fbc28fcd63",
+      "price_days": 1766
+    },
+    "SMCI": {
+      "cik": 1375365,
+      "sic": 3571,
+      "sec_sha256": "039172a7eec0fe46077ce444eb12280a0e625f5cec313c058903ec7016d82794",
+      "price_sha256": "8162f5edb5bbc0b98391805e7e20a19ade6442db34aabc7c7ba7b79f323821e3",
+      "price_days": 3204
+    },
+    "ENPH": {
+      "cik": 1463101,
+      "sic": 3674,
+      "sec_sha256": "ff43e841870f44069d6d009e39a56297c24e8ee277cd9c8a3789fcf9632fc6c3",
+      "price_sha256": "ce942bcb49678011a369341c0478a58d6f719366e67f52f1a807aacaea1bd269",
+      "price_days": 3204
+    },
+    "FSLR": {
+      "cik": 1274494,
+      "sic": 3674,
+      "sec_sha256": "ad72f6f8be95cf5544d37eb78b0af9753ee93e5cabd1bd3f49e85a57db0daa2f",
+      "price_sha256": "6fefe1f4ceba295bf863355295a55cb10c4bbf4918f53eaf8a6b13deb4315dc8",
+      "price_days": 3204
+    },
+    "GEN": {
+      "cik": 849399,
+      "sic": 7372,
+      "sec_sha256": "1ab96531b9c9e367514ad0e1b6e81b0749f553760fe2b87e5a77f69bb29de44f",
+      "price_sha256": "60c01feec338bd46be6eac62bb9071b5b201cba4a1fe234fb1c08fa6c3e153e8",
+      "price_days": 3204
+    },
+    "JKHY": {
+      "cik": 779152,
+      "sic": 7373,
+      "sec_sha256": "7b8677dda7b51f9fcbb16580d35aace9d99d7edde4af93136cfff28a24625bb2",
+      "price_sha256": "416dd93202ace33e26430384b66a9872eb78ce58265558fd80072d32ff87325e",
+      "price_days": 3204
+    },
+    "BR": {
+      "cik": 1383312,
+      "sic": 7389,
+      "sec_sha256": "578d04e135e12e49db7950c9c720062b477574a6d9e4fc069632c0b94a84a0ad",
+      "price_sha256": "a463e7277c780ca1ca39a02b9f94eb625a863979da32bfbf5dd6be4b0e846d1e",
+      "price_days": 3204
+    },
+    "GPN": {
+      "cik": 1123360,
+      "sic": 7389,
+      "sec_sha256": "dccb532d14d0be99767d5b58f18f91b0b6d6e79211e8dbe26bc6cd9ce7adbd7e",
+      "price_sha256": "dc73b6207d5337d381795dfd2022f244a8c37c9545d35040409efc8d2b50cbcd",
+      "price_days": 3204
+    },
+    "CPAY": {
+      "cik": 1175454,
+      "sic": 7389,
+      "sec_sha256": "0489e4601d317a5f7dd115e6517947abce1e06ae809cc551dd6438ff4e4ca11b",
+      "price_sha256": "aa7922107579edf0d5cdac1cb00d531a92dfb07c5311b236aa308d4175ad84bb",
+      "price_days": 3204
+    },
+    "TRMB": {
+      "cik": 864749,
+      "sic": 3829,
+      "sec_sha256": "2778a19629bf5eba804ccf31ae4dd6cac95e303bfd5e007be968535a7133d2c5",
+      "price_sha256": "631ee02ff4ebe61677e2a05fae2159a1a2a88e1cd892e66d348d295787a0198c",
+      "price_days": 3204
+    },
+    "TYL": {
+      "cik": 860731,
+      "sic": 7372,
+      "sec_sha256": "2a4ec793c0bf7f9da9d3133f93327d4f328746f361fc9ef0a3c52acc4b9ae922",
+      "price_sha256": "9b8117409ddecf54e207e83c829bb3fad540d553acb0be6df7d03f291bb6e506",
+      "price_days": 3204
+    },
+    "PTC": {
+      "cik": 857005,
+      "sic": 7372,
+      "sec_sha256": "35d7f8001e1873d67862c9a42bc8b8683fc38fb7f88e9202f3a63a51575013ed",
+      "price_sha256": "f4ee77fe934c3accbbca972fbdb65036b3ef58a5cff60e8fd1fdf16775f635c3",
+      "price_days": 3204
+    },
+    "ROP": {
+      "cik": 882835,
+      "sic": 3823,
+      "sec_sha256": "052fc6e4bef90d7703fc3ae1485b31f5a849e72ff2d6feaedecf8811f41ef339",
+      "price_sha256": "475a1caf7f1710d28601df299afc54598f16bee01030debb96bfa84caa9eba24",
+      "price_days": 3204
+    },
+    "GRMN": {
+      "cik": 1121788,
+      "sic": 3812,
+      "sec_sha256": "f132e5d872392f477b3b4f7e7f3e558fd35c4f5bb10547a94ed208bd01156dd5",
+      "price_sha256": "219ce2113ef627070ba4e5d501cfd5d962f4492f6d44549ac2c66a47b86c0c96",
+      "price_days": 3204
+    },
+    "TEL": {
+      "cik": 1385157,
+      "sic": 5065,
+      "sec_sha256": "1797fe441ae96b35b5c39c78cdbe7668e293f52cf332cf9b15086a29ed6c67bc",
+      "price_sha256": "8418d3a1e39e1bbf675063f5ed55b42bef0e620d7768e40ee9d361ce6b861d85",
+      "price_days": 3204
+    },
+    "JBL": {
+      "cik": 898293,
+      "sic": 3672,
+      "sec_sha256": "7cca1f8abe8ecb3e3055922f1fbfc8e148b559c07efe695f0efe5de33aa0d3fb",
+      "price_sha256": "609d5c409558a78edbf7eb7940f303584bf7483ebc4be190127111f5967d0976",
+      "price_days": 3204
+    },
+    "SWKS": {
+      "cik": 4127,
+      "sic": 3674,
+      "sec_sha256": "fe97017d523d23be63ebcc6d002d596ff7e1e00e89944976731ca27b8303c1b8",
+      "price_sha256": "7b39e72392fdb3e9f43d129508ce884eabc0c79c1d848f4ae8b5f7404deb59f2",
+      "price_days": 3204
+    },
+    "QRVO": {
+      "cik": 1604778,
+      "sic": 3674,
+      "sec_sha256": "077161694facd4d21a7f526a97360591e1a5139f3e8779eb0354e51110c459e8",
+      "price_sha256": "e25bc8cf19afd32fa7f084fb71c343f917cade06f7b7b26a5cc64aa8a0b7ba7f",
+      "price_days": 2952
+    },
+    "EPAM": {
+      "cik": 1352010,
+      "sic": 7371,
+      "sec_sha256": "a44c750a1468b1e7b44893101e967e06b57bea9d39dfa8e7d8f56f19e856a7af",
+      "price_sha256": "2af6add5cad34decfdb2759f37236e63a33a4633b638166fa84723a5a3d6350e",
+      "price_days": 3204
+    },
+    "FFIV": {
+      "cik": 1048695,
+      "sic": 3576,
+      "sec_sha256": "9cc393aa5c19a2d23f818bb88f381d7437acaeb5863409226daf44a2d60b9a92",
+      "price_sha256": "a48588ff12f77659128dee41042a0a01c6416bd063a8107375f08f4c495500b7",
+      "price_days": 3204
+    },
+    "TPR": {
+      "cik": 1116132,
+      "sic": 3100,
+      "sec_sha256": "f778dc6d6092b7f14f730475c9e1f06dd25e4947852b457f0a5fbdbecb6197e9",
+      "price_sha256": "fd71f069f7e68b3e76abb6d7c156c973a8606e15e4008c953fe9ac87030bfd8e",
+      "price_days": 3204
+    },
+    "RL": {
+      "cik": 1037038,
+      "sic": 2320,
+      "sec_sha256": "9941afcadb20bb4ecf7958fe71a236ff4491ffe74a659b55b7c6737d81217e31",
+      "price_sha256": "80aa873d55edf770f983b68f517f914289a44ec4ff97bb8aeefec13a734d3c97",
+      "price_days": 3204
+    },
+    "HAS": {
+      "cik": 46080,
+      "sic": 3944,
+      "sec_sha256": "5c712cfd038f396393133b7e3f452ac48209eadad07769d05e760457eafe3207",
+      "price_sha256": "87fae7594cfa2349a255721a71f89ef0475e96faff802172a8446247a7e2a510",
+      "price_days": 3204
+    },
+    "LVS": {
+      "cik": 1300514,
+      "sic": 7011,
+      "sec_sha256": "e358569f68f3e18106d3d7fdb181edd9f7ec8216760e734bf0365e8f5b709883",
+      "price_sha256": "e70e61f19886f9b625989d28bdf4a46f79ee698502f5a30ed46061e3797d31b1",
+      "price_days": 3204
+    },
+    "WYNN": {
+      "cik": 1174922,
+      "sic": 7011,
+      "sec_sha256": "b7a92484f985e9cf0a17139221148ecb3d48c14c1c2c07d6b919b3951e496786",
+      "price_sha256": "75030893465c3d2d3ad35737253202cc844973feefb362c087ca8415c4f28eef",
+      "price_days": 3204
+    },
+    "MGM": {
+      "cik": 789570,
+      "sic": 7011,
+      "sec_sha256": "747e845ac11195975d04f811c36604ce2d4eec32f1b8a948dd222884c182d2a8",
+      "price_sha256": "e7aeece0c474dcec0658f7bb5dc178162b15dffba37f3337a064b0565ab12d34",
+      "price_days": 3204
+    },
+    "CCL": {
+      "cik": 815097,
+      "sic": 4400,
+      "sec_sha256": "c207466469f69d3af50817c174fb9dc501bb65e4d2f64fdd51f2b3a3b9f3e5c9",
+      "price_sha256": "1a81dfb2d832f5ec2806a029ec6a5cabf4a9c34298c7f938c9d2267aaf5d663f",
+      "price_days": 3204
+    },
+    "RCL": {
+      "cik": 884887,
+      "sic": 4400,
+      "sec_sha256": "7df0620aeda2dcd04b8d5f91a7c865d48f5f826094280b1e09b9d894e5a8a0cb",
+      "price_sha256": "f67d8954fe565ca2f80c33fcf876501d2819016797e89ce63f57046b94524015",
+      "price_days": 3204
+    },
+    "NCLH": {
+      "cik": 1513761,
+      "sic": 4400,
+      "sec_sha256": "bf46a67bdc1d634accdb56ba95c405c1674985d10d3be5b8314633b290d4bd0d",
+      "price_sha256": "325d2b3eab16ff01cef839a7f0e437e716e13a60759f80378f8458dc5a93d685",
+      "price_days": 3204
+    },
+    "DPZ": {
+      "cik": 1286681,
+      "sic": 5140,
+      "sec_sha256": "69ca22ba2b925d469a31bdf914596abe060e4e9eeb53da9a9a15a7750c5bfc24",
+      "price_sha256": "d7412a51d48e0230b67925d674780d8ed1cf11843a5d3d4dbe992fb60fec5c51",
+      "price_days": 3204
+    },
+    "MHK": {
+      "cik": 851968,
+      "sic": 2273,
+      "sec_sha256": "3832f6211aa4baf6a1f154b195a612db99935e0d4d8bb1229a4768b07167e30f",
+      "price_sha256": "3b4f69ffcc923e5eda6b589269303c4a47cc23a4f5e10ec29059b9f29705481f",
+      "price_days": 3204
+    },
+    "KMX": {
+      "cik": 1170010,
+      "sic": 5500,
+      "sec_sha256": "c63998ad2bf942ab4ce5bb81e293d5ea8919417cde73da129af0d5d29b56ee76",
+      "price_sha256": "462272f9354c0247fe4bc180cc736002498ad4075d923f43572afd7f1979d6ac",
+      "price_days": 3204
+    },
+    "EBAY": {
+      "cik": 1065088,
+      "sic": 7389,
+      "sec_sha256": "2a70f5a1a257f32a897035c25960fe09faf96940ad51d65515203c8709e362ff",
+      "price_sha256": "4595c067d5ca3940af42e24fc9e0d0703216926c2703c1f4b1f0197e8f24803a",
+      "price_days": 3204
+    },
+    "KDP": {
+      "cik": 1418135,
+      "sic": 2080,
+      "sec_sha256": "ada095aed6af778d3862b9fdfb75376ff216af33de7a7bf7f78f2b0fdd4d4416",
+      "price_sha256": "45f1e7501c59ea868e3999692c88b71b32d4acf56005a1422571495a174b8eb8",
+      "price_days": 3204
+    },
+    "TAP": {
+      "cik": 24545,
+      "sic": 2082,
+      "sec_sha256": "b05913f55a8a8be2fa236fecd7a816edf05c6211ffe9569eb812d2e7f791da46",
+      "price_sha256": "93b9f0bff329d4105788389cf26a28a0dc60c483346590efabeba4b0917968b3",
+      "price_days": 3204
+    },
+    "BG": {
+      "cik": 1996862,
+      "sic": 2070,
+      "sec_sha256": "cee7c90b69f2443b108661eccdfe914dfa7b9a80f04f59802590ad6292f556e9",
+      "price_sha256": "3f0bc7feb877a22f2fb67694c3d382cb652f81ed7a3d498640cbd81d006e14a0",
+      "price_days": 3204
+    },
+    "SJM": {
+      "cik": 91419,
+      "sic": 2033,
+      "sec_sha256": "61d6e06730d187ecb04ff6f4645810dc5bef6b6df0dca9754bc3afcd664503ab",
+      "price_sha256": "8c9b800587abade6eccc254f34d44b226a1c2b8a9871618a1b71cc1950c3d840",
+      "price_days": 3204
+    },
+    "MKC": {
+      "cik": 63754,
+      "sic": 2090,
+      "sec_sha256": "e8eb70bdbde4381137bfd778076bc1dec3b82e7ef00a41f7f321463955957e2e",
+      "price_sha256": "5b4c3fde821158d594a878265970bbb2b6b4004bf2fe43802f3efdee33664b77",
+      "price_days": 3204
+    },
+    "CPB": {
+      "cik": 16732,
+      "sic": 2000,
+      "sec_sha256": "c107cfbaad8fa6d566adf27d75037980171d8d0c1ae671f1a14763d0d017b57d",
+      "price_sha256": "a4b47e2a07900f225367b54d36ea4298cfa02d977e75a806d9c5f910309b4bc5",
+      "price_days": 3204
+    },
+    "LW": {
+      "cik": 1679273,
+      "sic": 2030,
+      "sec_sha256": "458440b213f7356d48044c8bed2bfef6cf8eb77e14f111f62e7e43eaf7067141",
+      "price_sha256": "c1e3a50096917161ea178dc84b7bd6d93d808d02f088a6958c84378d75ba6863",
+      "price_days": 2483
+    },
+    "WSM": {
+      "cik": 719955,
+      "sic": 5700,
+      "sec_sha256": "16afd59c6d21ea7be1f7cbaa84e26fbc0ab5d9ea9a4938decf2f3f7077618d5c",
+      "price_sha256": "83ee1f90fd899af5293ac7972fec9c5c317408a0627189c0c70decaa7752d0b1",
+      "price_days": 3204
+    },
+    "LKQ": {
+      "cik": 1065696,
+      "sic": 5010,
+      "sec_sha256": "20197bee7a0ab736845ee0728084b3b041282d5b4f56619bc3ed7f9c662eec4d",
+      "price_sha256": "01082bdfa11be6f5e7e9f32d1656d77054fb86955e3de206e9461617b4643c58",
+      "price_days": 3204
+    },
+    "GE": {
+      "cik": 40545,
+      "sic": 3600,
+      "sec_sha256": "8c18acb17bbe0760fae6205c5df75b805480c58d4d1dbbabeba206d9ca36e1e3",
+      "price_sha256": "1230dd25da41017c1ff11315d5cf09bc7785340a98068b833fbd5056482cf330",
+      "price_days": 3204
+    },
+    "RTX": {
+      "cik": 101829,
+      "sic": 3724,
+      "sec_sha256": "6d08f320c9fff931eb211602c6025869e4353fa548d495d8814b4c4842d26f8a",
+      "price_sha256": "b15fa2b74952d0f9c4736db4574f0898ab759040b959665cc16b83f37ecfd7a0",
+      "price_days": 3204
+    },
+    "HWM": {
+      "cik": 4281,
+      "sic": 3350,
+      "sec_sha256": "6492e3d33c64f39adc48757ccf5feff27df9c0e708b37bb641b251e9ff12eb59",
+      "price_sha256": "8486ca559fb34cb78af057bd9d62d9f3717df97ba1735340328691972ba199d1",
+      "price_days": 2490
+    },
+    "ALLE": {
+      "cik": 1579241,
+      "sic": 7381,
+      "sec_sha256": "838a936033f9e2ceb5a60bbb42a6e41e4d4977a2cd263d0a55e2327b0094b80c",
+      "price_sha256": "8d2669400dbf767492538ef54e06752b7d64c39f1084a1dff51636c9da5ffaf3",
+      "price_days": 3204
+    },
+    "AOS": {
+      "cik": 91142,
+      "sic": 3630,
+      "sec_sha256": "e6130945e25a2456a70a69b153838628bd31a5f19f389aa9412e9f3960c80ed8",
+      "price_sha256": "96fdedcf95910ce2c20768e85784072839f2c4b4920b60bed7947b2c0b90ee92",
+      "price_days": 3204
+    },
+    "BLDR": {
+      "cik": 1316835,
+      "sic": 5211,
+      "sec_sha256": "a5c351f2c90435b2687e704fa0062d81bfb13f358da57d86bdbb8e12f3c5b1d0",
+      "price_sha256": "cc770cb3aa4b79d96dd6ffa2b19af7998115e601bdb453ae03a5dfeb086e41a5",
+      "price_days": 3204
+    },
+    "CHRW": {
+      "cik": 1043277,
+      "sic": 4731,
+      "sec_sha256": "d4ed896e4ad7d80e907eb6aa1f11255b20fc0d744069677e6fa6546f880a215d",
+      "price_sha256": "fa08616161ed535b9c79a48d16a09bf46e5c7f25af6a25da84250e4275df0834",
+      "price_days": 3204
+    },
+    "J": {
+      "cik": 52988,
+      "sic": 1600,
+      "sec_sha256": "de8c69f98fd5a68a912ec3d765f1f4d086bb0e5ca1ebc9fef2b80358c9b28343",
+      "price_sha256": "043ea8c75108c72b974f1489862e07ec4f47dc80d334fd26486f82ef8721fff6",
+      "price_days": 3204
+    },
+    "LDOS": {
+      "cik": 1336920,
+      "sic": 7373,
+      "sec_sha256": "26d258f25d20ba4a489c4ef0dcd8b311f5a10314c207e675cec67cd20c8d45af",
+      "price_sha256": "8539bfdcc8c87b0d4e35a63d60f2e73eb488a5abacc093a6745aeb66e1d5e148",
+      "price_days": 3204
+    },
+    "PWR": {
+      "cik": 1050915,
+      "sic": 1731,
+      "sec_sha256": "0ade68a7b36cb1ef71104428122b0c3c43c98ac84b4f960a3c691c8ac29e4604",
+      "price_sha256": "c40f5c2f7a9b520837044868e7d922789a7722226928cbc0ea2c97b72e5b2ba5",
+      "price_days": 3204
+    },
+    "GNRC": {
+      "cik": 1474735,
+      "sic": 3621,
+      "sec_sha256": "781061845a296a528e3df9fdc72ff39ab0af04d208026052e842f480a5435cca",
+      "price_sha256": "4842edec1ad4e86ede84d0c4e0c05e786acf54c66527ed474c49e917da5fabfb",
+      "price_days": 3204
+    },
+    "IEX": {
+      "cik": 832101,
+      "sic": 3561,
+      "sec_sha256": "ab2e6f7015eab31153b1783a6d2594497c7c35579e2466fb5b7f1995c4afda96",
+      "price_sha256": "1d7ea536e1565811e3cbcebfaf32702d22f11310283859d64a4bbc2193a581a9",
+      "price_days": 3204
+    },
+    "PNR": {
+      "cik": 77360,
+      "sic": 3550,
+      "sec_sha256": "6e53bdf7b8d6c97ab74ccf05b0546ac311908ea094021bab8dd19bce2b336e1c",
+      "price_sha256": "5aa6b0836f51d1433d75f2e87010e51ed550bcfdb5a0b541bcbd7570851251c4",
+      "price_days": 3204
+    },
+    "RHI": {
+      "cik": 315213,
+      "sic": 7363,
+      "sec_sha256": "1a3a2c95a1c800108742135f876d51b91d08e3fdc78714efb676efc767bc5b42",
+      "price_sha256": "04d40860ea6a7c74fe16a0058b93b017aea65f23526b1b5e8ec876633d834347",
+      "price_days": 3204
+    },
+    "NDSN": {
+      "cik": 72331,
+      "sic": 3569,
+      "sec_sha256": "9782d1eab6bdd78c49f6ab6de3749a577fe54cd33d3afd29bd105474f124eb2e",
+      "price_sha256": "9ac99c37e65b547a665e5fee7362d35a9b2f7aa8164b7476cc9852358f5ec41a",
+      "price_days": 3204
+    },
+    "ROL": {
+      "cik": 84839,
+      "sic": 7340,
+      "sec_sha256": "ae4b8c87e5f58268ddf496d1e7eef6e01c40e4c1f9a6a5ab970f46e2b018263e",
+      "price_sha256": "5bdf587d42ef03ec37b3df3b3aa4d190235f0160247f98d6f8da7d31fef6e275",
+      "price_days": 3204
+    },
+    "VRSK": {
+      "cik": 1442145,
+      "sic": 7374,
+      "sec_sha256": "7ff151fb537fe40bd72f3e304b894f10371a6edefbbb18e8ab97766dc9fa9e4a",
+      "price_sha256": "53cc44cd99a9729e168b0b0c004a96f8d985737d3d1769cf07f062116fca2470",
+      "price_days": 3204
+    },
+    "WAB": {
+      "cik": 943452,
+      "sic": 3743,
+      "sec_sha256": "5804f76a2be77d3b70aaf2fd1d6576d7c14423657e3d5c4e426475baca4c07a2",
+      "price_sha256": "9a4a1a359e4c09357c71542df78ad301d636ba038372cbbc716a8a5d3725889d",
+      "price_days": 3204
+    },
+    "HUBB": {
+      "cik": 48898,
+      "sic": 3670,
+      "sec_sha256": "cbad7cc261333e5397faf635864ab61db830df38d6e5540afb19bc8e2b60cfc2",
+      "price_sha256": "060b4a7c752d3770366f5bf6d23aa11e051c2a09d4ee4395ac42e86655314ec7",
+      "price_days": 3204
+    },
+    "LII": {
+      "cik": 1069202,
+      "sic": 3585,
+      "sec_sha256": "f0291f411002ac66080e7ba074fa848d602589552e6e3d48f26e8ca7c431d4dc",
+      "price_sha256": "31266ae906c9c2b415a93f3b63a92e1490221b6d7a11fccf88442edc5d1e2720",
+      "price_days": 3204
+    },
+    "TT": {
+      "cik": 1466258,
+      "sic": 3822,
+      "sec_sha256": "b514b24aaf89f3bb84f578aa9ce522656f011b8796723013a2c41faeec0490df",
+      "price_sha256": "57749207c729d2d74b2359f2a0448539442029698e26912c763a1bcbf5b73bf5",
+      "price_days": 3204
+    },
+    "IR": {
+      "cik": 1699150,
+      "sic": 3560,
+      "sec_sha256": "f7b73452870313d34b6a520556c5df5316828b47d4106b258b77ed73ca8b0932",
+      "price_sha256": "664bb2d9104480fde2420c0b2ef81c82c47eeb0480fde74ed9e419f95cad4649",
+      "price_days": 2358
+    },
+    "EFX": {
+      "cik": 33185,
+      "sic": 7320,
+      "sec_sha256": "9d076a05576d41f09d86dd2b3a54843a67188bbd040442861b559b80c8c7558d",
+      "price_sha256": "e85520b1642a75588f00d44fcda0d2c56e2bc56ff3c88caf8a12b6f0abde393a",
+      "price_days": 3204
+    },
+    "AXON": {
+      "cik": 1069183,
+      "sic": 3480,
+      "sec_sha256": "be850abfbd01dde516d129120f79c82e782240fdcd24df1f27234e36c35f4d06",
+      "price_sha256": "60de379bd4a49e9ae1c20befe77306666d5c9b6514ceb178b562382994e266f2",
+      "price_days": 3204
+    },
+    "PAYC": {
+      "cik": 1590955,
+      "sic": 7372,
+      "sec_sha256": "588556b7e71a89bf4e8a6ac0b9fed255fc1e5c15953d5c5b77b35778fb5ea3dd",
+      "price_sha256": "7b3a426ad5f3e6a49cedc4e7a9a4d9fbd0222d6b6eb10fd2a4439171941a3a0f",
+      "price_days": 3133
+    },
+    "LIN": {
+      "cik": 1707925,
+      "sic": 2810,
+      "sec_sha256": "282a7dea4f8fa3beffcf27b39d3d5a08424e7ae5bbd6f33f5b30c591395ff22a",
+      "price_sha256": "d163a325446f7e999b95c0ae0d2e31b007fb726c0016c98a0976a6b8f35347b0",
+      "price_days": 3204
+    },
+    "DD": {
+      "cik": 1666700,
+      "sic": 2821,
+      "sec_sha256": "496efa04b7364ec9f3869e58cdf53fd6fdfeb3d6f75234e3f09c2c408bf165dd",
+      "price_sha256": "bb02a072937b443964db8b3013d83fc7e2e82413372c44ff076b6490c1e09176",
+      "price_days": 3204
+    },
+    "CE": {
+      "cik": 1306830,
+      "sic": 2820,
+      "sec_sha256": "b7bfa5a79dd56e28f209fbf81201b4cbcdd428df74e5c4bfe76682848a9619d6",
+      "price_sha256": "e589bf198ff6c10b8843ee95a2998df15816255991301440793d639371e2d804",
+      "price_days": 3204
+    },
+    "IFF": {
+      "cik": 51253,
+      "sic": 2860,
+      "sec_sha256": "7a9abcdaa0a3ccb7149d851a37cca209a6c386c1eb081d6f1ee2e0e01641e534",
+      "price_sha256": "5a3d5fc3be9922b3b9b40efa9a51385b5c4fb44e59d8c1b572285abeb11e2ad3",
+      "price_days": 3204
+    },
+    "BALL": {
+      "cik": 9389,
+      "sic": 3411,
+      "sec_sha256": "75fe375c1c37418d1c4b81341fe67ef4e5c91b582b0accff37a6dcae05cd37a8",
+      "price_sha256": "594e78f8d68bb5cd68e0cb9716b11646f897a01b74697e721e6c7c31cd1f97bd",
+      "price_days": 3204
+    },
+    "AMCR": {
+      "cik": 1748790,
+      "sic": 3990,
+      "sec_sha256": "7542059b02b2a470e52127a273243f0f480885eacaa5c5033935d1b835e32c2f",
+      "price_sha256": "70e624ac427fa461bfb9d0525e86732f471812619fa13ab7a8aa9040d5be28f7",
+      "price_days": 3204
+    },
+    "RS": {
+      "cik": 861884,
+      "sic": 5051,
+      "sec_sha256": "908753ca12daacd8dd27ec2caa4535591adafc0e67772b6d51d7b196c39091fe",
+      "price_sha256": "4922d1a61255c8593c2f041fb3440c4af8b4aed826739e3423199f2e42e0e765",
+      "price_days": 3204
+    },
+    "APA": {
+      "cik": 1841666,
+      "sic": 1311,
+      "sec_sha256": "8412d6f4a709414b9d4630e6f969080aa608f9baf5f409fc296cbe071b1b7772",
+      "price_sha256": "7072a47810da66ac6577cc5d22f7331f371e28fbd12803cb4bf73a296974b595",
+      "price_days": 3204
+    },
+    "CTRA": {
+      "error": "ticker not in SEC mapping"
+    },
+    "FANG": {
+      "cik": 1539838,
+      "sic": 1311,
+      "sec_sha256": "a64bad1abbe376b56b551d59104f8e7c88873a3e1f8b7f4433e88115d5efc999",
+      "price_sha256": "a92440590ad1cc0aa3fcb789e90a944f6e44552f2e6f63f2b4d2b55afd5509f4",
+      "price_days": 3204
+    },
+    "EQT": {
+      "cik": 33213,
+      "sic": 1311,
+      "sec_sha256": "47cbea53d7e22ddf4866dcae819856c46fabe057a9646cc9b8f39b03b027f082",
+      "price_sha256": "69af4b88d309ceb1bd73f219ebcde18d7d47da8b1ebf3e0af7664e40a2bbd8cc",
+      "price_days": 3204
+    },
+    "OKE": {
+      "cik": 1039684,
+      "sic": 4923,
+      "sec_sha256": "7836d924a1b1474511788058f753cfadea623f42c27c4e4c3526b6d6d0c3f515",
+      "price_sha256": "388ba08ae1f459e9f4f19e47ec23edb29bdc12e8b725814dca18fc7bfc98b047",
+      "price_days": 3204
+    },
+    "KMI": {
+      "cik": 1506307,
+      "sic": 4922,
+      "sec_sha256": "1a60fc0f9776bfc713f1569c0d588be4a28901044e47de75c24e1a6a9b4369c7",
+      "price_sha256": "bf8e65a848e588ce788a02c12a1a1ff39f70d9ad7087f66a2a0fc7c8daf8bb55",
+      "price_days": 3204
+    },
+    "WMB": {
+      "cik": 107263,
+      "sic": 4922,
+      "sec_sha256": "c23327d6da64caafaaf53b61b6b8262b7e5cd04703b13435f46054c17dec3503",
+      "price_sha256": "581598d86a4bada20941d48047d85d33af46bea52d7e3e7d6d4e3d5b92736511",
+      "price_days": 3204
+    },
+    "TRGP": {
+      "cik": 1389170,
+      "sic": 4922,
+      "sec_sha256": "7ab92281f74d9e9749a48348565ed1b2bd94ab5efa8aed92f91030f5a4f0437c",
+      "price_sha256": "14756990c0a431d3f667ea33d9ef24152ab5972f65ee460047903e1004ef0b71",
+      "price_days": 3204
+    },
+    "FOXA": {
+      "cik": 1754301,
+      "sic": 4833,
+      "sec_sha256": "4a80ac8514d37da0a0ca8b01a090cf90c3eff2c3095b9b3602ac357627bf6589",
+      "price_sha256": "a7479389335a047542ac7a3f43db877f90726ccec9503fa4eb641def14950a59",
+      "price_days": 1899
+    },
+    "NWSA": {
+      "cik": 1564708,
+      "sic": 2711,
+      "sec_sha256": "a93a5df01fd389bf264e65b6651d42b3e49e6549f68d79e6d37c7670e2dd4952",
+      "price_sha256": "ebb606e53107a9934cd720b29bc99e79655a1f9ea5efc5cada3bfd770dba6984",
+      "price_days": 3204
+    },
+    "WBD": {
+      "cik": 1437107,
+      "sic": 4841,
+      "sec_sha256": "44fd29e891ff91bbd424b5f7ea4aa49c5769ef1f223651a6e6b0f0325154472f",
+      "price_sha256": "e8d3954ed90e6aa8efdecf23c758f44374a3ac643194f64040a17c0c1309cf68",
+      "price_days": 3204
+    },
+    "OMC": {
+      "cik": 29989,
+      "sic": 7311,
+      "sec_sha256": "cc26e81446aac32f6ead772b0fe8a783e2936fce7bb4c6f1c255878ba436acad",
+      "price_sha256": "ed7f672f6751a7c118b21106a9d8e218459c39fea978b0a6c594bc72ad0654e5",
+      "price_days": 3204
+    },
+    "LYV": {
+      "cik": 1335258,
+      "sic": 7900,
+      "sec_sha256": "1f79733d82bfb9f1e2b845e0b64b9f57bc5f5a3c73186879dfa6d23067a379db",
+      "price_sha256": "5eb6e2fa7208e665d24b405cf1f78796b157b2459d26bc3da9c62bb3ed2b1441",
+      "price_days": 3204
+    },
+    "MTCH": {
+      "cik": 891103,
+      "sic": 7370,
+      "sec_sha256": "1ea8326820c1722f60a807fc38c9cff3b5eb143d807d596a582bba71c8d6c7d6",
+      "price_sha256": "3854d9b2219fe6a53362d09ed7f4bbe33ec31fd50a50779b87a49a6d51c048f6",
+      "price_days": 3204
+    },
+    "IPG": {
+      "error": "ticker not in SEC mapping"
+    }
+  },
+  "risk_free": {
+    "symbol": "^TNX",
+    "sha256": "dd09d974e6960133c23067f636c3521d9d69238e7ae3b25b8cdc67d0a5dbc48b",
+    "days": 3203
+  }
+}

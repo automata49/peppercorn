@@ -1,0 +1,168 @@
+{
+  "id": "wf-d2f5ddb525",
+  "frozen_at": "2026-09-29",
+  "parent": null,
+  "origin": "seed from position-rules-v2",
+  "retired": null,
+  "rules": {
+    "version": "wf-d2f5ddb525",
+    "active": false,
+    "active_note": "Walk-forward candidate; activation is a human decision after review.",
+    "markets": [
+      "US"
+    ],
+    "market_note": "KR is not covered: DART has no point-in-time archive for a lookahead-free backtest and no weighted diluted share basis for Value. KR snapshots stay insufficient_data under this version.",
+    "window": {
+      "quarters": 24,
+      "min_ttm_points": 16,
+      "note": "Rules read up to 24 consecutive quarter ends (6 years). Type, Quality and non-cyclical Growth need at least 16 TTM points (19 quarters, so 12 year-over-year changes); cyclical through-cycle growth needs all 24 quarters. A gap longer than 100 days between quarter ends inside the window makes the data insufficient.",
+      "drawdown_quarters": 20
+    },
+    "type": {
+      "order": [
+        "Unprofitable",
+        "Cyclical",
+        "Fast Grower",
+        "Stalwart",
+        "Slow Grower"
+      ],
+      "unprofitable": {
+        "ttm_operating_income_max": 0
+      },
+      "cyclical": {
+        "sic_ranges": [
+          [
+            1000,
+            1499
+          ],
+          [
+            1520,
+            1799
+          ],
+          [
+            2600,
+            2699
+          ],
+          [
+            2810,
+            2829
+          ],
+          [
+            2860,
+            2899
+          ],
+          [
+            2910,
+            2911
+          ],
+          [
+            3310,
+            3399
+          ],
+          [
+            3510,
+            3569
+          ],
+          [
+            3630,
+            3639
+          ],
+          [
+            3674,
+            3674
+          ],
+          [
+            3711,
+            3716
+          ],
+          [
+            3720,
+            3729
+          ],
+          [
+            4400,
+            4599
+          ]
+        ],
+        "industries": "mining and oil and gas extraction, construction and homebuilding, paper, basic and industrial chemicals, petroleum refining, primary metals, industrial and farm machinery (incl. semiconductor equipment), household appliances, semiconductors, motor vehicles, aircraft, water and air transport",
+        "source": "SEC EDGAR submissions `sic` for the registrant (current code, not point-in-time)",
+        "note": "Cyclical is decided by industry, as Lynch defines it, because revenue drawdowns alone confused divestitures (KO, PG, ABT, DHR), one-off impairments (MSFT) and business-model transitions (ADBE) with cycles in the first backtest. Drawdowns inside the latest 20 quarters are reported in the reason as evidence only."
+      },
+      "growth_classes": {
+        "fast_min_cagr": 0.15,
+        "stalwart_min_cagr": 0.05
+      },
+      "basis": "Lynch, One Up on Wall Street (1989): slow growers grow about as fast as GDP, stalwarts 10-12%, fast growers 20-25%; cyclicals are companies in industries whose sales and profits rise and fall with the economy or commodity prices. Growth bands are widened so the categories are exhaustive."
+    },
+    "quality": {
+      "labels": [
+        "High",
+        "Average",
+        "Low"
+      ],
+      "high_roic_min": 0.15,
+      "low_roic_max": 0.08,
+      "high_fcf_conversion_min": 0.7,
+      "high_dilution_max": 0.03,
+      "fcf_window_quarters": 12,
+      "cyclical_roic": "mean of TTM ROIC at the latest quarter and every fourth quarter before it inside the window (at least 3 points)",
+      "basis": "ROIC below about 8% does not clear a typical US cost of capital (Damodaran's annual cost-of-capital data put the US market WACC near 7-8%); 15% is roughly the top third of US non-financial companies in McKinsey's long-run ROIC distribution (Koller et al., Valuation). FCF conversion uses cumulative 12-quarter FCF over cumulative net income to damp timing noise. Share count growth above 3% a year signals capital allocation that transfers value from holders.",
+      "not_covered": "incremental ROIC and a qualitative capital allocation review"
+    },
+    "growth": {
+      "labels": [
+        "Durable",
+        "Moderate",
+        "Weak"
+      ],
+      "durable_min_cagr": 0.03,
+      "durable_min_positive_share": 0.75,
+      "durable_min_momentum": 0.5,
+      "weak_min_positive_share": 0.5,
+      "cyclical_durable_min": 0.05,
+      "cyclical_weak_max": 0.0,
+      "basis": "Non-cyclical: durability is consistency (share of the last 12 TTM year-over-year changes that are positive) and momentum (latest TTM growth positive and at least half the 3-year CAGR), with a 3% floor so a flat business is not called durable. Weak means sustained weakness (shrinking over 3 years or mostly negative changes), because v1 showed that one negative TTM change, often a shock such as 2020, reverts. Cyclical: growth of the latest 12-quarter revenue sum over the previous 12-quarter sum, annualised, so a single peak or trough does not decide the label.",
+      "not_covered": "reinvestment runway and competitive evidence; they need cited filing text and are not computed",
+      "weak_max_cagr": 0.0
+    },
+    "value": {
+      "labels": [
+        "Undemanding",
+        "Reasonable",
+        "Demanding",
+        "Speculative"
+      ],
+      "risk_free": "US 10-year Treasury yield on the valuation day (Yahoo ^TNX close, last trading day within 7 days)",
+      "risk_free_floor": 0.025,
+      "equity_risk_premium": 0.05,
+      "discount_rule": "discount rate = max(risk-free, risk_free_floor) + equity_risk_premium; the floor equals terminal growth so terminal growth never exceeds the risk-free rate",
+      "terminal_growth": 0.025,
+      "high_growth_years": 5,
+      "fade_years": 5,
+      "base_growth_min": -0.05,
+      "base_growth_max": 0.2,
+      "bear_multiplier": 0.5,
+      "bull_multiplier": 1.5,
+      "bull_growth_max": 0.3,
+      "attractive_gap": 0.05,
+      "cash_flow": "TTM free cash flow minus stock-based compensation (owner earnings proxy, not Buffett maintenance-CapEx owner earnings); cyclicals use the 12-quarter average",
+      "share_basis": "latest quarter weighted-average diluted shares, moved to the price's split basis",
+      "price_basis": "Yahoo chart close on the valuation day (last trading day within 7 days), split-adjusted",
+      "labels_rule": "Implied growth is the first-5-year growth that makes the DCF equal the enterprise value. Undemanding when implied growth is at least 5 points below base growth; Demanding when implied growth is above bull growth; otherwise Reasonable. Speculative when the cash flow base is not positive, since a DCF on it is undefined.",
+      "basis": "Discount rate is a point-in-time cost of equity: the 10-year Treasury yield plus a 5% equity risk premium (Damodaran's implied US ERP has mostly ranged 4-6% since 2010); the first backtest with a fixed 9% ignored the 2018-2022 rate environment. Terminal growth 2.5% stays below long-run nominal GDP and at or below the risk-free floor. Base growth is the 3-year revenue CAGR (cyclicals: through-cycle growth), bounded to -5%..20%; bear is half, bull 1.5x (at most 30%). Mauboussin and Rappaport's expectations investing frames value as implied versus expected growth.",
+      "bear_rule": "bear = base - |base| x (1 - bear_multiplier); bull = min(base + |base| x (bull_multiplier - 1), bull_growth_max), so a negative base gets a worse bear case",
+      "label_names": {
+        "low": "Undemanding",
+        "mid": "Reasonable",
+        "high": "Demanding"
+      },
+      "test": "expectations",
+      "claim": "How much growth today's price requires relative to the company's own growth record: Undemanding when the implied first-5-year growth is at least 5 points below base growth, Demanding when it is above bull growth, Reasonable otherwise. It is not a forecast of returns or a buy signal."
+    },
+    "supersedes": {
+      "version": "position-rules-v1.2",
+      "result": "Value failed its return-ordering test in 3 of 4 samples; the implied-growth ordering held in all 4",
+      "change": "Value becomes an expectations label: same DCF, thresholds and discount rate, renamed Undemanding / Reasonable / Demanding / Speculative, and judged on whether realized growth reached the price-implied growth, not on returns. Every other rule is unchanged."
+    }
+  }
+}

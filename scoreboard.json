@@ -1,0 +1,41 @@
+{
+  "today": "2026-09-29",
+  "candidates": [
+    {
+      "id": "wf-d2f5ddb525",
+      "origin": "seed from position-rules-v2",
+      "frozen_at": "2026-09-29",
+      "retired": null,
+      "in_sample_fitness": 5.5818,
+      "in_sample_acceptance": {
+        "A1 quality": true,
+        "A2 growth": true,
+        "A3 value": true,
+        "A4 type": true,
+        "A5 coverage": true
+      },
+      "forward_dates": 0,
+      "forward_acceptance": null,
+      "ready_for_review": false
+    }
+  ],
+  "proposed": [
+    {
+      "id": "wf-e18848ffa5",
+      "change": "type.growth_classes.fast_min_cagr 0.15 -> 0.18",
+      "in_sample_fitness": 5.5829
+    },
+    {
+      "id": "wf-5fbc433340",
+      "change": "type.growth_classes.stalwart_min_cagr 0.05 -> 0.03",
+      "in_sample_fitness": 5.5823
+    }
+  ],
+  "sealed": {
+    "wf-d2f5ddb525": 14,
+    "wf-e18848ffa5": 14,
+    "wf-5fbc433340": 14
+  },
+  "next_maturity": "2026-10-28",
+  "ready_for_review": []
+}
