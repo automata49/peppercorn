@@ -93,7 +93,7 @@ def test_only_the_requested_number_of_newest_quarters_is_written():
 def test_snapshot_status_follows_checks_and_never_has_labels():
     result = _result()
     ok = persist.snapshot_row(result, ["h1", "h2"], "2026-09-28")
-    assert ok["status"] == "unavailable" and ok["rules_version"] == "uncalibrated" and ok["roic_method"] == "US-ROIC-1"
+    assert ok["status"] == "unavailable" and ok["rules_version"] == "uncalibrated" and ok["roic_method"] == "US-ROIC-2"
     assert all(ok[k] is None for k in ("type_label", "quality_label", "growth_label", "value_label")) and ok["label_reasons"] == {}
     result["checks"][1][1] = False
     assert persist.snapshot_row(result, ["h1", "h2"], "2026-09-28")["status"] == "check_failed"

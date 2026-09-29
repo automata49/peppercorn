@@ -41,7 +41,7 @@ def _drawdown(values: list[float], relative: bool) -> float:
     return worst
 
 
-def features(q: dict, rules: dict, default_tax: float, roic_method: dict) -> tuple[dict, list[str]]:
+def features(q: dict, rules: dict, default_tax: float, roic_method: dict, absent=()) -> tuple[dict, list[str]]:
     """Every quantity the rules read, and the list of what is missing."""
     missing: list[str] = []
     ends = sorted(q)[-rules["window"]["quarters"]:]
@@ -81,11 +81,19 @@ def features(q: dict, rules: dict, default_tax: float, roic_method: dict) -> tup
     def upto(e):
         return {k: v for k, v in q.items() if k <= e}
 
-    m = metrics.compute(upto(latest), default_tax, roic_method)
-    f["roic"], f["dilution_yoy"], f["net_debt"] = m.get("roic"), m.get("dilution_yoy"), m.get("net_debt")
+    m = metrics.compute(upto(latest), default_tax, roic_method, absent)
+    f["roic"], f["net_debt"] = m.get("roic"), m.get("net_debt")
+    # Fiscal Q4 weighted diluted shares are rarely filed (the 10-K reports the annual average), so the share
+    # basis is the latest quarter within one quarter of the valuation quarter that has a filed count.
+    share_end = next((e for e in ends[::-1][:2] if q[e].get("diluted_shares")), None)
+    prior = back(share_end, 4) if share_end else None
+    f["shares_quarter"] = share_end
+    f["diluted_shares"] = q[share_end]["diluted_shares"] if share_end else None
+    f["dilution_yoy"] = (q[share_end]["diluted_shares"] / q[prior]["diluted_shares"] - 1
+                         if prior and q[prior].get("diluted_shares") else None)
     f["ttm_fcf"], f["ttm_sbc"] = m.get("ttm_fcf"), m.get("ttm_sbc")
     cyc_points = [e for e in ends[::-1][::4]][: len(ends) // 4 + 1]
-    roics = [metrics.compute(upto(e), default_tax, roic_method).get("roic") for e in cyc_points]
+    roics = [metrics.compute(upto(e), default_tax, roic_method, absent).get("roic") for e in cyc_points]
     roics = [r for r in roics if r is not None]
     f["roic_cycle_mean"] = sum(roics) / len(roics) if len(roics) >= 3 else None
     f["roic_cycle_points"] = len(roics)
@@ -206,14 +214,15 @@ def classify_value(f: dict, kind: str, price: dict | None, rules: dict) -> tuple
     return "Fair", text, detail
 
 
-def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax: float, roic_method: dict) -> dict:
+def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax: float, roic_method: dict,
+             absent=()) -> dict:
     """Four independent labels with one reason each, or insufficient_data with no labels."""
     out = {"rules_version": rules["version"], "status": "insufficient_data", "labels": {}, "reasons": {},
            "features": {}, "value_detail": {}, "missing": []}
     if market not in rules["markets"]:
         out["missing"] = [f"market {market} is not covered by {rules['version']}"]
         return out
-    f, missing = features(q, rules, default_tax, roic_method)
+    f, missing = features(q, rules, default_tax, roic_method, absent)
     out["features"] = f
     if missing:
         out["missing"] = missing

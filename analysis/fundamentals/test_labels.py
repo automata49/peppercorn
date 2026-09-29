@@ -80,13 +80,27 @@ def test_rules_are_inactive_until_the_backtest_passes():
 
 # --- missing data suppresses all four labels
 
-@pytest.mark.parametrize("field", ["sbc", "diluted_shares", "operating_cash_flow", "net_income", "cash"])
+@pytest.mark.parametrize("field", ["sbc", "operating_cash_flow", "net_income", "cash"])
 def test_missing_input_in_latest_quarters_suppresses_every_label(field):
     q = company()
     q[max(q)].pop(field)
     out = run(q, price_for(400.0))
     assert out["status"] == "insufficient_data" and out["labels"] == {} and out["reasons"] == {}
     assert out["missing"]
+
+
+def test_fiscal_q4_without_share_count_uses_the_previous_quarter():
+    q = company()
+    q[max(q)].pop("diluted_shares")
+    out = run(q, price_for(400.0))
+    assert out["status"] == "ok" and out["features"]["shares_quarter"] == sorted(q)[-2]
+
+
+def test_two_quarters_without_share_count_is_insufficient():
+    q = company()
+    for end in sorted(q)[-2:]:
+        q[end].pop("diluted_shares")
+    assert run(q, price_for(400.0))["status"] == "insufficient_data"
 
 
 def test_unknown_is_not_treated_as_zero():

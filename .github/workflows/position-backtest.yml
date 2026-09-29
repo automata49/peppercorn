@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:  # TEMPORARY: dispatch needs the file on main; remove before merging
     branches: [claude/position-rules-v1]
-    paths: [.github/workflows/position-backtest.yml]
+    paths: [.github/workflows/position-backtest.yml, analysis/fundamentals/**]
 
 permissions:
   contents: read

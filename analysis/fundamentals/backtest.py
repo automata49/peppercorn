@@ -27,14 +27,25 @@ import prices
 import sec
 from quarters import ttm
 
-# Non-financial US large caps chosen before looking at results, spread across the expected types and including
-# companies that stagnated or lost value in the period. Survivorship bias remains: all are still listed today.
+# Non-financial US large caps fixed before any result was read: the 43 names of the first run plus sector
+# peers added only for filing coverage (an operating income line, no captive finance arm, 13-week quarters).
+# Groups are the expected profile, used only to show coverage, never by the rules. Survivorship bias remains:
+# every name is still listed today.
 UNIVERSE = {
-    "growth": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "ADBE", "CRM", "NOW", "ISRG", "AVGO", "NFLX"],
-    "stalwart": ["KO", "PG", "PEP", "JNJ", "MCD", "COST", "WMT", "HD", "UNH", "ABT"],
-    "cyclical": ["MU", "INTC", "CAT", "DE", "DOW", "NUE", "FCX", "XOM", "CVX", "F", "GM"],
-    "stagnant": ["IBM", "T", "VZ", "PFE", "MMM", "BA", "NKE", "KHC", "CVS", "DIS"],
+    "growth": ["AAPL", "MSFT", "NVDA", "GOOGL", "META", "AMZN", "ADBE", "CRM", "NOW", "ISRG", "AVGO", "NFLX",
+               "ORCL", "CSCO", "TXN", "QCOM", "INTU", "ADI", "ACN", "TMO", "DHR", "SYK", "ZTS", "AMGN", "GILD",
+               "BSX", "MDT", "EW", "IDXX", "CMG", "BKNG", "ADP", "PAYX", "V", "MA"],
+    "stalwart": ["KO", "PG", "PEP", "JNJ", "MCD", "COST", "WMT", "HD", "UNH", "ABT", "LOW", "TGT", "SBUX", "CL",
+                 "KMB", "GIS", "HSY", "MDLZ", "YUM", "TJX", "ROST", "CLX", "HON", "UNP", "UPS", "LMT", "GD", "NOC",
+                 "ITW", "EMR", "CSX", "NSC", "WM", "SHW", "APD"],
+    "cyclical": ["MU", "INTC", "CAT", "DE", "DOW", "NUE", "FCX", "XOM", "CVX", "F", "GM", "AMAT", "LRCX", "KLAC",
+                 "AMD", "LYB", "STLD", "CLF", "COP", "EOG", "OXY", "SLB", "HAL", "MPC", "VLO", "WHR", "LEN", "DHI",
+                 "PHM", "NEM"],
+    "stagnant": ["IBM", "T", "VZ", "PFE", "MMM", "BA", "NKE", "KHC", "CVS", "DIS", "TSLA", "UBER", "EL", "WBA"],
 }
+# The SEC ticker list maps a ticker to its current registrant; these reorganized companies filed their history
+# under an earlier CIK.
+CIK_OVERRIDE = {"XOM": 34088}
 AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "2020-12-31",
          "2021-06-30", "2021-12-31", "2022-06-30"]
 HORIZON_YEARS = 3
@@ -52,15 +63,18 @@ def fetch(cache: Path) -> None:
     (cache / "sec").mkdir(parents=True, exist_ok=True)
     (cache / "prices").mkdir(parents=True, exist_ok=True)
     mapping = requests.get(TICKERS_URL, headers={"User-Agent": ua}, timeout=60).json()
-    cik = {row["ticker"]: row["cik_str"] for row in mapping.values()}
+    cik = {row["ticker"]: row["cik_str"] for row in mapping.values()} | CIK_OVERRIDE
     manifest = {"fetched_at": datetime.now(timezone.utc).isoformat(), "companies": {}}
     for ticker in tickers():
         if ticker not in cik:
             manifest["companies"][ticker] = {"error": "ticker not in SEC mapping"}
             continue
-        facts = sec.fetch(cik[ticker])
+        try:
+            facts, quote = sec.fetch(cik[ticker]), prices.fetch(ticker)
+        except Exception as error:  # noqa: BLE001 - one company's outage must not stop the fetch
+            manifest["companies"][ticker] = {"error": f"{type(error).__name__}: {str(error)[:120]}"}
+            continue
         (cache / "sec" / f"{ticker}.json.gz").write_bytes(gzip.compress(json.dumps(facts).encode()))
-        quote = prices.fetch(ticker)
         (cache / "prices" / f"{ticker}.json").write_text(json.dumps(quote), encoding="utf-8")
         manifest["companies"][ticker] = {"cik": cik[ticker], "sec_sha256": facts.get("_raw_sha256"),
                                          "price_sha256": quote["raw_sha256"], "price_days": len(quote["dates"])}
@@ -125,11 +139,15 @@ def run(cache: Path, out_dir: Path, rules: dict) -> dict:
                 rows.append({**row, "status": "stale"})
                 continue
             tax = methods.statutory_tax_rate("US", int(latest[:4]))
-            m = metrics.compute(q, tax, method)
+            absent = parsed.get("not_presented", [])
+            m = metrics.compute(q, tax, method, absent)
             failed = [c[0] for c in metrics.checks(q, m, date.fromisoformat(as_of)) if not c[1]]
-            share_input = (parsed["source_lineage"].get(latest, {}).get("diluted_shares") or {}).get("inputs") or [{}]
-            price = prices.market_cap(quote, as_of, q[latest].get("diluted_shares"), share_input[0].get("filed"))
-            result = labels.evaluate(q, "US", price, rules, tax, method)
+            result = labels.evaluate(q, "US", None, rules, tax, method, absent)
+            share_end = result["features"].get("shares_quarter")
+            if share_end:
+                share_input = (parsed["source_lineage"].get(share_end, {}).get("diluted_shares") or {}).get("inputs") or [{}]
+                price = prices.market_cap(quote, as_of, q[share_end]["diluted_shares"], share_input[0].get("filed"))
+                result = labels.evaluate(q, "US", price, rules, tax, method, absent)
             row |= {"status": "check_failed" if failed else result["status"], "failed_checks": failed,
                     "labels": result["labels"] if not failed else {}, "missing": result["missing"],
                     "features": result["features"], "value_detail": result["value_detail"],

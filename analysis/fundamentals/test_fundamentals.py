@@ -549,7 +549,7 @@ def test_us_roic_never_adds_leases_and_declares_its_basis():
     method = methods.for_market("US")["roic"]
     q = _roic_quarters({"2024-09-30": 60, "2025-09-30": 80})
     result = metrics.compute(q, 0.21, method)
-    assert result["roic_lease_basis"] == "excluded" and result["roic_method"] == "US-ROIC-1"
+    assert result["roic_lease_basis"] == "excluded" and result["roic_method"] == "US-ROIC-2"
     assert result["roic"] == metrics.compute(_roic_quarters(), 0.21, method)["roic"]
     assert metrics.compute(_roic_quarters(), 0.21)["roic_method"] is None
 
@@ -602,3 +602,78 @@ if __name__ == "__main__":
         if name.startswith("test_"):
             fn()
             print("ok", name)
+
+
+# --- SEC fallback tags and sustained non-presentation (US-ROIC-2)
+
+_QENDS = ["2023-03-31", "2023-06-30", "2023-09-30", "2023-12-31", "2024-03-31", "2024-06-30", "2024-09-30", "2024-12-31"]
+_QSTARTS = ["2023-01-01", "2023-04-01", "2023-07-01", "2023-10-01", "2024-01-01", "2024-04-01", "2024-07-01", "2024-10-01"]
+
+
+def _revenue(tag="Revenues", val=100):
+    return {tag: {"units": {"USD": [_sec_fact(s, e, val) for s, e in zip(_QSTARTS, _QENDS)]}}}
+
+
+def test_sec_fallback_fills_only_spans_the_primary_tag_lacks():
+    facts = {"facts": {"us-gaap": {
+        **_revenue("Revenues", 100),
+        "SalesRevenueGoodsNet": {"units": {"USD": [_sec_fact("2023-01-01", "2023-03-31", 60, filed="2026-01-01"),
+                                                    _sec_fact("2022-10-01", "2022-12-31", 55)]}},
+    }}}
+    q = sec.parse(facts)["quarters"]
+    assert q["2023-03-31"]["revenue"] == 100      # a later-filed narrower concept never replaces the primary
+    assert q["2022-12-31"]["revenue"] == 55       # but fills a period the primary does not cover
+
+
+def test_sec_instant_fallback_only_without_primary():
+    facts = {"facts": {"us-gaap": {
+        **_revenue(),
+        "CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": [_sec_fact(None, "2024-12-31", 10)]}},
+        "CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents": {"units": {"USD": [
+            _sec_fact(None, "2024-12-31", 12, filed="2026-01-01"), _sec_fact(None, "2024-09-30", 11)]}},
+    }}}
+    q = sec.parse(facts)["quarters"]
+    assert q["2024-12-31"]["cash"] == 10 and q["2024-09-30"]["cash"] == 11
+
+
+def test_sec_total_debt_fallback_drops_current_portion():
+    facts = {"facts": {"us-gaap": {
+        **_revenue(),
+        "LongTermDebtAndCapitalLeaseObligationsIncludingCurrentMaturities": {"units": {"USD": [_sec_fact(None, "2024-12-31", 50)]}},
+        "LongTermDebtCurrent": {"units": {"USD": [_sec_fact(None, "2024-12-31", 5)]}},
+    }}}
+    row = sec.parse(facts)["quarters"]["2024-12-31"]
+    assert row["debt"] == 50 and "debt_current" not in row
+
+
+def test_sec_lines_absent_for_eight_quarters_are_not_presented():
+    facts = {"facts": {"us-gaap": {**_revenue()}}}
+    assert sec.parse(facts)["not_presented"] == ["short_term_investments", "debt", "debt_current"]
+
+
+def test_sec_line_present_within_eight_quarters_is_not_zeroed():
+    facts = {"facts": {"us-gaap": {
+        **_revenue(),
+        "ShortTermInvestments": {"units": {"USD": [_sec_fact(None, "2023-03-31", 7)]}},
+        "LongTermDebtNoncurrent": {"units": {"USD": [_sec_fact(None, e, 20) for e in _QENDS]}},
+        "LiabilitiesOtherThanLongtermDebtNoncurrent": {"units": {"USD": [_sec_fact(None, "2024-12-31", 3)]}},
+    }}}
+    parsed = sec.parse(facts)
+    assert parsed["not_presented"] == ["debt_current"]
+    assert parsed["quarters"]["2024-12-31"]["debt"] == 20     # noncurrent debt kept: no current portion for 8 quarters
+
+
+def test_sec_short_history_never_counts_as_not_presented():
+    facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [_sec_fact("2025-01-01", "2025-03-31", 100)]}}}}}
+    assert sec.parse(facts)["not_presented"] == []
+
+
+def test_metrics_zero_only_for_declared_not_presented_lines():
+    q = {e: {"revenue": 100, "operating_income": 20, "pretax_income": 20, "income_tax": 4, "net_income": 16,
+             "operating_cash_flow": 18, "capex": 2, "equity": 100, "debt": 10, "cash": 5} for e in _QENDS}
+    method = methods.for_market("US")["roic"]
+    assert metrics.compute(q, 0.21, method)["roic"] is None
+    filled = metrics.compute(q, 0.21, method, ["short_term_investments"])
+    assert filled["roic"] is not None and filled["roic_zero_not_presented"] == ["short_term_investments"]
+    kr = metrics.compute(q, 0.264, methods.for_market("KR")["roic"], ["short_term_investments"])
+    assert kr["roic"] is None     # KR declares no zero-if-not-presented lines
