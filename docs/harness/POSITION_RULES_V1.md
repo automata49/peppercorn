@@ -95,6 +95,24 @@ v1.2 has the same rules and thresholds as v1.1; only the version and gate differ
 
 Activation requires A1–A5, unchanged, on universe B at both date sets: 2018-06-30 … 2022-06-30 and 2014-06-30 … 2017-12-31. If either fails, v1.2 stays inactive. If both pass, v1.2 may be activated with the universe A 2014–2017 failure (A1 Quality: too few Low observations; A3 Value: Attractive below Fair) recorded here as a known limitation.
 
-## Result of position-rules-v1.2
+## Result of position-rules-v1.2 (run 36587461497, commit 30911a8)
 
-Pending the run recorded below.
+Activation: **no**. Universe B: 116 of 118 fetched (HOLX and EA are no longer in the SEC ticker list).
+
+| Test | Universe B 2018–2022 (438 labelled, 67 companies) | Universe B 2014–2017 (276 labelled, 58 companies) |
+|---|---|---|
+| A1 Quality, forward ROIC | pass: 18.1% (27) > 8.2% (23) > 5.4% (27) | **fail**: 18.3% (21) > 10.6% (17) > 3.2%, but Low has only 5 |
+| A2 Growth, forward revenue CAGR | pass: 9.1% (253) > 6.1% (118) > 5.7% (67) | pass: 8.0% (170) > 4.7% (69) > 1.7% (37) |
+| A3 Value, forward excess return | **fail**: Attractive +0.9% (87) < Fair +2.1% (133); Expensive −0.8% (193) | **fail**: Attractive −6.6% (63) < Fair +8.3% (90); Expensive +2.7% (111) |
+| A4 Type | pass: drawdown 7.6% vs 2.8%, stability 89% | pass: 1.5% vs 0.3%, stability 88% |
+| A5 Coverage | pass: 67 | pass: 58 |
+
+Value, informational (realized growth reached implied): 76% / 38% / 17% (2018–2022) and 71% / 51% / 10% (2014–2017) for Attractive / Fair / Expensive.
+
+## What four tests say (universe A and B, two periods each)
+
+- Growth (A2) and Type (A4) passed all four tests.
+- Quality ordered High > Average > Low in every test; it failed only where the Low group had 5 observations (both 2014–2017 tests), so its evidence is limited by sample size, not contradicted.
+- Value's return ordering held in one of four tests. Attractive beat Fair on forward returns only in universe A 2018–2022. What held in all four is the claim the label actually computes: realized growth reached the price-implied growth far more often for Attractive (69–90%) than Fair (38–69%) or Expensive (10–24%). As a forecast of excess returns the label is not supported.
+
+Consequence. Because the contract requires all four labels together, no rule version can be activated while Value fails. Every sample prepared so far (both universes, both periods) has now been used; a revised Value definition — for example one judged on implied versus realized growth instead of returns — needs its claim, gate and fresh data (a third universe or matured post-2022 dates) fixed before it runs.

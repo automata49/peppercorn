@@ -13,9 +13,6 @@ on:
         description: 규칙 버전
         type: string
         default: position-rules-v1.2
-  push:  # TEMPORARY: dispatch needs the file on main; remove before merging
-    branches: [claude/position-rules-universe-b]
-    paths: [.github/workflows/position-backtest.yml]
 
 permissions:
   contents: read

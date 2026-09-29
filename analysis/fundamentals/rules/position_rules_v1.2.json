@@ -1,7 +1,7 @@
 {
   "version": "position-rules-v1.2",
   "active": false,
-  "active_note": "Thresholds and rules identical to position-rules-v1.1. Activation requires acceptance A1-A5 on the replication universe B (backtest.UNIVERSE_B) at both the 2018-2022 and 2014-2017 dates; see docs/harness/POSITION_RULES_V1.md.",
+  "active_note": "Failed the pre-registered universe B gate on 2026-09-30 (A3 Value in both periods, A1 Quality in 2014-2017 with 5 Low observations). Stays inactive; see docs/harness/POSITION_RULES_V1.md.",
   "markets": [
     "US"
   ],
