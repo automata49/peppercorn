@@ -292,8 +292,8 @@ def main():
     else:
         rules = labels.load_rules(a.rules)
         report = run(Path(a.cache), Path(a.out), rules, HOLDOUT if a.dates == "holdout" else AS_OF)
-        print(f"{a.dates} dates
-" + render(report, rules))
+        print(f"{a.dates} dates")
+        print(render(report, rules))
 
 
 if __name__ == "__main__":

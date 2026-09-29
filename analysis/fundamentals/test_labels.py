@@ -318,3 +318,34 @@ def test_parse_reads_chart_payload_and_splits():
                                   "events": {"splits": {"1718026200": {"date": 1718026200, "numerator": 10.0, "denominator": 1.0}}}}]}}
     parsed = prices.parse(body, "X")
     assert parsed["dates"] == ["2024-06-10"] and parsed["splits"] == [{"date": "2024-06-10", "ratio": 10.0}]
+
+
+# --- backtest harness (offline pieces)
+
+def test_backtest_universe_and_dates_are_fixed_and_disjoint():
+    import backtest
+    tickers = backtest.tickers()
+    assert len(tickers) == len(set(tickers)) == 114
+    assert not set(backtest.AS_OF) & set(backtest.HOLDOUT) and max(backtest.HOLDOUT) < min(backtest.AS_OF)
+
+
+def test_backtest_acceptance_needs_every_group_ordered_with_enough_observations():
+    import backtest
+
+    def row(ticker, as_of, labels_, outcomes):
+        return {"ticker": ticker, "as_of": as_of, "status": "ok", "labels": labels_, "outcomes": outcomes,
+                "value_detail": {"implied_growth": 0.05}}
+    rows = []
+    for i in range(10):
+        for label, roic, growth, ret, kind, dd in (("High", 0.3, 0.1, 0.5, "Cyclical", 0.2), ("Average", 0.15, 0.05, 0.3, "Stalwart", 0.0),
+                                                  ("Low", 0.05, 0.01, 0.1, "Slow Grower", 0.0)):
+            g = {"High": "Durable", "Average": "Moderate", "Low": "Weak"}[label]
+            v = {"High": "Attractive", "Average": "Fair", "Low": "Expensive"}[label]
+            rows.append(row(f"{label}{i}", "2019-06-30", {"type": kind, "quality": label, "growth": g, "value": v},
+                            {"fwd_roic": roic, "fwd_revenue_cagr": growth, "fwd_return": ret, "fwd_revenue_drawdown": dd}))
+    report = backtest.summarize(rows)
+    assert report["acceptance"]["A1 quality"] and report["acceptance"]["A2 growth"] and report["acceptance"]["A3 value"]
+    assert report["acceptance"]["A5 coverage"] is False            # 30 companies < 40
+    assert report["activate"] is False
+    report = backtest.summarize(rows[:-1])                          # Low / Weak / Expensive drop to n = 9
+    assert report["acceptance"]["A1 quality"] is False
