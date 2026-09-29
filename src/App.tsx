@@ -295,7 +295,7 @@ function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:strin
   return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong className={valueClassName}>{children}</strong></div>
 }
 
-function StockSnapshot({row}:{row:LeaderRow}){
+function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>void;refreshing:boolean}){
   const ma200Gap=gapPct(row.price,row.ma200)
   const ma200Status=row.price!=null&&row.ma200!=null?(Number(row.price)>=Number(row.ma200)?'위 ':'아래 ')+ma200Gap:'—'
   const indexes=row.index_memberships?.length?row.index_memberships.join(' · '):'—'
@@ -318,7 +318,7 @@ function StockSnapshot({row}:{row:LeaderRow}){
       <p className="classification-meta" title={row.classification_source||undefined}>지수 {indexes} · 데이터 {row.data_status||'정상'}{row.classification_as_of&&` · 분류 ${row.classification_as_of}`}{row.classification_source&&` · 출처 ${sourceName(row.classification_source)}`}</p>
     </section>
     <section className="snapshot-section drill-animate">
-      <div className="snapshot-section-head"><div><span>02</span><h3>상대강도</h3></div><small>벤치마크 대비</small></div>
+      <div className="snapshot-section-head"><div><span>02</span><h3>상대강도</h3></div><div><small>벤치마크 대비</small><button className="snapshot-refresh" aria-label="RS 새로고침" disabled={refreshing} onClick={onRefresh}>↻</button></div></div>
       <div className="signal-strip">{rsItems.map(([label,value])=><div key={label}><span>RS {label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
     </section>
     <section className="snapshot-section drill-animate">
@@ -364,6 +364,10 @@ export default function App(){
   const [page,setPage]=useState('dashboard')
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
   const [source,setSource]=useState<'demo'|'supabase'>('demo')
+  const [refreshing,setRefreshing]=useState(false)
+  const refreshingRef=useRef(false)
+  const sourceRef=useRef<'demo'|'supabase'>('demo')
+  const lastLoadRef=useRef(0)
   const [market,setMarket]=useState<'ALL'|Market>('ALL')
   const [query,setQuery]=useState('')
   const [sector,setSector]=useState<string|null>(null)
@@ -417,13 +421,33 @@ export default function App(){
     try{localStorage.setItem(SECTOR_NAME_WIDTH_KEY,String(sectorNameWidth))}catch{}
   },[sectorNameWidth])
 
+  const refreshLeaderboard=async()=>{
+    if(refreshingRef.current)return
+    refreshingRef.current=true;setRefreshing(true)
+    try{
+      const result=await loadLeaderboard()
+      lastLoadRef.current=Date.now()
+      // A transient connection failure must not replace loaded live rows with demo data.
+      if(result.source==='demo'&&sourceRef.current==='supabase')return
+      sourceRef.current=result.source
+      setLeaders(result.rows);setSource(result.source)
+      const matching=(row:LeaderRow|null)=>result.rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
+      setSelected(previous=>matching(previous)??result.rows[0]??null)
+      setDrillStock(previous=>previous?matching(previous)??null:null)
+    }finally{
+      refreshingRef.current=false;setRefreshing(false)
+    }
+  }
   useEffect(()=>{
-    let active=true
-    loadLeaderboard().then(r=>{
-      if(!active)return
-      setLeaders(r.rows);setSource(r.source);setSelected(r.rows[0]??null)
-    })
-    return()=>{active=false}
+    void refreshLeaderboard()
+    const onVisible=()=>{
+      if(document.visibilityState==='visible'&&Date.now()-lastLoadRef.current>5*60_000)void refreshLeaderboard()
+    }
+    document.addEventListener('visibilitychange',onVisible)
+    const interval=window.setInterval(()=>{
+      if(document.visibilityState==='visible'&&Date.now()-lastLoadRef.current>15*60_000)void refreshLeaderboard()
+    },60_000)
+    return()=>{document.removeEventListener('visibilitychange',onVisible);window.clearInterval(interval)}
   },[])
   useLayoutEffect(()=>{
     const root=launchRef.current
@@ -732,7 +756,7 @@ export default function App(){
   }else if(page==='analysis'){
     content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>산업·RS가 강한 순</p></div></div>{visible.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}</div>
       <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
-        <StockSnapshot row={selected}/>
+        <StockSnapshot row={selected} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{(selected.rs_rank??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
         <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div><button className="primary-action" onClick={addSelectedAnalysis}>이 종목 분석행 추가</button>
       </>:<p>종목을 선택하세요.</p>}</div></div>
@@ -783,7 +807,7 @@ export default function App(){
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{stageLabel(drillStock.stage)}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
-        <StockSnapshot row={drillStock}/>
+        <StockSnapshot row={drillStock} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
         <button className="primary-action" onClick={()=>recordAnalysis(drillStock,true)}>종목분석 기록 작성 →</button>
@@ -806,5 +830,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><span className={'source '+source}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'}</span><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Peppercorn Capital 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div className="brand-wordmark"><h2 className="brand-wordmark-pepper">Peppercorn</h2><span className="brand-wordmark-capital">Capital</span></div></div><p className="launch-slogan">Historia Magistra Vitae</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</>
+  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Peppercorn Capital 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div className="brand-wordmark"><h2 className="brand-wordmark-pepper">Peppercorn</h2><span className="brand-wordmark-capital">Capital</span></div></div><p className="launch-slogan">Historia Magistra Vitae</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</>
 }
