@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:  # TEMPORARY: dispatch needs the file on main; remove before merging
     branches: [feat/position-reference-metadata-ingestion]
-    paths: [.github/workflows/position-test-db.yml]
+    paths: [.github/workflows/position-test-db.yml, analysis/fundamentals/persist.py, supabase/position_growth.sql, supabase/tests/position_growth_remote.py]
 
 permissions:
   contents: read
