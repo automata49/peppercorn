@@ -204,3 +204,8 @@ def test_cli_exits_nonzero_when_a_result_is_refused(monkeypatch, tmp_path, capsy
     with pytest.raises(SystemExit) as stop:
         persist.main()
     assert stop.value.code == 1 and "REFUSED T" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("given", ["https://proj.example.co", "https://proj.example.co/rest/v1", " https://proj.example.co/rest/v1/ "])
+def test_client_accepts_project_url_or_rest_endpoint(given):
+    assert persist.Client(given, "t").url == "https://proj.example.co"

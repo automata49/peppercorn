@@ -71,7 +71,8 @@ def counts() -> dict:
 
 class Rest:
     def __init__(self, bearer: str | None):
-        self.base = env("TEST_SUPABASE_URL").rstrip("/") + "/rest/v1"
+        base = env("TEST_SUPABASE_URL").strip().rstrip("/")
+        self.base = base if base.endswith("/rest/v1") else base + "/rest/v1"
         self.headers = {"apikey": env("TEST_SUPABASE_APIKEY"), "Content-Type": "application/json"}
         if bearer:
             self.headers["Authorization"] = f"Bearer {bearer}"
