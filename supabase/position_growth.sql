@@ -39,12 +39,28 @@ create table if not exists public.fundamentals_q (
   pipeline_version text not null check (length(btrim(pipeline_version)) > 0),
   collected_at timestamptz not null default now(),
   unique (instrument_id, period_end, field, input_hash),
-  -- Unknown is never stored as zero: a reported fact carries a value, its filing date and inputs.
+  -- A reported fact must retain usable SEC/DART identity, dates, periods and a raw response hash.
+  -- The raw hash may cover the full response or be present on every source input.
   constraint fundamentals_q_reported_has_evidence check (
-    status <> 'reported' or (
+    status <> 'reported' or coalesce((
       value is not null and unknown_reason is null and source_filed_at is not null
       and case when jsonb_typeof(lineage -> 'inputs') = 'array'
-               then jsonb_array_length(lineage -> 'inputs') > 0 else false end)),
+               then jsonb_array_length(lineage -> 'inputs') > 0
+                 and lineage ->> 'source' in ('SEC', 'DART')
+                 and lineage ->> 'operation' = extraction
+                 and jsonb_array_length(jsonb_path_query_array(lineage,
+                   '$.inputs[*] ? (@.end.type() == "string" && @.end != "" && @.filed.type() == "string" && @.filed != "")'))
+                   = jsonb_array_length(lineage -> 'inputs')
+                 and jsonb_array_length(jsonb_path_query_array(lineage,
+                   case lineage ->> 'source'
+                     when 'SEC' then '$.inputs[*] ? (@.accession.type() == "string" && @.accession != "")'::jsonpath
+                     else '$.inputs[*] ? (@.receipt.type() == "string" && @.receipt != "")'::jsonpath end))
+                   = jsonb_array_length(lineage -> 'inputs')
+                 and (lineage ->> 'raw_sha256' ~ '^[0-9a-f]{64}$'
+                   or jsonb_array_length(jsonb_path_query_array(lineage,
+                     '$.inputs[*] ? (@.raw_sha256 like_regex "^[0-9a-f]{64}$")'))
+                     = jsonb_array_length(lineage -> 'inputs'))
+               else false end), false)),
   constraint fundamentals_q_unknown_has_reason check (
     status <> 'unknown' or (value is null and unknown_reason is not null and length(btrim(unknown_reason)) > 0))
 );
