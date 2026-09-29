@@ -10,8 +10,9 @@
     "harness:sync": "node scripts/harness/sync.mjs",
     "harness:check": "node scripts/harness/check.mjs",
     "test:position-db": "node supabase/tests/position_growth.verify.mjs",
+    "test:etf-rs": "node supabase/tests/etf_rs.verify.mjs",
     "test:ui": "playwright test",
-    "verify": "npm run harness:check && npm run test:position-db && npm run build && npm run test:ui"
+    "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run build && npm run test:ui"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.23",

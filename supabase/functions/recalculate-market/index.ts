@@ -19,5 +19,11 @@ Deno.serve(async(req:Request)=>{
     method:"POST",headers:{apikey:secret,Authorization:"Bearer "+secret,"Content-Type":"application/json"},body:"{}"
   });
   if(!r.ok)return Response.json({error:"recalculate_failed",detail:await r.text()},{status:502});
-  return Response.json({ok:true,result:await r.json()});
+  const result=await r.json();
+  // ETF relative returns share each market's benchmark, but never enter the equity ranking.
+  const etf=await fetch(base+"/rest/v1/rpc/recalculate_etf_relative_strength",{
+    method:"POST",headers:{apikey:secret,Authorization:"Bearer "+secret,"Content-Type":"application/json"},body:"{}"
+  });
+  if(!etf.ok)return Response.json({error:"etf_rs_failed",detail:await etf.text()},{status:502});
+  return Response.json({ok:true,result,etf_rs_updated:await etf.json()});
 });
