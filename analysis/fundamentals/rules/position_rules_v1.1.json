@@ -1,7 +1,7 @@
 {
   "version": "position-rules-v1.1",
   "active": false,
-  "active_note": "Labels are emitted only when active is true. v1.1 activation requires acceptance A1-A5 on both the in-sample dates and the untouched holdout dates in docs/harness/POSITION_RULES_V1.md.",
+  "active_note": "Failed the pre-registered holdout gate on 2026-09-29 (A1 Quality and A3 Value on 2014-2017; in-sample passed). Stays inactive; see docs/harness/POSITION_RULES_V1.md. A successor needs fresh out-of-sample data.",
   "markets": [
     "US"
   ],

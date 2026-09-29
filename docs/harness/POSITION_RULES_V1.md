@@ -73,6 +73,18 @@ Because this change was informed by the in-sample result, v1.1 is activated only
 
 If either fails, v1.1 stays inactive and no label is shown.
 
-## Result of position-rules-v1.1
+## Result of position-rules-v1.1 (run 36582942133, commit 1ee4b51)
 
-Pending the run recorded below.
+Activation: **no**. The in-sample gate passed; the holdout gate failed A1 and A3, so v1.1 stays `"active": false` and no Position label is written or shown.
+
+| Test | In-sample 2018–2022 (386 labelled, 60 companies) | Holdout 2014–2017 (268 labelled, 46 companies) |
+|---|---|---|
+| A1 Quality, forward ROIC | pass: 40.4% (116) > 14.4% (39) > 6.6% (22) | **fail**: 37.2% (84) > 19.3% (21), Low 19.6% with only 5 observations |
+| A2 Growth, forward revenue CAGR | pass: 9.3% (205) > 5.3% (123) > 4.7% (58) | pass: 8.0% (129) > 5.6% (82) > 2.1% (57) |
+| A3 Value, forward excess return | pass: +5.5% (74) > +2.3% (134) > −4.0% (159) | **fail**: Attractive −0.8% (70) < Fair +7.1% (64); Expensive −5.4% (118) lowest |
+| A4 Type | pass: drawdown 12.3% vs 2.5%, stability 88% | pass: 9.7% vs 0.9%, stability 88% |
+| A5 Coverage | pass: 60 | pass: 46 |
+
+Value, informational (realized growth reached implied): in-sample 69% / 51% / 14%, holdout 90% / 69% / 24% for Attractive / Fair / Expensive. The implied-growth ordering held in both periods; the return ordering did not hold between Attractive and Fair in 2014–2017.
+
+Reading. High Quality and Durable Growth separate clearly in both periods, cyclical typing predicts drawdowns, and Expensive is the weakest return group in both. What did not replicate is the top of Value (Attractive vs Fair returns) and a Low Quality group large enough to test. The holdout has now been used, so it cannot validate a further revision: the next candidate needs fresh out-of-sample data (for example a different universe of companies, or post-2022 dates as they mature), and its acceptance must again be fixed before it runs.

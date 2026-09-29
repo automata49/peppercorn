@@ -3,9 +3,6 @@ name: Position rules backtest
 # 수동 실행 전용. SEC companyfacts 와 Yahoo 가격을 받아 라벨 규칙을 과거 시점별로 백테스트한다. DB 쓰기 없음.
 on:
   workflow_dispatch:
-  push:  # TEMPORARY: dispatch needs the file on main; remove before merging
-    branches: [claude/position-rules-v1]
-    paths: [.github/workflows/position-backtest.yml, analysis/fundamentals/**]
 
 permissions:
   contents: read
