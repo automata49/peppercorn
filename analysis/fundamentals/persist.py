@@ -142,11 +142,17 @@ def plan(result: dict, quarters: int, computed_on: str) -> dict:
             "snapshot": snapshot_row(result, fact_hashes, computed_on)}
 
 
+def project_url(url: str) -> str:
+    """Accept the project URL or the REST endpoint (…/rest/v1) that the Supabase dashboard also shows."""
+    url = url.strip().rstrip("/")
+    return url[: -len("/rest/v1")] if url.endswith("/rest/v1") else url
+
+
 class Client:
     """Minimal PostgREST client for the pipeline role; the token never appears in messages."""
 
     def __init__(self, url: str, token: str, apikey: str | None = None):
-        self.url = url.rstrip("/")
+        self.url = project_url(url)
         self.token = token
         self.headers = {"apikey": apikey or token, "Authorization": f"Bearer {token}", "Content-Type": "application/json"}
 

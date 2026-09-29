@@ -22,7 +22,7 @@ import uuid
 
 import requests
 
-URL = os.environ.get("TEST_SUPABASE_URL", "").rstrip("/")
+URL = os.environ.get("TEST_SUPABASE_URL", "").strip().rstrip("/").removesuffix("/rest/v1")  # either URL form
 APIKEY = os.environ.get("TEST_SUPABASE_APIKEY", "")
 SECRET = os.environ.get("TEST_SUPABASE_JWT_SECRET", "")
 DENIED = {401, 403}

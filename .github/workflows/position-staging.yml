@@ -43,11 +43,16 @@ jobs:
           esac
           echo "Target is not the production project."
 
-      - name: Apply schema.sql and position_growth.sql (twice, to prove re-runs)
+      - name: Apply schema.sql (empty project only) and position_growth.sql (twice, to prove re-runs)
         shell: bash
         run: |
           set -euo pipefail
-          psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/schema.sql
+          # schema.sql is not re-runnable (plain create policy), so apply it only to an empty project.
+          if [ "$(psql "$TEST_SUPABASE_DB_URL" -X -A -t -c "select to_regclass('public.instruments') is not null")" = "t" ]; then
+            echo "public.instruments exists; schema.sql not re-applied"
+          else
+            psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/schema.sql
+          fi
           psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/position_growth.sql
           psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/position_growth.sql
           psql "$TEST_SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
