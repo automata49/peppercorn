@@ -43,7 +43,8 @@ const h = c => c.repeat(64 / c.length);
 const fact = (over = {}) => ({
   instrument_id: inst, period_end: '2026-07-26', field: 'revenue', status: 'reported', value: 96221000000, unit: 'USD',
   scope: 'consolidated', unknown_reason: null, extraction: 'direct', method_version: 'US-FCF-1',
-  lineage: {operation: 'direct', inputs: [{accession: '0001045810-26-000075'}]}, source_filed_at: '2026-08-26',
+  lineage: {source: 'SEC', operation: 'direct', raw_sha256: h('d'),
+    inputs: [{accession: '0001045810-26-000075', filed: '2026-08-26', end: '2026-07-26'}]}, source_filed_at: '2026-08-26',
   input_hash: h('a'), pipeline_version: 'fundamentals-1', ...over});
 const insertFact = f => tryQ(
   `insert into public.fundamentals_q(instrument_id,period_end,field,status,value,unit,scope,unknown_reason,extraction,method_version,lineage,source_filed_at,input_hash,pipeline_version)
@@ -90,6 +91,27 @@ await bad('reported fact without value rejected', await insertFact(fact({input_h
 await bad('reported fact without filing date rejected', await insertFact(fact({input_hash: h('e'), source_filed_at: null})), 'fundamentals_q_reported_has_evidence');
 await bad('reported fact without inputs rejected', await insertFact(fact({input_hash: h('f'), lineage: {inputs: []}})), 'fundamentals_q_reported_has_evidence');
 await bad('reported fact with non-array inputs rejected', await insertFact(fact({input_hash: h('1'), lineage: {inputs: 'x'}})), 'fundamentals_q_reported_has_evidence');
+const goodLineage = fact().lineage;
+const noInput = key => ({...goodLineage, inputs: goodLineage.inputs.map(({[key]: _discard, ...rest}) => rest)});
+for (const [idx, [name, lineage]] of [
+  ['source', {...goodLineage, source: 'unknown'}],
+  ['null source', {...goodLineage, source: null}],
+  ['accession', noInput('accession')],
+  ['filing date', noInput('filed')],
+  ['period', noInput('end')],
+  ['raw hash', {...goodLineage, raw_sha256: null}],
+  ['operation', {...goodLineage, operation: 'subtract'}],
+  ['null operation', {...goodLineage, operation: null}],
+  ['second input identity', {...goodLineage, inputs: [...goodLineage.inputs, {filed: '2026-08-26', end: '2026-07-26'}]}],
+].entries()) await bad(`reported fact without valid ${name} rejected`,
+  await insertFact(fact({input_hash: h(`f${idx}`), lineage})), 'fundamentals_q_reported_has_evidence');
+ok('input-level raw hashes accepted', (await insertFact(fact({input_hash: h('e1'),
+  lineage: {...goodLineage, raw_sha256: null, inputs: [{...goodLineage.inputs[0], raw_sha256: h('e')}]}}))).ok);
+ok('DART receipt lineage accepted', (await insertFact(fact({input_hash: h('e2'), unit: 'KRW',
+  lineage: {source: 'DART', operation: 'direct', raw_sha256: h('f'),
+    inputs: [{receipt: '20260814003699', filed: '20260814', end: '2026-06-30'}]}}))).ok);
+await bad('DART accession cannot replace receipt', await insertFact(fact({input_hash: h('e3'),
+  lineage: {...goodLineage, source: 'DART'}})), 'fundamentals_q_reported_has_evidence');
 await bad('unknown stored as zero rejected', await insertFact(fact({input_hash: h('2'), status: 'unknown', value: 0, unknown_reason: 'missing'})), 'fundamentals_q_unknown_has_reason');
 await bad('unknown without reason rejected', await insertFact(fact({input_hash: h('3'), status: 'unknown', value: null, unknown_reason: null})), 'fundamentals_q_unknown_has_reason');
 ok('unknown with reason accepted', (await insertFact(fact({input_hash: h('4'), field: 'sbc', status: 'unknown', value: null, unknown_reason: 'SBC not collected', source_filed_at: null, lineage: {}}))).ok);
