@@ -76,8 +76,10 @@ function normalizeRow(raw:unknown,index:number):LeaderRow{
 const normalizeRows=(rows:unknown[])=>rows.map(normalizeRow)
 
 export async function loadLeaderboard(): Promise<{rows:LeaderRow[];source:'supabase'|'demo'}> {
+  const controller=new AbortController()
+  const timeout=window.setTimeout(()=>controller.abort(),12_000)
   try {
-    const res = await fetch(endpoint)
+    const res = await fetch(endpoint,{signal:controller.signal})
     if (!res.ok) throw new Error('Peppercorn API HTTP ' + res.status)
     const payload = await res.json() as { rows?: unknown[] }
     return payload.rows?.length
@@ -85,5 +87,7 @@ export async function loadLeaderboard(): Promise<{rows:LeaderRow[];source:'supab
       : { rows: normalizeRows(demoRows), source: 'demo' }
   } catch {
     return { rows: normalizeRows(demoRows), source: 'demo' }
+  } finally {
+    window.clearTimeout(timeout)
   }
 }

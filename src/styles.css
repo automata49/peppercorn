@@ -1045,3 +1045,6 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .stock-row .stock-id{text-align:left;padding-right:8px}
 .stock-row .pill{justify-self:center}
 .stock-column-resizer{right:0}
+
+.top-actions button.source{border-radius:999px;padding:6px 9px;font-size:11px;white-space:nowrap}.top-actions button.source:disabled{opacity:.65;cursor:wait}
+.snapshot-refresh{border:1px solid #d5dce5;border-radius:7px;background:#fff;color:#426486;min-width:28px;min-height:28px;cursor:pointer}.snapshot-refresh:disabled{opacity:.6;cursor:wait}

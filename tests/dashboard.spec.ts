@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:i%2?'Electronic Technology':'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[i%2?'KOSPI200':'S&P 500'],price:100+i,rs_rank:99-i%4,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
+const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:i%2?'Electronic Technology':'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[i%2?'KOSPI200':'S&P 500'],price:100+i,rs_rank:99-i%4,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,rs_5d:.01,rs_20d:.02,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' layout and stock parity',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
@@ -41,6 +41,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
    await expect(page.locator('.drill-sheet')).toBeVisible();
    await page.locator('.drill-sheet .stock-row').first().click();
   }
+  const rsSection=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
+  await expect(rsSection.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.getByRole('button',{name:'종목분석 기록 작성 →'})).toBeVisible();
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   await expect(page.locator('.drill-sheet')).toHaveCount(0);
@@ -49,3 +51,49 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await context.close();
  })
 }
+
+test('RS bands refresh in an already open stock detail',async({page})=>{
+  let calls=0;
+  await page.route('**/functions/v1/leaderboard?*',route=>{
+    calls++;
+    route.fulfill({json:{rows:rows.map(r=>({...r,rs_5d:calls===1?null:'0.11'}))}});
+  });
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.locator('.dashboard-stock-panel .stock-row').first().click();
+  const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
+  await expect(rs.locator('.signal-strip strong').first()).toHaveText('—');
+  await page.getByRole('button',{name:'RS 새로고침'}).click();
+  await expect(rs.locator('.signal-strip strong').first()).toHaveText('+11.0%');
+  await expect(page.locator('.drill-sheet .drill-meta')).toContainText('TEST0');
+  expect(calls).toBe(2);
+});
+
+test('failed live load can be retried from the demo state',async({page})=>{
+  let calls=0;
+  await page.route('**/functions/v1/leaderboard?*',route=>{
+    calls++;
+    calls===1?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
+  });
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.getByRole('button',{name:'시장 데이터 새로고침'})).toContainText('Demo / Local');
+  await page.getByRole('button',{name:'시장 데이터 새로고침'}).click();
+  await expect(page.getByRole('button',{name:'시장 데이터 새로고침'})).toContainText('Supabase Live');
+  expect(calls).toBe(2);
+});
+
+test('a stalled live response releases the refresh controls',async({page})=>{
+  let calls=0;
+  await page.route('**/functions/v1/leaderboard?*',route=>{
+    calls++;
+    if(calls>1)void route.fulfill({json:{rows}});
+  });
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  const refresh=page.getByRole('button',{name:'시장 데이터 새로고침'});
+  await expect(refresh).toBeEnabled({timeout:17_000});
+  await expect(refresh).toContainText('Demo / Local');
+  await refresh.click();
+  await expect(refresh).toContainText('Supabase Live');
+  expect(calls).toBe(2);
+});
