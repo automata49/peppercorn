@@ -9,8 +9,9 @@
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",
     "harness:check": "node scripts/harness/check.mjs",
+    "test:position-db": "node supabase/tests/position_growth.verify.mjs",
     "test:ui": "playwright test",
-    "verify": "npm run harness:check && npm run build && npm run test:ui"
+    "verify": "npm run harness:check && npm run test:position-db && npm run build && npm run test:ui"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.23",
@@ -23,6 +24,7 @@
     "react-dom": "19.3.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
     "@playwright/test": "1.51.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",

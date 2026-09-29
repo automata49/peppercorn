@@ -119,7 +119,7 @@ create trigger position_snapshot_append_only before update on public.position_sn
 alter table public.fundamentals_q enable row level security;
 alter table public.position_snapshot enable row level security;
 
--- Supabase default privileges grant new tables to the API roles, so start from nothing.
+-- Default table exposure varies by project configuration; start from explicit grants.
 revoke all on public.fundamentals_q, public.position_snapshot from public, anon, authenticated;
 grant select on public.position_snapshot to anon, authenticated;
 grant select on public.fundamentals_q to authenticated;

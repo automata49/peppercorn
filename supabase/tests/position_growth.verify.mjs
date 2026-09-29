@@ -1,7 +1,6 @@
 // Executes supabase/schema.sql and supabase/position_growth.sql in an in-process Postgres (PGlite) with
 // Supabase-like roles, then checks grants, RLS, idempotency and the data constraints.
-// Not part of CI: run from the repository root with
-//   npm install --no-save @electric-sql/pglite && node supabase/tests/position_growth.verify.mjs
+// Run from the repository root with `npm run test:position-db`; PR and deployment CI run it too.
 import {PGlite} from '@electric-sql/pglite';
 import {readFileSync} from 'node:fs';
 
