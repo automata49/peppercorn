@@ -69,6 +69,20 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
   expect(calls).toBe(2);
 });
 
+test('ETF detail shows relative strength without equity-only rankings',async({page})=>{
+  const etf={...rows[0],id:'etf-spy',ticker:'SPY',name:'SPY ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,ibd_rs_as_of:null,leader_tt:false,leadership_class:'중립'};
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[etf]}}));
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
+  await expect(page.locator('.analysis-card .stock-title')).toContainText('SPY ETF');
+  const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
+  await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
+  await expect(page.locator('.analysis-card .ibd-score')).toHaveAttribute('title','ETF 등 주식 외 자산은 IBD식 RS 산정 대상이 아닙니다');
+  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'Trend Template'}).locator('b')).toHaveText('해당 없음');
+  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('해당 없음');
+});
+
 test('failed live load can be retried from the demo state',async({page})=>{
   let calls=0;
   await page.route('**/functions/v1/leaderboard?*',route=>{
