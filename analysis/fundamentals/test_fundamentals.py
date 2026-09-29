@@ -412,6 +412,8 @@ def test_official_reference_periods_are_ordered_and_complete():
             assert all(isinstance(v, int) and v > 0 for v in p['values'].values())
     assert len(reconcile.REFERENCE['NVDA']['periods']) >= 6
     assert len(reconcile.REFERENCE['005930']['periods']) >= 8
+    for p in reconcile.REFERENCE['005930']['periods']:
+        assert p['filed'] and p['receipts'] and all(r[:8] <= p['filed'].replace('-', '') for r in p['receipts'])
 
 
 def test_official_reference_skips_quarters_not_yet_filed_at_as_of():
