@@ -240,7 +240,15 @@ def evaluate(q: dict, market: str, price: dict | None, rules: dict, default_tax:
         out["missing"] = [f"market {market} is not covered by {rules['version']}"]
         return out
     f, missing = features(q, rules, default_tax, roic_method, absent)
-    out["features"] = f
+    return decide(f, missing, price, rules, industry)
+
+
+def decide(f: dict, missing: list[str], price: dict | None, rules: dict, industry: dict | None) -> dict:
+    """The label step alone, from precomputed features; lets a backtest try many rule candidates cheaply.
+
+    Valid only for rules whose `window` equals the one the features were computed with."""
+    out = {"rules_version": rules["version"], "status": "insufficient_data", "labels": {}, "reasons": {},
+           "features": f, "value_detail": {}, "missing": []}
     if not industry or not isinstance(industry.get("sic"), int):
         missing = missing + ["industry SIC code"]
     if missing:
