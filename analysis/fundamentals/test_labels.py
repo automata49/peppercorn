@@ -326,6 +326,8 @@ def test_backtest_universe_and_dates_are_fixed_and_disjoint():
     import backtest
     tickers = backtest.tickers()
     assert len(tickers) == len(set(tickers)) == 114
+    b = backtest.tickers("B")
+    assert len(b) == len(set(b)) == 118 and not set(b) & set(tickers)
     assert not set(backtest.AS_OF) & set(backtest.HOLDOUT) and max(backtest.HOLDOUT) < min(backtest.AS_OF)
 
 
@@ -349,3 +351,10 @@ def test_backtest_acceptance_needs_every_group_ordered_with_enough_observations(
     assert report["activate"] is False
     report = backtest.summarize(rows[:-1])                          # Low / Weak / Expensive drop to n = 9
     assert report["acceptance"]["A1 quality"] is False
+
+
+def test_v12_differs_from_v11_only_in_version_and_gate_notes():
+    v11, v12 = labels.load_rules("position-rules-v1.1"), labels.load_rules("position-rules-v1.2")
+    notes = {"version", "active", "active_note", "supersedes"}
+    assert {k: v for k, v in v11.items() if k not in notes} == {k: v for k, v in v12.items() if k not in notes}
+    assert v12["active"] is False

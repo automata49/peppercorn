@@ -45,6 +45,22 @@ UNIVERSE = {
 }
 # The SEC ticker list maps a ticker to its current registrant; these reorganized companies filed their history
 # under an earlier CIK.
+# Replication universe, fixed on 2026-09-30 before any run on it: US non-financial S&P 500 members not in UNIVERSE
+# and still listed; banks, insurers, REITs and utilities are excluded because ROIC is not meaningful for them.
+# Used only to test position-rules-v1.2 (content identical to v1.1); never used to design a rule.
+UNIVERSE_B = {
+    "technology": ["ANET", "CDNS", "SNPS", "FTNT", "PANW", "ADSK", "MCHP", "NXPI", "ON", "MPWR", "TER", "KEYS",
+                   "ZBRA", "CDW", "IT", "FICO", "VRSN", "AKAM", "HPQ", "NTAP", "WDC", "STX", "GLW", "APH", "CTSH"],
+    "health": ["REGN", "VRTX", "BIIB", "ILMN", "IQV", "A", "WAT", "MTD", "RMD", "BDX", "BAX", "HOLX", "ALGN",
+               "DXCM", "STE", "LH", "DGX", "HCA", "MCK", "ZBH"],
+    "consumer": ["ORLY", "AZO", "TSCO", "DG", "DLTR", "BBY", "ULTA", "DRI", "MAR", "HLT", "EXPE", "POOL", "GPC",
+                 "LULU", "DECK", "NVR", "KR", "SYY", "ADM", "TSN", "HRL", "CAG", "MNST", "CHD", "STZ", "MO", "PM"],
+    "industrial": ["ETN", "PH", "ROK", "DOV", "AME", "XYL", "JCI", "CMI", "PCAR", "ODFL", "JBHT", "EXPD", "FAST",
+                   "GWW", "URI", "CTAS", "RSG", "CPRT", "LHX", "TXT", "TDG", "SNA", "SWK", "FDX", "DAL", "UAL", "LUV"],
+    "materials_energy": ["ECL", "PPG", "ALB", "CF", "MOS", "VMC", "MLM", "IP", "PKG", "AVY", "EMN", "PSX", "DVN", "BKR"],
+    "media": ["CMCSA", "CHTR", "TMUS", "EA", "TTWO"],
+}
+UNIVERSES = {"A": UNIVERSE, "B": UNIVERSE_B}
 CIK_OVERRIDE = {"XOM": 34088}
 AS_OF = ["2018-06-30", "2018-12-31", "2019-06-30", "2019-12-31", "2020-06-30", "2020-12-31",
          "2021-06-30", "2021-12-31", "2022-06-30"]
@@ -55,11 +71,11 @@ HORIZON_YEARS = 3
 TICKERS_URL = "https://www.sec.gov/files/company_tickers.json"
 
 
-def tickers() -> list[str]:
-    return [t for group in UNIVERSE.values() for t in group]
+def tickers(universe: str = "A") -> list[str]:
+    return [t for group in UNIVERSES[universe].values() for t in group]
 
 
-def fetch(cache: Path) -> None:
+def fetch(cache: Path, universe: str = "A") -> None:
     ua = os.environ.get("SEC_USER_AGENT", "").strip()
     if "@" not in ua:
         raise SystemExit("SEC_USER_AGENT is required")
@@ -67,8 +83,8 @@ def fetch(cache: Path) -> None:
     (cache / "prices").mkdir(parents=True, exist_ok=True)
     mapping = requests.get(TICKERS_URL, headers={"User-Agent": ua}, timeout=60).json()
     cik = {row["ticker"]: row["cik_str"] for row in mapping.values()} | CIK_OVERRIDE
-    manifest = {"fetched_at": datetime.now(timezone.utc).isoformat(), "companies": {}}
-    for ticker in tickers():
+    manifest = {"fetched_at": datetime.now(timezone.utc).isoformat(), "universe": universe, "companies": {}}
+    for ticker in tickers(universe):
         if ticker not in cik:
             manifest["companies"][ticker] = {"error": "ticker not in SEC mapping"}
             continue
@@ -127,11 +143,11 @@ def outcomes(full: dict, start_quarter: str, as_of: str, quote: dict, roic_metho
     return out
 
 
-def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF) -> dict:
+def run(cache: Path, out_dir: Path, rules: dict, dates: list[str] = AS_OF, universe: str = "A") -> dict:
     method = methods.for_market("US")["roic"]
     tnx = json.loads((cache / "prices" / "_risk_free.json").read_text(encoding="utf-8"))
     rows = []
-    for ticker in tickers():
+    for ticker in tickers(universe):
         if not (cache / "sec" / f"{ticker}.json.gz").exists():
             rows.append({"ticker": ticker, "error": "not fetched"})
             continue
@@ -286,13 +302,14 @@ def main():
     ap.add_argument("--out", default="bt")
     ap.add_argument("--rules", default="position-rules-v1.1")
     ap.add_argument("--dates", choices=["in-sample", "holdout"], default="in-sample")
+    ap.add_argument("--universe", choices=sorted(UNIVERSES), default="A")
     a = ap.parse_args()
     if a.command == "fetch":
-        fetch(Path(a.cache))
+        fetch(Path(a.cache), a.universe)
     else:
         rules = labels.load_rules(a.rules)
-        report = run(Path(a.cache), Path(a.out), rules, HOLDOUT if a.dates == "holdout" else AS_OF)
-        print(f"{a.dates} dates")
+        report = run(Path(a.cache), Path(a.out), rules, HOLDOUT if a.dates == "holdout" else AS_OF, a.universe)
+        print(f"universe {a.universe}, {a.dates} dates")
         print(render(report, rules))
 
 

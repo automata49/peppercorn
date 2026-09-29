@@ -88,3 +88,13 @@ Activation: **no**. The in-sample gate passed; the holdout gate failed A1 and A3
 Value, informational (realized growth reached implied): in-sample 69% / 51% / 14%, holdout 90% / 69% / 24% for Attractive / Fair / Expensive. The implied-growth ordering held in both periods; the return ordering did not hold between Attractive and Fair in 2014–2017.
 
 Reading. High Quality and Durable Growth separate clearly in both periods, cyclical typing predicts drawdowns, and Expensive is the weakest return group in both. What did not replicate is the top of Value (Attractive vs Fair returns) and a Low Quality group large enough to test. The holdout has now been used, so it cannot validate a further revision: the next candidate needs fresh out-of-sample data (for example a different universe of companies, or post-2022 dates as they mature), and its acceptance must again be fixed before it runs.
+
+## position-rules-v1.2: replication on a new universe (pre-registered 2026-09-30, before any run on it)
+
+v1.2 has the same rules and thresholds as v1.1; only the version and gate differ, so its snapshots can be told apart from the failed candidate. It is tested on `UNIVERSE_B` in `backtest.py`: 118 US non-financial S&P 500 members that are not in the first universe and are still listed (banks, insurers, REITs and utilities excluded), fixed before any run on them.
+
+Activation requires A1–A5, unchanged, on universe B at both date sets: 2018-06-30 … 2022-06-30 and 2014-06-30 … 2017-12-31. If either fails, v1.2 stays inactive. If both pass, v1.2 may be activated with the universe A 2014–2017 failure (A1 Quality: too few Low observations; A3 Value: Attractive below Fair) recorded here as a known limitation.
+
+## Result of position-rules-v1.2
+
+Pending the run recorded below.
