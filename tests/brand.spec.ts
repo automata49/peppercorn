@@ -60,3 +60,17 @@ for(const view of views){
   await context.close()
  })
 }
+
+test('home-screen icons point to the Folio app icon',async({page,request})=>{
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
+ expect(touch).toBe('./folio-apple-touch-icon.png')
+ const manifest=await (await request.get('manifest.webmanifest')).json()
+ const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
+ expect(srcs.every(s=>s.includes('folio-'))).toBe(true)
+ for(const src of srcs){
+  const res=await request.get(src.replace('./',''))
+  expect(res.status(),src).toBe(200)
+  expect(res.headers()['content-type']).toContain('image/png')
+ }
+})
