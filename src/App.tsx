@@ -253,8 +253,10 @@ function MarketMetricCard({tone,icon,label,value,sub,progress}:{tone:'green'|'bl
   const safeProgress=progress==null?null:Math.max(0,Math.min(100,progress))
   return <div className={'market-metric-card '+tone}>
     <div className="market-metric-head"><span className="market-metric-icon" aria-hidden="true">{icon}</span><b>{label}</b></div>
-    <div className="market-metric-reading"><strong>{value}</strong><small>{sub}</small></div>
-    {safeProgress!=null&&<div className="market-metric-track" aria-hidden="true"><span style={{width:safeProgress+'%'}}/></div>}
+    {/* Value and description sit on their own subgrid rows so every card in a row lines up. */}
+    <div className="market-metric-reading market-metric-value"><strong>{value}</strong></div>
+    <div className="market-metric-reading market-metric-sub"><small>{sub}</small></div>
+    <div className="market-metric-track" aria-hidden="true">{safeProgress!=null&&<span style={{width:safeProgress+'%'}}/>}</div>
   </div>
 }
 
@@ -795,7 +797,7 @@ export default function App(){
         <div className="market-metric-grid">
           <MarketMetricCard tone="green" icon="↗" label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+ma50Rows.length+' 종목'} progress={breadth*100}/>
           <MarketMetricCard tone="blue" icon="⌁" label="MA200 위 비율" value={(ma200Breadth*100).toFixed(0)+'%'} sub={'/ '+ma200Rows.length+' 종목'} progress={ma200Breadth*100}/>
-          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={highNearCount+' 종목'} sub={'고점 -10% 이내 · '+(highNearShare*100).toFixed(0)+'%'} progress={highNearShare*100}/>
+          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'} sub={highNearCount+' / '+high52Rows.length+' 종목 · 고점 -10% 이내'} progress={highNearShare*100}/>
           <MarketMetricCard tone="split" icon="↕" label="상승 / 하락 비율" value={(advanceDeclineRatio||0).toFixed(1)+' : 1'} sub={'1W 기준 · 상승 '+advanceCount+' · 하락 '+declineCount} progress={advanceCount+declineCount?advanceCount/(advanceCount+declineCount)*100:0}/>
           <MarketMetricCard tone="teal" icon="◴" label="평균 RS" value={averageRs==null?'—':averageRs.toFixed(1)} sub={'RS 데이터 '+stockRows.filter(r=>r.rs_rank!=null).length+' 종목'} progress={averageRs??0}/>
         </div>
