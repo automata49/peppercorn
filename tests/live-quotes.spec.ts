@@ -27,6 +27,8 @@ test('current price refreshes from live quotes without touching daily metrics',a
  const nvdaRow=page.locator('.stock-row').filter({hasText:'엔비디아'}).first()
  await expect(nvdaRow.locator('.stock-price')).toHaveText('123.45')
  await expect(nvdaRow.locator('.stock-price')).toHaveClass(/live-price/)
+ // 현재가 등락: live price against the previous close.
+ await expect(nvdaRow.locator('.live-change')).toHaveText('+2.9%')
  await expect(page.locator('.stock-row').filter({hasText:'에코프로비엠'}).first().locator('.stock-price')).toHaveText('210,500')
  expect(requested.some(s=>s.includes('247540.KQ'))).toBe(true)
  // Daily metrics stay: the 5D return cell is unchanged.
@@ -37,4 +39,23 @@ test('current price refreshes from live quotes without touching daily metrics',a
  await expect(nvdaRow.locator('.stock-price')).toHaveText('130')
  await nvdaRow.click()
  await expect(page.locator('.live-badge').first()).toContainText('실시간')
+})
+
+test('주도 종목 현재가 기준 orders leaders by live change',async({page})=>{
+ await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
+ await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{as_of:new Date().toISOString(),failed:[],quotes:{
+  NVDA:{price:123,time:null,previous_close:120,currency:'USD'},'247540.KQ':{price:210000,time:null,previous_close:200000,currency:'KRW'}}}}))
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+ const basis=page.locator('.leader-basis button')
+ await expect(basis).toHaveText(['종가 기준','현재가 기준'])
+ await expect(page.locator('.leadership-card-grid')).toBeVisible()
+ await basis.nth(1).click()
+ await expect(page.locator('.leadership-card-grid')).toHaveCount(0)
+ const list=page.locator('.live-leaders .stock-row')
+ await expect(list.locator('.live-change')).toHaveText(['+5.0%','+2.5%'])
+ await expect(list.locator('.stock-id b')).toHaveText(['에코프로비엠','엔비디아'])
+ await expect(page.locator('.live-leaders-note')).toContainText('시세 2/2')
+ await basis.nth(0).click()
+ await expect(page.locator('.leadership-card-grid')).toBeVisible()
 })

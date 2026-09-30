@@ -25,6 +25,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await sectorActions.nth(0).click();
   const metrics=page.locator('.market-metrics-dialog');
   await expect(metrics.getByRole('heading',{name:'시장 지표'})).toBeVisible();
+  expect(await metrics.locator('.market-context').evaluate(e=>getComputedStyle(e).whiteSpace)).toBe('normal');
+  expect(await sectorActions.nth(0).evaluate(e=>getComputedStyle(e).borderTopStyle)).toBe('solid');
   await expect(metrics.locator('.market-metric-card')).toHaveCount(4);
   await expect(metrics).not.toContainText('평균 RS');
   const mc=await metrics.locator('.market-metric-card').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,r:r.right}}));
@@ -252,8 +254,9 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
     expect(await align(first.locator('.stock-id'))).toEqual(['left']);
     const rank=first.locator('strong.rank').first();
     expect(await rank.evaluate(e=>getComputedStyle(e).justifyContent)).toBe('flex-end');
-    const pill=(await first.locator('.pill').boundingBox())!,price=(await first.locator('.stock-price').boundingBox())!;
-    expect(pill.x-(price.x+price.width)).toBeLessThan(12);
+    const pill=(await first.locator('.pill').boundingBox())!,change=(await first.locator('.live-change').boundingBox())!;
+    expect(pill.x-(change.x+change.width)).toBeLessThan(12);
+    await expect(first.locator('.live-change')).toHaveText('—');
   }
   await page.locator('.sidebar nav').getByRole('button',{name:'Leaderboard'}).click();
   const priceCell=page.locator('.ag-row .ag-cell[col-id="price"]').first();

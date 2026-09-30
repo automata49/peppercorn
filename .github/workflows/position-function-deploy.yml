@@ -1,6 +1,6 @@
 name: Edge function deploy
 
-# 수동 실행 전용. position-ingest 또는 quotes Edge Function 을 테스트 또는 운영 프로젝트에 배포한다.
+# 수동 실행 전용. position-ingest, quotes 또는 position-read Edge Function 을 테스트 또는 운영 프로젝트에 배포한다.
 # Supabase 개인 액세스 토큰: 운영은 SUPABASE_ACCESS_TOKEN, 테스트는 SUPABASE_ACCESS_TOKEN_TEST (없으면 운영 토큰을 시도).
 # 토큰은 각 프로젝트 하나에 Edge Functions 권한만 주는 것을 권장한다. 운영은 confirm 에 deploy 를 입력해야 한다.
 on:
@@ -9,7 +9,7 @@ on:
       function:
         description: 배포할 함수
         type: choice
-        options: [position-ingest, quotes]
+        options: [position-ingest, quotes, position-read]
         default: position-ingest
       target:
         description: 배포 대상
@@ -54,6 +54,7 @@ jobs:
             [ "$ref" != "mhbcchegrbakearqptdr" ] || { echo "::error::test target resolves to production"; exit 1; }
           fi
           # position-ingest authenticates with a GitHub OIDC token; quotes is a public read-only proxy
-          # guarded by origin and client token like leaderboard. Neither uses a Supabase JWT.
-          case "$FUNCTION" in position-ingest|quotes) ;; *) echo "::error::unknown function $FUNCTION"; exit 1;; esac
+          # guarded by origin and client token like leaderboard; position-read is the same kind of public read-only
+          # endpoint (READ ONLY transaction under position_pipeline). None uses a Supabase JWT.
+          case "$FUNCTION" in position-ingest|quotes|position-read) ;; *) echo "::error::unknown function $FUNCTION"; exit 1;; esac
           supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt
