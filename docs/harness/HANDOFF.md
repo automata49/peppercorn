@@ -225,3 +225,7 @@ After merge (person): re-run `Position migration (production)` (confirm `apply`,
 
 ## Edge function deploy workflow fix — 2026-09-30
 The #58 merge left `FUNCTION` twice in the deploy step's `env` of `position-function-deploy.yml`. GitHub rejects duplicate mapping keys, so the workflow failed to load (runs 36785712914, 36786065614) and could not be dispatched for `position-public`. The duplicate line is removed; all workflows were checked for duplicate keys with a strict YAML loader. After merge: Actions → `Edge function deploy`, function `position-public`, target `prod`, confirm `deploy`.
+
+## Share and install metadata — 2026-09-30
+By user request KakaoTalk link previews (Open Graph) and Chrome's add-to-home-screen use `Folio XX` and a one-line Korean description: `모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼`. `app/index.html` sets `<title>`, `application-name`, `og:title`, `og:site_name`, `og:image:alt`, `twitter:title` and the three descriptions; the manifest `description` matches. KakaoTalk caches previews per URL: an already shared link keeps its old card until the cache is cleared in Kakao Developers' 공유 디버거 (share debugger) or it expires. An installed Chrome app keeps its old name until re-added.
+Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (38 passed; new `tests/brand.spec.ts` case checks the OG/title/manifest values and that the OG image loads), `git diff --check`.

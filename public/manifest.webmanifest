@@ -2,7 +2,7 @@
   "name": "Folio XX",
   "short_name": "Folio XX",
   "id": "/peppercorn/",
-  "description": "Peppercorn Capital은 한국·미국 시장의 강한 섹터와 주도 종목을 찾고, 상대강도·추세·위험을 한눈에 살펴보는 투자 분석 웹앱입니다.",
+  "description": "모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
