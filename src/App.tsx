@@ -36,8 +36,8 @@ const sourceName=(source:string)=>source.includes('TradingView')?(source.include
 const CANDIDATE_RS_MIN=80
 const CANDIDATE_HIGH_DISTANCE_MIN=-.25
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
-// Finviz covers US listings only; share classes use a dash (BRK.B → BRK-B).
-const finvizUrl=(r:LeaderRow)=>'https://finviz.com/stock?t='+encodeURIComponent(String(r.ticker).toUpperCase().replace(/\./g,'-'))+'&p=d'
+// Finviz covers US listings only; share classes use a dash (BRK.B → BRK-B). ETFs open the chart view.
+const finvizUrl=(r:LeaderRow)=>'https://finviz.com/stock?t='+encodeURIComponent(String(r.ticker).toUpperCase().replace(/\./g,'-'))+(r.asset_class==='ETF'?'&ty=c&ta=1&p=d':'&p=d')
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
 const med=(values:unknown[])=>{
   const a=values.filter(v=>v!=null&&v!=='').map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
