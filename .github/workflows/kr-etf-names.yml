@@ -1,0 +1,23 @@
+name: KR ETF names
+
+# Prints the official KRX short names of the KR ETFs in the universe snapshot. Copy the map into
+# src/data/krEtfNames.json through a reviewed commit; this workflow does not write to the repository.
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/kr-etf-korean-names]
+
+permissions:
+  contents: read
+
+jobs:
+  names:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install 'requests==2.32.5'
+      - run: python analysis/kr_etf_names.py kr_etf_names.json
