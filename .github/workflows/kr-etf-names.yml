@@ -19,5 +19,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: pip install 'requests==2.32.5'
+      - run: pip install 'requests==2.32.5' 'pykrx==1.2.8'
       - run: python analysis/kr_etf_names.py kr_etf_names.json
