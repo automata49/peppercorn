@@ -55,7 +55,7 @@ def main():
             "role":(r.get("Role") or "").strip() or None,
             "priority":(r.get("Priority") or "").strip() or None,
             "theme":(r.get("Theme / Group") or "").strip() or None,
-            "benchmark_ticker":"SPY" if market=="US" else "069500",
+            "benchmark_ticker":"SPY" if market=="US" else "226490",  # KR-BENCH-2: KODEX 코스피
             "currency":"USD" if market=="US" else "KRW",
             "active":True
         }

@@ -66,7 +66,7 @@ def main():
         if len(prices)>=22:result[item["id"]]=metric(pd.DataFrame(prices))
 
     bench={}
-    for market,ticker in [("US","SPY"),("KR","069500")]:
+    for market,ticker in [("US","SPY"),("KR","226490")]:  # KR-BENCH-2: KODEX 코스피
         inst=next((x for x in instruments if x["market"]==market and x["ticker"]==ticker),None)
         if inst and inst["id"] in result:bench[market]=result[inst["id"]]
 
