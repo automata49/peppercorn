@@ -42,7 +42,9 @@ for(const view of views){
    await expect(menu).toBeVisible()
    const [mb,tb2]=await Promise.all([menu.boundingBox(),page.locator('.topbar h1').boundingBox()])
    expect(mb!.y).toBeLessThan(20)
-   expect(mb!.x+mb!.width).toBeLessThanOrEqual(tb2!.x)
+   // Below 1280px the menu button sits at the right edge of the page header.
+   expect(mb!.x).toBeGreaterThanOrEqual(tb2!.x+tb2!.width)
+   expect(view.width-(mb!.x+mb!.width)).toBeLessThan(28)
   }
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`})
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)
@@ -58,7 +60,13 @@ for(const view of views){
    expect(Math.abs(dh[0]-dh[1])).toBeLessThanOrEqual(1)
    expect(dw!.x+dw!.width).toBeLessThanOrEqual(dc!.x)
    expect(dh[0]).toBeGreaterThanOrEqual(28)
-   expect(dd!.x+dd!.width).toBeLessThanOrEqual(view.width)
+   void dd
+   await page.waitForTimeout(400)
+   const settled=(await drawer.boundingBox())!
+   // Phone/iPad drawers open from the right; iPad Pro keeps the left drawer.
+   if(view.brand)expect(settled.x).toBeLessThan(2)
+   else{expect(Math.abs(settled.x+settled.width-view.width)).toBeLessThan(2);expect(settled.x).toBeGreaterThan(view.width/8)}
+   expect(settled.x+settled.width).toBeLessThanOrEqual(view.width+1)
    await page.waitForTimeout(400)
    if(shots)await page.screenshot({path:`${shots}/${view.name}-menu.png`})
    await page.keyboard.press('Escape')
@@ -71,8 +79,11 @@ for(const view of views){
 test('home-screen icons point to the Folio app icon',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-apple-touch-icon.png')
+ expect(touch).toBe('./folio-app-icon-180.png')
  const manifest=await (await request.get('manifest.webmanifest')).json()
+ expect(manifest.name).toBe('Folio XX')
+ expect(manifest.short_name).toBe('Folio XX')
+ expect(await page.locator('meta[name="apple-mobile-web-app-title"]').getAttribute('content')).toBe('Folio XX')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-'))).toBe(true)
  for(const src of srcs){

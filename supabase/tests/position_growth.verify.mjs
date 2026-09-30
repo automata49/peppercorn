@@ -198,5 +198,6 @@ finally { await exec('rollback'); }
 ok('postgres can step down to position_pipeline (SET granted by the migration)',
   (await db.query(`select pg_has_role('postgres','position_pipeline','member') m`)).rows[0].m === true);
 
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

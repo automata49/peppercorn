@@ -17,7 +17,28 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(etfRows.first().locator('strong').nth(0)).toHaveText('99');
   await expect(etfRows.first().locator('strong').nth(1)).toHaveText('—');
   await expect(etfRows.first().locator('span').last()).toHaveText('-10.0%');
-  expect((await etfPanel.locator('.stock-rows-head > span').allTextContents()).slice(1)).toEqual((await page.locator('.dashboard-stock-panel .stock-rows-head > span').allTextContents()).slice(1));
+  // 시장 지표: a popup opened from the button left of 섹터 요약's 전체 보기; four cards, no 평균 RS.
+  await expect(page.locator('.dashboard-section.market-internals')).toHaveCount(0);
+  const sectorActions=page.locator('.dashboard-sector-panel .sector-actions button');
+  await expect(sectorActions).toHaveText(['시장 지표','전체 보기 →']);
+  const [mt,sa]=await Promise.all([sectorActions.nth(0).boundingBox(),sectorActions.nth(1).boundingBox()]);
+  expect(mt!.x+mt!.width).toBeLessThanOrEqual(sa!.x);
+  await sectorActions.nth(0).click();
+  const metrics=page.locator('.market-metrics-dialog');
+  await expect(metrics.getByRole('heading',{name:'시장 지표'})).toBeVisible();
+  expect(await metrics.locator('.market-context').evaluate(e=>getComputedStyle(e).whiteSpace)).toBe('normal');
+  expect(await sectorActions.nth(0).evaluate(e=>getComputedStyle(e).borderTopStyle)).toBe('solid');
+  await expect(metrics.locator('.market-metric-card')).toHaveCount(4);
+  await expect(metrics).not.toContainText('평균 RS');
+  const mc=await metrics.locator('.market-metric-card').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,r:r.right}}));
+  const dialogBox=(await metrics.boundingBox())!;
+  for(const c of mc){expect(c.x).toBeGreaterThanOrEqual(dialogBox.x);expect(c.r).toBeLessThanOrEqual(dialogBox.x+dialogBox.width+1)}
+  if(view.width<700){expect(mc[0].y).toBe(mc[1].y);expect(mc[2].y).toBe(mc[3].y);expect(mc[2].y).toBeGreaterThan(mc[0].y)}
+  else expect(new Set(mc.map(c=>Math.round(c.y))).size).toBeLessThanOrEqual(2);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
+  await page.keyboard.press('Escape');
+  await expect(metrics).toHaveCount(0);
+  await expect(page.locator('.ui-dialog-overlay')).toHaveCount(0);
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
   const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
   const before=await sameWidth();
@@ -33,38 +54,19 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   expect(Math.abs((await etfHead.boundingBox())!.x-(await etfScroll.boundingBox())!.x)).toBeLessThan(6);
   await etfScroll.evaluate(e=>{e.scrollLeft=0});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
-  const panel=page.locator('.dashboard-stock-panel');
-  if(view.width>=1280){
-   await expect(panel).toBeVisible();
-   const sectorBox=await page.locator('.dashboard-sector-panel').boundingBox();const stockBox=await panel.boundingBox();
-   expect(stockBox!.x).toBeGreaterThan(sectorBox!.x+sectorBox!.width);
-   const headFont=await panel.locator('.stock-rows-head').evaluate(e=>getComputedStyle(e).fontSize);
-   expect(headFont).toBe(await page.locator('.sector-metrics-table th').first().evaluate(e=>getComputedStyle(e).fontSize));
-   for(const period of ['5D','20D','50D','120D','200D','52W'])await expect(panel.locator('.stock-rows-head').getByText('등락 '+period,{exact:true})).toBeVisible();
-   const heads=panel.locator('.stock-rows-head > span');
-   expect(await heads.evaluateAll(es=>es.map(e=>({text:e.textContent,width:e.clientWidth,scroll:e.scrollWidth})).filter(e=>e.scroll>e.width+1))).toEqual([]);
-   await expect(panel.locator('.stock-row').first().locator('span').last()).toHaveText('-10.0%');
-   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
-   await expect(page.locator('.drill-sheet')).toHaveCount(0);
-   const scroll=panel.locator('.stock-rows');
-   await scroll.evaluate(e=>{e.scrollTop=100;e.scrollLeft=200});
-   const frozen=await panel.locator('.stock-name-head').boundingBox();const box=await scroll.boundingBox();
-   expect(Math.abs(frozen!.x-box!.x)).toBeLessThan(6);
-   await scroll.evaluate(e=>{e.scrollTop=0;e.scrollLeft=0});
-   const resize=panel.getByRole('button',{name:'종목 열 너비 조절'});
-   const handle=await resize.boundingBox();
-   await page.mouse.move(handle!.x+handle!.width/2,handle!.y+handle!.height/2);
-   await page.mouse.down();await page.mouse.move(handle!.x+handle!.width/2+40,handle!.y+handle!.height/2);await page.mouse.up();
-   expect(await panel.locator('.stock-name-head').evaluate(e=>e.getBoundingClientRect().width)).toBeGreaterThan(102);
-   await panel.locator('.stock-row').first().focus();await page.keyboard.press('Enter');
-  }else{
-   await expect(panel).toBeHidden();
-   const cards=page.locator('.market-metric-card');const b=await cards.evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y}}));
-   expect(b[0].y).toBe(b[2].y);expect(b[3].y).toBe(b[4].y);expect(b[3].y).toBeGreaterThan(b[0].y);
-   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
-   await expect(page.locator('.drill-sheet')).toBeVisible();
-   await page.locator('.drill-sheet .stock-row').first().click();
-  }
+  // Leading stocks are a popup on every screen: no right-hand panel, a sector row opens the drill sheet.
+  await expect(page.locator('.dashboard-stock-panel')).toHaveCount(0);
+  await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
+  const drill=page.locator('.drill-sheet');
+  await expect(drill).toBeVisible();
+  await expect(drill.locator('.drill-tabs button')).toHaveCount(4);
+  expect((await etfPanel.locator('.stock-rows-head > span').allTextContents()).slice(1)).toEqual((await drill.locator('.stock-rows-head > span').allTextContents()).slice(1));
+  for(const period of ['5D','20D','50D','120D','200D','52W'])await expect(drill.locator('.stock-rows-head').getByText('등락 '+period,{exact:true})).toBeVisible();
+  const scroll=drill.locator('.stock-rows');
+  await scroll.evaluate(e=>{e.scrollLeft=200});
+  expect(Math.abs((await drill.locator('.stock-name-head').boundingBox())!.x-(await scroll.boundingBox())!.x)).toBeLessThan(6);
+  await scroll.evaluate(e=>{e.scrollLeft=0});
+  await drill.locator('.stock-row').first().focus();await page.keyboard.press('Enter');
   const rsSection=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rsSection.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.getByRole('button',{name:'종목분석 기록 작성 →'})).toBeVisible();
@@ -96,7 +98,8 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  await page.locator('.dashboard-stock-panel .stock-row').first().click();
+  await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
+  await page.locator('.drill-sheet .stock-row').first().click();
   const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong').first()).toHaveText('—');
   await page.getByRole('button',{name:'RS 새로고침'}).click();
@@ -248,7 +251,9 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
   expect(await align(sector.locator('th'))).toEqual(['left']);
   expect(await align(sector.locator('tbody tr').first().locator('td:not(:first-child)'))).toEqual(['right']);
   expect(await align(sector.locator('tbody tr').first().locator('td:first-child'))).toEqual(['left']);
-  for(const panel of ['.dashboard-stock-panel','.dashboard-etf-panel']){
+  await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
+  for(const panel of ['.drill-sheet','.dashboard-etf-panel']){
+    if(panel==='.dashboard-etf-panel'){await page.keyboard.press('Escape');await expect(page.locator('.drill-sheet')).toHaveCount(0)}
     const rows=page.locator(panel+' .stock-rows');
     expect(await align(rows.locator('.stock-rows-head > span'))).toEqual(['left']);
     const first=rows.locator('.stock-row').first();
@@ -256,8 +261,9 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
     expect(await align(first.locator('.stock-id'))).toEqual(['left']);
     const rank=first.locator('strong.rank').first();
     expect(await rank.evaluate(e=>getComputedStyle(e).justifyContent)).toBe('flex-end');
-    const pill=(await first.locator('.pill').boundingBox())!,price=(await first.locator('.stock-price').boundingBox())!;
-    expect(pill.x-(price.x+price.width)).toBeLessThan(12);
+    const pill=(await first.locator('.pill').boundingBox())!,change=(await first.locator('.live-change').boundingBox())!;
+    expect(pill.x-(change.x+change.width)).toBeLessThan(12);
+    await expect(first.locator('.live-change')).toHaveText('—');
   }
   await page.locator('.sidebar nav').getByRole('button',{name:'Leaderboard'}).click();
   const priceCell=page.locator('.ag-row .ag-cell[col-id="price"]').first();
