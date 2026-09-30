@@ -1031,7 +1031,7 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .dashboard-stock-panel .panel-head>div{min-width:0}
 .dashboard-stock-panel .dashboard-section-action{flex:none;white-space:nowrap}
 .stock-row:focus-visible{outline:2px solid #456a9e;outline-offset:-2px}
-.stock-rows-head,.stock-row{grid-template-columns:var(--stock-name-width,102px) 90px 92px 70px 82px 72px 76px 76px 82px 82px 78px 72px 76px 76px 82px 82px 78px 112px;gap:0;width:max-content;min-width:100%}
+.stock-rows-head,.stock-row{grid-template-columns:var(--stock-name-width,102px) 90px 84px 92px 70px 82px 72px 76px 76px 82px 82px 78px 72px 76px 76px 82px 82px 78px 112px;gap:0;width:max-content;min-width:100%}
 .stock-rows-head>span:not(:first-child){padding:0 4px;white-space:nowrap;overflow:visible;text-align:right}
 .stock-row>span,.stock-row>strong{padding-left:4px;padding-right:4px;text-align:right;justify-self:stretch}
 .stock-row .stock-id{text-align:left;padding-right:8px}
@@ -1150,3 +1150,43 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 @container metrics-dialog (min-width:720px){.market-metrics-dialog .market-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 .market-metrics-dialog .market-context{word-break:keep-all}
 .market-metrics-more{display:block;margin:14px 0 0 auto}
+
+/* 시장 지표 popup: the context line wraps; the trigger reads as a boxed button. */
+.market-metrics-dialog .sector-summary-dialog-head p.market-context{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:keep-all;overflow-wrap:anywhere;line-height:1.5;max-width:100%}
+.market-metrics-dialog .sector-summary-dialog-head>div{min-width:0}
+.dashboard-section-action.market-metrics-trigger{border:1px solid #c9d4e1;border-radius:8px;background:#fff;color:#24476f;padding:5px 10px;font-weight:700;line-height:1.2}
+.dashboard-section-action.market-metrics-trigger:hover{background:#f2f6fb}
+
+/* LIVE-CHANGE-1: 현재가 등락 column. */
+.stock-row .live-change{font-variant-numeric:tabular-nums}
+
+/* LIVE-LEADERS-1: 종가 기준 / 현재가 기준 toggle in 주도 종목. */
+.leader-basis{width:max-content;margin:0 0 12px}
+.leader-basis button{font-size:12.5px;padding:6px 12px}
+.live-leaders-note{margin:0 0 8px;color:#7b8797;font-size:12px;line-height:1.5;word-break:keep-all}
+
+/* 종목 분석: Swing / Position sections. */
+.analysis-tabs{width:max-content;margin:16px 0 4px}
+.analysis-tabs button{min-width:92px;font-size:13px}
+.position-panel{margin-top:14px}
+.position-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #e1e6ec}
+.position-kicker{display:block;color:#8c7243;font-size:11px;margin-bottom:4px}
+.position-head h3{font-size:16px;color:#293b51}
+.position-labels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.position-label{border:1px solid #dfe6ee;border-radius:11px;padding:12px;background:#fbfcfe;min-width:0}
+.position-label span{display:block;color:#6d7a8c;font-size:11.5px;font-weight:700}
+.position-label strong{display:block;margin-top:6px;font-size:18px;color:#24476f}
+.position-label small{display:block;margin-top:4px;color:#8a95a4;font-size:11px;line-height:1.4;word-break:keep-all}
+.position-label.off strong{color:#a3adba}
+.position-note{margin-top:12px;padding:10px 12px;border-radius:9px;background:#fff8e9;border:1px solid #ead9ad;color:#6f572d;font-size:12px;line-height:1.55;word-break:keep-all}
+.position-group{margin-top:16px}
+.position-group h4{margin:0 0 8px;font-size:13px;color:#2b3c52}
+.position-metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.position-metric{border:1px solid #e6ebf1;border-radius:9px;padding:9px 10px;min-width:0}
+.position-metric span{display:block;color:#7b8797;font-size:11px;word-break:keep-all}
+.position-metric strong{display:block;margin-top:4px;font-size:15px;color:#27394f;font-variant-numeric:tabular-nums;text-align:right}
+.position-meta{display:flex;flex-direction:column;gap:5px;color:#697586;font-size:12px;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
+.position-meta b{color:#27394f}
+.position-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px dashed #d5dde7;border-radius:11px;color:#697586;font-size:12.5px;line-height:1.55;word-break:keep-all}
+.position-empty b{color:#2b3c52;font-size:13.5px}
+@media(max-width:650px){.position-labels{grid-template-columns:repeat(2,minmax(0,1fr))}.analysis-tabs{width:100%}.analysis-tabs button{flex:1}}

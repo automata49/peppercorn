@@ -184,5 +184,25 @@ await underPipeline(async () => ok('edge role cannot read stock_analyses', denie
 ok('postgres can step down to position_pipeline (SET granted by the migration)',
   (await db.query(`select pg_has_role('postgres','position_pipeline','member') m`)).rows[0].m === true);
 
+// --- position-read Edge Function: its own SQL in a READ ONLY transaction under the pipeline role
+const readSource = readFileSync('supabase/functions/position-read/index.ts', 'utf8');
+const readSql = name => new RegExp(`export const ${name} = \`([\\s\\S]*?)\`;`).exec(readSource)[1];
+async function readOnlyPipeline(fn) {
+  await exec('begin read only');
+  try { await exec('set local role position_pipeline'); return await fn(); }
+  finally { await exec('rollback'); }
+}
+await readOnlyPipeline(async () => {
+  const i = await tryQ(readSql('INSTRUMENT_READ'), ['US', 'NVDA']);
+  ok('read path resolves the instrument under the pipeline role', i.ok && i.rows.length === 1 && i.rows[0].id === inst, i.msg ?? JSON.stringify(i.rows));
+  const s = await tryQ(readSql('SNAPSHOT_READ'), [inst]);
+  ok('read path returns one latest snapshot', s.ok && s.rows.length === 1 && 'metrics' in s.rows[0] && 'checks' in s.rows[0], s.msg);
+  const f = await tryQ(readSql('FACTS_READ'), [inst]);
+  ok('read path summarises fact coverage', f.ok && f.rows.length === 1 && f.rows[0].reported >= 1 && Array.isArray(f.rows[0].sources), f.msg ?? JSON.stringify(f.rows));
+  const w = await tryQ('insert into public.position_snapshot (instrument_id, as_of, rules_version, fcf_method, roic_method, status, input_hash, pipeline_version) values ($1, current_date, $2, $2, $2, $3, $4, $2)', [inst, 'x', 'unavailable', h('ro')]);
+  ok('read path cannot write (read-only transaction)', !w.ok && /read-only/.test(w.msg), w.msg);
+});
+await readOnlyPipeline(async () => ok('read path cannot read stock_analyses', denied(await tryQ('select 1 from public.stock_analyses'))));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
