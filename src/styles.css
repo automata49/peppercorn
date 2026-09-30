@@ -357,7 +357,7 @@ body{font-size:14px;line-height:1.45}
 /* Lower dashboard panels */
 .dashboard-lower-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:16px}
 .dashboard-lower-grid>.panel{margin-bottom:18px}
-.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
+.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-etf-industry-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
 .dashboard-sector-table-wrap{max-height:560px}
 .dashboard-sector-table{width:100%;min-width:610px;table-layout:fixed}
 .dashboard-sector-table th,.dashboard-sector-table td{padding:9px 8px}
@@ -449,9 +449,9 @@ body{font-size:14px;line-height:1.45}
   .dashboard-sector-filter{display:none}
   .dashboard-lower-grid{display:block}
   .dashboard-lower-grid>.panel{margin-bottom:12px;padding:12px;border-radius:15px}
-  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
-  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
-  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
+  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-etf-industry-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
+  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-etf-industry-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
+  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-etf-industry-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
   .sector-actions{justify-content:flex-end}
   .mini-segment button{padding:5px 7px;font-size:9.5px}
   .dashboard-sector-table-wrap{max-height:none;overflow:visible}
@@ -1063,3 +1063,25 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .stock-row .rank{justify-content:flex-end;padding-right:8px}
 .ag-header-cell-label{justify-content:flex-start!important}
 .ag-cell.cell-num{text-align:right;justify-content:flex-end}
+
+/* ETF 주도 산업 chart (ETF-INDUSTRY-1): single-hue horizontal bars, ≤16px thick, 4px rounded data end, value at the tip. */
+.dashboard-etf-industry-panel{margin-bottom:18px}
+.etf-industry-chart{display:grid;gap:2px}
+.etf-industry-scale,.etf-industry-row{display:grid;grid-template-columns:minmax(120px,32%) minmax(0,1fr) 40px;align-items:center;gap:12px}
+.etf-industry-scale{height:18px;color:var(--muted);font-size:11px}
+.etf-industry-ticks{position:relative;height:100%}
+.etf-industry-ticks i{position:absolute;top:0;transform:translateX(-50%);font-style:normal;font-variant-numeric:tabular-nums}
+.etf-industry-row{width:100%;min-height:48px;padding:6px 8px;border:0;border-radius:10px;background:transparent;text-align:left;cursor:pointer;color:var(--ink)}
+.etf-industry-row:hover,.etf-industry-row:focus-visible{background:#f3f6fa;outline:none}
+.etf-industry-row:focus-visible{box-shadow:0 0 0 2px #456a9e}
+.etf-industry-label{min-width:0;display:grid}
+.etf-industry-label b,.etf-industry-label small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etf-industry-label b{font-size:var(--pepper-table-name-size);line-height:1.25}
+.etf-industry-label small{font-size:var(--pepper-table-meta-size);color:#8893a2;margin-top:2px}
+.etf-industry-track{position:relative;height:16px;background:linear-gradient(to right,transparent 0 calc(50% - 1px),#e4e9ef calc(50% - 1px) 50%,transparent 50% calc(70% - 1px),#e4e9ef calc(70% - 1px) 70%,transparent 70% calc(90% - 1px),#e4e9ef calc(90% - 1px) 90%,transparent 90% 100%)}
+.etf-industry-fill{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--blue)}
+.etf-industry-value{text-align:right;font-size:var(--pepper-table-cell-size);font-variant-numeric:tabular-nums;color:var(--ink)}
+@media(max-width:650px){
+  .etf-industry-scale,.etf-industry-row{grid-template-columns:minmax(0,42%) minmax(0,1fr) 30px;gap:8px}
+  .etf-industry-row{padding:6px 4px}
+}

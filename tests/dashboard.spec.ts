@@ -132,6 +132,40 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('CHECK');
 });
 
+test('ETF 주도 산업 chart ranks industries by median ETF RS rank and opens their ETFs',async({browser})=>{
+  test.setTimeout(120_000);
+  const base={...rows[0],asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립',rs_6m:null,rs_12m:null};
+  const mk=(id:string,market:string,industry:string,sector:string,rs:number,tt=false)=>({...base,id,ticker:id,name:id+' ETF',market,industry,sector,rs_1m:rs,rs_3m:rs,leader_tt:tt});
+  const data=[...rows,
+    mk('SMH','US','Semiconductors','Information Technology',.30,true),mk('SOXX','US','Semiconductors','Information Technology',.20),
+    mk('ITA','US','Aerospace & Defense','Industrials',.10),mk('XBI','US','Biotechnology','Health Care',-.10),
+    mk('SPY','US','S&P 500','Broad Market',.0),mk('KSEMI','KR','Semiconductors','Information Technology',.05)];
+  for(const view of [{width:390,height:844,touch:true},{width:834,height:1194,touch:true},{width:1194,height:834,touch:true},{width:1366,height:1024,touch:true},{width:1440,height:900,touch:false}]){
+    const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
+    const page=await context.newPage();
+    await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:data}}));
+    await page.goto('http://127.0.0.1:4173/peppercorn/');
+    await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+    const chart=page.locator('.dashboard-etf-industry-panel');
+    const bars=chart.locator('.etf-industry-row');
+    // US ranks among 5 US ETFs: SMH 99, SOXX 79.4, ITA 60, SPY 40, XBI 21 → Semis median 89, A&D 60, Bio 21; SPY excluded (Broad Market).
+    await expect(bars.locator('.etf-industry-label b')).toHaveText(['KR · Semiconductors','US · Semiconductors','US · Aerospace & Defense','US · Biotechnology']);
+    await expect(bars.locator('.etf-industry-value')).toHaveText(['99','89','60','21']);
+    await expect(bars.nth(1).locator('small')).toHaveText('ETF 2 · TT 통과 1');
+    const track=(await bars.nth(1).locator('.etf-industry-track').boundingBox())!,fill=(await bars.nth(1).locator('.etf-industry-fill').boundingBox())!;
+    expect(Math.abs(fill.width/track.width-.89)).toBeLessThan(.01);
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
+    await bars.nth(1).click();
+    const dialog=page.locator('.etf-summary-dialog');
+    await expect(dialog.getByRole('heading')).toHaveText('ETF 주도 산업 · Semiconductors');
+    await expect(dialog.locator('.stock-row .stock-id b')).toHaveText(['SMH ETF','SOXX ETF']);
+    await page.getByRole('button',{name:'닫기',exact:true}).click();
+    await page.locator('.toolbar .segment').getByRole('button',{name:'US'}).click();
+    await expect(bars.locator('.etf-industry-label b').first()).toHaveText('Semiconductors');
+    await context.close();
+  }
+});
+
 test('failed live load can be retried from the demo state',async({page})=>{
   let calls=0;
   await page.route('**/functions/v1/leaderboard?*',route=>{

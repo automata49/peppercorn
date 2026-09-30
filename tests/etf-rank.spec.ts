@@ -46,3 +46,22 @@ test('KR ETFs show the official Korean name; other rows keep theirs',async()=>{
   const out=applyKrEtfNames(rows,{'069500':'KODEX 200','0080G0':'KODEX 방산TOP10'})
   expect(out.map(r=>r.name)).toEqual(['KODEX 200','KODEX 방산TOP10','원본 이름','US ETF','주식'])
 })
+
+test('ETF-INDUSTRY-1 groups ETFs by market and industry with the median ETF rank',async()=>{
+  const {buildEtfIndustries}=await import('../src/lib/etfIndustries')
+  const e=(id:string,market:'US'|'KR',industry:string,sector:string,rank:number|null,tt=false)=>
+    ({...etf(id,market,{}),industry,sector,etf_rs_rank:rank,leader_tt:tt,name:id}) as LeaderRow
+  const groups=buildEtfIndustries([
+    e('SMH','US','Semiconductors','Information Technology',90,true),e('SOXX','US','Semiconductors','Information Technology',70),
+    e('XSD','US','Semiconductors','Information Technology',null),
+    e('KSEMI','KR','Semiconductors','Information Technology',40),
+    e('ITA','US','Aerospace & Defense','Industrials',95,true),
+    e('SPY','US','S&P 500','Broad Market',99),e('MIX','KR','Multi','Multi-Sector',99),
+    e('NORANK','US','Biotechnology','Health Care',null),
+    {...etf('AAPL','US',{}),asset_class:'Equity',industry:'Semiconductors',sector:'Information Technology',etf_rs_rank:99} as LeaderRow
+  ]);
+  expect(groups.map(g=>g.key)).toEqual(['US|Aerospace & Defense','US|Semiconductors','KR|Semiconductors']);
+  const us=groups[1];
+  expect([us.n,us.ranked,us.medRank,us.ttPass,us.leader]).toEqual([3,2,80,1,'SMH']);
+  expect(groups[2].medRank).toBe(40);
+});
