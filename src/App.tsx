@@ -35,8 +35,9 @@ const sectorName=(market:Market,sector:string)=>market==='KR'?(krSectorNames[sec
 const sourceName=(source:string)=>source.includes('TradingView')?(source.includes('KRX')?'TradingView·KRX':'TradingView'):source.includes('Nasdaq')?'Nasdaq':source.includes('S&P 500')?'S&P 500':source.replace(/^AUTO:/,'').slice(0,28)
 const CANDIDATE_RS_MIN=80
 const CANDIDATE_HIGH_DISTANCE_MIN=-.25
-const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wpP9pB5vrni5SrjAMrbbiE/edit'
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
+// Finviz covers US listings only; share classes use a dash (BRK.B → BRK-B).
+const finvizUrl=(r:LeaderRow)=>'https://finviz.com/stock?t='+encodeURIComponent(String(r.ticker).toUpperCase().replace(/\./g,'-'))+'&p=d'
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
 const med=(values:unknown[])=>{
   const a=values.filter(v=>v!=null&&v!=='').map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
@@ -402,7 +403,7 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
-      <a target="_blank" rel="noreferrer" href={SHEET_URL}>Google Sheet ↗</a>
+      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={finvizUrl(row)}>Finviz ↗</a>}
     </div>
     <section className="snapshot-section leadership-section drill-animate">
       <div className="snapshot-section-head"><div><span>01</span><h3>리더십 · 분류</h3></div><ValuePill tone={leadTone(leadership(row))}>{leadership(row)}</ValuePill></div>

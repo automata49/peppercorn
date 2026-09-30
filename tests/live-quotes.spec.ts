@@ -35,3 +35,17 @@ test('current price refreshes from live quotes without touching daily metrics',a
  await nvdaRow.click()
  await expect(page.locator('.live-badge').first()).toContainText('실시간')
 })
+
+test('stock detail links to Finviz for US tickers and no longer to the Google Sheet',async({page})=>{
+ await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[{...rows[0],ticker:'MU',name:'마이크론'},rows[1]]}}))
+ await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{},failed:[]}}))
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+ await page.locator('.stock-row').filter({hasText:'마이크론'}).first().click()
+ const links=page.locator('.external-links').first()
+ await expect(links.getByRole('link',{name:'Finviz ↗'})).toHaveAttribute('href','https://finviz.com/stock?t=MU&p=d')
+ await expect(page.getByRole('link',{name:/Google Sheet/})).toHaveCount(0)
+ await page.keyboard.press('Escape')
+ await page.locator('.stock-row').filter({hasText:'에코프로비엠'}).first().click()
+ await expect(page.locator('.external-links').first().getByRole('link',{name:'Finviz ↗'})).toHaveCount(0)
+})
