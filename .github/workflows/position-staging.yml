@@ -63,6 +63,16 @@ jobs:
           SQL
           sleep 5
 
+      - name: postgres steps down to position_pipeline (position-ingest Edge Function path)
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$TEST_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "begin; set local role position_pipeline; select 'pipeline reads facts: ' || count(*) from public.fundamentals_q; rollback;"
+          if psql "$TEST_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "begin; set local role position_pipeline; select 1 from public.price_daily limit 1; rollback;" 2>err.txt; then
+            echo "::error::position_pipeline could read price_daily"; exit 1
+          fi
+          grep -q "permission denied" err.txt && echo "PASS stepped-down role cannot read price_daily"
+
       - name: Role, grant and token checks through the Data API
         run: python supabase/tests/position_growth_staging.py roles
 

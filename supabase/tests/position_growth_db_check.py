@@ -52,6 +52,10 @@ def verify(before_path: str) -> int:
     check("position_pipeline exists without login or RLS bypass", role == "false,false", role or "missing")
     member = sql("select pg_has_role('authenticator', 'position_pipeline', 'member')")
     check("authenticator can switch to position_pipeline", member == "t", member)
+    # position-ingest runs SET LOCAL ROLE position_pipeline as postgres; PG16+ needs the SET option explicitly.
+    option = "SET" if int(sql("show server_version_num")) >= 160000 else "MEMBER"
+    step_down = sql(f"select pg_has_role('postgres', 'position_pipeline', '{option}')")
+    check("postgres can step down to position_pipeline", step_down == "t", step_down)
     for table in POSITION_TABLES:
         rls = sql(f"select relrowsecurity from pg_class where oid = to_regclass('public.{table}')")
         check(f"{table} exists with RLS", rls == "t", rls or "missing")

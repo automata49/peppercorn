@@ -17,6 +17,17 @@ begin
   if exists (select 1 from pg_roles where rolname = 'authenticator') then
     grant position_pipeline to authenticator;
   end if;
+  -- The position-ingest Edge Function connects as postgres and runs each write under SET LOCAL ROLE
+  -- position_pipeline, so the database, not the function code, limits it to the two Position tables.
+  -- Membership only lets postgres step down to the narrower role; it adds no privilege.
+  -- PG16+ gives a role's creator an ADMIN-only membership, which cannot SET ROLE, so SET is granted explicitly.
+  if exists (select 1 from pg_roles where rolname = 'postgres') then
+    if current_setting('server_version_num')::int >= 160000 then
+      execute 'grant position_pipeline to postgres with set true, inherit false';
+    else
+      execute 'grant position_pipeline to postgres';
+    end if;
+  end if;
 end $$;
 
 -- One row per instrument, period, field and distinct source input. Rows are never updated: an amended

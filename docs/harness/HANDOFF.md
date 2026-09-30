@@ -122,3 +122,8 @@ PR #42 merged (`c702deb`). By user decision the rules now improve on post-2022 o
 Branch test run wrote `position-ledger-test` (seed `wf-d2f5ddb525` plus two proposals; 48 files). The first forward outcome matures on 2026-10-28; the earliest review is after 2027-07-29.
 Open: production pipeline credential (recommended: an Edge Function behind the existing GitHub OIDC check, writing only the two Position tables) and whether to start label-free fact ingestion.
 Validation: `python -m pytest -q analysis/fundamentals` (157 passed), `npm run harness:check`.
+
+## Position ingestion via Edge Function — 2026-09-30
+PR #43 merged (`c16b107`). Branch `claude/position-ingest-edge`: `position-ingest` Edge Function (GitHub OIDC from `position-ingest.yml` on main only; writes under `SET LOCAL ROLE position_pipeline`), `persist.py --via edge`, `position-ingest.yml` (weekly Monday 06:00 UTC to production; manual target test/prod; ingests twice and fails if the second round inserts), `position-function-deploy.yml` (manual; needs `SUPABASE_ACCESS_TOKEN`; production needs confirm `deploy`), and the migration grant letting `postgres` step down to the pipeline role. Staging run 36644646297 on the test project passed with the new grant.
+Order after merge: add `SUPABASE_ACCESS_TOKEN` → deploy to test → `Position ingest` target test → re-run `Position migration (production)` (adds the grant; checks now include the step-down) → deploy to prod with confirm `deploy` → first production ingest (manual or the Monday schedule). Labels stay off; snapshots are `unavailable` or `check_failed`.
+Validation: `python -m pytest -q analysis/fundamentals` (158 passed), `npm run test:position-db` (91 passed), `npm run harness:check`.
