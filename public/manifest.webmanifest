@@ -1,6 +1,6 @@
 {
-  "name": "Peppercorn Capital",
-  "short_name": "Peppercorn",
+  "name": "Folio XX",
+  "short_name": "Folio XX",
   "id": "/peppercorn/",
   "description": "Peppercorn Capital은 한국·미국 시장의 강한 섹터와 주도 종목을 찾고, 상대강도·추세·위험을 한눈에 살펴보는 투자 분석 웹앱입니다.",
   "start_url": "./",
@@ -10,8 +10,8 @@
   "theme_color": "#f4f6fa",
   "lang": "ko",
   "icons": [
-    {"src":"./folio-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"./folio-icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
-    {"src":"./folio-icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+    {"src":"./folio-app-icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./folio-app-icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"./folio-app-icon-512-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
   ]
 }
