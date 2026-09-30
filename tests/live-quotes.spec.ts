@@ -41,6 +41,26 @@ test('current price refreshes from live quotes without touching daily metrics',a
  await expect(page.locator('.live-badge').first()).toContainText('실시간')
 })
 
+test('stock detail links to Finviz for US tickers and no longer to the Google Sheet',async({page})=>{
+ await page.setViewportSize({width:1440,height:900})
+ await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[{...rows[0],ticker:'MU',name:'마이크론'},rows[1],{...rows[0],id:'3',ticker:'CRAK',name:'정유 ETF',asset_class:'ETF',leadership_class:'해당 없음'}]}}))
+ await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{},failed:[]}}))
+ await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+ await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+ const list=page.locator('.stock-list')
+ await list.getByRole('tab',{name:'전체'}).click()
+ const finviz=page.locator('.external-links').first().getByRole('link',{name:'Finviz ↗'})
+ await list.locator('> button').filter({hasText:'MU'}).click()
+ await expect(finviz).toHaveAttribute('href','https://finviz.com/stock?t=MU&p=d')
+ await expect(page.getByRole('link',{name:/Google Sheet/})).toHaveCount(0)
+ await list.locator('> button').filter({hasText:'CRAK'}).click()
+ await expect(finviz).toHaveAttribute('href','https://finviz.com/stock?t=CRAK&ty=c&ta=1&p=d')
+ await list.locator('> button').filter({hasText:'247540'}).click()
+ await expect(finviz).toHaveCount(0)
+})
+
 test('주도 종목 현재가 기준 orders leaders by live change',async({page})=>{
  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{as_of:new Date().toISOString(),failed:[],quotes:{

@@ -39,8 +39,9 @@ const CANDIDATE_RS_MIN=80
 // The dashboard's leading groups; the stock analysis list starts from these.
 const LEADING_CLASSES=new Set(['핵심 주도','주도 후보','강세 전환'])
 const CANDIDATE_HIGH_DISTANCE_MIN=-.25
-const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wpP9pB5vrni5SrjAMrbbiE/edit'
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
+// Finviz covers US listings only; share classes use a dash (BRK.B → BRK-B). ETFs open the chart view.
+const finvizUrl=(r:LeaderRow)=>'https://finviz.com/stock?t='+encodeURIComponent(String(r.ticker).toUpperCase().replace(/\./g,'-'))+(r.asset_class==='ETF'?'&ty=c&ta=1&p=d':'&p=d')
 const saveTickerUrl=(r:LeaderRow)=>'https://www.saveticker.com/company/'+encodeURIComponent(r.ticker)+'?entry=search_result'
 const med=(values:unknown[])=>{
   const a=values.filter(v=>v!=null&&v!=='').map(Number).filter(Number.isFinite).sort((x,y)=>x-y)
@@ -257,8 +258,10 @@ function MarketMetricCard({tone,icon,label,value,sub,progress}:{tone:'green'|'bl
   const safeProgress=progress==null?null:Math.max(0,Math.min(100,progress))
   return <div className={'market-metric-card '+tone}>
     <div className="market-metric-head"><span className="market-metric-icon" aria-hidden="true">{icon}</span><b>{label}</b></div>
-    <div className="market-metric-reading"><strong>{value}</strong><small>{sub}</small></div>
-    {safeProgress!=null&&<div className="market-metric-track" aria-hidden="true"><span style={{width:safeProgress+'%'}}/></div>}
+    {/* Value and description sit on their own subgrid rows so every card in a row lines up. */}
+    <div className="market-metric-reading market-metric-value"><strong>{value}</strong></div>
+    <div className="market-metric-reading market-metric-sub"><small>{sub}</small></div>
+    <div className="market-metric-track" aria-hidden="true">{safeProgress!=null&&<span style={{width:safeProgress+'%'}}/>}</div>
   </div>
 }
 
@@ -417,7 +420,7 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
-      <a target="_blank" rel="noreferrer" href={SHEET_URL}>Google Sheet ↗</a>
+      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={finvizUrl(row)}>Finviz ↗</a>}
     </div>
     <section className="snapshot-section leadership-section drill-animate">
       <div className="snapshot-section-head"><div><span>01</span><h3>리더십 · 분류</h3></div><ValuePill tone={leadTone(leadership(row))}>{leadership(row)}</ValuePill></div>
@@ -917,7 +920,7 @@ export default function App(){
         <div className="market-metric-grid">
           <MarketMetricCard tone="green" icon="↗" label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+ma50Rows.length+' 종목'} progress={breadth*100}/>
           <MarketMetricCard tone="blue" icon="⌁" label="MA200 위 비율" value={(ma200Breadth*100).toFixed(0)+'%'} sub={'/ '+ma200Rows.length+' 종목'} progress={ma200Breadth*100}/>
-          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={highNearCount+' 종목'} sub={'고점 -10% 이내 · '+(highNearShare*100).toFixed(0)+'%'} progress={highNearShare*100}/>
+          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'} sub={highNearCount+' / '+high52Rows.length+' 종목 · 고점 -10% 이내'} progress={highNearShare*100}/>
           <MarketMetricCard tone="split" icon="↕" label="상승 / 하락 비율" value={(advanceDeclineRatio||0).toFixed(1)+' : 1'} sub={'1W 기준 · 상승 '+advanceCount+' · 하락 '+declineCount} progress={advanceCount+declineCount?advanceCount/(advanceCount+declineCount)*100:0}/>
         </div>
       </section>
