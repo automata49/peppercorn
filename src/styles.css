@@ -1051,3 +1051,15 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 
 /* ETF summary: shared StockRows; its ETF name column uses the same width state as the sector name column. */
 .dashboard-etf-panel{margin-bottom:18px}
+
+/* Canonical table alignment (CONTRACT UI rule): every column header is left-aligned; numeric cells are right-aligned;
+   names, stages and other text stay left. Applies to sector tables, StockRows and AG Grid tables (cell-num). */
+.sector-metrics-table th{text-align:left!important}
+.sector-metrics-table td:not(:first-child){text-align:right!important}
+.stock-rows-head>span{text-align:left!important}
+.stock-row>span,.stock-row>strong{text-align:right!important}
+.stock-row .stock-id{text-align:left!important}
+.stock-row .pill{justify-self:start}
+.stock-row .rank{justify-content:flex-end;padding-right:8px}
+.ag-header-cell-label{justify-content:flex-start!important}
+.ag-cell.cell-num{text-align:right;justify-content:flex-end}
