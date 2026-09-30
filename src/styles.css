@@ -1127,6 +1127,32 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .live-badge::before{content:'';display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#2f9e5f;vertical-align:1px}
 .live-badge.off{color:#8a94a1}
 .live-badge.off::before{background:#b9c2cd}
+
+/* Stock analysis: Swing / Position / 내 분석 parts, and the Position panel */
+.analysis-part{font-size:13px;color:#2b3c52;margin:22px 0 10px;padding-top:14px;border-top:2px solid #e3e9f0;word-break:keep-all}
+.analysis-card>.analysis-part:first-of-type{margin-top:16px}
+.analysis-scope{margin:0 0 8px}.analysis-scope button{flex:1}
+.stock-list .position-dot{display:inline-flex;margin-left:6px;padding:0 5px;border-radius:5px;background:#eaf0f7;color:#24476f;font-style:normal;font-size:10px;font-weight:700;vertical-align:middle}
+.analysis-mine{font-size:12px;color:#697586;line-height:1.6;word-break:keep-all}
+.position-panel{border:1px solid #e1e7ee;border-radius:12px;padding:14px;background:#fbfcfe}
+.position-head{flex-wrap:wrap;gap:6px}.position-head small{color:#7b8797;font-size:11px;margin-right:8px;word-break:keep-all}
+.position-status{font-style:normal;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--gray-bg);color:#687587;white-space:nowrap}
+.position-status.ok{background:var(--green-bg);color:var(--green)}.position-status.check_failed{background:var(--red-bg);color:var(--red)}.position-status.insufficient_data{background:var(--amber-bg);color:var(--amber)}
+.position-empty{font-size:12px;color:#7b8797;padding:10px 0;word-break:keep-all}
+.position-alert{margin:10px 0;padding:10px 12px;border:1px solid #f0c9c4;background:#fff5f4;border-radius:9px;font-size:12px;line-height:1.5;word-break:keep-all}.position-alert b{color:var(--red);margin-right:8px}
+.position-labels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.position-label-card{border:1px solid #e3e8ee;background:#fff;border-radius:10px;padding:11px;min-width:0}
+.position-label-card>span{display:block;font-size:11px;color:#7b8797}.position-label-card strong{display:block;font-size:16px;color:#26364b;margin-top:4px}
+.position-label-card p{font-size:11.5px;color:#5c6a7d;line-height:1.5;margin-top:6px;word-break:keep-all}
+.position-label-card small{display:block;font-size:10.5px;color:#8a754e;margin-top:8px;line-height:1.45;word-break:keep-all}
+.position-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin-top:12px;background:#fff;border:1px solid #e6ebf0;border-radius:10px;overflow:hidden}
+.position-facts>div{background:#fff;padding:9px 10px;min-width:0;box-shadow:0 0 0 1px #e6ebf0}.position-facts span{display:block;font-size:10.5px;color:#7b8797;word-break:keep-all}.position-facts strong{display:block;font-size:14px;color:#2b3c52;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.position-note{font-size:11px;color:#7b8797;margin-top:10px;line-height:1.5;word-break:keep-all}
+.position-evidence{margin-top:10px;font-size:12px;color:#5c6a7d}.position-evidence summary{cursor:pointer;color:#24476f;font-weight:700}
+.position-evidence p{margin:8px 0;line-height:1.55;word-break:keep-all}.position-evidence ul{margin:0;padding-left:18px}
+.position-evidence li{margin:6px 0;line-height:1.5;word-break:keep-all}.position-evidence li em{font-style:normal;color:#8a754e;margin:0 6px}.position-evidence li span,.position-evidence li small{display:block;color:#7b8797}
+@media(max-width:1180px){.position-labels{grid-template-columns:repeat(2,minmax(0,1fr))}.position-facts{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.position-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.position-labels{grid-template-columns:1fr 1fr}.position-label-card strong{font-size:14px}}
 /* Phone and iPad (below 1280px, not iPad Pro or desktop): the menu button sits at the right of the page header and the drawer slides in from the right. */
 @media(max-width:1279px){
   .topbar .topbar-menu{order:3;margin-left:auto}
@@ -1164,29 +1190,3 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .leader-basis{width:max-content;margin:0 0 12px}
 .leader-basis button{font-size:12.5px;padding:6px 12px}
 .live-leaders-note{margin:0 0 8px;color:#7b8797;font-size:12px;line-height:1.5;word-break:keep-all}
-
-/* 종목 분석: Swing / Position sections. */
-.analysis-tabs{width:max-content;margin:16px 0 4px}
-.analysis-tabs button{min-width:92px;font-size:13px}
-.position-panel{margin-top:14px}
-.position-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #e1e6ec}
-.position-kicker{display:block;color:#8c7243;font-size:11px;margin-bottom:4px}
-.position-head h3{font-size:16px;color:#293b51}
-.position-labels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
-.position-label{border:1px solid #dfe6ee;border-radius:11px;padding:12px;background:#fbfcfe;min-width:0}
-.position-label span{display:block;color:#6d7a8c;font-size:11.5px;font-weight:700}
-.position-label strong{display:block;margin-top:6px;font-size:18px;color:#24476f}
-.position-label small{display:block;margin-top:4px;color:#8a95a4;font-size:11px;line-height:1.4;word-break:keep-all}
-.position-label.off strong{color:#a3adba}
-.position-note{margin-top:12px;padding:10px 12px;border-radius:9px;background:#fff8e9;border:1px solid #ead9ad;color:#6f572d;font-size:12px;line-height:1.55;word-break:keep-all}
-.position-group{margin-top:16px}
-.position-group h4{margin:0 0 8px;font-size:13px;color:#2b3c52}
-.position-metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
-.position-metric{border:1px solid #e6ebf1;border-radius:9px;padding:9px 10px;min-width:0}
-.position-metric span{display:block;color:#7b8797;font-size:11px;word-break:keep-all}
-.position-metric strong{display:block;margin-top:4px;font-size:15px;color:#27394f;font-variant-numeric:tabular-nums;text-align:right}
-.position-meta{display:flex;flex-direction:column;gap:5px;color:#697586;font-size:12px;line-height:1.5;word-break:keep-all;overflow-wrap:anywhere}
-.position-meta b{color:#27394f}
-.position-empty{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:1px dashed #d5dde7;border-radius:11px;color:#697586;font-size:12.5px;line-height:1.55;word-break:keep-all}
-.position-empty b{color:#2b3c52;font-size:13.5px}
-@media(max-width:650px){.position-labels{grid-template-columns:repeat(2,minmax(0,1fr))}.analysis-tabs{width:100%}.analysis-tabs button{flex:1}}

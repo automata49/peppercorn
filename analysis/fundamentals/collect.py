@@ -149,7 +149,9 @@ def main():
     ap.add_argument("--out", default="out")
     ap.add_argument("--only", choices=["US", "KR"])
     ap.add_argument("--as-of", help="Historical filing cutoff YYYY-MM-DD (US only)")
+    ap.add_argument("--targets", help="targets.json from targets.py; default is the two reference companies")
     a = ap.parse_args()
+    targets = json.loads(Path(a.targets).read_text(encoding="utf-8"))["targets"] if a.targets else TARGETS
     if a.as_of:
         sec.validate_as_of(a.as_of)
         if a.only != "US":
@@ -157,7 +159,7 @@ def main():
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     results = []
-    for t in TARGETS:
+    for t in targets:
         if a.only and t["market"] != a.only:
             continue
         try:

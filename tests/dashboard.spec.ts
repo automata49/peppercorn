@@ -5,6 +5,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  test(view.name+' layout and stock parity',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
   const page=await context.newPage();
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
@@ -90,6 +91,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
 
 test('RS bands refresh in an already open stock detail',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     route.fulfill({json:{rows:rows.map(r=>({...r,rs_5d:calls===1?null:'0.11'}))}});
@@ -108,6 +110,7 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
 
 test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide',async({page})=>{
   const etf={...rows[0],id:'etf-spy',ticker:'SPY',name:'SPY ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,ibd_rs_as_of:null,leader_tt:false,leadership_class:'중립'};
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   const qqq={...etf,id:'etf-qqq',ticker:'QQQ',name:'QQQ ETF',rs_1m:.2,rs_3m:.2,ibd_rs_estimate:92,ibd_rs_as_of:'2026-09-28',leader_tt:true,leadership_class:'주도 후보',stage:'▲ 돌파 매수권',verdict:'★ 우선 분석',action_guide:'52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인'};
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
@@ -126,6 +129,8 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
+  // The analysis list starts with dashboard leaders; SPY is neutral, so switch to the full list.
+  await page.locator('.stock-list').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .stock-title')).toContainText('SPY ETF');
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
@@ -196,6 +201,7 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
 
 test('failed live load can be retried from the demo state',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     calls===1?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
@@ -210,6 +216,7 @@ test('failed live load can be retried from the demo state',async({page})=>{
 
 test('a stalled live response releases the refresh controls',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     if(calls>1)void route.fulfill({json:{rows}});
