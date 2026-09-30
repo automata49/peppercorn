@@ -3,7 +3,7 @@ import type { LeaderRow } from '../types'
 // ETF-RS-RANK-1: ETFs are ranked only against ETFs of the same market; they never enter the equity rs_rank.
 // Score and scale mirror the equity rank in recalculate_market_leadership(): weighted RS 1M/3M/6M/12M
 // (.30/.30/.20/.20, re-weighted over available periods), then round(1+98*cume_dist) per market.
-// Inputs are ETF-RS-1 benchmark-relative returns (US SPY, KR 069500); an ETF without any of them stays unranked.
+// Inputs are ETF-RS-1 benchmark-relative returns (US SPY, KR 226490 KODEX 코스피); an ETF without any of them stays unranked.
 export const ETF_RS_RANK_VERSION='ETF-RS-RANK-1'
 
 const weights=[['rs_1m',.30],['rs_3m',.30],['rs_6m',.20],['rs_12m',.20]] as const

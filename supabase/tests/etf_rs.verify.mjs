@@ -111,4 +111,36 @@ let deniedAgain=false;
 try { await q('select public.recalculate_etf_relative_strength()'); } catch(e) { deniedAgain=/permission denied/.test(String(e.message)); }
 await db.exec('reset role');
 check('anon still cannot recalculate after the traded value migration',deniedAgain);
+
+// KR-BENCH-2: KODEX 코스피 (226490) replaces 069500 as the KR RS benchmark for equities and ETFs.
+const benchA = readdirSync('supabase/migrations').find(name=>name.endsWith('_kr_benchmark_instrument.sql'));
+const benchB = readdirSync('supabase/migrations').find(name=>name.endsWith('_kr_benchmark_kospi.sql'));
+if (!benchA || !benchB) throw new Error('missing KR benchmark migrations');
+await db.exec(readFileSync(`supabase/migrations/${benchA}`,'utf8'));
+await db.exec(readFileSync(`supabase/migrations/${benchA}`,'utf8'));
+check('KODEX 코스피 instrument added once and active', (await q(`select count(*) n from public.instruments where market='KR' and ticker='226490' and active`)).rows[0].n===1);
+let refused=false;
+try { await db.exec(readFileSync(`supabase/migrations/${benchB}`,'utf8')); } catch(e) { refused=/226490 has no metrics/.test(String(e.message)); }
+check('benchmark switch refuses before 226490 has metrics on the KR date', refused);
+check('refused switch leaves the KR benchmark on 069500', (await q(`select prosrc like '%''069500''%' ok from pg_proc where proname='recalculate_etf_relative_strength'`)).rows[0].ok===true);
+const kospi=(await q(`select id from public.instruments where ticker='226490'`)).rows[0].id;
+await q(`insert into public.market_metrics(instrument_id,as_of,return_1w,return_1m,return_3m,return_6m,return_12m,return_5d,return_20d,return_50d,return_120d,return_200d)
+  values($1,'2026-09-29',.01,.02,.1,.2,.5,.01,.02,.03,.1,.6)`,[kospi]);
+await q(`insert into public.instruments(id,market,ticker,name,asset_class) values('77777777-7777-7777-7777-777777777777','KR','005930','삼성전자','Equity')`);
+await q(`insert into public.market_metrics(instrument_id,as_of,return_1w,return_1m,return_3m,return_6m,return_12m,return_5d,return_20d,return_50d,return_120d,return_200d)
+  values('77777777-7777-7777-7777-777777777777','2026-09-29',.05,.06,.3,.4,.9,.05,.06,.07,.2,.9)`);
+const usBefore=(await q(`select rs_5d,rs_1m,rs_rank,stage,verdict from public.market_metrics where instrument_id in ($1,$2) order by instrument_id`,[ids.AAPL,ids.QQQ])).rows;
+await db.exec(readFileSync(`supabase/migrations/${benchB}`,'utf8'));
+const krm=async id=>(await q('select rs_5d,rs_1m,rs_3m,rs_12m,rs_200d,rs_rank from public.market_metrics where instrument_id=$1',[id])).rows[0];
+const krEtfNew=await krm(ids.KRETF), krBase=await krm(ids.KR), sam=await krm('77777777-7777-7777-7777-777777777777');
+check('function md5 guards matched the repo definitions (migration applied)', (await q(`select prosrc like '%''226490''%' ok from pg_proc where proname='recalculate_market_leadership'`)).rows[0].ok===true);
+check('KR ETF RS now measured against KODEX 코스피', Math.abs(Number(krEtfNew.rs_5d)-(-.01-.01))<1e-10 && Math.abs(Number(krEtfNew.rs_200d)-(.7-.6))<1e-10);
+check('KODEX 200 is now an ordinary KR ETF with its own RS', Math.abs(Number(krBase.rs_5d)-(.03-.01))<1e-10);
+check('KR equity RS measured against KODEX 코스피', Math.abs(Number(sam.rs_1m)-(.06-.02))<1e-10 && Math.abs(Number(sam.rs_12m)-(.9-.5))<1e-10 && sam.rs_rank===99);
+check('KODEX 코스피 benchmark reads zero', Number((await krm(kospi)).rs_5d)===0);
+check('KR instruments point at 226490', (await q(`select count(*) filter (where benchmark_ticker<>'226490') bad from public.instruments where market='KR'`)).rows[0].bad===0);
+check('US rows unchanged by the KR benchmark switch', JSON.stringify((await q(`select rs_5d,rs_1m,rs_rank,stage,verdict from public.market_metrics where instrument_id in ($1,$2) order by instrument_id`,[ids.AAPL,ids.QQQ])).rows)===JSON.stringify(usBefore));
+await db.exec('set role service_role');
+check('service role KR benchmark rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
+await db.exec('reset role');
 console.log(`${passed} ETF RS checks passed`);

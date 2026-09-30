@@ -1,0 +1,105 @@
+name: KR benchmark to KODEX 코스피 (production)
+
+# 수동 실행 전용. Actions 탭 → "KR benchmark to KODEX 코스피 (production)" → Run workflow, confirm 칸에 apply 입력.
+# 1) KODEX 코스피(226490)를 KR ETF로 추가 2) KR 가격을 갱신해 226490 가격·지표 수집 3) 226490 지표가 최신 KR 날짜에 있는지 확인
+# 4) KR RS 벤치마크를 069500 → 226490 으로 바꾸고 재계산 5) US 행 불변·재실행 무변경을 검증하고 KR 분류 변화를 출력한다.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 운영 DB에 적용하려면 apply 입력
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: etf-swing-production
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
+  OIDC_AUDIENCE: peppercorn-supabase
+
+jobs:
+  switch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm target
+        shell: bash
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          [ "$CONFIRM" = "apply" ] || { echo "::error::confirm input must be 'apply'"; exit 1; }
+          [ -n "$PROD_SUPABASE_DB_URL" ] || { echo "::error::repository secret PROD_SUPABASE_DB_URL is not set"; exit 1; }
+          case "$PROD_SUPABASE_DB_URL" in
+            *"$PRODUCTION_REF"*) echo "Target is the production project." ;;
+            *) echo "::error::PROD_SUPABASE_DB_URL does not point at the production project"; exit 1 ;;
+          esac
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+
+      - name: Record US hash and KR classification before
+        shell: bash
+        run: |
+          set -euo pipefail
+          psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_1m,l.rs_3m,l.rs_5d,l.rs_rank,l.ibd_rs_estimate,l.leader_tt,l.stage,l.verdict,l.action_guide),',' order by l.instrument_id),''))
+            from (select distinct on (m.instrument_id) m.* from public.market_metrics m join public.instruments i on i.id=m.instrument_id
+                  where i.market='US' order by m.instrument_id,m.as_of desc) l" > "$RUNNER_TEMP/us_before"
+          echo "US hash before: $(cat "$RUNNER_TEMP/us_before")"
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select leadership_class,count(*) kr_equities from public.leaderboard_view
+            where market='KR' and asset_class='Equity' group by 1 order by 1"
+
+      - name: Add KODEX 코스피 (226490)
+        run: psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/migrations/20260930140000_kr_benchmark_instrument.sql
+
+      - name: Refresh KR prices (collects 226490 history)
+        shell: bash
+        run: |
+          set -euo pipefail
+          get_token() {
+            curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
+          }
+          for OFFSET in $(seq 0 120 1920); do
+            TOKEN=$(get_token); echo "::add-mask::$TOKEN"
+            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "{\"offset\":$OFFSET,\"limit\":120,\"market\":\"KR\"}")
+            echo "$RESP"
+            REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
+            [ "$REQUESTED" -eq 0 ] && break
+          done
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select i.ticker,max(m.as_of) latest,count(p.trade_date) price_rows
+            from public.instruments i left join public.market_metrics m on m.instrument_id=i.id
+            left join public.price_daily p on p.instrument_id=i.id and p.trade_date=m.as_of
+            where i.market='KR' and i.ticker in ('226490','069500') group by i.ticker order by i.ticker"
+
+      - name: Switch the KR benchmark and recalculate
+        run: psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/migrations/20260930140100_kr_benchmark_kospi.sql
+
+      - name: Verify US unchanged, rerun idempotent, report KR changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          after=$(psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_1m,l.rs_3m,l.rs_5d,l.rs_rank,l.ibd_rs_estimate,l.leader_tt,l.stage,l.verdict,l.action_guide),',' order by l.instrument_id),''))
+            from (select distinct on (m.instrument_id) m.* from public.market_metrics m join public.instruments i on i.id=m.instrument_id
+                  where i.market='US' order by m.instrument_id,m.as_of desc) l")
+          [ "$after" = "$(cat "$RUNNER_TEMP/us_before")" ] || { echo "::error::US metrics changed"; exit 1; }
+          echo "US metrics unchanged: $after"
+          rerun=$(psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select public.recalculate_etf_relative_strength()")
+          [ "$rerun" = "0" ] || { echo "::error::ETF rerun changed $rerun rows"; exit 1; }
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select leadership_class,count(*) kr_equities from public.leaderboard_view
+            where market='KR' and asset_class='Equity' group by 1 order by 1" -c "
+            select i.ticker,l.rs_5d,l.rs_20d,l.rs_12m from public.instruments i
+            join lateral (select * from public.market_metrics m where m.instrument_id=i.id order by as_of desc limit 1) l on true
+            where i.market='KR' and i.ticker in ('226490','069500')" -c "
+            select count(*) filter (where benchmark_ticker='226490') kr_on_kospi,count(*) kr_total from public.instruments where market='KR'"
