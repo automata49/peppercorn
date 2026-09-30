@@ -21,7 +21,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
   const before=await sameWidth();
   const sectorResizer=page.locator('.dashboard-sector-panel').getByRole('button',{name:'섹터 열 너비 조절'});
-  await sectorResizer.scrollIntoViewIfNeeded();
+  // Centre the handle so the fixed bottom navigation on phone/iPad cannot cover it.
+  await sectorResizer.evaluate(e=>e.scrollIntoView({block:'center'}));
   const sectorResize=(await sectorResizer.boundingBox())!;
   await page.mouse.move(sectorResize.x+sectorResize.width/2,sectorResize.y+sectorResize.height/2);
   await page.mouse.down();await page.mouse.move(sectorResize.x+sectorResize.width/2+30,sectorResize.y+sectorResize.height/2);await page.mouse.up();
