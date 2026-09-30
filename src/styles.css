@@ -142,8 +142,6 @@
 .settings-grid .setting b{max-width:64%;text-align:right;line-height:1.5}
 
 /* Phone and iPad share a full-width workspace and a left-side navigation drawer. */
-.menu-trigger{display:none;position:fixed;top:18px;left:16px;z-index:8;align-items:center;gap:7px;min-height:44px;padding:7px 11px;border:1px solid #d5dce5;border-radius:9px;background:#fff;color:#28486f;font-weight:700;box-shadow:0 2px 8px #26384f12;cursor:pointer}
-.menu-trigger span:first-child{font-size:20px;line-height:1}
 .menu-drawer{left:0;right:auto;top:0;bottom:0;transform:none;width:min(320px,85vw);height:100dvh;display:flex;flex-direction:column;overflow-y:auto;background:#fff;padding:20px 14px calc(20px + env(safe-area-inset-bottom));box-shadow:18px 0 50px #24324429}
 .menu-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .menu-drawer .brand{display:flex;padding:4px 8px 22px}
@@ -166,13 +164,8 @@
 @media(max-width:1279px){
   .shell,.shell>main{display:block;min-width:0}
   .shell>.sidebar{display:none}
-  .menu-trigger{display:inline-flex}
-  .topbar{padding-left:112px}
 }
 @media(max-width:650px){
-  .menu-trigger{top:13px;left:10px;padding:7px 9px}
-  .menu-trigger-label{display:none}
-  .topbar{padding-left:74px}
   .topbar h1{font-size:18px}
   .top-actions .source{display:none}
 }
@@ -413,9 +406,8 @@ body{font-size:14px;line-height:1.45}
   .mobile-brand-home img{width:30px;height:30px;object-fit:contain}
   .mobile-brand-home strong{font-size:15px;white-space:nowrap}
   .mobile-brand-menu{display:grid;place-items:center;width:38px;height:38px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:18px;cursor:pointer}
-  .menu-trigger{display:none!important}
   .topbar{position:sticky;top:58px;z-index:14;height:auto;min-height:78px;padding:12px 14px;background:rgba(255,255,255,.96);align-items:flex-start}
-  .topbar>div:first-child{min-width:0}
+  .topbar>.topbar-title{min-width:0}
   .topbar h1{font-size:28px!important;line-height:1.08;letter-spacing:-.035em}
   .topbar p{display:block!important;margin-top:5px;font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .top-actions{display:none!important}
@@ -932,13 +924,13 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 @media(min-width:651px) and (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
   body{background:#f3f6fa}
   .shell,.shell>main{display:block;min-width:0}
-  .shell>.sidebar,.menu-trigger{display:none!important}
+  .shell>.sidebar{display:none!important}
   .mobile-brandbar{position:sticky;top:0;z-index:18;display:flex;align-items:center;justify-content:space-between;height:62px;padding:8px 20px;background:rgba(255,255,255,.96);border-bottom:1px solid #e6ebf0;backdrop-filter:blur(12px)}
   .mobile-brand-home{display:flex;align-items:center;gap:9px;padding:0;border:0;background:transparent;color:#18314f;cursor:pointer}
   .mobile-brand-home img{width:32px;height:32px;object-fit:contain}
   .mobile-brand-menu{display:grid;place-items:center;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer}
   .topbar{position:sticky;top:62px;z-index:14;height:auto;min-height:74px;padding:12px 20px;background:rgba(255,255,255,.96)}
-  .topbar>div:first-child{min-width:0}
+  .topbar>.topbar-title{min-width:0}
   .topbar p{max-width:100%;overflow:hidden;text-overflow:ellipsis}
   .top-actions{display:none!important}
   .content{padding:18px 20px calc(96px + env(safe-area-inset-bottom))}
@@ -1084,3 +1076,54 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .etf-heat-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:10px;color:var(--muted);font-size:12px}
 .etf-heat-key{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
 .etf-heat-key i{display:inline-block;width:14px;height:14px;border-radius:3px}
+
+/* Folio brand: icon and wordmark share one height everywhere. */
+.folio-brand{display:flex;align-items:center;gap:10px;min-width:0;margin:0}
+.folio-brand .brand-icon,.folio-brand .brand-wordmark-img{display:block;flex:none;width:auto!important;height:var(--folio-brand-h,36px)!important;object-fit:contain}
+.sidebar .folio-brand{--folio-brand-h:36px;justify-content:flex-start;padding:4px 8px 24px}
+.mobile-brand-home .folio-brand{--folio-brand-h:34px}
+/* The drawer brand scales with the drawer width. */
+.menu-drawer{container-type:inline-size}
+.menu-drawer .folio-brand{--folio-brand-h:clamp(28px,9vw,40px);--folio-brand-h:clamp(28px,12cqi,40px);justify-content:flex-start;padding:4px 8px 22px}
+.topbar-title{flex:1;min-width:0}
+.topbar-menu{display:none}
+
+/* Only iPad Pro landscape and desktop (>=1280px) show the brand above the page; narrower screens start with the menu. */
+@media(max-width:1279px){
+  .mobile-brandbar{display:none!important}
+  .topbar{top:0!important;justify-content:flex-start;gap:12px}
+  .topbar-menu{display:grid;place-items:center;flex:none;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer}
+}
+
+/* Loading page: Folio lockup and slogan centred, the house brand in one small line at the bottom. */
+.launch-screen{position:relative}
+.launch-brand{display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,16px)}
+.launch-brand img{display:block;width:auto;height:clamp(44px,13vw,64px)}
+.launch-brand .launch-emblem{filter:drop-shadow(0 5px 7px rgba(36,55,77,.12))}
+.launch-center .launch-slogan{margin-top:20px;color:#6f7c8d;font-size:14px;letter-spacing:.04em;white-space:nowrap}
+.launch-footer{position:absolute;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;gap:5px;color:#8a94a1;font-size:11px;line-height:1;white-space:nowrap}
+.launch-footer img{display:block;width:auto;height:1em;object-fit:contain}
+.launch-footer span{color:#5d6a7b;font-weight:600}
+.launch-footer small{margin-left:4px;font-size:inherit}
+@media(max-width:650px){.launch-center .launch-slogan{font-size:13px;letter-spacing:.02em}}
+
+/* Light theme (the app's only theme): the Folio card icon reads as a raised 3D tile. */
+:root:not([data-theme="dark"]) .folio-brand .brand-icon,
+:root:not([data-theme="dark"]) .launch-brand .launch-emblem{
+  transform:perspective(420px) rotateX(9deg) rotateY(-11deg);
+  transform-origin:50% 60%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.95)) drop-shadow(0 2px 2px rgba(22,38,64,.20)) drop-shadow(0 7px 10px rgba(22,38,64,.18)) drop-shadow(0 16px 22px rgba(22,38,64,.10));
+}
+/* Loading page description under the slogan. */
+.launch-center .launch-description{
+  max-width:min(92vw,400px);margin-top:12px;color:#8a95a4;font-size:12.5px;line-height:1.75;letter-spacing:-.005em;
+  text-align:center;word-break:keep-all;overflow-wrap:normal;text-wrap:balance;
+}
+@media(max-width:650px){.launch-center .launch-description{font-size:12px;max-width:320px}}
+/* LIVE-QUOTE-1: live current price display. */
+.live-price{font-variant-numeric:tabular-nums}
+.stock-row .stock-price.live-price{color:#1e3a5f}
+.live-badge{display:block;margin-top:3px;font-size:10.5px;font-weight:600;color:#237a4b;white-space:nowrap}
+.live-badge::before{content:'';display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#2f9e5f;vertical-align:1px}
+.live-badge.off{color:#8a94a1}
+.live-badge.off::before{background:#b9c2cd}
