@@ -1,11 +1,19 @@
-name: ETF swing migration (production)
+name: ETF migration (production)
 
-# 수동 실행 전용. Actions 탭 → "ETF swing migration (production)" → Run workflow, confirm 칸에 apply 입력.
-# supabase/migrations/*_etf_swing_criteria.sql 을 한 트랜잭션으로 적용한다(ETF IBD식 RS·Trend Template·단계·최종 판단·액션 가이드).
+# 수동 실행 전용. Actions 탭 → "ETF migration (production)" → Run workflow, migration 선택, confirm 칸에 apply 입력.
+# supabase/migrations/*_<migration>.sql 하나를 한 트랜잭션으로 적용한다
+# 현재 선택지는 etf_traded_value(산업 히트맵용 20일 평균 거래대금) 하나다. etf_swing_criteria 는 이미 적용됐고 이 마이그레이션이 대체한다.
 # 적용 전후 주식(Equity) 최신 지표의 해시가 달라지면 실패한다. 이후 정기 analyze 작업이 같은 함수를 다시 호출한다.
 on:
   workflow_dispatch:
     inputs:
+      migration:
+        description: 적용할 마이그레이션
+        required: true
+        type: choice
+        default: etf_traded_value
+        # etf_swing_criteria (applied 2026-09-30) is superseded: re-applying it would drop the trading-value step.
+        options: [etf_traded_value]
       confirm:
         description: 운영 DB에 적용하려면 apply 입력
         required: true
@@ -44,9 +52,13 @@ jobs:
 
       - name: Apply the migration and verify equities are unchanged
         shell: bash
+        env:
+          MIGRATION: ${{ inputs.migration }}
         run: |
           set -euo pipefail
-          file=$(ls supabase/migrations/*_etf_swing_criteria.sql)
+          case "$MIGRATION" in etf_traded_value) ;; *) echo "::error::unknown migration $MIGRATION"; exit 1 ;; esac
+          file=$(ls supabase/migrations/*_"$MIGRATION".sql)
+          echo "Applying $file"
           equity_hash() {
             psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
               select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_rank,l.ibd_rs_estimate,l.tt_pass_count,l.leader_tt,l.stage,l.verdict,l.action_guide),',' order by l.instrument_id),''))
@@ -60,7 +72,8 @@ jobs:
           echo "Equity latest metrics unchanged: $after"
           psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
             select i.market,count(*) etfs,count(l.ibd_rs_estimate) with_ibd,count(*) filter(where l.leader_tt) tt_pass,
-                   count(l.rs_rank) equity_rank_leaks,count(*) filter(where l.stage is null) no_stage
+                   count(l.rs_rank) equity_rank_leaks,count(*) filter(where l.stage is null) no_stage,
+                   count(l.traded_value_20d) with_traded_value
             from (select distinct on (m.instrument_id) m.* from public.market_metrics m order by m.instrument_id,m.as_of desc) l
             join public.instruments i on i.id=l.instrument_id
             where i.active and i.asset_class='ETF' group by i.market order by i.market"

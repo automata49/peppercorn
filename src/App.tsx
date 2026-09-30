@@ -11,7 +11,8 @@ import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, ini
 import { loadLeaderboard } from './lib/rest'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
-import { ETF_INDUSTRY_VERSION, buildEtfIndustries, type EtfIndustry } from './lib/etfIndustries'
+import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
+import { squarify } from './lib/treemap'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
@@ -299,24 +300,68 @@ function useColumnWidth(key:string,initial:number,min:number,max:number){
 
 const etfRankTitle=`ETF끼리만 비교한 시장별 순위(${ETF_RS_RANK_VERSION}) · 주식 RS 순위와 별도`
 
-const ETF_INDUSTRY_TOP=8
+// Diverging red(+)/gray/blue(−) scale for median benchmark-relative RS, matching the app's up-red/down-blue convention.
+// Steps are lightness-matched per arm (relative luminance .11/.31 blue vs .11/.31 red); ink on light, white on dark (≥4.9:1).
+const HEAT_THRESHOLDS:Record<EtfHeatPeriod,[number,number]>={'5D':[.01,.03],'20D':[.02,.06],'50D':[.03,.10],'120D':[.05,.15],'200D':[.07,.20],'52W':[.10,.30]}
+const HEAT_MISSING={bg:'#e4e7eb',ink:'#5d6b7c'}
+const heatColor=(value:number|null,[t1,t2]:[number,number])=>value==null?HEAT_MISSING
+  :value>=t2?{bg:'#b3261e',ink:'#ffffff'}:value>=t1?{bg:'#e8766d',ink:'#202938'}
+  :value<=-t2?{bg:'#1c5cab',ink:'#ffffff'}:value<=-t1?{bg:'#5598e7',ink:'#202938'}:{bg:'#f0efec',ink:'#202938'}
+const pctLabel=(v:number)=>`${v>0?'+':''}${Math.round(v*100)}%`
+const tradedLabel=(market:string,value:number)=>market==='KR'
+  ?(value>=1e12?`${(value/1e12).toFixed(1)}조원`:value>=1e8?`${Math.round(value/1e8).toLocaleString('ko-KR')}억원`:`${Math.round(value/1e4).toLocaleString('ko-KR')}만원`)
+  :(value>=1e9?`$${(value/1e9).toFixed(1)}B`:value>=1e6?`$${Math.round(value/1e6).toLocaleString('en-US')}M`:`$${Math.round(value/1e3).toLocaleString('en-US')}K`)
 
-// Horizontal bar chart: one bar per ETF industry, length = median ETF-only RS rank (1–99). One hue, value labelled at the tip;
-// each bar is a button that opens the industry's ETFs in StockRows (the table view).
-function EtfIndustryChart({groups,marketLabel,onSelect}:{groups:EtfIndustry[];marketLabel:boolean;onSelect:(group:EtfIndustry)=>void}){
-  if(!groups.length)return <p className="empty">순위가 산정된 산업 ETF가 없습니다.</p>
-  return <div className="etf-industry-chart" role="list" aria-label="ETF 주도 산업, ETF 전용 RS 순위 중앙값">
-    <div className="etf-industry-scale" aria-hidden="true"><span/><span className="etf-industry-ticks"><i style={{left:'50%'}}>50</i><i style={{left:'70%'}}>70</i><i style={{left:'90%'}}>90</i></span><span/></div>
-    {groups.map(g=>{
-      const label=`${marketLabel?g.market+' · ':''}${g.industry}`
-      const tip=`${label} · ETF ${g.n}개(순위 ${g.ranked}개) · RS 순위 중앙값 ${Math.round(g.medRank)} · Trend Template 통과 ${g.ttPass} · 최상위 ${g.leader}`
-      return <button key={g.key} type="button" role="listitem" className="etf-industry-row" title={tip} aria-label={tip} onClick={()=>onSelect(g)}>
-        <span className="etf-industry-label"><b>{label}</b><small>ETF {g.n} · TT 통과 {g.ttPass}</small></span>
-        <span className="etf-industry-track"><span className="etf-industry-fill" style={{width:`${Math.max(1,Math.min(99,g.medRank))}%`}}/></span>
-        <strong className="etf-industry-value">{Math.round(g.medRank)}</strong>
-      </button>
-    })}
+function useElementWidth<T extends HTMLElement>(){
+  const ref=useRef<T|null>(null)
+  const [width,setWidth]=useState(0)
+  useLayoutEffect(()=>{
+    const el=ref.current;if(!el)return
+    setWidth(el.clientWidth)
+    const observer=new ResizeObserver(entries=>setWidth(entries[0].contentRect.width))
+    observer.observe(el)
+    return()=>observer.disconnect()
+  },[])
+  return [ref,width] as const
+}
+
+// One market's treemap: tile area = industry's 20-session trading value, colour = median RS for the chosen period.
+function EtfIndustryTreemap({market,groups,period,onSelect}:{market:string;groups:EtfIndustry[];period:EtfHeatPeriod;onSelect:(group:EtfIndustry)=>void}){
+  const [ref,width]=useElementWidth<HTMLDivElement>()
+  const height=width<520?300:340
+  const rects=width?squarify(groups,g=>g.tradedValue,width,height):[]
+  const total=groups.reduce((sum,g)=>sum+g.tradedValue,0)
+  return <div className="etf-heat-market">
+    <div className="etf-heat-market-head"><b>{market}</b><span>ETF 20일 평균 거래대금 합계 {tradedLabel(market,total)}</span></div>
+    <div ref={ref} className="etf-heat-map" style={{height}} role="list" aria-label={`${market} ETF 주도 산업 히트맵`}>
+      {rects.map(({item:g,x,y,w,h})=>{
+        const name=etfIndustryLabel(g.market,g.industry),value=g.medRs[period],color=heatColor(value,HEAT_THRESHOLDS[period])
+        const tip=`${name} · RS ${period} 중앙값 ${value==null?'—':pctLabel(value)} · 20일 평균 거래대금 ${tradedLabel(g.market,g.tradedValue)} · ETF ${g.n}개(거래대금 ${g.valued}개) · RS 순위 중앙값 ${g.medRank==null?'—':Math.round(g.medRank)} · TT 통과 ${g.ttPass} · 최상위 ${g.leader}`
+        return <button key={g.key} type="button" role="listitem" className="etf-heat-tile" title={tip} aria-label={tip} onClick={()=>onSelect(g)}
+          style={{left:x+1,top:y+1,width:Math.max(0,w-2),height:Math.max(0,h-2),background:color.bg,color:color.ink}}>
+          {w>=64&&h>=40&&<><b>{name}</b><strong>{value==null?'—':pctLabel(value)}</strong></>}
+          {w>=64&&h>=72&&<small>ETF {g.n} · {tradedLabel(g.market,g.tradedValue)}</small>}
+        </button>
+      })}
+    </div>
   </div>
+}
+
+function EtfIndustryHeatmap({groups,markets,period,onSelect}:{groups:EtfIndustry[];markets:string[];period:EtfHeatPeriod;onSelect:(group:EtfIndustry)=>void}){
+  const sized=groups.filter(g=>g.tradedValue>0)
+  const missing=groups.length-sized.length
+  const [t1,t2]=HEAT_THRESHOLDS[period]
+  const keys=[{v:-t2,label:`≤ ${pctLabel(-t2)}`},{v:-t1,label:`${pctLabel(-t2)} ~ ${pctLabel(-t1)}`},{v:0,label:`± ${Math.round(t1*100)}% 미만`},{v:t1,label:`${pctLabel(t1)} ~ ${pctLabel(t2)}`},{v:t2,label:`≥ ${pctLabel(t2)}`}]
+  if(!sized.length)return <p className="empty">거래대금이 집계된 산업 ETF가 없습니다.</p>
+  return <>
+    {markets.map(m=>{const list=sized.filter(g=>g.market===m);return list.length?<EtfIndustryTreemap key={m} market={m} groups={list} period={period} onSelect={onSelect}/>:null})}
+    <div className="etf-heat-legend" aria-label={`색상 범례: RS ${period} 중앙값`}>
+      <span>RS {period} 중앙값</span>
+      {keys.map(k=><span key={k.label} className="etf-heat-key"><i style={{background:heatColor(k.v,HEAT_THRESHOLDS[period]).bg}}/>{k.label}</span>)}
+      <span className="etf-heat-key"><i style={{background:HEAT_MISSING.bg}}/>데이터 없음</span>
+      {missing>0&&<span>· 거래대금 없는 산업 {missing}개 제외</span>}
+    </div>
+  </>
 }
 
 // Shared stock/ETF table. A caller may pass a name-column width it owns (the ETF summary shares the sector column width).
@@ -416,7 +461,7 @@ export default function App(){
   const [sectorNameWidth,startSectorColumnResize]=useColumnWidth(SECTOR_NAME_WIDTH_KEY,SECTOR_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,SECTOR_NAME_MAX_WIDTH)
   const [etfSummaryOpen,setEtfSummaryOpen]=useState(false)
   const [etfIndustryKey,setEtfIndustryKey]=useState<string|null>(null)
-  const [etfIndustryAll,setEtfIndustryAll]=useState(false)
+  const [etfHeatPeriod,setEtfHeatPeriod]=useState<EtfHeatPeriod>('20D')
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
   const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|'corrections'|null>(null)
   const [selected,setSelected]=useState<LeaderRow|null>(null)
@@ -747,6 +792,7 @@ export default function App(){
       </section>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
+        <div className="dashboard-left-column">
         <div className="panel industry-panel dashboard-sector-panel">
           <div className="panel-head dashboard-sector-head">
             <div><h2>섹터 요약</h2><p>RS 순위 기준 Top 5 · 섹터별 리더십과 52W 고점 근접도</p></div>
@@ -769,6 +815,14 @@ export default function App(){
             {!dashboardTopSectors.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
           </tbody></table></div>
         </div>
+        <div className="panel dashboard-etf-industry-panel">
+          <div className="panel-head dashboard-sector-head">
+            <div><h2>ETF 주도 산업</h2><p title={ETF_INDUSTRY_VERSION}>타일 크기 = ETF 20일 평균 거래대금 · 색 = 기간별 RS 중앙값(벤치마크 대비) · 타일을 누르면 해당 ETF를 봅니다</p></div>
+          </div>
+          <div className="mini-segment etf-heat-periods" role="group" aria-label="RS 기간">{ETF_HEAT_PERIODS.map(([period])=><button key={period} type="button" className={etfHeatPeriod===period?'on':''} aria-pressed={etfHeatPeriod===period} onClick={()=>setEtfHeatPeriod(period)}>{period}</button>)}</div>
+          <EtfIndustryHeatmap groups={etfIndustries} markets={market==='ALL'?['KR','US']:[market]} period={etfHeatPeriod} onSelect={openEtfIndustry}/>
+        </div>
+        </div>
         <div className="panel dashboard-stock-panel">
           <div className="panel-head dashboard-sector-head"><div><h2>주도 종목</h2><p>{chosenSector?sectorLabel(chosenSector):'전체 섹터'} · RS 순위 기준 Top 12</p></div><button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey(chosenSector?.key||sector||'ALL')}}>전체 보기 →</button></div>
           <div className="dashboard-leader-tabs" role="group" aria-label="주도 종목 분류">
@@ -784,14 +838,6 @@ export default function App(){
           <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
         </div>
         <StockRows label="ETF" rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/>
-      </section>
-
-      <section className="panel dashboard-etf-industry-panel">
-        <div className="panel-head dashboard-sector-head">
-          <div><h2>ETF 주도 산업</h2><p title={ETF_INDUSTRY_VERSION}>산업별 ETF의 RS 순위 중앙값 · 막대를 누르면 해당 ETF를 봅니다</p></div>
-          {etfIndustries.length>ETF_INDUSTRY_TOP&&<div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfIndustryAll(!etfIndustryAll)}>{etfIndustryAll?'접기 ↑':`전체 ${etfIndustries.length}개 보기 →`}</button></div>}
-        </div>
-        <EtfIndustryChart groups={etfIndustryAll?etfIndustries:etfIndustries.slice(0,ETF_INDUSTRY_TOP)} marketLabel={market==='ALL'} onSelect={openEtfIndustry}/>
       </section>
     </>
   }else if(page==='leaderboard'){
@@ -849,7 +895,7 @@ export default function App(){
     <DialogContent className="sector-summary-dialog etf-summary-dialog">
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
-        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>{chosenEtfIndustry?`ETF 주도 산업 · ${chosenEtfIndustry.industry}`:'ETF 요약 · 전체'}</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>{chosenEtfIndustry?`ETF 주도 산업 · ${etfIndustryLabel(chosenEtfIndustry.market,chosenEtfIndustry.industry)}`:'ETF 요약 · 전체'}</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
       <div className="drill-summary-list"><StockRows label="ETF" rows={dialogEtfRows} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/></div>

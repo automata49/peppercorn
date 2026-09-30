@@ -132,36 +132,60 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('CHECK');
 });
 
-test('ETF 주도 산업 chart ranks industries by median ETF RS rank and opens their ETFs',async({browser})=>{
+test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS period and sits under 섹터 요약',async({browser})=>{
   test.setTimeout(120_000);
-  const base={...rows[0],asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립',rs_6m:null,rs_12m:null};
-  const mk=(id:string,market:string,industry:string,sector:string,rs:number,tt=false)=>({...base,id,ticker:id,name:id+' ETF',market,industry,sector,rs_1m:rs,rs_3m:rs,leader_tt:tt});
+  const base={...rows[0],asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립'};
+  const mk=(id:string,market:string,industry:string,sector:string,value:number|null,rs20:number,rs5:number)=>
+    ({...base,id,ticker:id,name:id+' ETF',market,industry,sector,traded_value_20d:value,rs_20d:rs20,rs_5d:rs5,rs_1m:rs20,rs_3m:rs20});
   const data=[...rows,
-    mk('SMH','US','Semiconductors','Information Technology',.30,true),mk('SOXX','US','Semiconductors','Information Technology',.20),
-    mk('ITA','US','Aerospace & Defense','Industrials',.10),mk('XBI','US','Biotechnology','Health Care',-.10),
-    mk('SPY','US','S&P 500','Broad Market',.0),mk('KSEMI','KR','Semiconductors','Information Technology',.05)];
+    mk('SMH','US','Semiconductors','Information Technology',6e8,.08,.01),mk('SOXX','US','Semiconductors','Information Technology',2e8,.04,.01),
+    mk('ITA','US','Aerospace & Defense','Industrials',2e8,.03,-.02),mk('XBI','US','Biotechnology','Health Care',1e8,-.07,.04),
+    mk('SPY','US','S&P 500','Broad Market',9e10,0,0),mk('NOVAL','US','Software','Information Technology',null,.02,.02),
+    mk('KSEMI','KR','Semiconductors','Information Technology',3e11,.10,.00),mk('KSHIP','KR','Shipbuilding','Industrials',1e11,-.03,-.05)];
+  const rgb=(hex:string)=>`rgb(${parseInt(hex.slice(1,3),16)}, ${parseInt(hex.slice(3,5),16)}, ${parseInt(hex.slice(5,7),16)})`;
   for(const view of [{width:390,height:844,touch:true},{width:834,height:1194,touch:true},{width:1194,height:834,touch:true},{width:1366,height:1024,touch:true},{width:1440,height:900,touch:false}]){
     const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
     const page=await context.newPage();
     await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:data}}));
     await page.goto('http://127.0.0.1:4173/peppercorn/');
     await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-    const chart=page.locator('.dashboard-etf-industry-panel');
-    const bars=chart.locator('.etf-industry-row');
-    // US ranks among 5 US ETFs: SMH 99, SOXX 79.4, ITA 60, SPY 40, XBI 21 → Semis median 89, A&D 60, Bio 21; SPY excluded (Broad Market).
-    await expect(bars.locator('.etf-industry-label b')).toHaveText(['KR · Semiconductors','US · Semiconductors','US · Aerospace & Defense','US · Biotechnology']);
-    await expect(bars.locator('.etf-industry-value')).toHaveText(['99','89','60','21']);
-    await expect(bars.nth(1).locator('small')).toHaveText('ETF 2 · TT 통과 1');
-    const track=(await bars.nth(1).locator('.etf-industry-track').boundingBox())!,fill=(await bars.nth(1).locator('.etf-industry-fill').boundingBox())!;
-    expect(Math.abs(fill.width/track.width-.89)).toBeLessThan(.01);
+    const panel=page.locator('.dashboard-etf-industry-panel');
+    // Placement: directly under 섹터 요약 (same column), above ETF 요약.
+    const sectorBox=(await page.locator('.dashboard-sector-panel').boundingBox())!,heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
+    expect(Math.abs(heatBox.x-sectorBox.x)).toBeLessThan(2);
+    expect(heatBox.y).toBeGreaterThan(sectorBox.y+sectorBox.height-1);
+    expect(heatBox.y-(sectorBox.y+sectorBox.height)).toBeLessThan(40);
+    expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
+    // One map per market; broad-market and valueless industries have no tile; KR labels are Korean.
+    await expect(panel.locator('.etf-heat-market-head b')).toHaveText(['KR','US']);
+    const us=panel.locator('.etf-heat-market').nth(1),kr=panel.locator('.etf-heat-market').nth(0);
+    await expect(us.locator('.etf-heat-tile')).toHaveCount(3);
+    await expect(kr.locator('.etf-heat-tile b')).toHaveText(['반도체','조선']);
+    await expect(panel.locator('.etf-heat-legend')).toContainText('거래대금 없는 산업 1개 제외');
+    // Area ∝ trading value within each market (US: 8e8 / 2e8 / 1e8 of 1.1e9).
+    const map=(await us.locator('.etf-heat-map').boundingBox())!;
+    const areas=await us.locator('.etf-heat-tile').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {t:e.getAttribute('title')!.split(' · ')[0],a:(r.width+2)*(r.height+2)}}));
+    const share=Object.fromEntries(areas.map(x=>[x.t,x.a/(map.width*map.height)]));
+    expect(Math.abs(share['Semiconductors']-8/11)).toBeLessThan(.02);
+    expect(Math.abs(share['Biotechnology']-1/11)).toBeLessThan(.02);
+    // 20D colours: US Semis median +6% ≥ 6% → strong red; Biotech −7% → strong blue; A&D +3% → light red.
+    const tile=(scope:any,name:string)=>scope.locator('.etf-heat-tile').filter({has:page.locator('b',{hasText:name})});
+    await expect(tile(us,'Semiconductors')).toHaveCSS('background-color',rgb('#b3261e'));
+    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#1c5cab'));
+    await expect(tile(us,'Aerospace & Defense')).toHaveCSS('background-color',rgb('#e8766d'));
+    await expect(tile(us,'Semiconductors').locator('strong')).toHaveText('+6%');
+    // Switching the period recolours: 5D Biotech +4% ≥ 3% → strong red.
+    await panel.getByRole('button',{name:'5D',exact:true}).click();
+    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#b3261e'));
+    await expect(tile(us,'Biotechnology').locator('strong')).toHaveText('+4%');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
-    await bars.nth(1).click();
+    await tile(kr,'반도체').click();
     const dialog=page.locator('.etf-summary-dialog');
-    await expect(dialog.getByRole('heading')).toHaveText('ETF 주도 산업 · Semiconductors');
-    await expect(dialog.locator('.stock-row .stock-id b')).toHaveText(['SMH ETF','SOXX ETF']);
+    await expect(dialog.getByRole('heading')).toHaveText('ETF 주도 산업 · 반도체');
+    await expect(dialog.locator('.stock-row .stock-id b')).toHaveText(['KSEMI ETF']);
     await page.getByRole('button',{name:'닫기',exact:true}).click();
     await page.locator('.toolbar .segment').getByRole('button',{name:'US'}).click();
-    await expect(bars.locator('.etf-industry-label b').first()).toHaveText('Semiconductors');
+    await expect(panel.locator('.etf-heat-market-head b')).toHaveText(['US']);
     await context.close();
   }
 });

@@ -88,4 +88,27 @@ check('flat benchmark ETF fails the Trend Template', spyFull.leader_tt===false);
 await db.exec('set role service_role');
 check('service role ETF swing rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
 await db.exec('reset role');
+
+// ETF-VALUE-1: 20-session average trading value, exposed through leaderboard_view.
+// QQQ closes are 100+0.5*(253-g) for g=0..252, so the last 20 average 221.75; volume 1000 → 221,750.
+const valueMigration = readdirSync('supabase/migrations').find(name=>name.endsWith('_etf_traded_value.sql'));
+if (!valueMigration) throw new Error('missing ETF traded value migration');
+await q(`update public.price_daily set volume=1000 where instrument_id=$1`,[ids.QQQ]);
+await q(`update public.price_daily set volume=500 where instrument_id=$1 and trade_date>'2026-09-18'`,[ids.SPY]);
+await db.exec(readFileSync(`supabase/migrations/${valueMigration}`,'utf8'));
+const traded = async key => (await q('select traded_value_20d v from public.market_metrics where instrument_id=$1',[ids[key]])).rows[0].v;
+check('ETF traded value is the 20-session average of close × volume', Math.abs(Number(await traded('QQQ'))-221750)<1e-6);
+check('fewer than 20 sessions with volume stays unknown', await traded('SPY')===null);
+check('ETF without volume stays unknown', await traded('KRETF')===null);
+check('equities are not given a traded value', await traded('AAPL')===null);
+check('leaderboard_view exposes traded_value_20d', Math.abs(Number((await q(`select traded_value_20d v from public.leaderboard_view where ticker='QQQ'`)).rows[0].v)-221750)<1e-6);
+check('swing classification kept by the traded value migration', (await full('QQQ')).verdict==='⭐ 최우선 관심' && (await full('QQQ')).ibd_rs_estimate===99);
+await db.exec('set role service_role');
+check('service role traded value rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
+await db.exec('reset role');
+await db.exec('set role anon');
+let deniedAgain=false;
+try { await q('select public.recalculate_etf_relative_strength()'); } catch(e) { deniedAgain=/permission denied/.test(String(e.message)); }
+await db.exec('reset role');
+check('anon still cannot recalculate after the traded value migration',deniedAgain);
 console.log(`${passed} ETF RS checks passed`);
