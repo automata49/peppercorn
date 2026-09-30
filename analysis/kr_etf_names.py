@@ -52,6 +52,16 @@ def krx_etf_names():
     raise RuntimeError("KRX ETF listing unavailable: "+" | ".join(errors))
 
 
+def naver_etf_names():
+    # Naver Finance ETF list (same source as FinanceDataReader StockListing("ETF/KR")).
+    r=requests.get("https://finance.naver.com/api/sise/etfItemList.nhn",headers={"User-Agent":HEADERS["User-Agent"]},timeout=30)
+    r.raise_for_status()
+    rows=((r.json().get("result") or {}).get("etfItemList")) or []
+    if len(rows)<500:raise RuntimeError(f"Naver ETF list returned only {len(rows)} rows")
+    print(f"source: Naver Finance etfItemList ({len(rows)} ETFs)")
+    return {str(x["itemcode"]).strip().upper():str(x["itemname"]).strip() for x in rows if x.get("itemcode") and x.get("itemname")}
+
+
 def pykrx_names(tickers):
     from pykrx import stock
     out={}
@@ -67,10 +77,12 @@ def pykrx_names(tickers):
 
 def main():
     tickers=snapshot_tickers()
-    try:listing=krx_etf_names()
-    except Exception as exc:
-        print(f"WARNING: {exc}; falling back to pykrx")
-        listing=pykrx_names(tickers)
+    listing={}
+    for label,source in (("KRX",krx_etf_names),("Naver",naver_etf_names),("pykrx",lambda:pykrx_names(tickers))):
+        try:listing=source()
+        except Exception as exc:
+            print(f"WARNING: {label} unavailable: {str(exc)[:300]}");continue
+        if sum(t.upper() in listing for t in tickers)>=len(tickers)*0.9:break
     names={t:listing[t.upper()] for t in tickers if t.upper() in listing}
     missing=[t for t in tickers if t not in names]
     OUTPUT.parent.mkdir(parents=True,exist_ok=True)
