@@ -119,6 +119,11 @@ create table if not exists public.position_snapshot (
       and label_reasons = '{}'::jsonb))
 );
 
+-- Per-share facts (EPS) carry their own unit. Re-created so an existing table gains the new values.
+alter table public.fundamentals_q drop constraint if exists fundamentals_q_unit_check;
+alter table public.fundamentals_q add constraint fundamentals_q_unit_check
+  check (unit in ('USD','KRW','shares','USD/share','KRW/share'));
+
 create index if not exists fundamentals_q_instrument_period_idx on public.fundamentals_q(instrument_id, period_end desc);
 create index if not exists position_snapshot_instrument_asof_idx on public.position_snapshot(instrument_id, as_of desc);
 

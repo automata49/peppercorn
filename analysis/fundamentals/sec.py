@@ -34,7 +34,10 @@ DURATION_TAGS = {
     "capex": ["PaymentsToAcquirePropertyPlantAndEquipment", "PaymentsToAcquireProductiveAssets"],
     "sbc": ["ShareBasedCompensation", "AllocatedShareBasedCompensationExpense"],
     "diluted_shares": ["WeightedAverageNumberOfDilutedSharesOutstanding"],
+    "eps_diluted": ["EarningsPerShareDiluted"],
 }
+# companyfacts unit per duration field; every other field is USD.
+UNITS = {"diluted_shares": "shares", "eps_diluted": "USD/shares"}
 INSTANT_TAGS = {
     # Consolidated operating income pairs with equity including non-controlling interests; fall back to parent-only.
     "equity": ["StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest", "StockholdersEquity"],
@@ -42,6 +45,7 @@ INSTANT_TAGS = {
     "short_term_investments": ["MarketableSecuritiesCurrent", "AvailableForSaleSecuritiesDebtSecuritiesCurrent", "ShortTermInvestments", "OtherShortTermInvestments"],
     "debt": ["LongTermDebt", "LongTermDebtNoncurrent"],
     "debt_current": ["LongTermDebtCurrent", "DebtCurrent"],
+    "liabilities": ["Liabilities"],
 }
 # Fallback tags fill only periods (spans or dates) where no primary tag above was reported, so a narrower
 # concept (goods-only revenue, continuing-operations cash flow) never replaces a broader primary one.
@@ -144,7 +148,7 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
     revisions: dict[str, dict[str, list[dict]]] = {}
     conflicts: dict[str, dict[str, list[dict]]] = {}
     for field, tags in DURATION_TAGS.items():
-        unit = "shares" if field == "diluted_shares" else "USD"
+        unit = UNITS.get(field, "USD")
         selected = _latest_rows(facts, tags, unit, as_of)
         fallback = FALLBACK_DURATION_TAGS.get(field, [])
         for span, hit in _latest_rows(facts, fallback, unit, as_of).items():
@@ -169,7 +173,7 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
             lineage.setdefault(end, {})[field] = {
                 "operation": "direct" if len(derived[end]["spans"]) == 1 else "subtract",
                 "inputs": [{"start": span[0], "end": span[1], "tag": selected[span][0],
-                            "unit": "shares" if field == "diluted_shares" else "USD",
+                            "unit": UNITS.get(field, "USD"),
                             "value": selected[span][1]["val"], "form": selected[span][1].get("form"),
                             "filed": selected[span][1].get("filed"), "accession": selected[span][1].get("accn")}
                            for span in derived[end]["spans"]],
@@ -263,6 +267,7 @@ def parse(facts: dict, as_of: str | None = None) -> dict:
                 lineage[end].pop(field)
                 revisions.get(end, {}).pop(field, None)
                 conflicts.get(end, {}).pop(field, None)
+    _derive_liabilities(facts, table, lineage, tag_by_period, as_of)
     table = {k: v for k, v in table.items() if "revenue" in v}
     return {"quarters": dict(sorted(table.items())), "tags": used, "tag_by_period": tag_by_period,
             "entity": facts.get("entityName"), "source_lineage": {k: lineage[k] for k in table},
@@ -303,6 +308,27 @@ def _conflict_record(chosen: dict, competing: list[dict]) -> dict:
     return {"selected": {"accession": chosen.get("accn"), "filed": chosen.get("filed"), "value": chosen["val"]},
             "competing": [{"accession": c["accession"], "filed": c["filed"], "value": c["value"], "tag": c["tag"]}
                           for c in competing]}
+
+
+def _derive_liabilities(facts: dict, table: dict, lineage: dict, tag_by_period: dict, as_of: str | None) -> None:
+    """Total liabilities = total liabilities and equity - total equity, where no `Liabilities` line is filed.
+
+    Only when the equity used includes non-controlling interests, so that the difference is liabilities alone."""
+    totals: dict[str, dict] = {}
+    for row in _entries(facts, "LiabilitiesAndStockholdersEquity", as_of=as_of):
+        if "start" not in row and (row["end"] not in totals or _rank(row) > _rank(totals[row["end"]])):
+            totals[row["end"]] = row
+    for end, row in table.items():
+        if row.get("liabilities") is not None or end not in totals or row.get("equity") is None:
+            continue
+        equity_tag = tag_by_period.get(end, {}).get("equity")
+        if equity_tag != "StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest":
+            continue
+        total = totals[end]
+        row["liabilities"] = total["val"] - row["equity"]
+        lineage.setdefault(end, {})["liabilities"] = {"operation": "subtract", "inputs": (
+            _instant_lineage("LiabilitiesAndStockholdersEquity", total)["inputs"] + lineage[end]["equity"]["inputs"])}
+        tag_by_period.setdefault(end, {})["liabilities"] = "LiabilitiesAndStockholdersEquity-minus-equity"
 
 
 def _instant_lineage(tag: str, row: dict) -> dict:
