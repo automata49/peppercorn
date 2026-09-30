@@ -357,7 +357,7 @@ body{font-size:14px;line-height:1.45}
 /* Lower dashboard panels */
 .dashboard-lower-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:16px}
 .dashboard-lower-grid>.panel{margin-bottom:18px}
-.dashboard-sector-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
+.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
 .dashboard-sector-table-wrap{max-height:560px}
 .dashboard-sector-table{width:100%;min-width:610px;table-layout:fixed}
 .dashboard-sector-table th,.dashboard-sector-table td{padding:9px 8px}
@@ -449,9 +449,9 @@ body{font-size:14px;line-height:1.45}
   .dashboard-sector-filter{display:none}
   .dashboard-lower-grid{display:block}
   .dashboard-lower-grid>.panel{margin-bottom:12px;padding:12px;border-radius:15px}
-  .dashboard-sector-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
-  .dashboard-sector-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
-  .dashboard-sector-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
+  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
+  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
+  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
   .sector-actions{justify-content:flex-end}
   .mini-segment button{padding:5px 7px;font-size:9.5px}
   .dashboard-sector-table-wrap{max-height:none;overflow:visible}
@@ -1048,3 +1048,10 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 
 .top-actions button.source{border-radius:999px;padding:6px 9px;font-size:11px;white-space:nowrap}.top-actions button.source:disabled{opacity:.65;cursor:wait}
 .snapshot-refresh{border:1px solid #d5dce5;border-radius:7px;background:#fff;color:#426486;min-width:28px;min-height:28px;cursor:pointer}.snapshot-refresh:disabled{opacity:.6;cursor:wait}
+
+/* ETF summary: sector-summary frame with one row per ETF (name, ETF RS rank, 6 returns, signed 52W high distance). */
+.dashboard-etf-panel{margin-bottom:18px}
+.sector-metrics-table.etf-metrics-table{width:calc(var(--sector-name-width,180px) + 650px)!important;min-width:calc(var(--sector-name-width,180px) + 650px)!important}
+.sector-metrics-table.etf-metrics-table th:nth-child(n+3):nth-child(-n+8),.sector-metrics-table.etf-metrics-table td:nth-child(n+3):nth-child(-n+8){width:78px;min-width:78px;max-width:78px}
+.sector-metrics-table.etf-metrics-table th:nth-child(9),.sector-metrics-table.etf-metrics-table td:nth-child(9){width:112px;min-width:112px;max-width:112px}
+@media(min-width:651px){.etf-summary-dialog{width:min(980px,calc(100vw - 28px))}}
