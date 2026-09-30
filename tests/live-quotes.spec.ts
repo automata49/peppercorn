@@ -21,6 +21,9 @@ test('current price refreshes from live quotes without touching daily metrics',a
  await page.clock.runFor(6000)
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
  await page.clock.runFor(1000)
+ // Leading stocks now open in a popup; the 핵심 주도 card lists both markets.
+ await page.locator('.leadership-card-grid button').filter({hasText:'핵심 주도'}).click()
+ await page.clock.runFor(1000)
  const nvdaRow=page.locator('.stock-row').filter({hasText:'엔비디아'}).first()
  await expect(nvdaRow.locator('.stock-price')).toHaveText('123.45')
  await expect(nvdaRow.locator('.stock-price')).toHaveClass(/live-price/)
