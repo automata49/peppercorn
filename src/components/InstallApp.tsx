@@ -48,7 +48,7 @@ export function InstallApp() {
     </PopoverTrigger>
       <PopoverContent className="install-dialog" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Peppercorn Capital 설치 안내">
         <PopoverClose asChild><button className="install-close" aria-label="닫기">×</button></PopoverClose>
-        <img className="install-icon" src="./icon-192.png" alt="Peppercorn Capital 아이콘" />
+        <img className="install-icon" src="./folio-icon-192.png" alt="Folio 아이콘" />
         <h2>Peppercorn Capital</h2>
         <p className="install-description">홈 화면에 추가하면 앱처럼 바로 열 수 있습니다.</p>
         <ol>
