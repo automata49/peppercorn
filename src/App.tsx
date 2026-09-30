@@ -9,6 +9,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
+import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
@@ -268,6 +269,48 @@ const SECTOR_NAME_DEFAULT_WIDTH=120
 const SECTOR_NAME_MIN_WIDTH=80
 const SECTOR_NAME_MAX_WIDTH=260
 const SECTOR_NAME_WIDTH_KEY='peppercorn-sector-name-width-v1'
+const ETF_NAME_DEFAULT_WIDTH=180
+const ETF_NAME_WIDTH_KEY='peppercorn-etf-name-width-v1'
+
+function useColumnWidth(key:string,initial:number,min:number,max:number){
+  const [width,setWidth]=useState(()=>{
+    try{
+      const raw=localStorage.getItem(key)
+      const saved=raw===null?initial:Number(raw)
+      return Number.isFinite(saved)?Math.min(max,Math.max(min,saved)):initial
+    }catch{return initial}
+  })
+  useEffect(()=>{
+    try{localStorage.setItem(key,String(width))}catch{}
+  },[key,width])
+  const startResize=(event:any)=>{
+    event.preventDefault();event.stopPropagation()
+    const startX=event.clientX,startWidth=width
+    const previousCursor=document.body.style.cursor,previousSelect=document.body.style.userSelect
+    document.body.style.cursor='col-resize';document.body.style.userSelect='none'
+    const move=(moveEvent:PointerEvent)=>setWidth(Math.min(max,Math.max(min,startWidth+moveEvent.clientX-startX)))
+    const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);document.body.style.cursor=previousCursor;document.body.style.userSelect=previousSelect}
+    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)
+  }
+  return [width,startResize] as const
+}
+
+const toneClass=(value:number|null|undefined)=>value!=null&&value>0?'pos':value!=null&&value<0?'neg':''
+const etfRankTitle=`ETF끼리만 비교한 시장별 순위(${ETF_RS_RANK_VERSION}) · 주식 RS 순위와 별도`
+
+// Same table frame and tokens as the sector summary; each row is one ETF. Equity-only leadership counts do not apply.
+function EtfTable({rows,onSelect,onResize,nameWidth,full=false,marketLabel}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;onResize:(event:any)=>void;nameWidth:number;full?:boolean;marketLabel:boolean}){
+  const wrapClass=full?'sector-summary-dialog-table':'industry-table-wrap dashboard-sector-table-wrap'
+  return <div className={wrapClass} style={{'--sector-name-width':`${nameWidth}px`} as CSSProperties}><table className={'industry-table dashboard-sector-table sector-metrics-table etf-metrics-table'+(full?' sector-summary-full-table':'')}><thead><tr><th className="sector-name-head">ETF<button type="button" className="sector-column-resizer" aria-label="ETF 열 너비 조절" title="드래그하여 ETF 열 너비 조절" onPointerDown={onResize}/></th><th title={etfRankTitle}>RS 순위</th>{tradingPeriods.map(period=><th key={period}>등락 {period}</th>)}<th>52W 고점 대비</th></tr></thead><tbody>
+    {rows.map(r=><tr key={r.id} tabIndex={0} role="button" aria-label={`${r.name} ETF 상세 보기`} onClick={()=>onSelect(r)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+      <td className="industry-name-cell" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{marketLabel?r.market+' · ':''}{r.ticker} · {sectorName(r.market,r.sector||'분류 확인')}</small></td>
+      <td><span className={(r.etf_rs_rank??0)>=90?'heat top':(r.etf_rs_rank??0)>=70?'heat high':'heat'} title={etfRankTitle}>{r.etf_rs_rank??'—'}</span></td>
+      {returnTradingValues(r).map((value,i)=><td key={i} className={toneClass(value)}>{pct(value)}</td>)}
+      <td className={toneClass(r.high_52w_distance)}>{pct(r.high_52w_distance)}</td>
+    </tr>)}
+    {!rows.length&&<tr><td colSpan={9} className="empty">표시할 ETF가 없습니다.</td></tr>}
+  </tbody></table></div>
+}
 
 function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const [stockNameWidth,setStockNameWidth]=useState(()=>{
@@ -313,7 +356,9 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
     <section className="snapshot-section leadership-section drill-animate">
       <div className="snapshot-section-head"><div><span>01</span><h3>리더십 · 분류</h3></div><ValuePill tone={leadTone(leadership(row))}>{leadership(row)}</ValuePill></div>
       <div className="leadership-hero">
-        <div className="leadership-score"><span>RS순위</span><strong>{row.rs_rank??'—'}</strong></div>
+        {row.asset_class==='ETF'
+          ?<div className="leadership-score" title={etfRankTitle}><span>ETF RS순위</span><strong>{row.etf_rs_rank??'—'}</strong></div>
+          :<div className="leadership-score"><span>RS순위</span><strong>{row.rs_rank??'—'}</strong></div>}
         <div className="leadership-score ibd-score" title={ibdTitle(row)}><span>IBD식 RS</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
         <div className="leadership-copy"><span>최종 판단</span><ValuePill tone={stageTone(row.stage)}>{row.verdict||'—'}</ValuePill><small>{row.stage||'—'}</small></div>
       </div>
@@ -376,13 +421,9 @@ export default function App(){
   const [sector,setSector]=useState<string|null>(null)
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
-  const [sectorNameWidth,setSectorNameWidth]=useState(()=>{
-    try{
-      const raw=localStorage.getItem(SECTOR_NAME_WIDTH_KEY)
-      const saved=raw===null?SECTOR_NAME_DEFAULT_WIDTH:Number(raw)
-      return Number.isFinite(saved)?Math.min(SECTOR_NAME_MAX_WIDTH,Math.max(SECTOR_NAME_MIN_WIDTH,saved)):SECTOR_NAME_DEFAULT_WIDTH
-    }catch{return SECTOR_NAME_DEFAULT_WIDTH}
-  })
+  const [sectorNameWidth,startSectorColumnResize]=useColumnWidth(SECTOR_NAME_WIDTH_KEY,SECTOR_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,SECTOR_NAME_MAX_WIDTH)
+  const [etfNameWidth,startEtfColumnResize]=useColumnWidth(ETF_NAME_WIDTH_KEY,ETF_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
+  const [etfSummaryOpen,setEtfSummaryOpen]=useState(false)
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
   const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|'corrections'|null>(null)
   const [selected,setSelected]=useState<LeaderRow|null>(null)
@@ -410,19 +451,6 @@ export default function App(){
 
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
   const sectorTableStyle={'--sector-name-width':`${sectorNameWidth}px`} as CSSProperties
-  const startSectorColumnResize=(event:any)=>{
-    event.preventDefault();event.stopPropagation()
-    const startX=event.clientX,startWidth=sectorNameWidth
-    const previousCursor=document.body.style.cursor,previousSelect=document.body.style.userSelect
-    document.body.style.cursor='col-resize';document.body.style.userSelect='none'
-    const move=(moveEvent:PointerEvent)=>setSectorNameWidth(Math.min(SECTOR_NAME_MAX_WIDTH,Math.max(SECTOR_NAME_MIN_WIDTH,startWidth+moveEvent.clientX-startX)))
-    const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);document.body.style.cursor=previousCursor;document.body.style.userSelect=previousSelect}
-    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)
-  }
-
-  useEffect(()=>{
-    try{localStorage.setItem(SECTOR_NAME_WIDTH_KEY,String(sectorNameWidth))}catch{}
-  },[sectorNameWidth])
 
   const refreshLeaderboard=async()=>{
     if(refreshingRef.current)return
@@ -433,9 +461,10 @@ export default function App(){
       // A transient connection failure must not replace loaded live rows with demo data.
       if(result.source==='demo'&&sourceRef.current==='supabase')return
       sourceRef.current=result.source
-      setLeaders(result.rows);setSource(result.source)
-      const matching=(row:LeaderRow|null)=>result.rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
-      setSelected(previous=>matching(previous)??result.rows[0]??null)
+      const rows=withEtfRanks(result.rows)
+      setLeaders(rows);setSource(result.source)
+      const matching=(row:LeaderRow|null)=>rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
+      setSelected(previous=>matching(previous)??rows[0]??null)
       setDrillStock(previous=>previous?matching(previous)??null:null)
     }finally{
       refreshingRef.current=false;setRefreshing(false)
@@ -542,6 +571,8 @@ export default function App(){
     return marketRows.filter(r=>!q||[r.ticker,r.name,r.sector,sectorName(r.market,r.sector),r.industry].map(v=>String(v||'')).join(' ').toLowerCase().includes(q))
   },[marketRows,query])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
+  const rankedEtfRows=marketRows.filter(r=>r.asset_class==='ETF').sort((a,b)=>(b.etf_rs_rank??-1)-(a.etf_rs_rank??-1)||a.market.localeCompare(b.market)||a.ticker.localeCompare(b.ticker))
+  const openEtf=(row:LeaderRow)=>{setEtfSummaryOpen(false);setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
   const metricExchanges=[...new Set(stockRows.map(r=>r.exchange?.trim()).filter((name):name is string=>!!name))].sort((a,b)=>a.localeCompare(b,'ko'))
   const metricIndices=[...new Set(stockRows.flatMap(r=>r.index_memberships||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'))
   const metricNames=(names:string[])=>names.length?names.slice(0,3).join(' · ')+(names.length>3?` 외 ${names.length-3}`:''):'분류 확인 중'
@@ -749,6 +780,14 @@ export default function App(){
           <StockRows rows={tabStocks.slice(0,12)} onSelect={row=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}}/>
         </div>
       </section>
+
+      <section className="panel industry-panel dashboard-etf-panel">
+        <div className="panel-head dashboard-sector-head">
+          <div><h2>ETF 요약</h2><p>ETF 전용 RS 순위 기준 Top 5 · 주식 순위와 별도 산정</p></div>
+          <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
+        </div>
+        <EtfTable rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} onResize={startEtfColumnResize} nameWidth={etfNameWidth} marketLabel={market==='ALL'}/>
+      </section>
     </>
   }else if(page==='leaderboard'){
     content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
@@ -801,6 +840,16 @@ export default function App(){
       </tbody></table></div>
     </DialogContent>
   </Dialog>
+  const etfSummaryDialog=<Dialog open={etfSummaryOpen} onOpenChange={setEtfSummaryOpen}>
+    <DialogContent className="sector-summary-dialog etf-summary-dialog">
+      <div className="drill-handle"/>
+      <div className="sector-summary-dialog-head">
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>ETF 요약 · 전체</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 등락 5D~52W 전체 보기</DialogDescription></div>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+      </div>
+      <EtfTable full rows={rankedEtfRows} onSelect={openEtf} onResize={startEtfColumnResize} nameWidth={etfNameWidth} marketLabel={market==='ALL'}/>
+    </DialogContent>
+  </Dialog>
   const drillOverlay=<Dialog open={drillOpen} onOpenChange={open=>{if(!open)closeDrill()}}>
     <DialogContent ref={drillRef} className="drill-sheet">
       <div className="drill-handle"/>
@@ -833,5 +882,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Peppercorn Capital 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div className="brand-wordmark"><h2 className="brand-wordmark-pepper">Peppercorn</h2><span className="brand-wordmark-capital">Capital</span></div></div><p className="launch-slogan">Historia Magistra Vitae</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</>
+  return <><div className="shell"><Sidebar page={page} setPage={setPage}/><main><header className="topbar"><div><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Peppercorn Capital 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="brand launch-brand"><div className="launch-emblem"><img src="./logo.webp" alt=""/></div><div className="brand-wordmark"><h2 className="brand-wordmark-pepper">Peppercorn</h2><span className="brand-wordmark-capital">Capital</span></div></div><p className="launch-slogan">Historia Magistra Vitae</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</>
 }
