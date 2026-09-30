@@ -1,11 +1,9 @@
 name: KR ETF names
 
-# Prints the official KRX short names of the KR ETFs in the universe snapshot. Copy the map into
+# Prints the Korean short names (KRX, else Naver Finance) of the KR ETFs in the universe snapshot. Copy the map into
 # src/data/krEtfNames.json through a reviewed commit; this workflow does not write to the repository.
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/kr-etf-korean-names]
 
 permissions:
   contents: read

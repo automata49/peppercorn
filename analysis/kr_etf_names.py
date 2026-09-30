@@ -1,4 +1,4 @@
-"""Official Korean short names (KRX ISU_ABBRV) for the KR ETFs in the universe snapshot.
+"""Korean short names (KRX ISU_ABBRV, else Naver Finance itemname) for the KR ETFs in the universe snapshot.
 
 The snapshot that created the ETF instruments has no name column, so the app would otherwise show a
 ticker or a non-Korean label. This writes a ticker -> name map that the web app applies to KR ETFs only.
