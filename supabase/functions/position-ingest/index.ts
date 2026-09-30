@@ -21,13 +21,14 @@ async function authorized(req: Request) {
   } catch { return false; }
 }
 
-// Same SQL as supabase/tests/position_growth.verify.mjs exercises; keep them in step.
+// Same SQL as supabase/tests/position_growth.verify.mjs exercises; keep them in step. $2 is sent as text and cast,
+// because the driver would JSON-encode an already encoded string for a jsonb-typed parameter.
 export const FACT_INSERT = `
 insert into public.fundamentals_q (instrument_id, period_end, field, status, value, unit, scope, unknown_reason,
   extraction, method_version, lineage, source_filed_at, input_hash, pipeline_version)
 select $1::uuid, r.period_end, r.field, r.status, r.value, r.unit, r.scope, r.unknown_reason, r.extraction,
   r.method_version, r.lineage, r.source_filed_at, r.input_hash, r.pipeline_version
-from jsonb_to_recordset($2::jsonb) as r(period_end date, field text, status text, value numeric, unit text, scope text,
+from jsonb_to_recordset($2::text::jsonb) as r(period_end date, field text, status text, value numeric, unit text, scope text,
   unknown_reason text, extraction text, method_version text, lineage jsonb, source_filed_at date, input_hash text,
   pipeline_version text)
 on conflict (instrument_id, period_end, field, input_hash) do nothing
@@ -37,7 +38,7 @@ insert into public.position_snapshot (instrument_id, as_of, rules_version, fcf_m
   metrics, type_label, quality_label, growth_label, value_label, label_reasons, input_hash, pipeline_version)
 select $1::uuid, r.as_of, r.rules_version, r.fcf_method, r.roic_method, r.status, r.checks, r.metrics, r.type_label,
   r.quality_label, r.growth_label, r.value_label, r.label_reasons, r.input_hash, r.pipeline_version
-from jsonb_to_recordset($2::jsonb) as r(as_of date, rules_version text, fcf_method text, roic_method text, status text,
+from jsonb_to_recordset($2::text::jsonb) as r(as_of date, rules_version text, fcf_method text, roic_method text, status text,
   checks jsonb, metrics jsonb, type_label text, quality_label text, growth_label text, value_label text,
   label_reasons jsonb, input_hash text, pipeline_version text)
 on conflict (instrument_id, as_of, rules_version, input_hash) do nothing
