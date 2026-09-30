@@ -1,0 +1,86 @@
+name: ETF migration (production)
+
+# 수동 실행 전용. Actions 탭 → "ETF migration (production)" → Run workflow, migration 선택, confirm 칸에 apply 입력.
+# supabase/migrations/*_<migration>.sql 하나를 한 트랜잭션으로 적용한다
+# 현재 선택지는 etf_traded_value(산업 히트맵용 20일 평균 거래대금) 하나다. etf_swing_criteria 는 이미 적용됐고 이 마이그레이션이 대체한다.
+# 적용 전후 주식(Equity) 최신 지표의 해시가 달라지면 실패한다. 이후 정기 analyze 작업이 같은 함수를 다시 호출한다.
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: 적용할 마이그레이션
+        required: true
+        type: choice
+        default: etf_traded_value
+        # etf_swing_criteria (applied 2026-09-30) is superseded: re-applying it would drop the trading-value step.
+        options: [etf_traded_value]
+      confirm:
+        description: 운영 DB에 적용하려면 apply 입력
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: etf-swing-production
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm target
+        shell: bash
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          [ "$CONFIRM" = "apply" ] || { echo "::error::confirm input must be 'apply'"; exit 1; }
+          [ -n "$PROD_SUPABASE_DB_URL" ] || { echo "::error::repository secret PROD_SUPABASE_DB_URL is not set"; exit 1; }
+          case "$PROD_SUPABASE_DB_URL" in
+            *"$PRODUCTION_REF"*) echo "Target is the production project." ;;
+            *) echo "::error::PROD_SUPABASE_DB_URL does not point at the production project"; exit 1 ;;
+          esac
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+
+      - name: Apply the migration and verify equities are unchanged
+        shell: bash
+        env:
+          MIGRATION: ${{ inputs.migration }}
+        run: |
+          set -euo pipefail
+          case "$MIGRATION" in etf_traded_value) ;; *) echo "::error::unknown migration $MIGRATION"; exit 1 ;; esac
+          file=$(ls supabase/migrations/*_"$MIGRATION".sql)
+          echo "Applying $file"
+          equity_hash() {
+            psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+              select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_rank,l.ibd_rs_estimate,l.tt_pass_count,l.leader_tt,l.stage,l.verdict,l.action_guide),',' order by l.instrument_id),''))
+              from (select distinct on (m.instrument_id) m.* from public.market_metrics m join public.instruments i on i.id=m.instrument_id
+                    where i.asset_class='Equity' order by m.instrument_id,m.as_of desc) l"
+          }
+          before=$(equity_hash)
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f "$file"
+          after=$(equity_hash)
+          [ "$before" = "$after" ] || { echo "::error::equity metrics changed ($before -> $after)"; exit 1; }
+          echo "Equity latest metrics unchanged: $after"
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select i.market,count(*) etfs,count(l.ibd_rs_estimate) with_ibd,count(*) filter(where l.leader_tt) tt_pass,
+                   count(l.rs_rank) equity_rank_leaks,count(*) filter(where l.stage is null) no_stage,
+                   count(l.traded_value_20d) with_traded_value
+            from (select distinct on (m.instrument_id) m.* from public.market_metrics m order by m.instrument_id,m.as_of desc) l
+            join public.instruments i on i.id=l.instrument_id
+            where i.active and i.asset_class='ETF' group by i.market order by i.market"
+          leaks=$(psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select count(*) from (select distinct on (m.instrument_id) m.* from public.market_metrics m order by m.instrument_id,m.as_of desc) l
+            join public.instruments i on i.id=l.instrument_id where i.active and i.asset_class='ETF' and l.rs_rank is not null")
+          [ "$leaks" = "0" ] || { echo "::error::$leaks ETF rows carry an equity rs_rank"; exit 1; }
+          rerun=$(psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "select public.recalculate_etf_relative_strength()")
+          [ "$rerun" = "0" ] || { echo "::error::second run changed $rerun rows (not idempotent)"; exit 1; }
+          echo "Second run changed 0 rows."

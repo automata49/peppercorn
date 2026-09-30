@@ -360,7 +360,7 @@ def main():
             scheme="WICS 대분류 · 중분류" if sector else "WICS 확인 필요"
             source=("AUTO:WiseIndex WICS middle-group index constituents; FnGuide company WICS fallback"
                     if sector else "AUTO:WiseIndex/FnGuide WICS classification unavailable")
-            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"069500","currency":"KRW","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":f"{wics_as_of[:4]}-{wics_as_of[4:6]}-{wics_as_of[6:]}","universe_updated_at":NOW},2)
+            add({"market":"KR","ticker":ticker,"name":name,"asset_class":"Equity","exchange":exchange,"sector":sector,"industry":industry,"benchmark_ticker":"226490","currency":"KRW","active":True,"classification_scheme":scheme,"classification_source":source,"classification_as_of":f"{wics_as_of[:4]}-{wics_as_of[4:6]}-{wics_as_of[6:]}","universe_updated_at":NOW},2)
             member("KR",ticker,group,SOURCES[group],rank)
 
     add_kr_index(kospi200,"KOSPI200","KOSPI");add_kr_index(kosdaq150,"KOSDAQ150","KOSDAQ")

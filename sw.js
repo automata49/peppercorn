@@ -1,11 +1,11 @@
-const BUILD_REV = 'ed7dc03bf649'
+const BUILD_REV = '02dae452e760'
 const CACHE_NAME = `peppercorn-shell-${BUILD_REV}`
 const APP_ROOT = new URL('./', self.registration.scope)
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([
     APP_ROOT.href,
-    new URL('icon-192.png', APP_ROOT).href,
+    new URL('folio-icon-192.png', APP_ROOT).href,
   ])))
   self.skipWaiting()
 })

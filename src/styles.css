@@ -142,8 +142,6 @@
 .settings-grid .setting b{max-width:64%;text-align:right;line-height:1.5}
 
 /* Phone and iPad share a full-width workspace and a left-side navigation drawer. */
-.menu-trigger{display:none;position:fixed;top:18px;left:16px;z-index:8;align-items:center;gap:7px;min-height:44px;padding:7px 11px;border:1px solid #d5dce5;border-radius:9px;background:#fff;color:#28486f;font-weight:700;box-shadow:0 2px 8px #26384f12;cursor:pointer}
-.menu-trigger span:first-child{font-size:20px;line-height:1}
 .menu-drawer{left:0;right:auto;top:0;bottom:0;transform:none;width:min(320px,85vw);height:100dvh;display:flex;flex-direction:column;overflow-y:auto;background:#fff;padding:20px 14px calc(20px + env(safe-area-inset-bottom));box-shadow:18px 0 50px #24324429}
 .menu-drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .menu-drawer .brand{display:flex;padding:4px 8px 22px}
@@ -166,13 +164,8 @@
 @media(max-width:1279px){
   .shell,.shell>main{display:block;min-width:0}
   .shell>.sidebar{display:none}
-  .menu-trigger{display:inline-flex}
-  .topbar{padding-left:112px}
 }
 @media(max-width:650px){
-  .menu-trigger{top:13px;left:10px;padding:7px 9px}
-  .menu-trigger-label{display:none}
-  .topbar{padding-left:74px}
   .topbar h1{font-size:18px}
   .top-actions .source{display:none}
 }
@@ -357,7 +350,7 @@ body{font-size:14px;line-height:1.45}
 /* Lower dashboard panels */
 .dashboard-lower-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:16px}
 .dashboard-lower-grid>.panel{margin-bottom:18px}
-.dashboard-sector-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
+.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-etf-industry-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
 .dashboard-sector-table-wrap{max-height:560px}
 .dashboard-sector-table{width:100%;min-width:610px;table-layout:fixed}
 .dashboard-sector-table th,.dashboard-sector-table td{padding:9px 8px}
@@ -413,9 +406,8 @@ body{font-size:14px;line-height:1.45}
   .mobile-brand-home img{width:30px;height:30px;object-fit:contain}
   .mobile-brand-home strong{font-size:15px;white-space:nowrap}
   .mobile-brand-menu{display:grid;place-items:center;width:38px;height:38px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:18px;cursor:pointer}
-  .menu-trigger{display:none!important}
   .topbar{position:sticky;top:58px;z-index:14;height:auto;min-height:78px;padding:12px 14px;background:rgba(255,255,255,.96);align-items:flex-start}
-  .topbar>div:first-child{min-width:0}
+  .topbar>.topbar-title{min-width:0}
   .topbar h1{font-size:28px!important;line-height:1.08;letter-spacing:-.035em}
   .topbar p{display:block!important;margin-top:5px;font-size:11px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .top-actions{display:none!important}
@@ -449,9 +441,9 @@ body{font-size:14px;line-height:1.45}
   .dashboard-sector-filter{display:none}
   .dashboard-lower-grid{display:block}
   .dashboard-lower-grid>.panel{margin-bottom:12px;padding:12px;border-radius:15px}
-  .dashboard-sector-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
-  .dashboard-sector-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
-  .dashboard-sector-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
+  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-etf-industry-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
+  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-etf-industry-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
+  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-etf-industry-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
   .sector-actions{justify-content:flex-end}
   .mini-segment button{padding:5px 7px;font-size:9.5px}
   .dashboard-sector-table-wrap{max-height:none;overflow:visible}
@@ -932,13 +924,13 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 @media(min-width:651px) and (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
   body{background:#f3f6fa}
   .shell,.shell>main{display:block;min-width:0}
-  .shell>.sidebar,.menu-trigger{display:none!important}
+  .shell>.sidebar{display:none!important}
   .mobile-brandbar{position:sticky;top:0;z-index:18;display:flex;align-items:center;justify-content:space-between;height:62px;padding:8px 20px;background:rgba(255,255,255,.96);border-bottom:1px solid #e6ebf0;backdrop-filter:blur(12px)}
   .mobile-brand-home{display:flex;align-items:center;gap:9px;padding:0;border:0;background:transparent;color:#18314f;cursor:pointer}
   .mobile-brand-home img{width:32px;height:32px;object-fit:contain}
   .mobile-brand-menu{display:grid;place-items:center;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer}
   .topbar{position:sticky;top:62px;z-index:14;height:auto;min-height:74px;padding:12px 20px;background:rgba(255,255,255,.96)}
-  .topbar>div:first-child{min-width:0}
+  .topbar>.topbar-title{min-width:0}
   .topbar p{max-width:100%;overflow:hidden;text-overflow:ellipsis}
   .top-actions{display:none!important}
   .content{padding:18px 20px calc(96px + env(safe-area-inset-bottom))}
@@ -1048,6 +1040,94 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 
 .top-actions button.source{border-radius:999px;padding:6px 9px;font-size:11px;white-space:nowrap}.top-actions button.source:disabled{opacity:.65;cursor:wait}
 .snapshot-refresh{border:1px solid #d5dce5;border-radius:7px;background:#fff;color:#426486;min-width:28px;min-height:28px;cursor:pointer}.snapshot-refresh:disabled{opacity:.6;cursor:wait}
+
+/* ETF summary: shared StockRows; its ETF name column uses the same width state as the sector name column. */
+.dashboard-etf-panel{margin-bottom:18px}
+
+/* Canonical table alignment (CONTRACT UI rule): every column header is left-aligned; numeric cells are right-aligned;
+   names, stages and other text stay left. Applies to sector tables, StockRows and AG Grid tables (cell-num). */
+.sector-metrics-table th{text-align:left!important}
+.sector-metrics-table td:not(:first-child){text-align:right!important}
+.stock-rows-head>span{text-align:left!important}
+.stock-row>span,.stock-row>strong{text-align:right!important}
+.stock-row .stock-id{text-align:left!important}
+.stock-row .pill{justify-self:start}
+.stock-row .rank{justify-content:flex-end;padding-right:8px}
+.ag-header-cell-label{justify-content:flex-start!important}
+.ag-cell.cell-num{text-align:right;justify-content:flex-end}
+
+/* ETF 주도 산업 treemap heatmap (ETF-INDUSTRY-2): tile area = ETF trading value, colour = median RS for the chosen period.
+   One map per market (KRW and USD are never sized against each other); 2px surface gaps between tiles; legend below.
+   Placed under 섹터 요약 in the left column (the sector panel and the heatmap share .dashboard-left-column). */
+.dashboard-left-column{min-width:0}
+.dashboard-left-column>.panel{width:100%}
+.dashboard-etf-industry-panel{margin-bottom:18px}
+.etf-heat-periods{display:inline-flex;margin-bottom:12px}
+.etf-heat-market+.etf-heat-market{margin-top:14px}
+.etf-heat-market-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;font-size:12px;color:var(--muted)}
+.etf-heat-market-head b{font-size:13px;color:var(--ink)}
+.etf-heat-map{position:relative;width:100%;background:var(--card);overflow:hidden}
+.etf-heat-tile{position:absolute;display:flex;flex-direction:column;justify-content:flex-start;gap:2px;padding:7px 8px;border:0;border-radius:4px;text-align:left;cursor:pointer;font:inherit;overflow:hidden}
+.etf-heat-tile:hover{filter:brightness(1.06)}
+.etf-heat-tile:focus-visible{outline:2px solid #202938;outline-offset:-2px}
+.etf-heat-tile b{font-size:13px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etf-heat-tile strong{font-size:18px;line-height:1.15;font-weight:800;font-variant-numeric:tabular-nums}
+.etf-heat-tile small{font-size:11px;opacity:.9;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.etf-heat-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:10px;color:var(--muted);font-size:12px}
+.etf-heat-key{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+.etf-heat-key i{display:inline-block;width:14px;height:14px;border-radius:3px}
+
+/* Folio brand: icon and wordmark share one height everywhere. */
+.folio-brand{display:flex;align-items:center;gap:10px;min-width:0;margin:0}
+.folio-brand .brand-icon,.folio-brand .brand-wordmark-img{display:block;flex:none;width:auto!important;height:var(--folio-brand-h,36px)!important;object-fit:contain}
+.sidebar .folio-brand{--folio-brand-h:36px;justify-content:flex-start;padding:4px 8px 24px}
+.mobile-brand-home .folio-brand{--folio-brand-h:34px}
+/* The drawer brand scales with the drawer width. */
+.menu-drawer{container-type:inline-size}
+.menu-drawer .folio-brand{--folio-brand-h:clamp(28px,9vw,40px);--folio-brand-h:clamp(28px,12cqi,40px);justify-content:flex-start;padding:4px 8px 22px}
+.topbar-title{flex:1;min-width:0}
+.topbar-menu{display:none}
+
+/* Only iPad Pro landscape and desktop (>=1280px) show the brand above the page; narrower screens start with the menu. */
+@media(max-width:1279px){
+  .mobile-brandbar{display:none!important}
+  .topbar{top:0!important;justify-content:flex-start;gap:12px}
+  .topbar-menu{display:grid;place-items:center;flex:none;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer}
+}
+
+/* Loading page: Folio lockup and slogan centred, the house brand in one small line at the bottom. */
+.launch-screen{position:relative}
+.launch-brand{display:flex;align-items:center;justify-content:center;gap:clamp(10px,3vw,16px)}
+.launch-brand img{display:block;width:auto;height:clamp(44px,13vw,64px)}
+.launch-brand .launch-emblem{filter:drop-shadow(0 5px 7px rgba(36,55,77,.12))}
+.launch-center .launch-slogan{margin-top:20px;color:#6f7c8d;font-size:14px;letter-spacing:.04em;white-space:nowrap}
+.launch-footer{position:absolute;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;gap:5px;color:#8a94a1;font-size:11px;line-height:1;white-space:nowrap}
+.launch-footer img{display:block;width:auto;height:1em;object-fit:contain}
+.launch-footer span{color:#5d6a7b;font-weight:600}
+.launch-footer small{margin-left:4px;font-size:inherit}
+@media(max-width:650px){.launch-center .launch-slogan{font-size:13px;letter-spacing:.02em}}
+
+/* Light theme (the app's only theme): the Folio card icon reads as a raised 3D tile. */
+:root:not([data-theme="dark"]) .folio-brand .brand-icon,
+:root:not([data-theme="dark"]) .launch-brand .launch-emblem{
+  transform:perspective(420px) rotateX(9deg) rotateY(-11deg);
+  transform-origin:50% 60%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.95)) drop-shadow(0 2px 2px rgba(22,38,64,.20)) drop-shadow(0 7px 10px rgba(22,38,64,.18)) drop-shadow(0 16px 22px rgba(22,38,64,.10));
+}
+/* Loading page description under the slogan. */
+.launch-center .launch-description{
+  max-width:min(92vw,400px);margin-top:12px;color:#8a95a4;font-size:12.5px;line-height:1.75;letter-spacing:-.005em;
+  text-align:center;word-break:keep-all;overflow-wrap:normal;text-wrap:balance;
+}
+@media(max-width:650px){.launch-center .launch-description{font-size:12px;max-width:320px}}
+/* LIVE-QUOTE-1: live current price display. */
+.live-price{font-variant-numeric:tabular-nums}
+.stock-row .stock-price.live-price{color:#1e3a5f}
+.live-badge{display:block;margin-top:3px;font-size:10.5px;font-weight:600;color:#237a4b;white-space:nowrap}
+.live-badge::before{content:'';display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#2f9e5f;vertical-align:1px}
+.live-badge.off{color:#8a94a1}
+.live-badge.off::before{background:#b9c2cd}
+
 /* Stock analysis: Swing / Position / 내 분석 parts, and the Position panel */
 .analysis-part{font-size:13px;color:#2b3c52;margin:22px 0 10px;padding-top:14px;border-top:2px solid #e3e9f0;word-break:keep-all}
 .analysis-card>.analysis-part:first-of-type{margin-top:16px}
