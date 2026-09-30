@@ -102,19 +102,34 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
   expect(calls).toBe(2);
 });
 
-test('ETF detail shows relative strength without equity-only rankings',async({page})=>{
+test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide',async({page})=>{
   const etf={...rows[0],id:'etf-spy',ticker:'SPY',name:'SPY ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,ibd_rs_as_of:null,leader_tt:false,leadership_class:'중립'};
-  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[etf]}}));
+  const qqq={...etf,id:'etf-qqq',ticker:'QQQ',name:'QQQ ETF',rs_1m:.2,rs_3m:.2,ibd_rs_estimate:92,ibd_rs_as_of:'2026-09-28',leader_tt:true,leadership_class:'주도 후보',stage:'▲ 돌파 매수권',verdict:'★ 우선 분석',action_guide:'52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인'};
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  // Dashboard ETF summary: ETF-only RS rank and IBD estimate.
+  const top=page.locator('.dashboard-etf-panel .stock-row').first();
+  await expect(top.locator('.stock-id b')).toHaveText('QQQ ETF');
+  await expect(top.locator('strong').nth(0)).toHaveText('99');
+  await expect(top.locator('strong').nth(1)).toHaveText('92');
+  await expect(top.locator('strong').nth(1)).toHaveAttribute('title','가격 기준 2026-09-28 · 같은 시장 ETF끼리 비교한 추정치(ETF-IBD-1)');
+  await top.click();
+  await expect(page.locator('.drill-sheet .drill-guide')).toContainText('52주 고점(피벗) 돌파');
+  await expect(page.locator('.drill-sheet .drill-checks b').first()).toHaveText('PASS');
+  await expect(page.locator('.drill-sheet .leadership-copy')).toContainText('★ 우선 분석');
+  await expect(page.locator('.drill-sheet .leadership-section .snapshot-section-head .pill')).toHaveText('해당 없음');
+  await page.getByRole('button',{name:'닫기',exact:true}).click();
+  // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
+  await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .stock-title')).toContainText('SPY ETF');
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
-  await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위99');
-  await expect(page.locator('.analysis-card .ibd-score')).toHaveAttribute('title','ETF 등 주식 외 자산은 IBD식 RS 산정 대상이 아닙니다');
-  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'Trend Template'}).locator('b')).toHaveText('해당 없음');
-  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('해당 없음');
+  await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위50');
+  await expect(page.locator('.analysis-card .ibd-score')).toHaveAttribute('title','ETF 가격 이력 253거래일 미만');
+  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'Trend Template'}).locator('b')).toHaveText('CHECK');
+  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('CHECK');
 });
 
 test('failed live load can be retried from the demo state',async({page})=>{

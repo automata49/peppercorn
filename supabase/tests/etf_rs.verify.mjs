@@ -55,4 +55,37 @@ let denied=false;
 try { await q('select public.recalculate_etf_relative_strength()'); } catch(e) { denied=/permission denied/.test(String(e.message)); }
 await db.exec('reset role');
 check('anon cannot recalculate',denied);
+
+// ETF-SWING-1: IBD estimate, Trend Template, stage, verdict and guide for ETFs, ranked among ETFs only.
+const swing = readdirSync('supabase/migrations').find(name=>name.endsWith('_etf_swing_criteria.sql'));
+if (!swing) throw new Error('missing ETF swing migration');
+await db.exec(readFileSync(`supabase/migrations/${swing}`,'utf8'));
+// Identical inputs for one equity (AAPL, the only US equity) and one ETF (QQQ, the strongest US ETF).
+const same = `price=110,ma50=100,ma200=90,high_52w_distance=-.02,low_52w=60,atr_multiple=3,volume_ratio=1.6,
+  return_1w=.03,return_1m=.08,return_3m=.2,return_6m=.3,return_12m=.5`;
+await q(`update public.market_metrics set ${same} where instrument_id in ($1,$2)`,[ids.AAPL,ids.QQQ]);
+await q(`update public.market_metrics set price=100,ma50=100,ma200=100,return_1w=0,return_1m=0,return_3m=0,return_6m=0,return_12m=0 where instrument_id=$1`,[ids.SPY]);
+// 253 sessions: AAPL and QQQ share one rising series; SPY is flat; KR 229200 has only 100 sessions.
+async function prices(id, days, step, end='2026-09-28') {
+  await q(`insert into public.price_daily(instrument_id,trade_date,close)
+    select $1::uuid,$4::date-g,100+$3::numeric*($2::int-g) from generate_series(0,$2::int-1) g`,[id,days,step,end]);
+}
+await prices(ids.AAPL,253,.5); await prices(ids.QQQ,253,.5); await prices(ids.SPY,253,0);
+await prices(ids.KRETF,100,.5,'2026-09-29');
+await q('select public.recalculate_market_leadership()');
+await q('select public.recalculate_etf_relative_strength()');
+const full = async key => (await q(`select rs_rank,ibd_rs_estimate,ibd_rs_as_of,tt_pass_count,leader_tt,stage,verdict,action_guide
+  from public.market_metrics where instrument_id=$1`,[ids[key]])).rows[0];
+const aapl=await full('AAPL'), etfQ=await full('QQQ'), spyFull=await full('SPY'), krShort=await full('KRETF');
+check('ETF IBD estimate ranks among ETFs only', etfQ.ibd_rs_estimate===99 && spyFull.ibd_rs_estimate<99);
+check('equity IBD estimate unchanged by ETF ranking', aapl.ibd_rs_estimate===99);
+check('ETF without 253 sessions has no IBD estimate', krShort.ibd_rs_estimate===null);
+check('ETF rank never stored in rs_rank', etfQ.rs_rank===null && spyFull.rs_rank===null);
+check('Trend Template parity with equities', etfQ.leader_tt===aapl.leader_tt && etfQ.tt_pass_count===aapl.tt_pass_count && etfQ.leader_tt===true);
+check('stage, verdict and guide parity with equities', etfQ.stage===aapl.stage && etfQ.verdict===aapl.verdict && etfQ.action_guide===aapl.action_guide);
+check('ETF classification reaches the top verdict', etfQ.verdict==='⭐ 최우선 관심');
+check('flat benchmark ETF fails the Trend Template', spyFull.leader_tt===false);
+await db.exec('set role service_role');
+check('service role ETF swing rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
+await db.exec('reset role');
 console.log(`${passed} ETF RS checks passed`);
