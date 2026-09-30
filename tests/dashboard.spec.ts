@@ -135,3 +135,14 @@ test('a stalled live response releases the refresh controls',async({page})=>{
   await expect(refresh).toContainText('Supabase Live');
   expect(calls).toBe(2);
 });
+
+test('KR ETFs show their Korean name in the dashboard ETF summary and detail',async({page})=>{
+  const kr={...rows[1],id:'etf-kr',ticker:'069500',market:'KR',name:'Samsung KODEX 200 Securities ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립'};
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,kr]}}));
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  const row=page.locator('.dashboard-etf-panel tbody tr').first();
+  await expect(row.locator('td:first-child b')).toHaveText('KODEX 200');
+  await row.click();
+  await expect(page.locator('.drill-sheet h2').first()).toHaveText('KODEX 200');
+});

@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
+import { applyKrEtfNames } from './lib/krEtfNames'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
@@ -461,7 +462,7 @@ export default function App(){
       // A transient connection failure must not replace loaded live rows with demo data.
       if(result.source==='demo'&&sourceRef.current==='supabase')return
       sourceRef.current=result.source
-      const rows=withEtfRanks(result.rows)
+      const rows=withEtfRanks(applyKrEtfNames(result.rows))
       setLeaders(rows);setSource(result.source)
       const matching=(row:LeaderRow|null)=>rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
       setSelected(previous=>matching(previous)??rows[0]??null)

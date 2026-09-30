@@ -33,3 +33,16 @@ test('ETF-RS-RANK-1 ranks ETFs per market, separately from equities',()=>{
   expect(out.find(r=>r.id==='equity')!.etf_rs_rank).toBeUndefined()
   expect(out.every(r=>r.rs_rank===null)).toBe(true)
 })
+
+test('KR ETFs show the official Korean name; other rows keep theirs',async()=>{
+  const {applyKrEtfNames}=await import('../src/lib/krEtfNames')
+  const rows=[
+    {...etf('kr','KR',{}),ticker:'069500',name:'Samsung KODEX 200'},
+    {...etf('kr-new','KR',{}),ticker:'0080g0',name:'0080G0'},
+    {...etf('kr-unknown','KR',{}),ticker:'999999',name:'원본 이름'},
+    {...etf('us','US',{}),ticker:'069500',name:'US ETF'},
+    {...etf('eq','KR',{},'Equity'),ticker:'069500',name:'주식'}
+  ] as LeaderRow[]
+  const out=applyKrEtfNames(rows,{'069500':'KODEX 200','0080G0':'KODEX 방산TOP10'})
+  expect(out.map(r=>r.name)).toEqual(['KODEX 200','KODEX 방산TOP10','원본 이름','US ETF','주식'])
+})

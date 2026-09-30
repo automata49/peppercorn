@@ -139,3 +139,8 @@ By user request the dashboard has an `ETF 요약` section after the sector/stock
 Not verified: production data (the leaderboard endpoint is blocked from this container) and physical iPad Safari.
 Next: if a server-side ETF rank is wanted (e.g. for sorting in the leaderboard endpoint), port ETF-RS-RANK-1 into `recalculate_etf_relative_strength()` with the same fixtures.
 Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (11 passed, incl. 2 rank fixture cases), `git diff --check`.
+
+## KR ETF Korean names — 2026-09-30
+By user request KR ETFs show their Korean short name everywhere the app lists them (dashboard ETF summary, detail, Leaderboard, search). The ETF instruments came from the universe snapshot, whose name column is empty for ETFs. `analysis/kr_etf_names.py` fetches names for the snapshot's KR ETFs: KRX MDC (MDCSTAT04301/04601) now answers `400 LOGOUT` without a login, so run 36670605232 used the Naver Finance ETF list (1,171 ETFs) and matched 82/82. The 55 names the snapshot already recorded in `Official Sector / …` labels all match. The map is committed as `src/data/krEtfNames.json` and `applyKrEtfNames` renames only `market=KR, asset_class=ETF` rows at load; unmapped ETFs keep their source name. `instruments.name` in the database is unchanged.
+Refresh: run Actions → `KR ETF names` (manual; prints the map), then commit the updated JSON. A new KR ETF added to the universe shows its source name until then.
+Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (13 passed, incl. a name-mapping fixture and a dashboard/detail browser check), `git diff --check`.
