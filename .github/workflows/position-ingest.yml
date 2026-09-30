@@ -28,7 +28,7 @@ env:
 jobs:
   ingest:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: analysis/fundamentals
@@ -41,14 +41,23 @@ jobs:
       - run: python -m pytest -q
 
       - name: Collect (SEC + DART)
+        shell: bash
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
+          TARGET: ${{ inputs.target || 'prod' }}
+        # Production follows the dashboard's public leaders; the test project lists only the two reference companies.
         # A failed quality check still produces a result; persist turns it into a check_failed snapshot.
-        run: python collect.py --out out || echo "::warning::collector reported failed checks"
+        run: |
+          if [ "$TARGET" = "prod" ]; then
+            python targets.py --out targets.json
+            python collect.py --out out --targets targets.json || echo "::warning::collector reported failed checks"
+          else
+            python collect.py --out out || echo "::warning::collector reported failed checks"
+          fi
 
       - name: Dry run
-        run: python persist.py out
+        run: python persist.py out --tolerate-refusals
 
       - name: Ingest through the Edge Function (twice; the second must add nothing)
         shell: bash
@@ -63,13 +72,11 @@ jobs:
             project="${TEST_SUPABASE_URL%/}"; project="${project%/rest/v1}"
             base="$project/functions/v1"
           fi
-          export POSITION_EDGE_URL="$base/position-ingest"
+          export POSITION_EDGE_URL="$base/position-ingest" POSITION_OIDC_AUDIENCE="$OIDC_AUDIENCE"
           for round in first second; do
-            POSITION_OIDC_TOKEN=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])')
-            echo "::add-mask::$POSITION_OIDC_TOKEN"
-            export POSITION_OIDC_TOKEN
+            # persist.py requests a fresh OIDC token for every company; tokens are short-lived.
             echo "== $round round ($TARGET)"
-            python persist.py out --apply --via edge | tee "ingest-$round.txt"
+            python persist.py out --apply --via edge --tolerate-refusals | tee "ingest-$round.txt"
           done
           if grep -Eq "'facts_inserted': [1-9]|'snapshots_inserted': [1-9]" ingest-second.txt; then
             echo "::error::second round inserted rows; ingestion is not idempotent"; exit 1
@@ -79,5 +86,7 @@ jobs:
         if: always()
         with:
           name: position-ingest
-          path: analysis/fundamentals/out/
+          path: |
+            analysis/fundamentals/out/
+            analysis/fundamentals/targets.json
           if-no-files-found: warn

@@ -23,11 +23,22 @@ RULES_VERSION = "uncalibrated"          # no calibrated label rules exist, so sn
 EXTRACT_VERSION = "fundamentals-extract-1"
 CHUNK = 200
 EXPECTED = ["revenue", "gross_profit", "operating_income", "pretax_income", "income_tax", "net_income",
-            "operating_cash_flow", "capex", "sbc", "diluted_shares", "equity", "cash", "short_term_investments", "debt"]
+            "operating_cash_flow", "capex", "sbc", "diluted_shares", "equity", "cash", "short_term_investments", "debt",
+            "liabilities", "eps_diluted"]
+EXPECTED_BY_MARKET = {"US": EXPECTED, "KR": EXPECTED + ["shares_common", "shares_preferred"]}
+SHARE_FIELDS = {"diluted_shares", "shares_common", "shares_preferred"}
+
+
+def unit_for(field: str, currency: str) -> str:
+    if field in SHARE_FIELDS:
+        return "shares"
+    return f"{currency}/share" if field == "eps_diluted" else currency
 UNKNOWN_WHY = {
     ("KR", "sbc"): "share-based compensation is not collected from DART statements",
     ("KR", "diluted_shares"): "weighted diluted share count is not collected from DART statements (total shares differ)",
+    ("KR", "shares_preferred"): "no preferred share count in the periodic report (the class may not exist)",
 }
+REFERENCE_TICKERS = {"NVDA", "005930"}   # reconciled against official filings; a refusal is always an error
 CONFLICT_KEYS = {"fundamentals_q": "instrument_id,period_end,field,input_hash",
                  "position_snapshot": "instrument_id,as_of,rules_version,input_hash"}
 
@@ -81,16 +92,16 @@ def fact_rows(result: dict, quarters: int = 20) -> tuple[list[dict], list[str]]:
             if result.get("raw_sha256") and isinstance(result["raw_sha256"], str):
                 lineage["raw_sha256"] = result["raw_sha256"]
             rows.append({"period_end": end, "field": field, "status": "reported", "value": value,
-                         "unit": "shares" if field == "diluted_shares" else currency, "scope": "consolidated",
+                         "unit": unit_for(field, currency), "scope": "consolidated",
                          "unknown_reason": None, "extraction": origin["operation"], "method_version": method,
                          "lineage": lineage, "source_filed_at": max(filed), "input_hash": digest(identity),
                          "pipeline_version": PIPELINE_VERSION})
-        for field in EXPECTED:
+        for field in EXPECTED_BY_MARKET.get(market, EXPECTED):
             if field in present:
                 continue
             why = UNKNOWN_WHY.get((market, field), f"{field} not reported in the collected {result['source']} statements")
             rows.append({"period_end": end, "field": field, "status": "unknown", "value": None,
-                         "unit": "shares" if field == "diluted_shares" else currency, "scope": "consolidated",
+                         "unit": unit_for(field, currency), "scope": "consolidated",
                          "unknown_reason": why, "extraction": "direct", "method_version": EXTRACT_VERSION,
                          "lineage": {}, "source_filed_at": None,
                          "input_hash": digest({"unknown": True, "field": field, "period_end": end, "why": why}),
@@ -189,19 +200,33 @@ class EdgeClient:
 
     The bearer token is the workflow's GitHub OIDC token; it never appears in messages."""
 
-    def __init__(self, url: str, token: str):
+    def __init__(self, url: str, token: str | None = None, audience: str | None = None):
         self.url = url.strip().rstrip("/")
         self.token = token
+        self.audience = audience
+
+    def _token(self) -> str:
+        """A fresh GitHub OIDC token per request when running in Actions (tokens are short-lived), else the given one."""
+        request_url, request_token = os.environ.get("ACTIONS_ID_TOKEN_REQUEST_URL"), os.environ.get("ACTIONS_ID_TOKEN_REQUEST_TOKEN")
+        if self.audience and request_url and request_token:
+            response = requests.get(f"{request_url}&audience={self.audience}", timeout=30,
+                                    headers={"Authorization": f"bearer {request_token}"})
+            response.raise_for_status()
+            self.token = response.json()["value"]
+        if not self.token:
+            raise RuntimeError("no OIDC token available")
+        return self.token
 
     def send(self, planned: dict) -> dict:
         for table in ("fundamentals_q", "position_snapshot"):
             assert_position_write_target(table)
         body = {"market": planned["market"], "ticker": planned["ticker"], "facts": planned["facts"],
                 "snapshot": planned["snapshot"]}
+        token = self._token()
         response = requests.post(self.url, timeout=180, data=json.dumps(body, allow_nan=False),
-                                 headers={"Authorization": f"Bearer {self.token}", "Content-Type": "application/json"})
+                                 headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"})
         if response.status_code >= 300:
-            raise RuntimeError(f"position-ingest failed: HTTP {response.status_code} {response.text.replace(self.token, '***')[:300]}")
+            raise RuntimeError(f"position-ingest failed: HTTP {response.status_code} {response.text.replace(token, '***')[:300]}")
         return response.json()
 
 
@@ -227,6 +252,9 @@ def main():
     ap.add_argument("--apply", action="store_true", help="write to the database; default is a dry run")
     ap.add_argument("--via", choices=["rest", "edge"], default="rest",
                     help="rest: PostgREST with a pipeline JWT (test project); edge: position-ingest Edge Function with a GitHub OIDC token")
+    ap.add_argument("--tolerate-refusals", action="store_true",
+                    help="for a broad target list: report refused companies but fail only if a reference company "
+                         "is refused, a write fails, or nothing is written")
     args = ap.parse_args()
     if args.quarters < 1:
         ap.error("--quarters must be positive")
@@ -236,20 +264,23 @@ def main():
     client = None
     if args.apply and args.via == "edge":
         url, token = os.environ.get("POSITION_EDGE_URL", ""), os.environ.get("POSITION_OIDC_TOKEN", "")
-        if not url or not token:
-            raise SystemExit("--via edge needs POSITION_EDGE_URL and POSITION_OIDC_TOKEN (GitHub Actions only)")
-        client = EdgeClient(url, token)
+        audience = os.environ.get("POSITION_OIDC_AUDIENCE", "")
+        if not url or not (token or audience):
+            raise SystemExit("--via edge needs POSITION_EDGE_URL and POSITION_OIDC_TOKEN or POSITION_OIDC_AUDIENCE (GitHub Actions only)")
+        client = EdgeClient(url, token or None, audience or None)
     elif args.apply:
         url, token = os.environ.get("POSITION_SUPABASE_URL", ""), os.environ.get("POSITION_PIPELINE_JWT", "")
         if not url or not token:
             raise SystemExit("--apply needs POSITION_SUPABASE_URL and POSITION_PIPELINE_JWT (server side only)")
         client = Client(url, token, os.environ.get("POSITION_SUPABASE_APIKEY") or None)
-    failed = False
+    failed, written, refused = False, 0, []
     for result in results:
         planned = plan(result, args.quarters, date.today().isoformat())
         if "refused" in planned:
             print(f"REFUSED {planned['ticker']}: {planned['refused']}")
-            failed = True
+            refused.append(planned["ticker"])
+            if not args.tolerate_refusals or planned["ticker"] in REFERENCE_TICKERS:
+                failed = True
             continue
         reported = sum(1 for row in planned["facts"] if row["status"] == "reported")
         summary = (f"{planned['ticker']}: {reported} reported + {len(planned['facts']) - reported} unknown facts, "
@@ -257,8 +288,17 @@ def main():
         if not client:
             print("DRY RUN", summary)
             continue
-        print("APPLIED", summary, apply(planned, client))
-    if failed:
+        try:
+            print("APPLIED", summary, apply(planned, client))
+            written += 1
+        except RuntimeError as error:          # e.g. an instrument the target database does not list
+            print(f"WRITE FAILED {planned['ticker']}: {error}")
+            refused.append(planned["ticker"])
+            if not args.tolerate_refusals or planned["ticker"] in REFERENCE_TICKERS:
+                failed = True
+    print(f"SUMMARY {len(results)} results, {written if client else len(results) - len(refused)} "
+          f"{'written' if client else 'ready'}, {len(refused)} refused")
+    if failed or (client and written == 0):
         raise SystemExit(1)
 
 

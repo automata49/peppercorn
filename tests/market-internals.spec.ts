@@ -3,15 +3,16 @@ const base={asset_class:'Equity',sector:'Technology',industry:'Semiconductors',i
 // 25 stocks, 8 within 10% of the 52W high (32%); one row has no high history.
 const rows=Array.from({length:26},(_,i)=>({...base,id:String(i),ticker:'T'+i,market:'US',name:'종목 '+i,price:100,high_52w_distance:i===25?null:i<8?-.05:-.3}))
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
- test(view.name+' market internals rows line up and 52W shows a share',async({browser})=>{
+ test(view.name+' market metrics popup rows line up and 52W shows a share',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
   const page=await context.newPage()
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{},failed:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  const cards=page.locator('.market-metric-card')
-  await expect(cards).toHaveCount(5)
+  await page.getByRole('button',{name:'시장 지표',exact:true}).click()
+  const cards=page.locator('.market-metrics-dialog .market-metric-card')
+  await expect(cards).toHaveCount(4)
   const high=cards.filter({hasText:'52W 고점 근접'})
   await expect(high.locator('.market-metric-value')).toHaveText('32%')
   await expect(high.locator('.market-metric-sub')).toHaveText('8 / 25 종목 · 고점 -10% 이내')

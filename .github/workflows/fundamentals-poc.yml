@@ -9,6 +9,11 @@ on:
         type: choice
         options: [ALL, US, KR]
         default: ALL
+      scope:
+        description: 대상 (reference 기준 2종목, leaders 대시보드 주도 종목 전체 — DB 쓰기 없음)
+        type: choice
+        options: [reference, leaders]
+        default: reference
 
 permissions:
   contents: read
@@ -16,7 +21,7 @@ permissions:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 120
     defaults:
       run:
         working-directory: analysis/fundamentals
@@ -34,8 +39,17 @@ jobs:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           MARKET: ${{ inputs.market }}
+          SCOPE: ${{ inputs.scope }}
         run: |
-          if [ "$MARKET" = "ALL" ]; then python collect.py --out out; else python collect.py --out out --only "$MARKET"; fi
+          args="--out out"
+          [ "$MARKET" = "ALL" ] || args="$args --only $MARKET"
+          if [ "$SCOPE" = "leaders" ]; then
+            python targets.py --out targets.json
+            python collect.py $args --targets targets.json || echo "::warning::some targets failed checks"
+            python persist.py out --tolerate-refusals | tail -40
+          else
+            python collect.py $args
+          fi
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4

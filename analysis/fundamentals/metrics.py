@@ -106,6 +106,29 @@ def compute(q: dict, default_tax: float, roic_method: dict | None = None, absent
         "revenue_cagr_3y": None if not rev_3y or rev_3y <= 0 or rev is None else (rev / rev_3y) ** (1 / 3) - 1,
         "net_income_cagr_3y": None if not ni_3y or ni_3y <= 0 or not ni or ni <= 0 else (ni / ni_3y) ** (1 / 3) - 1,
         "dilution_yoy": None if not shares or not shares_prev else shares / shares_prev - 1,
+        **_display(q, ends, e, e1, e3, T),
+    }
+
+
+def _display(q: dict, ends: list[str], e: str, e1: str | None, e3: str | None, T) -> dict:
+    """Quantities the stock analysis screen shows next to the user's own entries; unknown stays None."""
+    last, prior = q[e], (q[e1] if e1 else {})
+    rev, rev_prior = last.get("revenue"), prior.get("revenue")
+    eps_q, eps_q_prior = last.get("eps_diluted"), prior.get("eps_diluted")
+    eps_ttm, eps_ttm_3y = T("eps_diluted"), (T("eps_diluted", e3) if e3 else None)
+    liabilities, equity = last.get("liabilities"), last.get("equity")
+    shares_end = next((k for k in ends[::-1][:2] if q[k].get("diluted_shares")), None)
+    return {
+        "revenue_yoy_q": None if rev is None or not rev_prior or rev_prior <= 0 else rev / rev_prior - 1,
+        "ttm_operating_cash_flow": T("operating_cash_flow"),
+        "eps_ttm": eps_ttm,
+        "eps_yoy_q": None if eps_q is None or not eps_q_prior or eps_q_prior <= 0 else eps_q / eps_q_prior - 1,
+        "eps_cagr_3y": None if not eps_ttm or not eps_ttm_3y or eps_ttm <= 0 or eps_ttm_3y <= 0
+        else (eps_ttm / eps_ttm_3y) ** (1 / 3) - 1,
+        "debt_ratio": None if liabilities is None or not equity or equity <= 0 else liabilities / equity,
+        "diluted_shares_latest": q[shares_end]["diluted_shares"] if shares_end else None,
+        "shares_common": last.get("shares_common"),
+        "shares_preferred": last.get("shares_preferred"),
     }
 
 

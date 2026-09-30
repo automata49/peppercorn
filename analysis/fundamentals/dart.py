@@ -30,12 +30,21 @@ FLOW = {
     "net_income": (["ifrs-full_ProfitLoss"], ["당기순이익", "당기순이익(손실)", "분기순이익", "반기순이익"]),
     "operating_cash_flow": (["ifrs-full_CashFlowsFromUsedInOperatingActivities"], ["영업활동현금흐름", "영업활동으로인한현금흐름"]),
     "capex": (["ifrs-full_PurchaseOfPropertyPlantAndEquipment"], ["유형자산의취득"]),
+    # Per common share, in won. A company without dilutive securities presents one basic-and-diluted line,
+    # so the basic line is the fallback only when no diluted line exists.
+    "eps_diluted": (["ifrs-full_DilutedEarningsLossPerShare", "ifrs-full_BasicEarningsLossPerShare"],
+                    ["희석주당이익", "희석주당이익(손실)", "희석주당순이익", "희석주당순이익(손실)", "기본및희석주당이익",
+                     "기본및희석주당이익(손실)", "기본주당이익", "기본주당이익(손실)", "기본주당순이익"]),
 }
 STOCK = {
     "equity": (["ifrs-full_Equity"], ["자본총계"]),
     "cash": (["ifrs-full_CashAndCashEquivalents"], ["현금및현금성자산"]),
     "short_term_investments": (["ifrs-full_ShortTermDepositsNotClassifiedAsCashEquivalents"], ["단기금융상품"]),
+    "liabilities": (["ifrs-full_Liabilities"], ["부채총계"]),
 }
+SHARES_URL = "https://opendart.fss.or.kr/api/stockTotqySttus.json"
+# Outstanding shares (issued minus treasury) per class, from the same periodic report as the statements.
+SHARE_CLASSES = {"보통주": "shares_common", "우선주": "shares_preferred"}
 GRANT_NAME = "정부보조금의수취"
 # Complete prior years fetched in addition to the current year: at least 20 consecutive quarters,
 # enough for a 3-year TTM CAGR with an earlier comparison TTM.
@@ -76,7 +85,8 @@ def fetch(corp_code: str, years: list[int], fs_div: str = "CFS") -> list[dict]:
             receipts = {row.get("rcept_no") for row in body["list"] if row.get("rcept_no")}
             annual.append({"year": y, "reprt_code": code, "fs_div": fs_div,
                             "rcp_no": next(iter(receipts)) if len(receipts) == 1 else None,
-                            "raw_sha256": hashlib.sha256(r.content).hexdigest(), "rows": body["list"]})
+                            "raw_sha256": hashlib.sha256(r.content).hexdigest(), "rows": body["list"],
+                            **_share_rows(corp_code, y, code, key)})
             time.sleep(0.2)
         if annual:
             wanted = {rep["rcp_no"] for rep in annual if rep["rcp_no"]}
@@ -85,6 +95,17 @@ def fetch(corp_code: str, years: list[int], fs_div: str = "CFS") -> list[dict]:
                 rep["rcept_dt"] = dates.get(rep["rcp_no"])
             reports.extend(annual)
     return reports
+
+
+def _share_rows(corp_code: str, year: int, code: str, key: str) -> dict:
+    """Share counts from the periodic report; an empty result leaves the counts unknown."""
+    r = requests.get(SHARES_URL, params={"crtfc_key": key, "corp_code": corp_code, "bsns_year": str(year),
+                                         "reprt_code": code}, timeout=60)
+    r.raise_for_status()
+    body = r.json()
+    if body.get("status") != "000":
+        return {"share_rows": [], "share_sha256": None}
+    return {"share_rows": body.get("list", []), "share_sha256": hashlib.sha256(r.content).hexdigest()}
 
 
 def _filing_dates(corp_code: str, year: int, receipts: set[str], key: str) -> dict[str, str]:
@@ -148,6 +169,20 @@ def _find(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str
     return None
 
 
+def _find_ordered(rows: list[dict], sj: tuple[str, ...], ids: list[str], names: list[str]) -> dict | None:
+    """Like _find, but names are tried in priority order (diluted before basic)."""
+    cand = [r for r in rows if r.get("sj_div") in sj]
+    for i in ids:
+        for r in cand:
+            if r.get("account_id") == i:
+                return r
+    for name in names:
+        for r in cand:
+            if (r.get("account_nm") or "").replace(" ", "") == name.replace(" ", ""):
+                return r
+    return None
+
+
 def parse(reports: list[dict]) -> dict:
     durations: dict[str, dict[tuple[str, str], float]] = {f: {} for f in FLOW}
     duration_sources: dict[str, dict[tuple[str, str], dict]] = {f: {} for f in FLOW}
@@ -159,7 +194,8 @@ def parse(reports: list[dict]) -> dict:
         start, end = f"{y}-01-01", f"{y}-{REPORTS[rep['reprt_code']]}"
         for field, (ids, names) in FLOW.items():
             is_cf = field in ("operating_cash_flow", "capex")
-            row = _find(rows, ("CF",) if is_cf else ("IS", "CIS"), ids, names)
+            finder = _find_ordered if field == "eps_diluted" else _find
+            row = finder(rows, ("CF",) if is_cf else ("IS", "CIS"), ids, names)
             if not row:
                 continue
             # 손익: 분기·반기 보고서는 thstrm_add_amount 가 누적값. 현금흐름: thstrm_amount 가 누적값
@@ -189,6 +225,17 @@ def parse(reports: list[dict]) -> dict:
                 snap[field] = _num(row["thstrm_amount"])
                 lineage.setdefault(end, {})[field] = {"operation": "direct", "inputs": [
                     _input(rep, row, snap[field], None, end)]}
+        for row in rep.get("share_rows") or []:
+            field = SHARE_CLASSES.get((row.get("se") or "").replace(" ", ""))
+            count = _num(row.get("distb_stock_co"))
+            # Only counts filed in the same report as the statements carry a known filing date.
+            if field and count is not None and row.get("rcept_no") and row.get("rcept_no") == rep.get("rcp_no"):
+                snap[field] = count
+                lineage.setdefault(end, {})[field] = {"operation": "direct", "inputs": [{
+                    "start": None, "end": end, "value": count, "account_id": None,
+                    "account_nm": f"유통주식수({row.get('se')})", "sj_div": "SHARES", "unit": "shares",
+                    "fs_div": rep.get("fs_div", "CFS"), "year": rep["year"], "reprt_code": rep["reprt_code"],
+                    "receipt": row["rcept_no"], "filed": rep.get("rcept_dt"), "raw_sha256": rep.get("share_sha256")}]}
         lease_rows = _lease_rows(rows)
         if lease_rows:
             snap["lease_liabilities"] = sum(_num(r["thstrm_amount"]) for r in lease_rows)

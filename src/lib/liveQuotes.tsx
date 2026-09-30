@@ -5,7 +5,7 @@ import type { LeaderRow } from '../types'
 // still come from the scheduled recalculation; only the 현재가 display is overlaid.
 const QUOTES_URL='https://mhbcchegrbakearqptdr.supabase.co/functions/v1/quotes?client=peppercorn-public-read-v1'
 export const LIVE_QUOTE_INTERVAL_MS=30_000
-const MAX_SYMBOLS=120
+const MAX_SYMBOLS=200
 const CHUNK=60
 
 export type LiveQuote={price:number;time:number|null;previous_close:number|null;currency:string|null}
