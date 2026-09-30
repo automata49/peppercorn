@@ -156,3 +156,34 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   await row.click();
   await expect(page.locator('.drill-sheet h2').first()).toHaveText('KODEX 200');
 });
+
+test('table headers are left-aligned and numeric cells right-aligned',async({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  const align=(loc:any)=>loc.evaluateAll((es:Element[])=>[...new Set(es.map(e=>getComputedStyle(e).textAlign))]);
+  const sector=page.locator('.dashboard-sector-panel .sector-metrics-table');
+  expect(await align(sector.locator('th'))).toEqual(['left']);
+  expect(await align(sector.locator('tbody tr').first().locator('td:not(:first-child)'))).toEqual(['right']);
+  expect(await align(sector.locator('tbody tr').first().locator('td:first-child'))).toEqual(['left']);
+  for(const panel of ['.dashboard-stock-panel','.dashboard-etf-panel']){
+    const rows=page.locator(panel+' .stock-rows');
+    expect(await align(rows.locator('.stock-rows-head > span'))).toEqual(['left']);
+    const first=rows.locator('.stock-row').first();
+    expect(await align(first.locator(':scope > span:not(.pill), :scope > strong'))).toEqual(['right']);
+    expect(await align(first.locator('.stock-id'))).toEqual(['left']);
+    const rank=first.locator('strong.rank').first();
+    expect(await rank.evaluate(e=>getComputedStyle(e).justifyContent)).toBe('flex-end');
+    const pill=(await first.locator('.pill').boundingBox())!,price=(await first.locator('.stock-price').boundingBox())!;
+    expect(pill.x-(price.x+price.width)).toBeLessThan(12);
+  }
+  await page.locator('.sidebar nav').getByRole('button',{name:'Leaderboard'}).click();
+  const priceCell=page.locator('.ag-row .ag-cell[col-id="price"]').first();
+  await expect(priceCell).toHaveClass(/cell-num/);
+  expect(await priceCell.evaluate(e=>getComputedStyle(e).textAlign)).toBe('right');
+  await expect(page.locator('.ag-row .ag-cell[col-id="ibd_rs_estimate"]').first()).toHaveClass(/cell-num/);
+  await expect(page.locator('.ag-row .ag-cell[col-id="ticker"]').first()).not.toHaveClass(/cell-num/);
+  await expect(page.locator('.ag-row .ag-cell[col-id="industry"]').first()).not.toHaveClass(/cell-num/);
+  expect(await page.locator('.ag-header-cell[col-id="price"] .ag-header-cell-label').evaluate(e=>getComputedStyle(e).justifyContent)).toBe('flex-start');
+});
