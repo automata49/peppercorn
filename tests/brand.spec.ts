@@ -81,9 +81,9 @@ test('home-screen icons point to the Folio app icon',async({page,request})=>{
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
  expect(touch).toBe('./folio-app-icon-180.png')
  const manifest=await (await request.get('manifest.webmanifest')).json()
- expect(manifest.name).toBe('Folio XX')
- expect(manifest.short_name).toBe('Folio XX')
- expect(await page.locator('meta[name="apple-mobile-web-app-title"]').getAttribute('content')).toBe('Folio XX')
+ expect(manifest.name).toBe('Folio xx')
+ expect(manifest.short_name).toBe('Folio xx')
+ expect(await page.locator('meta[name="apple-mobile-web-app-title"]').getAttribute('content')).toBe('Folio xx')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-'))).toBe(true)
  for(const src of srcs){
@@ -91,4 +91,22 @@ test('home-screen icons point to the Folio app icon',async({page,request})=>{
   expect(res.status(),src).toBe(200)
   expect(res.headers()['content-type']).toContain('image/png')
  }
+})
+
+test('KakaoTalk share and Chrome install show Folio xx with a one-line Korean description',async({page,request})=>{
+ const description='모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼'
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ const meta=(sel:string)=>page.locator(sel).getAttribute('content')
+ expect(await meta('meta[property="og:title"]')).toBe('Folio xx')
+ expect(await meta('meta[property="og:site_name"]')).toBe('Folio xx')
+ expect(await meta('meta[property="og:description"]')).toBe(description)
+ expect(await meta('meta[name="description"]')).toBe(description)
+ expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
+ await expect(page).toHaveTitle('Folio xx')
+ expect(description).not.toContain('\n')
+ const manifest=await (await request.get('manifest.webmanifest')).json()
+ expect([manifest.name,manifest.short_name,manifest.description]).toEqual(['Folio xx','Folio xx',description])
+ const image=await meta('meta[property="og:image"]')
+ const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
+ expect(res.status()).toBe(200)
 })
