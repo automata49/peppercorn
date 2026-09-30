@@ -357,7 +357,7 @@ body{font-size:14px;line-height:1.45}
 /* Lower dashboard panels */
 .dashboard-lower-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);align-items:start;gap:16px}
 .dashboard-lower-grid>.panel{margin-bottom:18px}
-.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
+.dashboard-sector-panel,.dashboard-etf-panel,.dashboard-etf-industry-panel,.dashboard-stock-panel{min-height:0!important;scroll-margin-top:110px}
 .dashboard-sector-table-wrap{max-height:560px}
 .dashboard-sector-table{width:100%;min-width:610px;table-layout:fixed}
 .dashboard-sector-table th,.dashboard-sector-table td{padding:9px 8px}
@@ -449,9 +449,9 @@ body{font-size:14px;line-height:1.45}
   .dashboard-sector-filter{display:none}
   .dashboard-lower-grid{display:block}
   .dashboard-lower-grid>.panel{margin-bottom:12px;padding:12px;border-radius:15px}
-  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
-  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
-  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
+  .dashboard-sector-panel .panel-head,.dashboard-etf-panel .panel-head,.dashboard-etf-industry-panel .panel-head,.dashboard-stock-panel .panel-head{align-items:center;flex-direction:row;margin-bottom:10px}
+  .dashboard-sector-panel .panel-head h2,.dashboard-etf-panel .panel-head h2,.dashboard-etf-industry-panel .panel-head h2,.dashboard-stock-panel .panel-head h2{font-size:17px}
+  .dashboard-sector-panel .panel-head p,.dashboard-etf-panel .panel-head p,.dashboard-etf-industry-panel .panel-head p,.dashboard-stock-panel .panel-head p{display:none}
   .sector-actions{justify-content:flex-end}
   .mini-segment button{padding:5px 7px;font-size:9.5px}
   .dashboard-sector-table-wrap{max-height:none;overflow:visible}
@@ -1063,3 +1063,24 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .stock-row .rank{justify-content:flex-end;padding-right:8px}
 .ag-header-cell-label{justify-content:flex-start!important}
 .ag-cell.cell-num{text-align:right;justify-content:flex-end}
+
+/* ETF 주도 산업 treemap heatmap (ETF-INDUSTRY-2): tile area = ETF trading value, colour = median RS for the chosen period.
+   One map per market (KRW and USD are never sized against each other); 2px surface gaps between tiles; legend below.
+   Placed under 섹터 요약 in the left column (the sector panel and the heatmap share .dashboard-left-column). */
+.dashboard-left-column{min-width:0}
+.dashboard-left-column>.panel{width:100%}
+.dashboard-etf-industry-panel{margin-bottom:18px}
+.etf-heat-periods{display:inline-flex;margin-bottom:12px}
+.etf-heat-market+.etf-heat-market{margin-top:14px}
+.etf-heat-market-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;font-size:12px;color:var(--muted)}
+.etf-heat-market-head b{font-size:13px;color:var(--ink)}
+.etf-heat-map{position:relative;width:100%;background:var(--card);overflow:hidden}
+.etf-heat-tile{position:absolute;display:flex;flex-direction:column;justify-content:flex-start;gap:2px;padding:7px 8px;border:0;border-radius:4px;text-align:left;cursor:pointer;font:inherit;overflow:hidden}
+.etf-heat-tile:hover{filter:brightness(1.06)}
+.etf-heat-tile:focus-visible{outline:2px solid #202938;outline-offset:-2px}
+.etf-heat-tile b{font-size:13px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.etf-heat-tile strong{font-size:18px;line-height:1.15;font-weight:800;font-variant-numeric:tabular-nums}
+.etf-heat-tile small{font-size:11px;opacity:.9;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.etf-heat-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:10px;color:var(--muted);font-size:12px}
+.etf-heat-key{display:inline-flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+.etf-heat-key i{display:inline-block;width:14px;height:14px;border-radius:3px}
