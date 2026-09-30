@@ -471,6 +471,7 @@ export default function App(){
   const [sector,setSector]=useState<string|null>(null)
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
+  const [marketMetricsOpen,setMarketMetricsOpen]=useState(false)
   const [sectorNameWidth,startSectorColumnResize]=useColumnWidth(SECTOR_NAME_WIDTH_KEY,SECTOR_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,SECTOR_NAME_MAX_WIDTH)
   const [etfSummaryOpen,setEtfSummaryOpen]=useState(false)
   const [etfIndustryKey,setEtfIndustryKey]=useState<string|null>(null)
@@ -654,7 +655,6 @@ export default function App(){
   const advanceCount=stockRows.filter(r=>(r.return_1w??0)>0).length
   const declineCount=stockRows.filter(r=>(r.return_1w??0)<0).length
   const advanceDeclineRatio=declineCount?advanceCount/declineCount:advanceCount?advanceCount:0
-  const averageRs=avg(stockRows.map(r=>r.rs_rank))
 
   const allSectorRows=useMemo(()=>buildSectors(marketRows),[marketRows])
   const eligibleSectors=allSectorRows
@@ -679,7 +679,6 @@ export default function App(){
     turns:scopedStocks.filter(r=>leadership(r)==='강세 전환'),
     corrections:scopedStocks.filter(isCorrection)
   }
-  const tabStocks=stockGroups[stockTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
 
   const leaderMap=useMemo(()=>{
     const m=new Map<string,LeaderRow>()
@@ -787,20 +786,6 @@ export default function App(){
         </div>
       </section>
 
-      <section className="dashboard-section market-internals">
-        <div className="dashboard-section-head">
-          <div><h2>시장 내부 지표</h2><p className="market-context" title={metricContext}>{metricContext}</p></div>
-          <button className="dashboard-section-action" onClick={()=>setPage('leaderboard')}>지표 자세히 보기 →</button>
-        </div>
-        <div className="market-metric-grid">
-          <MarketMetricCard tone="green" icon="↗" label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+ma50Rows.length+' 종목'} progress={breadth*100}/>
-          <MarketMetricCard tone="blue" icon="⌁" label="MA200 위 비율" value={(ma200Breadth*100).toFixed(0)+'%'} sub={'/ '+ma200Rows.length+' 종목'} progress={ma200Breadth*100}/>
-          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={highNearCount+' 종목'} sub={'고점 -10% 이내 · '+(highNearShare*100).toFixed(0)+'%'} progress={highNearShare*100}/>
-          <MarketMetricCard tone="split" icon="↕" label="상승 / 하락 비율" value={(advanceDeclineRatio||0).toFixed(1)+' : 1'} sub={'1W 기준 · 상승 '+advanceCount+' · 하락 '+declineCount} progress={advanceCount+declineCount?advanceCount/(advanceCount+declineCount)*100:0}/>
-          <MarketMetricCard tone="teal" icon="◴" label="평균 RS" value={averageRs==null?'—':averageRs.toFixed(1)} sub={'RS 데이터 '+stockRows.filter(r=>r.rs_rank!=null).length+' 종목'} progress={averageRs??0}/>
-        </div>
-      </section>
-
       <section className="sector-strip panel compact-panel dashboard-sector-filter">
         <div className="panel-head"><div><h2>섹터 필터</h2><p>시장과 섹터를 선택해 주도 종목을 좁혀보세요.</p></div></div>
         <div className="chips"><button className={!sector?'chip on':'chip'} onClick={()=>{setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체 섹터</button>{sectorOptions.map(g=><button key={g.key} className={sector===g.key?'chip on':'chip'} onClick={()=>{setSector(sector===g.key?null:g.key);setSectorKeySelected(null);setDrillSectorKey(null)}}>{sectorLabel(g)}</button>)}</div>
@@ -812,11 +797,12 @@ export default function App(){
           <div className="panel-head dashboard-sector-head">
             <div><h2>섹터 요약</h2><p>RS 순위 기준 Top 5 · 섹터별 리더십과 52W 고점 근접도</p></div>
             <div className="sector-actions">
+              <button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표</button>
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
           <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
-            {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(compactStockLayout()?g.key:null)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+            {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
               <td>{g.n}</td>
@@ -837,13 +823,6 @@ export default function App(){
           <div className="mini-segment etf-heat-periods" role="group" aria-label="RS 기간">{ETF_HEAT_PERIODS.map(([period])=><button key={period} type="button" className={etfHeatPeriod===period?'on':''} aria-pressed={etfHeatPeriod===period} onClick={()=>setEtfHeatPeriod(period)}>{period}</button>)}</div>
           <EtfIndustryHeatmap groups={etfIndustries} markets={market==='ALL'?['KR','US']:[market]} period={etfHeatPeriod} onSelect={openEtfIndustry}/>
         </div>
-        </div>
-        <div className="panel dashboard-stock-panel">
-          <div className="panel-head dashboard-sector-head"><div><h2>주도 종목</h2><p>{chosenSector?sectorLabel(chosenSector):'전체 섹터'} · RS 순위 기준 Top 12</p></div><button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey(chosenSector?.key||sector||'ALL')}}>전체 보기 →</button></div>
-          <div className="dashboard-leader-tabs" role="group" aria-label="주도 종목 분류">
-            {(['core','candidates','turns','corrections'] as const).map(tab=><button key={tab} className={stockTab===tab?'on':''} onClick={()=>setStockTab(tab)}>{({core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중'} as const)[tab]} <b>{stockGroups[tab].length}</b></button>)}
-          </div>
-          <StockRows rows={tabStocks.slice(0,12)} onSelect={row=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}}/>
         </div>
       </section>
 
@@ -883,6 +862,24 @@ export default function App(){
 
   const pageTitle:Record<string,string>={dashboard:'Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
+  const marketMetricsDialog=<Dialog open={marketMetricsOpen} onOpenChange={setMarketMetricsOpen}>
+    <DialogContent className="sector-summary-dialog market-metrics-dialog">
+      <div className="drill-handle"/>
+      <div className="sector-summary-dialog-head">
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>시장 지표</DialogTitle><DialogDescription className="market-context" title={metricContext}>{metricContext}</DialogDescription></div>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+      </div>
+      <section className="market-internals">
+        <div className="market-metric-grid">
+          <MarketMetricCard tone="green" icon="↗" label="MA50 위 비율" value={(breadth*100).toFixed(0)+'%'} sub={'/ '+ma50Rows.length+' 종목'} progress={breadth*100}/>
+          <MarketMetricCard tone="blue" icon="⌁" label="MA200 위 비율" value={(ma200Breadth*100).toFixed(0)+'%'} sub={'/ '+ma200Rows.length+' 종목'} progress={ma200Breadth*100}/>
+          <MarketMetricCard tone="violet" icon="☆" label="52W 고점 근접" value={highNearCount+' 종목'} sub={'고점 -10% 이내 · '+(highNearShare*100).toFixed(0)+'%'} progress={highNearShare*100}/>
+          <MarketMetricCard tone="split" icon="↕" label="상승 / 하락 비율" value={(advanceDeclineRatio||0).toFixed(1)+' : 1'} sub={'1W 기준 · 상승 '+advanceCount+' · 하락 '+declineCount} progress={advanceCount+declineCount?advanceCount/(advanceCount+declineCount)*100:0}/>
+        </div>
+      </section>
+      <button className="dashboard-section-action market-metrics-more" onClick={()=>{setMarketMetricsOpen(false);setPage('leaderboard')}}>지표 자세히 보기 →</button>
+    </DialogContent>
+  </Dialog>
   const sectorSummaryDialog=<Dialog open={sectorSummaryOpen} onOpenChange={setSectorSummaryOpen}>
     <DialogContent className="sector-summary-dialog">
       <div className="drill-handle"/>
@@ -891,7 +888,7 @@ export default function App(){
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
       <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
-        {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(compactStockLayout()?g.key:null)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+        {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
           <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
           <td>{g.n}</td>
@@ -948,5 +945,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
 }

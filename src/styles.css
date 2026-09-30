@@ -1127,3 +1127,26 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .live-badge::before{content:'';display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#2f9e5f;vertical-align:1px}
 .live-badge.off{color:#8a94a1}
 .live-badge.off::before{background:#b9c2cd}
+/* Phone and iPad (below 1280px, not iPad Pro or desktop): the menu button sits at the right of the page header and the drawer slides in from the right. */
+@media(max-width:1279px){
+  .topbar .topbar-menu{order:3;margin-left:auto}
+  .menu-drawer{left:auto;right:0;box-shadow:-18px 0 50px #24324429}
+  .menu-drawer[data-state="open"]{animation:menuSlideInRight .24s ease-out}
+  .menu-drawer[data-state="closed"]{animation:menuSlideOutRight .18s ease-in}
+}
+@keyframes menuSlideInRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes menuSlideOutRight{from{transform:translateX(0)}to{transform:translateX(100%)}}
+@media(max-width:1279px) and (prefers-reduced-motion:reduce){.menu-drawer[data-state]{animation:none}}
+
+/* Sector summary spans the dashboard width; leading stocks open in the drill sheet on every screen. */
+.dashboard-lower-grid.dashboard-sector-only{display:block!important}
+.dashboard-sector-only .dashboard-left-column{min-width:0}
+
+/* 시장 지표 popup: four cards, 2×2 on narrow dialogs and one row when wide. */
+.market-metrics-dialog{overflow-y:auto}
+.market-metrics-dialog .market-internals{container:metrics-dialog/inline-size;padding-top:14px}
+.market-metrics-dialog .market-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
+.market-metrics-dialog .market-metric-card:nth-child(n){grid-column:auto!important}
+@container metrics-dialog (min-width:720px){.market-metrics-dialog .market-metric-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.market-metrics-dialog .market-context{word-break:keep-all}
+.market-metrics-more{display:block;margin:14px 0 0 auto}

@@ -44,12 +44,12 @@ export function InstallApp() {
 
   return <Popover open={open} onOpenChange={setOpen}>
     <PopoverTrigger asChild>
-      <button className="install-trigger" onClick={event=>{event.preventDefault();void startInstall()}} aria-label="Peppercorn Capital 홈 화면에 설치">앱 설치</button>
+      <button className="install-trigger" onClick={event=>{event.preventDefault();void startInstall()}} aria-label="Folio XX 홈 화면에 설치">앱 설치</button>
     </PopoverTrigger>
-      <PopoverContent className="install-dialog" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Peppercorn Capital 설치 안내">
+      <PopoverContent className="install-dialog" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Folio XX 설치 안내">
         <PopoverClose asChild><button className="install-close" aria-label="닫기">×</button></PopoverClose>
-        <img className="install-icon" src="./folio-icon-192.png" alt="Folio 아이콘" />
-        <h2>Peppercorn Capital</h2>
+        <img className="install-icon" src="./folio-app-icon-192.png" alt="Folio 아이콘" />
+        <h2>Folio XX</h2>
         <p className="install-description">홈 화면에 추가하면 앱처럼 바로 열 수 있습니다.</p>
         <ol>
           {isIOS ? <>
