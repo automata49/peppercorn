@@ -41,7 +41,6 @@ jobs:
           TARGET: ${{ inputs.target }}
           FUNCTION: ${{ inputs.function }}
           CONFIRM: ${{ inputs.confirm }}
-          FUNCTION: ${{ inputs.function }}
           TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
         run: |
           set -euo pipefail
