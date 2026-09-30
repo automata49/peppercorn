@@ -72,6 +72,12 @@ jobs:
             echo "::error::position_pipeline could read price_daily"; exit 1
           fi
           grep -q "permission denied" err.txt && echo "PASS stepped-down role cannot read price_daily"
+          # position-public reads as anon
+          psql "$TEST_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "begin; set local role anon; select 'anon reads snapshots: ' || count(*) from public.position_snapshot; rollback;"
+          if psql "$TEST_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "begin; set local role anon; select 1 from public.fundamentals_q limit 1; rollback;" 2>err2.txt; then
+            echo "::error::anon could read fundamentals_q"; exit 1
+          fi
+          grep -q "permission denied" err2.txt && echo "PASS anon step-down cannot read facts"
 
       - name: Role, grant and token checks through the Data API
         run: python supabase/tests/position_growth_staging.py roles

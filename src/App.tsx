@@ -5,10 +5,12 @@ import { Sidebar } from './components/Sidebar'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
 import { AuthModal } from './components/AuthModal'
+import { PositionPanel, valuation } from './components/PositionPanel'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
+import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import type { EditableRow, LeaderRow, Market } from './types'
 
@@ -29,6 +31,8 @@ const krSectorNames:Record<string,string>={
 const sectorName=(market:Market,sector:string)=>market==='KR'?(krSectorNames[sector]||sector):sector
 const sourceName=(source:string)=>source.includes('TradingView')?(source.includes('KRX')?'TradingView·KRX':'TradingView'):source.includes('Nasdaq')?'Nasdaq':source.includes('S&P 500')?'S&P 500':source.replace(/^AUTO:/,'').slice(0,28)
 const CANDIDATE_RS_MIN=80
+// The dashboard's leading groups; the stock analysis list starts from these.
+const LEADING_CLASSES=new Set(['핵심 주도','주도 후보','강세 전환'])
 const CANDIDATE_HIGH_DISTANCE_MIN=-.25
 const SHEET_URL='https://docs.google.com/spreadsheets/d/1KdbQqmGP7Q0iVV76OmJg1wpP9pB5vrni5SrjAMrbbiE/edit'
 const tradingViewUrl=(r:LeaderRow)=>'https://www.tradingview.com/chart/?symbol='+encodeURIComponent(r.market==='KR'?'KRX:'+r.ticker:r.ticker)
@@ -198,11 +202,11 @@ const analysisCols:ColDef<EditableRow>[]=[
   {field:'date',headerName:'분석일',width:110,flex:0},{field:'ticker',headerName:'종목코드',pinned:'left',width:105,flex:0},{field:'name',headerName:'종목명',editable:false,minWidth:145},
   {field:'market',headerName:'시장',editable:false,width:78,flex:0},{field:'sector',headerName:'섹터(자동)',editable:false,minWidth:130},
   {field:'lynch_category',headerName:'린치 분류',minWidth:120,...selectEditor(['저성장','대형우량','고성장','경기순환','회생','자산주'])},
-  {field:'eps_growth_q',headerName:'분기 EPS 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'sales_growth_q',headerName:'분기 매출 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'eps_growth_3y',headerName:'연간 EPS 성장률(3년 평균)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'roe',headerName:'ROE',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'operating_margin',headerName:'영업이익률',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'debt_ratio',headerName:'부채비율',valueFormatter:p=>pct(p.value)},
-  {field:'operating_cashflow_positive',headerName:'영업현금흐름',width:110,flex:0,...selectEditor([true,false]),valueFormatter:p=>p.value===true?'양수':p.value===false?'음수':'—'},
-  {field:'pe',headerName:'PER'},{field:'peg',headerName:'PEG'},{field:'above_ma50',headerName:'50일선 위(자동)',editable:false,width:115,flex:0},{field:'above_ma200',headerName:'200일선 위(자동)',editable:false,width:120,flex:0},
+  {field:'eps_growth_q',headerName:'분기 EPS 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'eps_growth_q_auto',headerName:'분기 EPS 성장률(공시)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'sales_growth_q',headerName:'분기 매출 성장률(YoY)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'sales_growth_q_auto',headerName:'분기 매출 성장률(공시)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'eps_growth_3y',headerName:'연간 EPS 성장률(3년 평균)',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'eps_growth_3y_auto',headerName:'EPS 3년 CAGR(공시)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'roe',headerName:'ROE',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'roe_auto',headerName:'ROE(공시)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
+  {field:'operating_margin',headerName:'영업이익률',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'operating_margin_auto',headerName:'영업이익률(공시)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},{field:'debt_ratio',headerName:'부채비율',valueFormatter:p=>pct(p.value)},{field:'debt_ratio_auto',headerName:'부채비율(공시)',editable:false,valueFormatter:p=>pct(p.value)},
+  {field:'operating_cashflow_positive',headerName:'영업현금흐름',width:110,flex:0,...selectEditor([true,false]),valueFormatter:p=>p.value===true?'양수':p.value===false?'음수':'—'},{field:'operating_cashflow_auto',headerName:'영업현금흐름(공시)',editable:false,width:130,flex:0,valueFormatter:p=>p.value===true?'양수':p.value===false?'음수':'—'},
+  {field:'pe',headerName:'PER'},{field:'pe_auto',headerName:'PER(현재가/공시 EPS)',editable:false,valueFormatter:p=>p.value==null||!Number.isFinite(Number(p.value))?'—':Number(p.value).toFixed(1)},{field:'peg',headerName:'PEG'},{field:'peg_auto',headerName:'PEG(공시)',editable:false,valueFormatter:p=>p.value==null||!Number.isFinite(Number(p.value))?'—':Number(p.value).toFixed(2)},{field:'filed_as_of',headerName:'공시 기준 분기',editable:false,width:120,flex:0,valueFormatter:p=>p.value||'—'},{field:'above_ma50',headerName:'50일선 위(자동)',editable:false,width:115,flex:0},{field:'above_ma200',headerName:'200일선 위(자동)',editable:false,width:120,flex:0},
   {field:'high_52w_distance',headerName:'52주 고점 대비(자동)',editable:false,width:135,flex:0,valueFormatter:p=>pct(p.value)},
   {field:'moat',headerName:'경쟁우위(해자)',minWidth:230},{field:'growth_driver',headerName:'성장 동력',minWidth:230},{field:'key_risk',headerName:'핵심 리스크',minWidth:230},
   {field:'pass_count',headerName:'통과 수(자동)',editable:false,width:105,flex:0},{field:'auto_grade',headerName:'자동 판정',editable:false,width:110,flex:0},{field:'conclusion',headerName:'내 결론',minWidth:150},
@@ -386,6 +390,8 @@ export default function App(){
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
   const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|'corrections'|null>(null)
   const [selected,setSelected]=useState<LeaderRow|null>(null)
+  const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
+  const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
   const [drillSectorKey,setDrillSectorKey]=useState<string|null>(null)
   const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [analysisDeleteTarget,setAnalysisDeleteTarget]=useState<EditableRow|null>(null)
@@ -428,7 +434,9 @@ export default function App(){
     if(refreshingRef.current)return
     refreshingRef.current=true;setRefreshing(true)
     try{
-      const result=await loadLeaderboard()
+      const [result,positionResult]=await Promise.all([loadLeaderboard(),loadPosition()])
+      // Keep the last good Position rows through a transient failure, as with the leaderboard.
+      setPosition(previous=>positionResult.status==='live'||!previous.rows.size?{...positionResult,loading:false}:{...previous,loading:false})
       lastLoadRef.current=Date.now()
       // A transient connection failure must not replace loaded live rows with demo data.
       if(result.source==='demo'&&sourceRef.current==='supabase')return
@@ -622,9 +630,13 @@ export default function App(){
     return {...r,no:i+1,verification:r.verification||(r.verified===true?'확인됨':r.verified===false?'반박됨':'미검증'),elapsed_days:elapsed==null?'':elapsed+'일',alert,analysis_no:analysisNoByTicker.get(String(r.ticker||''))||''}
   })
   const enrichedAnalysis=baseAnalysis.map((r,i)=>{
+    const filed=position.rows.get(positionKey(String(r.market||''),String(r.ticker||'')))
+    const live=leaders.find(l=>l.market===r.market&&l.ticker===r.ticker)
+    const val=live?valuation(live,filed):{pe:null,peg:null}
+    const auto=filed?{filed_as_of:filed.metrics.as_of,sales_growth_q_auto:filed.metrics.revenue_yoy_q,operating_margin_auto:filed.metrics.operating_margin,roe_auto:filed.metrics.roe,debt_ratio_auto:filed.metrics.debt_ratio,operating_cashflow_auto:filed.metrics.ttm_operating_cash_flow==null?null:filed.metrics.ttm_operating_cash_flow>0,eps_growth_q_auto:filed.metrics.eps_yoy_q,eps_growth_3y_auto:filed.metrics.eps_cagr_3y,pe_auto:val.pe,peg_auto:val.peg}:{filed_as_of:null}
     const yes50=Number(r.price)>Number(r.ma50),yes200=Number(r.price)>Number(r.ma200)
     const score=(Number(r.eps_growth_q)>=.25?1:0)+(Number(r.sales_growth_q)>=.20?1:0)+(Number(r.eps_growth_3y)>=.25?1:0)+(Number(r.roe)>=.17?1:0)+(Number(r.operating_margin)>=.10?1:0)+(Number(r.debt_ratio)<=1&&r.debt_ratio!==null&&r.debt_ratio!==''?1:0)+(r.operating_cashflow_positive===true?1:0)+(Number(r.peg)<=1&&r.peg!==null&&r.peg!==''?1:0)+(yes50&&yes200?1:0)+(Number(r.high_52w_distance)>=-.25?1:0)
-    return {...r,no:i+1,above_ma50:r.ticker?(yes50?'Y':'N'):'',above_ma200:r.ticker?(yes200?'Y':'N'):'',pass_count:r.ticker?score+'/10':'',auto_grade:r.ticker?(score>=8?'매수후보':score>=5?'관찰':'제외'):'',research_note_no:r.research_note_no||researchNoByTicker.get(String(r.ticker||''))||''}
+    return {...r,...auto,no:i+1,above_ma50:r.ticker?(yes50?'Y':'N'):'',above_ma200:r.ticker?(yes200?'Y':'N'):'',pass_count:r.ticker?score+'/10':'',auto_grade:r.ticker?(score>=8?'매수후보':score>=5?'관찰':'제외'):'',research_note_no:r.research_note_no||researchNoByTicker.get(String(r.ticker||''))||''}
   })
   const enrichedJournal=enrich(journal).map((r,i)=>{
     const buy=Number(r.buy_price),target=Number(r.target_price),stop=Number(r.stop_price),sell=Number(r.sell_price)
@@ -757,13 +769,22 @@ export default function App(){
   }else if(page==='portfolio'){
     content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><GridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
-    content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>산업·RS가 강한 순</p></div></div>{visible.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}</div>
+    const scoped=visible.filter(r=>analysisScope==='all'||(analysisScope==='leaders'?LEADING_CLASSES.has(leadership(r)):position.rows.has(positionKey(r.market,r.ticker))))
+    content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>RS가 강한 순 · P는 Position 데이터 있음</p></div></div>
+      <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['leaders','주도 종목'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
+      {scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
       <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
+        <h3 className="analysis-part">Swing · 모멘텀</h3>
         <StockSnapshot row={selected} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.asset_class==='Equity'?(selected.leader_tt?'PASS':'CHECK'):'해당 없음'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{selected.asset_class==='Equity'?((selected.rs_rank??0)>=70?'PASS':'CHECK'):'해당 없음'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
-        <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div><button className="primary-action" onClick={addSelectedAnalysis}>이 종목 분석행 추가</button>
+        <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div>
+        <h3 className="analysis-part">Position · 펀더멘털</h3>
+        <PositionPanel row={selected} position={position.rows.get(positionKey(selected.market,selected.ticker))} status={position.loading?'loading':position.status}/>
+        <h3 className="analysis-part">내 분석</h3>
+        <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. Swing과 Position은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</p>
+        <button className="primary-action" onClick={addSelectedAnalysis}>이 종목 분석행 추가</button>
       </>:<p>종목을 선택하세요.</p>}</div></div>
-      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. 재무 및 질적 분석은 직접 입력하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
+      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
   }else if(page==='research'){
     content=<><div className="page-note"><b>Research Notes</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·단계·RS가 연결됩니다. 팩트 → 해석 → 영향 → 다음 확인 순서로 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
   }else if(page==='journal'){

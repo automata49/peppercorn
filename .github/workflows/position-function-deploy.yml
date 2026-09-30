@@ -1,11 +1,16 @@
 name: Position function deploy
 
-# 수동 실행 전용. position-ingest Edge Function 을 테스트 또는 운영 프로젝트에 배포한다.
+# 수동 실행 전용. Position Edge Function(position-ingest, position-public)을 테스트 또는 운영 프로젝트에 배포한다.
 # Supabase 개인 액세스 토큰: 운영은 SUPABASE_ACCESS_TOKEN, 테스트는 SUPABASE_ACCESS_TOKEN_TEST (없으면 운영 토큰을 시도).
 # 토큰은 각 프로젝트 하나에 Edge Functions 권한만 주는 것을 권장한다. 운영은 confirm 에 deploy 를 입력해야 한다.
 on:
   workflow_dispatch:
     inputs:
+      function:
+        description: 배포할 함수
+        type: choice
+        options: [position-ingest, position-public]
+        default: position-ingest
       target:
         description: 배포 대상
         type: choice
@@ -35,6 +40,7 @@ jobs:
           TEST_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN_TEST }}
           TARGET: ${{ inputs.target }}
           CONFIRM: ${{ inputs.confirm }}
+          FUNCTION: ${{ inputs.function }}
           TEST_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
         run: |
           set -euo pipefail
@@ -47,5 +53,7 @@ jobs:
             ref=$(printf '%s' "$TEST_SUPABASE_URL" | sed -E 's#https://([a-z0-9]+)\.supabase\.co.*#\1#')
             [ "$ref" != "mhbcchegrbakearqptdr" ] || { echo "::error::test target resolves to production"; exit 1; }
           fi
-          # The caller authenticates with a GitHub OIDC token, not a Supabase JWT, as the Swing functions do.
-          supabase functions deploy position-ingest --project-ref "$ref" --no-verify-jwt
+          # position-ingest checks a GitHub OIDC token and position-public a public client token, as the Swing functions do;
+          # neither takes a Supabase JWT.
+          case "$FUNCTION" in position-ingest|position-public) ;; *) echo "::error::unknown function"; exit 1 ;; esac
+          supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt

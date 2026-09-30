@@ -4,6 +4,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  test(view.name+' layout and stock parity',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
   const page=await context.newPage();
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
@@ -54,6 +55,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
 
 test('RS bands refresh in an already open stock detail',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     route.fulfill({json:{rows:rows.map(r=>({...r,rs_5d:calls===1?null:'0.11'}))}});
@@ -71,6 +73,7 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
 
 test('ETF detail shows relative strength without equity-only rankings',async({page})=>{
   const etf={...rows[0],id:'etf-spy',ticker:'SPY',name:'SPY ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,ibd_rs_as_of:null,leader_tt:false,leadership_class:'중립'};
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
@@ -85,6 +88,7 @@ test('ETF detail shows relative strength without equity-only rankings',async({pa
 
 test('failed live load can be retried from the demo state',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     calls===1?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
@@ -99,6 +103,7 @@ test('failed live load can be retried from the demo state',async({page})=>{
 
 test('a stalled live response releases the refresh controls',async({page})=>{
   let calls=0;
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
     if(calls>1)void route.fulfill({json:{rows}});

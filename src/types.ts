@@ -54,3 +54,48 @@ export type LeaderRow = {
 }
 
 export type EditableRow = Record<string, string | number | boolean | null>
+
+export type PositionMetrics = {
+  as_of: string | null
+  ttm_revenue: number | null
+  ttm_operating_income: number | null
+  ttm_net_income: number | null
+  ttm_fcf: number | null
+  ttm_operating_cash_flow: number | null
+  revenue_yoy: number | null
+  revenue_yoy_q: number | null
+  revenue_cagr_3y: number | null
+  net_income_cagr_3y: number | null
+  gross_margin: number | null
+  operating_margin: number | null
+  fcf_margin: number | null
+  roic: number | null
+  roic_method: string | null
+  roe: number | null
+  net_debt: number | null
+  debt_ratio: number | null
+  eps_ttm: number | null
+  eps_yoy_q: number | null
+  eps_cagr_3y: number | null
+  diluted_shares_latest: number | null
+  shares_common: number | null
+  shares_preferred: number | null
+  dilution_yoy: number | null
+}
+
+export type PositionLabels = { type: string | null; quality: string | null; growth: string | null; value: string | null }
+
+/** Latest label-free (until rules pass validation) Position snapshot for one company, from position-public. */
+export type PositionRow = {
+  market: Market
+  ticker: string
+  as_of: string
+  status: 'ok' | 'check_failed' | 'insufficient_data' | 'unavailable'
+  rules_version: string
+  methods: { fcf: string; roic: string }
+  failed_checks: [string, string][]
+  metrics: PositionMetrics
+  labels: PositionLabels
+  label_reasons: Partial<Record<keyof PositionLabels, string>>
+  computed_at: string
+}

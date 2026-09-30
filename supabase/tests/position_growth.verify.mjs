@@ -181,6 +181,20 @@ await underPipeline(async () => {
 });
 await underPipeline(async () => ok('edge role cannot write price_daily', denied(await tryQ('delete from public.price_daily'))));
 await underPipeline(async () => ok('edge role cannot read stock_analyses', denied(await tryQ('select 1 from public.stock_analyses'))));
+// --- position-public Edge Function path: its query under SET LOCAL ROLE anon
+const publicSource = readFileSync('supabase/functions/position-public/index.ts', 'utf8');
+const latestSql = /export const LATEST_SNAPSHOTS = `([\s\S]*?)`;/.exec(publicSource)[1];
+await exec('begin');
+try {
+  await exec('set local role anon');
+  const latest = await tryQ(latestSql);
+  ok('public read returns one latest snapshot per company as anon', latest.ok && latest.rows.length === 1
+    && latest.rows[0].ticker === 'NVDA', latest.msg ?? JSON.stringify(latest.rows?.map(r => r.ticker)));
+} finally { await exec('rollback'); }
+await exec('begin');
+try { await exec('set local role anon'); ok('public read role cannot see facts', denied(await tryQ('select 1 from public.fundamentals_q'))); }
+finally { await exec('rollback'); }
+
 ok('postgres can step down to position_pipeline (SET granted by the migration)',
   (await db.query(`select pg_has_role('postgres','position_pipeline','member') m`)).rows[0].m === true);
 
