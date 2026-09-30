@@ -19,8 +19,13 @@ for(const view of views){
   expect(fb!.height).toBeLessThanOrEqual(14)
   expect(fb!.y+fb!.height).toBeGreaterThan(view.height-40)
   expect(Math.abs(ib!.height-tb!.height)).toBeLessThanOrEqual(1)
-  const [li,lw]=await Promise.all([launch.locator('.launch-emblem').boundingBox(),launch.locator('.launch-wordmark').boundingBox()])
-  expect(Math.abs(li!.height-lw!.height)).toBeLessThanOrEqual(1)
+  // Layout heights: the icon's 3D tilt changes its on-screen box, not its size.
+  const h=(l:ReturnType<typeof page.locator>)=>l.evaluate(e=>(e as HTMLElement).offsetHeight)
+  expect(Math.abs(await h(launch.locator('.launch-emblem'))-await h(launch.locator('.launch-wordmark')))).toBeLessThanOrEqual(1)
+  await expect(launch.locator('.launch-description')).toHaveText('모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼')
+  const db=(await launch.locator('.launch-description').boundingBox())!
+  expect(db.x).toBeGreaterThanOrEqual(0);expect(db.x+db.width).toBeLessThanOrEqual(view.width)
+  expect(await launch.locator('.launch-emblem').evaluate(e=>getComputedStyle(e).transform)).toContain('matrix3d')
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000})
 
@@ -29,8 +34,9 @@ for(const view of views){
   if(view.brand){
    await expect(visibleBrands).toHaveCount(1)
    await expect(menu).toBeHidden()
-   const [bi,bw]=await Promise.all([visibleBrands.locator('.brand-icon').boundingBox(),visibleBrands.locator('.brand-wordmark-img').boundingBox()])
-   expect(Math.abs(bi!.height-bw!.height)).toBeLessThanOrEqual(1)
+   const heights=await visibleBrands.evaluate(e=>[...e.querySelectorAll('img')].map(i=>(i as HTMLElement).offsetHeight))
+   expect(Math.abs(heights[0]-heights[1])).toBeLessThanOrEqual(1)
+   expect(await visibleBrands.locator('.brand-icon').evaluate(e=>getComputedStyle(e).transform)).toContain('matrix3d')
   }else{
    await expect(visibleBrands).toHaveCount(0)
    await expect(menu).toBeVisible()
@@ -48,9 +54,10 @@ for(const view of views){
    await expect(brand).toBeVisible()
    await expect(page.getByRole('dialog',{name:'Folio'})).toBeVisible()
    const [di,dw,dc,dd]=await Promise.all([brand.locator('.brand-icon').boundingBox(),brand.locator('.brand-wordmark-img').boundingBox(),drawer.locator('.menu-drawer-close').boundingBox(),drawer.boundingBox()])
-   expect(Math.abs(di!.height-dw!.height)).toBeLessThanOrEqual(1)
+   const dh=await brand.evaluate(e=>[...e.querySelectorAll('img')].map(i=>(i as HTMLElement).offsetHeight))
+   expect(Math.abs(dh[0]-dh[1])).toBeLessThanOrEqual(1)
    expect(dw!.x+dw!.width).toBeLessThanOrEqual(dc!.x)
-   expect(di!.height).toBeGreaterThanOrEqual(28)
+   expect(dh[0]).toBeGreaterThanOrEqual(28)
    expect(dd!.x+dd!.width).toBeLessThanOrEqual(view.width)
    await page.waitForTimeout(400)
    if(shots)await page.screenshot({path:`${shots}/${view.name}-menu.png`})

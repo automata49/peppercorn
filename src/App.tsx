@@ -14,6 +14,7 @@ import { applyKrEtfNames } from './lib/krEtfNames'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
+import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market } from './types'
 
 const pct=(v:unknown)=>{const n=Number(v);return v==null||!Number.isFinite(n)?'—':(n>=0?'+':'')+(n*100).toFixed(1)+'%'}
@@ -365,11 +366,21 @@ function EtfIndustryHeatmap({groups,markets,period,onSelect}:{groups:EtfIndustry
 }
 
 // Shared stock/ETF table. A caller may pass a name-column width it owns (the ETF summary shares the sector column width).
+const liveQuoteTime=(q:LiveQuote)=>q.time?new Date(q.time).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''
+const liveQuoteTitle=(q:LiveQuote)=>`실시간 현재가${q.time?' · '+liveQuoteTime(q)+' 기준':''} · 30초마다 새로고침 (등락·RS는 일간 집계)`
+
+function LiveGridTable(props:Parameters<typeof GridTable>[0]){
+  const live=useLiveQuotes(props.rows.filter(r=>r.ticker&&r.market).map(r=>({market:r.market as LeaderRow['market'],ticker:String(r.ticker),exchange:(r.exchange as string|null|undefined)??null})),120)
+  const rows=props.rows.map(r=>{const q=r.ticker&&r.market?live({market:r.market as LeaderRow['market'],ticker:String(r.ticker),exchange:(r.exchange as string|null|undefined)??null}):null;return q?{...r,current_price:q.price,price:q.price}:r})
+  return <GridTable {...props} rows={rows}/>
+}
+
 function StockRows({rows,onSelect,label='종목',nameWidth,onResizeStart}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;label?:string;nameWidth?:number;onResizeStart?:(event:any)=>void}){
   const [ownWidth,startOwnResize]=useColumnWidth(STOCK_NAME_WIDTH_KEY,STOCK_NAME_DEFAULT_WIDTH,STOCK_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
   const width=nameWidth??ownWidth
+  const live=useLiveQuotes(rows)
   return <div className="stock-rows" style={{'--stock-name-width':`${width}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">{label}<button type="button" className="stock-column-resizer" aria-label={`${label} 열 너비 조절`} title={`드래그하여 ${label} 열 너비 조절`} onPointerDown={onResizeStart??startOwnResize}/></span><span>현재가</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
-    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
+    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div>{(q=><span className={'stock-price'+(q?' live-price':'')} title={q?liveQuoteTitle(q):'일간 종가 기준'}>{num(q?.price??r.price)}</span>)(live(r))}<ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
     {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
@@ -384,6 +395,7 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
   const indexes=row.index_memberships?.length?row.index_memberships.join(' · '):'—'
   const rsItems=tradingPeriods.map((period,i)=>[period,rsTradingValues(row)[i]] as const)
   const retItems=tradingPeriods.map((period,i)=>[period,returnTradingValues(row)[i]] as const)
+  const liveQuote=useLiveQuotes([row],1)(row)
   return <div className="stock-snapshot">
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
@@ -413,7 +425,7 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>04</span><h3>추세 · 리스크</h3></div></div>
       <div className="snapshot-grid technical-grid">
-        <SnapshotItem label="현재가">{num(row.price)}</SnapshotItem>
+        <SnapshotItem label="현재가" valueClassName={liveQuote?'live-price':''}>{num(liveQuote?.price??row.price)}{liveQuote?<small className="live-badge" title={liveQuoteTitle(liveQuote)}>실시간{liveQuote.time?' '+liveQuoteTime(liveQuote):''}</small>:<small className="live-badge off">일간 종가</small>}</SnapshotItem>
         <SnapshotItem label="MA50 이격">{gapPct(row.price,row.ma50)}</SnapshotItem>
         <SnapshotItem label="200일선">{ma200Status}</SnapshotItem>
         <SnapshotItem label="52W 고점 대비" valueClassName={row.high_52w_distance!=null&&row.high_52w_distance>0?'pos':row.high_52w_distance!=null&&row.high_52w_distance<0?'neg':''}>{pct(row.high_52w_distance)}</SnapshotItem>
@@ -527,6 +539,7 @@ export default function App(){
     const wordmark=root.querySelector<HTMLElement>('.launch-wordmark')
     const footer=root.querySelector<HTMLElement>('.launch-footer')
     const slogan=root.querySelector<HTMLElement>('.launch-slogan')
+    const description=root.querySelector<HTMLElement>('.launch-description')
     const progress=root.querySelector<HTMLElement>('.launch-progress span')
     const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const finish=()=>{
@@ -538,13 +551,14 @@ export default function App(){
     const context=gsap.context(()=>{
       gsap.set(progress,{scaleX:0})
       if(!reduceMotion){
-        gsap.set([icon,wordmark,slogan,footer],{autoAlpha:0})
+        gsap.set([icon,wordmark,slogan,description,footer],{autoAlpha:0})
       }
       const timeline=gsap.timeline({onComplete:finish})
       if(!reduceMotion){
-        timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},.15)
+        timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0,rotationX:9,rotationY:-11,transformPerspective:420},{y:0,scale:1,autoAlpha:1,rotationX:9,rotationY:-11,transformPerspective:420,duration:.8,ease:'power2.out'},.15)
           .fromTo(wordmark,{x:-8,autoAlpha:0},{x:0,autoAlpha:1,duration:.65,ease:'power2.out'},.45)
           .fromTo(slogan,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.9)
+          .fromTo(description,{y:6,autoAlpha:0},{y:0,autoAlpha:1,duration:.7,ease:'power2.out'},1.1)
           .fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},1.2)
       }
       timeline.to(progress,{scaleX:1,duration:4.35,ease:'none'},0)
@@ -681,7 +695,7 @@ export default function App(){
   }
   const enrich=(rows:EditableRow[]):EditableRow[]=>rows.map(r=>{
     const l=matchLeader(r);if(!l)return r
-    return {...r,market:l.market,ticker:l.ticker,name:l.name,sector:l.sector,industry:l.industry,stage:stageLabel(l.stage),leadership_class:leadership(l),verdict:l.verdict,rs_rank:l.rs_rank,current_price:l.price,price:l.price,ma50:l.ma50,ma200:l.ma200,high_52w_distance:l.high_52w_distance,volume_ratio:l.volume_ratio,rsi14:l.rsi14,rs_5d:l.rs_5d??null,rs_20d:l.rs_20d??null,rs_50d:l.rs_50d??null,rs_120d:l.rs_120d??null,rs_200d:l.rs_200d??null,return_5d:l.return_5d??null,return_20d:l.return_20d??null,return_50d:l.return_50d??null,return_120d:l.return_120d??null,return_200d:l.return_200d??null}
+    return {...r,market:l.market,ticker:l.ticker,exchange:l.exchange??null,name:l.name,sector:l.sector,industry:l.industry,stage:stageLabel(l.stage),leadership_class:leadership(l),verdict:l.verdict,rs_rank:l.rs_rank,current_price:l.price,price:l.price,ma50:l.ma50,ma200:l.ma200,high_52w_distance:l.high_52w_distance,volume_ratio:l.volume_ratio,rsi14:l.rsi14,rs_5d:l.rs_5d??null,rs_20d:l.rs_20d??null,rs_50d:l.rs_50d??null,rs_120d:l.rs_120d??null,rs_200d:l.rs_200d??null,return_5d:l.return_5d??null,return_20d:l.return_20d??null,return_50d:l.return_50d??null,return_120d:l.return_120d??null,return_200d:l.return_200d??null}
   })
   const baseResearch=enrich(research)
   const baseAnalysis=enrich(analysis)
@@ -844,9 +858,9 @@ export default function App(){
   }else if(page==='leaderboard'){
     content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
-    content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><GridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
+    content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><LiveGridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
   }else if(page==='portfolio'){
-    content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><GridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
+    content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><LiveGridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
     content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>산업·RS가 강한 순</p></div></div>{visible.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}</div>
       <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
@@ -934,5 +948,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
 }

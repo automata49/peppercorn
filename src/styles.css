@@ -1106,3 +1106,24 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .launch-footer span{color:#5d6a7b;font-weight:600}
 .launch-footer small{margin-left:4px;font-size:inherit}
 @media(max-width:650px){.launch-center .launch-slogan{font-size:13px;letter-spacing:.02em}}
+
+/* Light theme (the app's only theme): the Folio card icon reads as a raised 3D tile. */
+:root:not([data-theme="dark"]) .folio-brand .brand-icon,
+:root:not([data-theme="dark"]) .launch-brand .launch-emblem{
+  transform:perspective(420px) rotateX(9deg) rotateY(-11deg);
+  transform-origin:50% 60%;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.95)) drop-shadow(0 2px 2px rgba(22,38,64,.20)) drop-shadow(0 7px 10px rgba(22,38,64,.18)) drop-shadow(0 16px 22px rgba(22,38,64,.10));
+}
+/* Loading page description under the slogan. */
+.launch-center .launch-description{
+  max-width:min(92vw,400px);margin-top:12px;color:#8a95a4;font-size:12.5px;line-height:1.75;letter-spacing:-.005em;
+  text-align:center;word-break:keep-all;overflow-wrap:normal;text-wrap:balance;
+}
+@media(max-width:650px){.launch-center .launch-description{font-size:12px;max-width:320px}}
+/* LIVE-QUOTE-1: live current price display. */
+.live-price{font-variant-numeric:tabular-nums}
+.stock-row .stock-price.live-price{color:#1e3a5f}
+.live-badge{display:block;margin-top:3px;font-size:10.5px;font-weight:600;color:#237a4b;white-space:nowrap}
+.live-badge::before{content:'';display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:#2f9e5f;vertical-align:1px}
+.live-badge.off{color:#8a94a1}
+.live-badge.off::before{background:#b9c2cd}
