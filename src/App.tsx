@@ -270,8 +270,6 @@ const SECTOR_NAME_DEFAULT_WIDTH=120
 const SECTOR_NAME_MIN_WIDTH=80
 const SECTOR_NAME_MAX_WIDTH=260
 const SECTOR_NAME_WIDTH_KEY='peppercorn-sector-name-width-v1'
-const ETF_NAME_DEFAULT_WIDTH=180
-const ETF_NAME_WIDTH_KEY='peppercorn-etf-name-width-v1'
 
 function useColumnWidth(key:string,initial:number,min:number,max:number){
   const [width,setWidth]=useState(()=>{
@@ -296,44 +294,14 @@ function useColumnWidth(key:string,initial:number,min:number,max:number){
   return [width,startResize] as const
 }
 
-const toneClass=(value:number|null|undefined)=>value!=null&&value>0?'pos':value!=null&&value<0?'neg':''
 const etfRankTitle=`ETF끼리만 비교한 시장별 순위(${ETF_RS_RANK_VERSION}) · 주식 RS 순위와 별도`
 
-// Same table frame and tokens as the sector summary; each row is one ETF. Equity-only leadership counts do not apply.
-function EtfTable({rows,onSelect,onResize,nameWidth,full=false,marketLabel}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;onResize:(event:any)=>void;nameWidth:number;full?:boolean;marketLabel:boolean}){
-  const wrapClass=full?'sector-summary-dialog-table':'industry-table-wrap dashboard-sector-table-wrap'
-  return <div className={wrapClass} style={{'--sector-name-width':`${nameWidth}px`} as CSSProperties}><table className={'industry-table dashboard-sector-table sector-metrics-table etf-metrics-table'+(full?' sector-summary-full-table':'')}><thead><tr><th className="sector-name-head">ETF<button type="button" className="sector-column-resizer" aria-label="ETF 열 너비 조절" title="드래그하여 ETF 열 너비 조절" onPointerDown={onResize}/></th><th title={etfRankTitle}>RS 순위</th>{tradingPeriods.map(period=><th key={period}>등락 {period}</th>)}<th>52W 고점 대비</th></tr></thead><tbody>
-    {rows.map(r=><tr key={r.id} tabIndex={0} role="button" aria-label={`${r.name} ETF 상세 보기`} onClick={()=>onSelect(r)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
-      <td className="industry-name-cell" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{marketLabel?r.market+' · ':''}{r.ticker} · {sectorName(r.market,r.sector||'분류 확인')}</small></td>
-      <td><span className={(r.etf_rs_rank??0)>=90?'heat top':(r.etf_rs_rank??0)>=70?'heat high':'heat'} title={etfRankTitle}>{r.etf_rs_rank??'—'}</span></td>
-      {returnTradingValues(r).map((value,i)=><td key={i} className={toneClass(value)}>{pct(value)}</td>)}
-      <td className={toneClass(r.high_52w_distance)}>{pct(r.high_52w_distance)}</td>
-    </tr>)}
-    {!rows.length&&<tr><td colSpan={9} className="empty">표시할 ETF가 없습니다.</td></tr>}
-  </tbody></table></div>
-}
-
-function StockRows({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  const [stockNameWidth,setStockNameWidth]=useState(()=>{
-    try{
-      const raw=localStorage.getItem(STOCK_NAME_WIDTH_KEY)
-      const saved=raw===null?STOCK_NAME_DEFAULT_WIDTH:Number(raw)
-      return Number.isFinite(saved)?Math.min(STOCK_NAME_MAX_WIDTH,Math.max(STOCK_NAME_MIN_WIDTH,saved)):STOCK_NAME_DEFAULT_WIDTH
-    }catch{return STOCK_NAME_DEFAULT_WIDTH}
-  })
-  useEffect(()=>{
-    try{localStorage.setItem(STOCK_NAME_WIDTH_KEY,String(stockNameWidth))}catch{}
-  },[stockNameWidth])
-  return <div className="stock-rows" style={{'--stock-name-width':`${stockNameWidth}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">종목<button type="button" className="stock-column-resizer" aria-label="종목 열 너비 조절" title="드래그하여 종목 열 너비 조절" onPointerDown={event=>{
-    event.preventDefault();event.stopPropagation()
-    const startX=event.clientX,startWidth=stockNameWidth
-    const previousCursor=document.body.style.cursor,previousSelect=document.body.style.userSelect
-    document.body.style.cursor='col-resize';document.body.style.userSelect='none'
-    const move=(moveEvent:PointerEvent)=>setStockNameWidth(Math.min(STOCK_NAME_MAX_WIDTH,Math.max(STOCK_NAME_MIN_WIDTH,startWidth+moveEvent.clientX-startX)))
-    const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);document.body.style.cursor=previousCursor;document.body.style.userSelect=previousSelect}
-    window.addEventListener('pointermove',move);window.addEventListener('pointerup',up)
-  }}/></span><span>현재가</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
-    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill><strong className={(r.rs_rank??0)>=90?'rank rank-top':(r.rs_rank??0)>=70?'rank rank-high':'rank'}>{r.rs_rank??'—'}</strong><strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
+// Shared stock/ETF table. A caller may pass a name-column width it owns (the ETF summary shares the sector column width).
+function StockRows({rows,onSelect,label='종목',nameWidth,onResizeStart}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;label?:string;nameWidth?:number;onResizeStart?:(event:any)=>void}){
+  const [ownWidth,startOwnResize]=useColumnWidth(STOCK_NAME_WIDTH_KEY,STOCK_NAME_DEFAULT_WIDTH,STOCK_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
+  const width=nameWidth??ownWidth
+  return <div className="stock-rows" style={{'--stock-name-width':`${width}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">{label}<button type="button" className="stock-column-resizer" aria-label={`${label} 열 너비 조절`} title={`드래그하여 ${label} 열 너비 조절`} onPointerDown={onResizeStart??startOwnResize}/></span><span>현재가</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div><span className="stock-price">{num(r.price)}</span><ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
     {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
@@ -423,7 +391,6 @@ export default function App(){
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
   const [sectorNameWidth,startSectorColumnResize]=useColumnWidth(SECTOR_NAME_WIDTH_KEY,SECTOR_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,SECTOR_NAME_MAX_WIDTH)
-  const [etfNameWidth,startEtfColumnResize]=useColumnWidth(ETF_NAME_WIDTH_KEY,ETF_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
   const [etfSummaryOpen,setEtfSummaryOpen]=useState(false)
   const [stockTab,setStockTab]=useState<'core'|'candidates'|'turns'|'corrections'>('core')
   const [summaryTab,setSummaryTab]=useState<'core'|'candidates'|'turns'|'corrections'|null>(null)
@@ -782,12 +749,12 @@ export default function App(){
         </div>
       </section>
 
-      <section className="panel industry-panel dashboard-etf-panel">
+      <section className="panel dashboard-etf-panel">
         <div className="panel-head dashboard-sector-head">
           <div><h2>ETF 요약</h2><p>ETF 전용 RS 순위 기준 Top 5 · 주식 순위와 별도 산정</p></div>
           <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
         </div>
-        <EtfTable rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} onResize={startEtfColumnResize} nameWidth={etfNameWidth} marketLabel={market==='ALL'}/>
+        <StockRows label="ETF" rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/>
       </section>
     </>
   }else if(page==='leaderboard'){
@@ -845,10 +812,10 @@ export default function App(){
     <DialogContent className="sector-summary-dialog etf-summary-dialog">
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
-        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>ETF 요약 · 전체</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 등락 5D~52W 전체 보기</DialogDescription></div>
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>ETF 요약 · 전체</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
-      <EtfTable full rows={rankedEtfRows} onSelect={openEtf} onResize={startEtfColumnResize} nameWidth={etfNameWidth} marketLabel={market==='ALL'}/>
+      <div className="drill-summary-list"><StockRows label="ETF" rows={rankedEtfRows} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/></div>
     </DialogContent>
   </Dialog>
   const drillOverlay=<Dialog open={drillOpen} onOpenChange={open=>{if(!open)closeDrill()}}>
