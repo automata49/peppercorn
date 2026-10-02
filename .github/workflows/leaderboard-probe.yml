@@ -1,0 +1,18 @@
+name: Leaderboard probe (temporary)
+on:
+  push:
+    branches: [claude/leaderboard-probe]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call the public leaderboard endpoint like the app does
+        run: |
+          URL='https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1'
+          for i in 1 2 3; do
+            curl -sS -o body.json -w "attempt $i: http=%{http_code} bytes=%{size_download} total=%{time_total}s\n" -H 'Origin: https://automata49.github.io' "$URL" || true
+            head -c 400 body.json; echo
+            python3 -c "import json;d=json.load(open('body.json'));r=d.get('rows');print('rows:',len(r) if isinstance(r,list) else r, 'keys:',list(d)[:5])" || true
+          done
