@@ -9,7 +9,7 @@ on:
       function:
         description: 배포할 함수
         type: choice
-        options: [position-ingest, position-public, quotes]
+        options: [position-ingest, position-public, quotes, price-history]
         default: position-ingest
       target:
         description: 배포 대상
@@ -53,7 +53,7 @@ jobs:
             ref=$(printf '%s' "$TEST_SUPABASE_URL" | sed -E 's#https://([a-z0-9]+)\.supabase\.co.*#\1#')
             [ "$ref" != "mhbcchegrbakearqptdr" ] || { echo "::error::test target resolves to production"; exit 1; }
           fi
-          # position-ingest authenticates with a GitHub OIDC token; position-public and quotes are public read-only
+          # position-ingest authenticates with a GitHub OIDC token; position-public, quotes and price-history are public read-only
           # endpoints guarded by origin and client token like leaderboard. None uses a Supabase JWT.
-          case "$FUNCTION" in position-ingest|position-public|quotes) ;; *) echo "::error::unknown function $FUNCTION"; exit 1;; esac
+          case "$FUNCTION" in position-ingest|position-public|quotes|price-history) ;; *) echo "::error::unknown function $FUNCTION"; exit 1;; esac
           supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt

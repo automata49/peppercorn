@@ -2,7 +2,7 @@ name: ETF migration (production)
 
 # 수동 실행 전용. Actions 탭 → "ETF migration (production)" → Run workflow, migration 선택, confirm 칸에 apply 입력.
 # supabase/migrations/*_<migration>.sql 하나를 한 트랜잭션으로 적용한다
-# 현재 선택지는 etf_traded_value(산업 히트맵용 20일 평균 거래대금) 하나다. etf_swing_criteria 는 이미 적용됐고 이 마이그레이션이 대체한다.
+# 선택지: equity_traded_value(VALUE-2, 섹터 히트맵용 주식 20일 평균 거래대금), etf_traded_value(산업 히트맵용, 적용 완료). etf_swing_criteria 는 이미 적용됐고 이 마이그레이션이 대체한다.
 # 적용 전후 주식(Equity) 최신 지표의 해시가 달라지면 실패한다. 이후 정기 analyze 작업이 같은 함수를 다시 호출한다.
 on:
   workflow_dispatch:
@@ -11,9 +11,10 @@ on:
         description: 적용할 마이그레이션
         required: true
         type: choice
-        default: etf_traded_value
+        default: equity_traded_value
         # etf_swing_criteria (applied 2026-09-30) is superseded: re-applying it would drop the trading-value step.
-        options: [etf_traded_value]
+        # equity_traded_value (VALUE-2) extends traded_value_20d to equities; apply it after etf_traded_value and kr_benchmark_kospi.
+        options: [equity_traded_value, etf_traded_value]
       confirm:
         description: 운영 DB에 적용하려면 apply 입력
         required: true
@@ -56,7 +57,7 @@ jobs:
           MIGRATION: ${{ inputs.migration }}
         run: |
           set -euo pipefail
-          case "$MIGRATION" in etf_traded_value) ;; *) echo "::error::unknown migration $MIGRATION"; exit 1 ;; esac
+          case "$MIGRATION" in etf_traded_value|equity_traded_value) ;; *) echo "::error::unknown migration $MIGRATION"; exit 1 ;; esac
           file=$(ls supabase/migrations/*_"$MIGRATION".sql)
           echo "Applying $file"
           equity_hash() {

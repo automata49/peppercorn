@@ -75,18 +75,21 @@ function normalizeRow(raw:unknown,index:number):LeaderRow{
 
 const normalizeRows=(rows:unknown[])=>rows.map(normalizeRow)
 
-export async function loadLeaderboard(): Promise<{rows:LeaderRow[];source:'supabase'|'demo'}> {
+// error says why live data was not used, so a device without the header badge can report it.
+export async function loadLeaderboard(): Promise<{rows:LeaderRow[];source:'supabase'|'demo';error?:string}> {
   const controller=new AbortController()
-  const timeout=window.setTimeout(()=>controller.abort(),12_000)
+  // 25 s: the full leaderboard is ~2.6 MB before compression; slow mobile links exceeded the former 12 s.
+  const timeout=window.setTimeout(()=>controller.abort(),25_000)
   try {
     const res = await fetch(endpoint,{signal:controller.signal})
     if (!res.ok) throw new Error('Peppercorn API HTTP ' + res.status)
     const payload = await res.json() as { rows?: unknown[] }
     return payload.rows?.length
       ? { rows: normalizeRows(payload.rows), source: 'supabase' }
-      : { rows: normalizeRows(demoRows), source: 'demo' }
-  } catch {
-    return { rows: normalizeRows(demoRows), source: 'demo' }
+      : { rows: normalizeRows(demoRows), source: 'demo', error: '응답에 종목이 없음' }
+  } catch (e) {
+    const error=controller.signal.aborted?'응답 시간 초과(25초)':e instanceof TypeError?'네트워크 차단 또는 연결 실패':e instanceof Error?e.message:String(e)
+    return { rows: normalizeRows(demoRows), source: 'demo', error }
   } finally {
     window.clearTimeout(timeout)
   }
