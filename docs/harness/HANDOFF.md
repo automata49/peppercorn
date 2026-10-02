@@ -236,3 +236,7 @@ By user request: (1) the stock detail has `‹ 뒤로` (목록으로 / ETF 목�
 Load check (scratch Playwright, 1,500 equities + 137 ETFs, 390 px, median of 10 toggles): a first version that kept the chart period state in `App` added about 30 ms to every App re-render at 4× CPU throttle (existing heatmap toggle 71 → 101 ms). The charts are now memoized components with their own period state and ref-backed handlers: the existing toggle measures 69–75 ms against 71–74 ms on main, and a chart toggle 40–60 ms (4×) / 14–20 ms (1×). Bundle +6.8 kB raw (+2.0 kB gzip). Leaderboard requests unchanged (test asserts 1 call).
 Not verified: physical iOS Safari swipe-back and Android back with the installed PWA.
 Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (rs-chart: helper fixture + 5 viewports), `git diff --check`.
+
+## RS line charts (RS-CHART-2) — 2026-10-02
+By user request the RS-CHART-1 bars become SVG line charts (x = period, y = %). Dashboard charts keep the period toggle, now choosing the Top 5 lines by that period's RS. The detail chart moved into 02 상대강도 (RS) and a return chart was added to 03 가격 모멘텀, each comparing the stock with industry/sector/market medians; the same snapshot on 종목 분석 shows them too. Display only; no request or metric change.
+Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (rs-chart: helper fixture for series/medians/axis, 5 viewports for axis labels, point order, toggle ranking, section placement), `git diff --check`. Not verified on physical devices.
