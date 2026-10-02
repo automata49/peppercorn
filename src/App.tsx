@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
@@ -15,6 +15,7 @@ import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
+import { RS_CHART_PERIODS, RS_CHART_VERSION, groupMedians, peerComparison, topByRs, type RsBar, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market } from './types'
@@ -405,6 +406,66 @@ function LiveLeaders({pool,live,onSelect}:{pool:LeaderRow[];live:boolean;onSelec
   </>
 }
 
+// RS-CHART-1: period toggle + RS bars (up red / down blue) built from rows already in memory; display only.
+type RsChartBar=RsBar&{onClick?:()=>void}
+function RsPeriodChart({title,period,onPeriod,bars,note}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;bars:RsChartBar[];note?:string}){
+  const max=Math.max(1e-9,...bars.map(b=>Math.abs(b.value??0)))
+  const diverging=bars.some(b=>(b.value??0)<0)
+  return <div className="rs-chart" role="figure" aria-label={`${title} RS ${period} 차트`} title={RS_CHART_VERSION}>
+    <div className="rs-chart-head">
+      <span>{title} · RS {period} <small>벤치마크 대비</small></span>
+      <div className="mini-segment rs-period-toggle" role="group" aria-label={`${title} RS 기간`}>{RS_CHART_PERIODS.map(([p])=><button key={p} type="button" className={period===p?'on':''} aria-pressed={period===p} onClick={()=>onPeriod(p)}>{p}</button>)}</div>
+    </div>
+    {bars.length?<ol className={'rs-chart-bars'+(diverging?' diverging':'')}>{bars.map(b=>{
+      const w=b.value==null?0:Math.abs(b.value)/max*(diverging?50:100)
+      const tone=b.value==null?'':b.value>0?'pos':b.value<0?'neg':''
+      const body=<>
+        <span className="rs-bar-label" title={b.sub?`${b.label} · ${b.sub}`:b.label}><b>{b.label}</b>{b.sub&&<small>{b.sub}</small>}</span>
+        <span className="rs-bar-track" aria-hidden="true"><i className={tone} style={{width:w+'%',left:diverging?((b.value??0)<0?50-w:50)+'%':0}}/></span>
+        <strong className={tone}>{pct(b.value)}</strong>
+      </>
+      return <li key={b.key} className={b.highlight?'self':''}>{b.onClick?<button type="button" className="rs-bar-row" onClick={b.onClick} aria-label={`${b.label} RS ${period} ${pct(b.value)} 상세 보기`}>{body}</button>:<div className="rs-bar-row">{body}</div>}</li>
+    })}</ol>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
+    {note&&<p className="rs-chart-note">{note}</p>}
+  </div>
+}
+
+const chartNote=(shown:number,total:number,missing:number,unit:string)=>`${total}${unit} 중 RS 상위 ${shown}${missing?` · 값 없음 ${missing}${unit} 제외`:''}`
+const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
+
+const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const pool=useMemo(()=>rows.filter(isLeaderClass),[rows])
+  const {items,missing}=useMemo(()=>topByRs(pool,period,10),[pool,period])
+  const bars=items.map(({row,value})=>({key:row.id,label:row.name,sub:`${row.market} · ${row.ticker} · ${leadership(row)}`,value,onClick:()=>onSelect(row)}))
+  return <RsPeriodChart title="주도 종목" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,pool.length,missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
+})
+
+const SectorRsChart=memo(function SectorRsChart({rows,market,sector,onSelect}:{rows:LeaderRow[];market:string;sector:string|null;onSelect:(key:string)=>void}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const equities=useMemo(()=>rows.filter(r=>r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)),[rows,sector])
+  const medians=useMemo(()=>groupMedians(equities,period,sectorKey),[equities,period])
+  const firstOf=useMemo(()=>{const m=new Map<string,LeaderRow>();for(const r of equities)if(!m.has(sectorKey(r)))m.set(sectorKey(r),r);return m},[equities])
+  const all=[...medians].map(([key,m])=>{const r=firstOf.get(key)!;return {key,label:`${market==='ALL'?r.market+' · ':''}${sectorName(r.market,r.sector)}`,sub:`주식 ${m.n}`,value:m.value,onClick:()=>onSelect(key)}})
+  const bars=all.filter(b=>b.value!=null).sort((a,b)=>(b.value??0)-(a.value??0)).slice(0,10)
+  return <RsPeriodChart title="섹터" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,all.length,all.length-all.filter(b=>b.value!=null).length,'개 섹터')+' · 섹터 소속 주식 RS 중앙값'}/>
+})
+
+const EtfRsChart=memo(function EtfRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const etfs=useMemo(()=>rows.filter(r=>r.asset_class==='ETF'),[rows])
+  const {items,missing}=useMemo(()=>topByRs(etfs,period,10),[etfs,period])
+  const bars=items.map(({row,value})=>({key:row.id,label:row.name,sub:`${row.market} · ${row.ticker}${row.industry?' · '+row.industry:''}`,value,onClick:()=>onSelect(row)}))
+  return <RsPeriodChart title="ETF" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,etfs.length,missing,'개 ETF')}/>
+})
+
+const DetailRsChart=memo(function DetailRsChart({row,rows}:{row:LeaderRow;rows:LeaderRow[]}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const bars=useMemo(()=>peerComparison(row,rows,period),[row,rows,period])
+  const kind=row.asset_class==='ETF'?'ETF':'주식'
+  return <RsPeriodChart title={kind==='ETF'?'ETF 비교':'종목 비교'} period={period} onPeriod={setPeriod} bars={bars} note={`같은 시장 ${kind}끼리의 RS 중앙값과 비교`}/>
+})
+
 function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:string;children:any;wide?:boolean;valueClassName?:string}){
   return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong className={valueClassName}>{children}</strong></div>
 }
@@ -507,6 +568,10 @@ export default function App(){
   const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [analysisDeleteTarget,setAnalysisDeleteTarget]=useState<EditableRow|null>(null)
   const drillRef=useRef<HTMLDivElement|null>(null)
+  const detailReturnRef=useRef<{etfIndustry:string|null}|null>(null)
+  const backFromDetailRef=useRef<()=>void>(()=>{})
+  const detailHistoryRef=useRef(false)
+  const ignorePopRef=useRef(0)
   const launchRef=useRef<HTMLDivElement|null>(null)
   const analysisRecordsRef=useRef<HTMLDivElement|null>(null)
   const [scrollToAnalysis,setScrollToAnalysis]=useState(false)
@@ -611,6 +676,24 @@ export default function App(){
     return()=>ctx.revert()
   },[drillOpen,drillStock?.id,drillSectorKey,summaryTab])
 
+  // The device back button/gesture leaves the stock detail the same way as the visible 뒤로 button.
+  const detailOpen=!!drillStock
+  useEffect(()=>{
+    if(detailOpen&&!detailHistoryRef.current){
+      try{window.history.pushState({...(window.history.state??{}),folioDetail:true},'');detailHistoryRef.current=true}catch{}
+    }else if(!detailOpen&&detailHistoryRef.current){
+      detailHistoryRef.current=false;ignorePopRef.current++;window.history.back()
+    }
+  },[detailOpen])
+  useEffect(()=>{
+    const onPop=()=>{
+      if(ignorePopRef.current>0){ignorePopRef.current--;return}
+      if(detailHistoryRef.current){detailHistoryRef.current=false;backFromDetailRef.current()}
+    }
+    window.addEventListener('popstate',onPop)
+    return()=>window.removeEventListener('popstate',onPop)
+  },[])
+
   useEffect(()=>{
     if(page==='analysis'&&scrollToAnalysis){analysisRecordsRef.current?.scrollIntoView({behavior:'smooth',block:'start'});setScrollToAnalysis(false)}
   },[page,scrollToAnalysis])
@@ -656,7 +739,7 @@ export default function App(){
   const chosenEtfIndustry=etfIndustries.find(g=>g.key===etfIndustryKey)||null
   const dialogEtfRows=chosenEtfIndustry?rankedEtfRows.filter(r=>`${r.market}|${String(r.industry||'').trim()}`===chosenEtfIndustry.key):rankedEtfRows
   const openEtfIndustry=(g:EtfIndustry)=>{setEtfIndustryKey(g.key);setEtfSummaryOpen(true)}
-  const openEtf=(row:LeaderRow)=>{setEtfSummaryOpen(false);setEtfIndustryKey(null);setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
+  const openEtf=(row:LeaderRow)=>{detailReturnRef.current=etfSummaryOpen?{etfIndustry:etfIndustryKey}:null;setEtfSummaryOpen(false);setEtfIndustryKey(null);setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
   const metricExchanges=[...new Set(stockRows.map(r=>r.exchange?.trim()).filter((name):name is string=>!!name))].sort((a,b)=>a.localeCompare(b,'ko'))
   const metricIndices=[...new Set(stockRows.flatMap(r=>r.index_memberships||[]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko'))
   const metricNames=(names:string[])=>names.length?names.slice(0,3).join(' · ')+(names.length>3?` 외 ${names.length-3}`:''):'분류 확인 중'
@@ -692,6 +775,13 @@ export default function App(){
   const shownSectors=sector?eligibleSectors.filter(g=>g.key===sector):eligibleSectors
   const rankedSectorRows=shownSectors.slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)
   const dashboardTopSectors=rankedSectorRows.slice(0,5)
+  // RS-CHART-1 charts get stable inputs (memoized rows + ref-backed handlers) so other App updates skip them.
+  const openStock=(row:LeaderRow)=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
+  const openSector=(key:string)=>{setSectorKeySelected(key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(key)}
+  const chartHandlers=useRef({openStock,openSector,openEtf});chartHandlers.current={openStock,openSector,openEtf}
+  const chartOpenStock=useCallback((row:LeaderRow)=>chartHandlers.current.openStock(row),[])
+  const chartOpenSector=useCallback((key:string)=>chartHandlers.current.openSector(key),[])
+  const chartOpenEtf=useCallback((row:LeaderRow)=>chartHandlers.current.openEtf(row),[])
   const chosenSector=allSectorRows.find(g=>g.key===sectorKeySelected)||null
   const drillSector=allSectorRows.find(g=>g.key===drillSectorKey)||null
   const drillSectorStocks=visible.filter(r=>r.asset_class==='Equity'&&(!drillSector||sectorKey(r)===drillSector.key)).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
@@ -811,6 +901,7 @@ export default function App(){
           <div><h2>주도 종목</h2><p>시장의 리더십 흐름을 한눈에 확인하세요.</p></div>
           <button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 보기 →</button>
         </div>
+        <LeaderRsChart rows={marketRows} onSelect={chartOpenStock}/>
         <div className="mini-segment leader-basis" role="group" aria-label="주도 종목 기준">{([['close','종가 기준'],['live','현재가 기준']] as const).map(([key,text])=><button key={key} type="button" aria-pressed={leaderBasis===key} className={leaderBasis===key?'on':''} onClick={()=>setLeaderBasis(key)}>{text}</button>)}</div>
         {leaderBasis==='close'?<>
         <div className="leadership-card-grid">
@@ -839,6 +930,7 @@ export default function App(){
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
+          <SectorRsChart rows={marketRows} market={market} sector={sector} onSelect={chartOpenSector}/>
           <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
             {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
@@ -869,6 +961,7 @@ export default function App(){
           <div><h2>ETF 요약</h2><p>ETF 전용 RS 순위 기준 Top 5 · 주식 순위와 별도 산정</p></div>
           <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
         </div>
+        <EtfRsChart rows={marketRows} onSelect={chartOpenEtf}/>
         <StockRows label="ETF" rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/>
       </section>
     </>
@@ -908,7 +1001,15 @@ export default function App(){
   }
 
   const pageTitle:Record<string,string>={dashboard:'Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
-  const closeDrill=()=>{setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
+  const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
+  // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
+  const backFromDetail=()=>{
+    const ret=detailReturnRef.current;detailReturnRef.current=null
+    setDrillStock(null)
+    if(ret){setEtfIndustryKey(ret.etfIndustry);setEtfSummaryOpen(true)}
+  }
+  backFromDetailRef.current=backFromDetail
+  const detailBackLabel=summaryTab||drillSectorKey!==null?'목록으로':detailReturnRef.current?'ETF 목록으로':'뒤로'
   const marketMetricsDialog=<Dialog open={marketMetricsOpen} onOpenChange={setMarketMetricsOpen}>
     <DialogContent className="sector-summary-dialog market-metrics-dialog">
       <div className="drill-handle"/>
@@ -964,11 +1065,12 @@ export default function App(){
     <DialogContent ref={drillRef} className="drill-sheet">
       <div className="drill-handle"/>
       <div className="drill-head">
-        <div><small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
+        <div>{drillStock&&<button type="button" className="drill-back" onClick={backFromDetail} aria-label={`종목 상세에서 ${detailBackLabel==='뒤로'?'나가기':detailBackLabel}`}>‹ {detailBackLabel}</button>}<small>{summaryTab?(market==='ALL'?'전체 시장':market):drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중'}[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{stageLabel(drillStock.stage)}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
+        <div className="drill-animate"><DetailRsChart row={drillStock} rows={leaders}/></div>
         <StockSnapshot row={drillStock} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>

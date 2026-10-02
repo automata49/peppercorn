@@ -1203,3 +1203,22 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 /* 시장 지표 popup: every card has the same width, so every card scales type from the same share. */
 .market-metrics-dialog .market-metric-card:nth-child(n){--card-share:.5}
 @container metrics-dialog (min-width:720px){.market-metrics-dialog .market-metric-card:nth-child(n){--card-share:.25}}
+
+/* RS-CHART-1: period toggle + RS bars at the top of 주도 종목, 섹터 요약, ETF 요약 and the stock detail. */
+.rs-chart{margin:0 0 14px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;min-width:0}
+.rs-chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-bottom:8px}
+.rs-chart-head>span{font-size:12px;font-weight:700;color:#33475f;word-break:keep-all}.rs-chart-head>span small{font-weight:500;color:#7b8797;font-size:11px;margin-left:4px}
+.rs-period-toggle{width:max-content;max-width:100%;overflow-x:auto}.rs-period-toggle button{font-size:11.5px;padding:4px 9px;white-space:nowrap}
+.rs-chart-bars{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.rs-bar-row{width:100%;display:grid;grid-template-columns:minmax(84px,34%) minmax(0,1fr) 58px;align-items:center;gap:10px;border:0;background:transparent;padding:4px 4px;border-radius:7px;text-align:left;color:inherit}
+button.rs-bar-row{cursor:pointer}button.rs-bar-row:hover,button.rs-bar-row:focus-visible{background:#eef3f8}
+.rs-bar-label{min-width:0;display:flex;flex-direction:column}.rs-bar-label b,.rs-bar-label small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-bar-label b{font-size:12px;color:#2d3d52}.rs-bar-label small{font-size:10px;color:#8a95a4;margin-top:1px}
+.rs-bar-track{position:relative;height:12px;border-radius:3px;background:#edf1f5}
+.rs-chart-bars.diverging .rs-bar-track::after{content:"";position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:#9aa6b4}
+.rs-bar-track i{position:absolute;top:0;bottom:0;border-radius:3px;background:#9aa6b4}.rs-bar-track i.pos{background:#c33d36}.rs-bar-track i.neg{background:#2467b2}
+.rs-bar-row strong{font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.rs-chart-bars li.self .rs-bar-row{background:#f1f5fa}.rs-chart-bars li.self .rs-bar-label b{color:#25486f}
+.rs-chart-note{margin:6px 4px 0;font-size:10.5px;color:#7b8797;line-height:1.5;word-break:keep-all}
+.drill-head .drill-back{display:block;font-weight:700}
+@media(max-width:650px){.rs-bar-row{grid-template-columns:minmax(76px,38%) minmax(0,1fr) 52px;gap:7px}.rs-period-toggle button{padding:4px 7px;font-size:11px}}
