@@ -1225,3 +1225,8 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .rs-chart-note{margin:6px 4px 0;font-size:10.5px;color:#7b8797;line-height:1.5;word-break:keep-all}
 .drill-head .drill-back{display:block;font-weight:700}
 @media(max-width:650px){.rs-period-toggle button{padding:4px 7px;font-size:11px}}
+
+/* Live data fallback notice: the header source badge is hidden below 1280px, so the demo state is shown in the page. */
+.demo-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:#fff6e5;border:1px solid #ecd6a6;color:#6b5328;font-size:13px;word-break:keep-all}
+.demo-banner button{border:1px solid #d9b977;background:#fff;color:#6b5328;border-radius:9px;padding:6px 12px;font-weight:700;cursor:pointer}.demo-banner button:disabled{opacity:.6;cursor:default}
+.demo-banner small{display:block;margin-top:2px;font-size:11.5px;color:#8a6d35}

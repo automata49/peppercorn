@@ -204,14 +204,16 @@ test('failed live load can be retried from the demo state',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>{
     calls++;
-    calls===1?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
+    // The initial load and its one automatic retry fail; the manual retry succeeds.
+    calls<=2?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect.poll(()=>calls,{timeout:10000}).toBe(2);
   await expect(page.getByRole('button',{name:'시장 데이터 새로고침'})).toContainText('Demo / Local');
   await page.getByRole('button',{name:'시장 데이터 새로고침'}).click();
   await expect(page.getByRole('button',{name:'시장 데이터 새로고침'})).toContainText('Supabase Live');
-  expect(calls).toBe(2);
+  expect(calls).toBe(3);
 });
 
 test('a stalled live response releases the refresh controls',async({page})=>{
@@ -222,11 +224,11 @@ test('a stalled live response releases the refresh controls',async({page})=>{
     if(calls>1)void route.fulfill({json:{rows}});
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
+  test.setTimeout(60_000);
   const refresh=page.getByRole('button',{name:'시장 데이터 새로고침'});
-  await expect(refresh).toBeEnabled({timeout:17_000});
-  await expect(refresh).toContainText('Demo / Local');
-  await refresh.click();
-  await expect(refresh).toContainText('Supabase Live');
+  // The first request stalls and aborts after 25 s; the automatic retry 4 s later succeeds.
+  await expect(refresh).toContainText('Supabase Live',{timeout:40_000});
+  await expect(refresh).toBeEnabled();
   expect(calls).toBe(2);
 });
 
