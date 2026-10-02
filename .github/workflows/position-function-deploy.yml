@@ -9,7 +9,7 @@ on:
       function:
         description: 배포할 함수
         type: choice
-        options: [position-ingest, position-public, quotes]
+        options: [position-ingest, position-public, quotes, price-history]
         default: position-ingest
       target:
         description: 배포 대상

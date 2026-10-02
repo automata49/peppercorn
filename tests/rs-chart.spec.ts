@@ -141,3 +141,34 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 7')
   await context.close()
 })
+
+test('momentum toggle draws daily closes rebased to 100 for the Top 5 by period return',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
+  const page=await context.newPage()
+  const asked:string[][]=[]
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows.map((r,i)=>({...r,return_20d:i/100})),...etfs]}}))
+  await page.route('**/functions/v1/price-history?*',route=>{
+    const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');asked.push(ids)
+    // 30 sessions: close 100 … 129 (+1 a day); the 20D window starts at 109 (21 closes).
+    const series=Object.fromEntries(ids.map(id=>[id,Array.from({length:30},(_,d)=>[`2026-09-${String(d+1).padStart(2,'0')}`,100+d])]))
+    route.fulfill({json:{series}})
+  })
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  const chart=page.locator('.leadership-overview .rs-chart')
+  await expect(chart.locator('.rs-mode-toggle button')).toHaveText(['RS 상위','가격 모멘텀 상위'])
+  expect(asked).toHaveLength(0) // no daily request until the toggle is used
+  await chart.getByRole('button',{name:'가격 모멘텀 상위'}).click()
+  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 7','검증 종목 6','검증 종목 5','검증 종목 4','검증 종목 3'])
+  expect(asked[0]).toHaveLength(5)
+  await expect(chart.locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
+  await expect(chart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
+  await expect(chart.locator('svg .line-series').first().locator('circle')).toHaveCount(1)
+  expect(await chart.locator('svg text.line-tick').allTextContents()).toContain('09-30')
+  await expect(page.locator('.dashboard-sector-panel .rs-mode-toggle')).toHaveCount(0)
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
+  await chart.locator('.line-legend button').first().click()
+  await expect(page.locator('.drill-sheet .drill-meta')).toContainText('TEST7')
+  await context.close()
+})
