@@ -419,14 +419,14 @@ function LineChart({series,yTitle,activePeriod,onPick}:{series:LineSeries[];yTit
     <div ref={ref} className="line-chart-plot">{width>0&&<svg width={width} height={H} role="img" aria-label={`${yTitle} 꺾은선 차트`}>
       <text className="line-axis-title" x={4} y={10}>{yTitle}</text>
       {ticks.map(t=><g key={t}><line x1={L} x2={L+w} y1={y(t)} y2={y(t)} className={t===0?'line-zero':'line-grid'}/><text x={L-6} y={y(t)+3.5} textAnchor="end" className="line-tick">{yLabel(t,digits)}</text></g>)}
-      {RS_CHART_PERIODS.map(([p],i)=><g key={p}>{p===activePeriod&&<rect x={x(i)-14} y={T} width={28} height={h} className="line-active"/>}<text x={x(i)} y={H-6} textAnchor="middle" className={'line-tick'+(p===activePeriod?' on':'')}>{p}</text></g>)}
+      {RS_CHART_PERIODS.map(([p],i)=><g key={p}>{p===activePeriod&&<line x1={x(i)} x2={x(i)} y1={T} y2={T+h} className="line-active"/>}<text x={x(i)} y={H-6} textAnchor="middle" className={'line-tick'+(p===activePeriod?' on':'')}>{p}</text></g>)}
       {series.map((s,k)=>{const c=LINE_COLORS[k%LINE_COLORS.length];return <g key={s.key} className="line-series" data-key={s.key}>
-        <path d={paths(s.values)} fill="none" stroke={c} strokeWidth={s.highlight?3:2} strokeLinejoin="round" strokeLinecap="round"/>
-        {s.values.map((v,i)=>v==null?null:<circle key={i} cx={x(i)} cy={y(v)} r={s.highlight?4:3} fill={c}><title>{`${s.label} · ${RS_CHART_PERIODS[i][0]} ${pct(v)}`}</title></circle>)}
+        <path d={paths(s.values)} fill="none" stroke={c} strokeWidth={s.highlight?2.4:1.6} strokeLinejoin="round" strokeLinecap="round" className="line-path" style={{color:c}}/>
+        {s.values.map((v,i)=>v==null?null:<circle key={i} cx={x(i)} cy={y(v)} r={s.highlight?4:3.2} className="line-dot" stroke={c} strokeWidth={s.highlight?2:1.6}><title>{`${s.label} · ${RS_CHART_PERIODS[i][0]} ${pct(v)}`}</title></circle>)}
       </g>})}
     </svg>}</div>
     <ul className="line-legend">{series.map((s,k)=>{const last=activePeriod?s.values[RS_CHART_PERIODS.findIndex(([p])=>p===activePeriod)]:null
-      const body=<><i style={{background:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{activePeriod?pct(last):''}</em></>
+      const body=<><i style={{color:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{activePeriod?pct(last):''}</em></>
       return <li key={s.key}>{onPick?<button type="button" onClick={()=>onPick(s.key)} aria-label={`${s.label} 상세 보기`}>{body}</button>:<span>{body}</span>}</li>})}</ul>
   </div>
 }

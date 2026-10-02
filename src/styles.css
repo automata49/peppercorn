@@ -1205,19 +1205,23 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 @container metrics-dialog (min-width:720px){.market-metrics-dialog .market-metric-card:nth-child(n){--card-share:.25}}
 
 /* RS-CHART-1: period toggle + RS bars at the top of 주도 종목, 섹터 요약, ETF 요약 and the stock detail. */
-.rs-chart{margin:0 0 14px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;min-width:0}
+.rs-chart{--rs-chart-bg:#f8fafc;margin:0 0 14px;padding:14px 14px 10px;border:0;border-radius:16px;background:var(--rs-chart-bg);box-shadow:inset 0 0 0 1px rgba(40,72,111,.06);min-width:0}
 .rs-chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;margin-bottom:8px}
 .rs-chart-head>span{font-size:12px;font-weight:700;color:#33475f;word-break:keep-all}.rs-chart-head>span small{font-weight:500;color:#7b8797;font-size:11px;margin-left:4px}
 .rs-period-toggle{width:max-content;max-width:100%;overflow-x:auto}.rs-period-toggle button{font-size:11.5px;padding:4px 9px;white-space:nowrap}
 .line-chart{min-width:0}.line-chart-plot{width:100%;min-width:0}.line-chart svg{display:block;overflow:visible}
-.line-grid{stroke:#e6ebf1;stroke-width:1}.line-zero{stroke:#9aa6b4;stroke-width:1}.line-active{fill:#eef3f8}
-.line-tick{font-size:10.5px;fill:#7b8797;font-variant-numeric:tabular-nums}.line-tick.on{fill:#25486f;font-weight:700}.line-axis-title{font-size:10px;fill:#7b8797}
+.line-grid{stroke:#e9edf2;stroke-width:1;stroke-dasharray:2 4}.line-zero{stroke:#b8c2ce;stroke-width:1}
+.line-active{stroke:#25486f;stroke-width:1;stroke-dasharray:3 3;opacity:.45}
+.line-path{filter:drop-shadow(0 2px 4px color-mix(in srgb,currentColor 35%,transparent))}
+.line-dot{fill:var(--rs-chart-bg,#fff)}
+.line-tick{font-size:10px;fill:#97a2b0;font-variant-numeric:tabular-nums;letter-spacing:.04em}.line-tick.on{fill:#25486f;font-weight:700}
+.line-axis-title{font-size:9.5px;fill:#97a2b0;letter-spacing:.08em}
 .line-legend{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px}
 .line-legend button,.line-legend span{width:100%;display:grid;grid-template-columns:12px minmax(0,auto) minmax(0,1fr) auto;align-items:center;gap:7px;border:0;background:transparent;padding:4px;border-radius:7px;text-align:left;color:inherit;font:inherit}
 .line-legend button{cursor:pointer}.line-legend button:hover,.line-legend button:focus-visible{background:#eef3f8}
-.line-legend i{width:12px;height:3px;border-radius:2px}.line-legend b{font-size:12px;color:#2d3d52;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.line-legend i{width:9px;height:9px;border-radius:50%;background:var(--rs-chart-bg,#fff);border:2px solid currentColor;box-sizing:border-box}.line-legend b{font-size:12px;color:#2d3d52;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .line-legend small{font-size:10px;color:#8a95a4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.line-legend em{font-style:normal;font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
-.peer-line{margin-top:10px}
+.peer-line{--rs-chart-bg:#fff;margin-top:10px}
 .rs-chart-note{margin:6px 4px 0;font-size:10.5px;color:#7b8797;line-height:1.5;word-break:keep-all}
 .drill-head .drill-back{display:block;font-weight:700}
 @media(max-width:650px){.rs-period-toggle button{padding:4px 7px;font-size:11px}}
