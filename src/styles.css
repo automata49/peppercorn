@@ -1231,3 +1231,10 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .demo-banner button{border:1px solid #d9b977;background:#fff;color:#6b5328;border-radius:9px;padding:6px 12px;font-weight:700;cursor:pointer}.demo-banner button:disabled{opacity:.6;cursor:default}
 .demo-banner small{display:block;margin-top:2px;font-size:11.5px;color:#8a6d35}
 .rs-mode-toggle{width:max-content;max-width:100%;margin:0 0 10px}.rs-mode-toggle button{font-size:12px;padding:5px 11px;white-space:nowrap}
+
+/* SECTION-MARKET-1 toggles and the header refresh button. */
+.section-market{width:max-content;margin-top:8px}.section-market button{font-size:12px;padding:4px 11px}
+.topbar-refresh{display:grid;place-items:center;flex:none;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:#fff;color:#53657b;font-size:19px;cursor:pointer;order:2}
+.topbar-refresh:disabled{opacity:.6;cursor:default}
+@media(max-width:1279px){.topbar .topbar-refresh{order:3;margin-left:auto}.topbar .topbar-menu{order:4;margin-left:0}}
+@media(min-width:1280px){.topbar-refresh{order:5;margin-left:8px}}

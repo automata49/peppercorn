@@ -64,7 +64,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await noOverflow()
 
   // Sector tile → sector popup (momentum lines on top) → stock detail (own daily line in 03 가격 모멘텀).
-  await sectorChart.getByRole('listitem').filter({hasText:'US · Technology'}).click()
+  await expect(sectorChart.locator('.etf-heat-market-head b')).toHaveText(['US'])
+  await sectorChart.getByRole('listitem',{name:/^Technology ·/}).click()
   const drill=page.locator('.drill-sheet')
   await expect(drill.locator('.drill-tabs')).toBeVisible()
   await expect(drill.locator('.rs-chart svg .line-axis-title')).toHaveText('지수 (시작=100)')
@@ -74,7 +75,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const back=drill.locator('.drill-back')
   await expect(back).toHaveText('‹ 목록으로')
   const section=(name:string)=>drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name})})
-  await expect(section('상대강도').locator('.line-legend b')).toHaveText(['이 종목','산업 중앙값','섹터 중앙값','US 중앙값'])
+  // 02 상대강도: daily RS line vs the market benchmark; these fixtures have no SPY row, so it says so.
+  await expect(section('상대강도')).toContainText('벤치마크(SPY) 가격이 없어')
   await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
   await expect(section('가격 모멘텀').locator('.line-legend li')).toHaveCount(1)
   await expect(section('가격 모멘텀').locator('.rs-period-toggle button')).toHaveCount(6)
@@ -103,7 +105,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.locator('.dashboard-etf-panel').getByRole('button',{name:'전체 보기 →'}).click()
   await page.locator('.etf-summary-dialog .stock-row').first().click()
   await expect(back).toHaveText('‹ ETF 목록으로')
-  await expect(drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})}).locator('.line-legend b')).toHaveText(['이 ETF','산업 중앙값','US 중앙값'])
+  await expect(drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})}).locator('.rs-period-toggle button')).toHaveCount(6)
   await back.click()
   await expect(page.locator('.etf-summary-dialog')).toBeVisible()
   await expect(drill).toHaveCount(0)
@@ -152,6 +154,48 @@ test('주도 종목 popup shows momentum lines for its group; data is fetched pe
   await expect(drill.locator('.rs-chart .line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
   await drill.locator('.rs-chart .line-legend button').first().click()
   await expect(drill.locator('.drill-meta')).toContainText('TEST3')
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
+  await context.close()
+})
+
+test('section market toggles, RS line against SPY and the refresh button',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:834,height:1194},hasTouch:true,isMobile:true})
+  const page=await context.newPage()
+  let calls=0;const asked:string[][]=[]
+  const spy={...etfs[0],id:'spy',ticker:'SPY',name:'SPDR S&P 500',industry:'Broad Market'}
+  const kr={...rows[0],id:'kr1',ticker:'005930',market:'KR',name:'한국 종목',sector:'Electronic Technology'}
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/leaderboard?*',route=>{calls++;route.fulfill({json:{rows:[...rows,kr,...etfs,spy]}})})
+  await page.route('**/functions/v1/price-history?*',route=>{
+    const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');asked.push(ids)
+    // stock rises 1/day, SPY flat at 100: RS line = stock/SPY rebased.
+    route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:60},(_,d)=>[`2026-08-${String(d+1).padStart(2,'0')}`,id==='spy'?100:100+d])]))}})
+  })
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  // Section toggles: the sector section switches to KR without touching 주도 종목; the global toggle resets all.
+  const sectorPanel=page.locator('.dashboard-sector-panel')
+  await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR','US'])
+  await sectorPanel.locator('.section-market').getByRole('button',{name:'KR'}).click()
+  await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR'])
+  await expect(page.locator('.leadership-overview .section-market button.on')).toHaveText('전체')
+  await page.locator('.toolbar .segment').getByRole('button',{name:'US'}).click()
+  await expect(sectorPanel.locator('.section-market button.on')).toHaveText('US')
+  await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['US'])
+  // RS line: 50D default, last close 159 vs base 109 against flat SPY.
+  await page.locator('.dashboard-etf-panel .stock-row').first().click()
+  await page.getByRole('button',{name:'닫기',exact:true}).click()
+  await page.locator('.leadership-overview .line-legend button').first().click()
+  const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})})
+  await expect(rs.locator('svg .line-axis-title')).toHaveText('RS 라인 (시작=100)')
+  await expect(rs.locator('.line-legend em')).toHaveText(`+${((159/109-1)*100).toFixed(1)}%`)
+  expect(asked.some(ids=>ids.includes('spy'))).toBeTruthy()
+  await page.getByRole('button',{name:'닫기',exact:true}).click()
+  // Refresh: reloads the leaderboard and refetches daily prices.
+  const before=asked.length
+  await page.getByRole('button',{name:'새로고침',exact:true}).click()
+  await expect.poll(()=>calls).toBe(2)
+  await expect.poll(()=>asked.length).toBeGreaterThan(before)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
   await context.close()
 })
