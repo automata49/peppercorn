@@ -27,6 +27,12 @@ test('RS-CHART-2 helpers build period series, medians and a zero-inclusive axis'
   expect(y.lo).toBeLessThanOrEqual(-.03);expect(y.hi).toBeGreaterThanOrEqual(.06);expect(y.ticks).toContain(0)
 })
 
+const mockHistory=(page:any,asked:string[][]=[])=>page.route('**/functions/v1/price-history?*',(route:any)=>{
+  const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');asked.push(ids)
+  // 30 sessions: close 100 … 129 (+1 a day); the 20D window starts at 109 (21 closes).
+  route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:30},(_,d)=>[`2026-09-${String(d+1).padStart(2,'0')}`,100+d])]))}})
+})
+
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' RS period charts and stock detail back navigation',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
@@ -34,58 +40,44 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   let leaderboardCalls=0
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/leaderboard?*',route=>{leaderboardCalls++;route.fulfill({json:{rows:[...rows,...etfs]}})})
+  await mockHistory(page)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
-  // 주도 종목: leaders only (8 of 10), Top by RS 20D by default; 5D reverses the order.
+  // 주도 종목 and ETF 요약: daily momentum lines only (no RS chart); 섹터 요약: heatmap.
   const leaderChart=page.locator('.leadership-overview .rs-chart')
+  await expect(leaderChart.locator('.rs-mode-toggle')).toHaveCount(0)
   await expect(leaderChart.locator('.rs-period-toggle button')).toHaveText(['5D','20D','50D','120D','200D','52W'])
-  // Line chart: x axis = the six periods, y axis = RS %, one line per Top 5 leader (by RS 20D).
-  await expect(leaderChart.locator('.line-legend b')).toHaveText(['검증 종목 7','검증 종목 6','검증 종목 5','검증 종목 4','검증 종목 3'])
-  await expect(leaderChart.locator('.line-legend em').first()).toHaveText('+4.0%')
-  await expect(leaderChart.locator('svg .line-series')).toHaveCount(5)
-  await expect(leaderChart.locator('svg .line-tick.on')).toHaveText('20D')
-  const xTicks=await leaderChart.locator('svg text.line-tick').allTextContents()
-  for(const p of ['5D','20D','50D','120D','200D','52W'])expect(xTicks).toContain(p)
-  expect(xTicks.some(t=>/^[+-]?\d+(\.\d)?%$/.test(t))).toBeTruthy()
-  await expect(leaderChart.locator('svg .line-axis-title')).toHaveText('RS %')
-  // Points sit left→right in period order and higher values plot higher.
-  const pts=await leaderChart.locator('svg .line-series').first().locator('circle').evaluateAll(es=>es.map(e=>({x:+e.getAttribute('cx')!,y:+e.getAttribute('cy')!})))
-  expect(pts).toHaveLength(6)
-  for(let i=1;i<6;i++)expect(pts[i].x).toBeGreaterThan(pts[i-1].x)
-  expect(pts[1].y).toBeLessThan(pts[0].y) // TEST7: RS 20D +4% above RS 5D -2%
+  await expect(leaderChart.locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
+  await expect(leaderChart.locator('.line-legend li')).toHaveCount(5)
+  await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
   await leaderChart.getByRole('button',{name:'5D',exact:true}).click()
-  await expect(leaderChart.getByRole('button',{name:'5D',exact:true})).toHaveAttribute('aria-pressed','true')
-  await expect(leaderChart.locator('.line-legend b').first()).toHaveText('검증 종목 0')
-  await expect(leaderChart.locator('.rs-chart-head')).toContainText('RS 5D')
-
-  // 섹터 요약: sector median RS lines; ETF 요약: Top ETFs. Toggles are independent.
-  const sectorChart=page.locator('.dashboard-sector-panel .rs-chart')
-  await expect(sectorChart.locator('.line-legend b')).toHaveText(['US · Health Technology','US · Technology'])
-  await expect(sectorChart.locator('.line-legend em')).toHaveText(['+3.5%','-1.0%'])
+  await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/124-1)*100).toFixed(1)}%`)
   const etfChart=page.locator('.dashboard-etf-panel .rs-chart')
-  await expect(etfChart.locator('.line-legend b')).toHaveText(['검증 ETF 2','검증 ETF 1','검증 ETF 0'])
-  await etfChart.getByRole('button',{name:'52W',exact:true}).click()
-  await expect(etfChart).toContainText('RS 52W 값이 있는 항목이 없습니다.')
-  await expect(etfChart.locator('.rs-chart-note')).toContainText('값 없음 3개 ETF 제외')
+  await expect(etfChart.locator('.line-legend b')).toHaveCount(3)
+  const sectorChart=page.locator('.dashboard-sector-panel .sector-heat')
+  await expect(sectorChart.locator('.etf-heat-tile')).toHaveCount(2)
+  await expect(page.locator('.dashboard-sector-panel svg')).toHaveCount(0)
   expect((await sectorChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-sector-panel .dashboard-sector-table').boundingBox())!.y)
   expect((await etfChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-etf-panel .stock-rows').boundingBox())!.y)
   await noOverflow()
 
-  // Sector line → sector list → stock detail; charts sit inside 02 상대강도 and 03 가격 모멘텀.
-  await sectorChart.locator('.line-legend button').nth(1).click()
+  // Sector tile → sector popup (momentum lines on top) → stock detail (own daily line in 03 가격 모멘텀).
+  await sectorChart.getByRole('listitem').filter({hasText:'US · Technology'}).click()
   const drill=page.locator('.drill-sheet')
   await expect(drill.locator('.drill-tabs')).toBeVisible()
+  await expect(drill.locator('.rs-chart svg .line-axis-title')).toHaveText('지수 (시작=100)')
+  expect((await drill.locator('.rs-chart').boundingBox())!.y).toBeLessThan((await drill.locator('.stock-rows').boundingBox())!.y)
   await expect(drill.locator('.drill-back')).toHaveCount(0)
   await drill.locator('.stock-row').first().click()
   const back=drill.locator('.drill-back')
   await expect(back).toHaveText('‹ 목록으로')
   const section=(name:string)=>drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name})})
   await expect(section('상대강도').locator('.line-legend b')).toHaveText(['이 종목','산업 중앙값','섹터 중앙값','US 중앙값'])
-  await expect(section('상대강도').locator('svg .line-axis-title')).toHaveText('RS %')
-  await expect(section('가격 모멘텀').locator('.line-legend b')).toHaveText(['이 종목','산업 중앙값','섹터 중앙값','US 중앙값'])
-  await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText('등락 %')
+  await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
+  await expect(section('가격 모멘텀').locator('.line-legend li')).toHaveCount(1)
+  await expect(section('가격 모멘텀').locator('.rs-period-toggle button')).toHaveCount(6)
   await expect(drill.locator('.rs-chart')).toHaveCount(0)
   await noOverflow()
   await back.click()
@@ -101,7 +93,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   await expect(drill).toHaveCount(0)
 
-  // Opened from a dashboard bar there is no list behind it: 뒤로 closes the sheet.
+  // Opened from a dashboard chart there is no list behind it: 뒤로 closes the sheet.
   await leaderChart.locator('.line-legend button').first().click()
   await expect(back).toHaveText('‹ 뒤로')
   await back.click()
@@ -130,6 +122,7 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   let ok=false
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/leaderboard?*',route=>ok?route.fulfill({json:{rows:[...rows,...etfs]}}):route.fulfill({status:503,body:'down'}))
+  await mockHistory(page)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const banner=page.locator('.demo-banner')
@@ -138,37 +131,27 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   ok=true
   await banner.getByRole('button',{name:'다시 연결'}).click()
   await expect(banner).toHaveCount(0)
-  await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 7')
+  await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 0')
   await context.close()
 })
 
-test('momentum toggle draws daily closes rebased to 100 for the Top 5 by period return',async({browser})=>{
+test('주도 종목 popup shows momentum lines for its group; data is fetched per group',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   const asked:string[][]=[]
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows.map((r,i)=>({...r,return_20d:i/100})),...etfs]}}))
-  await page.route('**/functions/v1/price-history?*',route=>{
-    const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');asked.push(ids)
-    // 30 sessions: close 100 … 129 (+1 a day); the 20D window starts at 109 (21 closes).
-    const series=Object.fromEntries(ids.map(id=>[id,Array.from({length:30},(_,d)=>[`2026-09-${String(d+1).padStart(2,'0')}`,100+d])]))
-    route.fulfill({json:{series}})
-  })
+  await mockHistory(page,asked)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const chart=page.locator('.leadership-overview .rs-chart')
-  await expect(chart.locator('.rs-mode-toggle button')).toHaveText(['RS 상위','가격 모멘텀 상위'])
-  expect(asked).toHaveLength(0) // no daily request until the toggle is used
-  await chart.getByRole('button',{name:'가격 모멘텀 상위'}).click()
   await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 7','검증 종목 6','검증 종목 5','검증 종목 4','검증 종목 3'])
-  expect(asked[0]).toHaveLength(5)
-  await expect(chart.locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
-  await expect(chart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
-  await expect(chart.locator('svg .line-series').first().locator('circle')).toHaveCount(1)
-  expect(await chart.locator('svg text.line-tick').allTextContents()).toContain('09-30')
-  await expect(page.locator('.dashboard-sector-panel .rs-mode-toggle')).toHaveCount(0)
+  expect(asked.some(ids=>ids.length===5)).toBeTruthy()
+  await page.locator('.leadership-card').filter({hasText:'핵심 주도'}).first().click()
+  const drill=page.locator('.drill-sheet')
+  await expect(drill.locator('.rs-chart .line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
+  await drill.locator('.rs-chart .line-legend button').first().click()
+  await expect(drill.locator('.drill-meta')).toContainText('TEST3')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
-  await chart.locator('.line-legend button').first().click()
-  await expect(page.locator('.drill-sheet .drill-meta')).toContainText('TEST7')
   await context.close()
 })
