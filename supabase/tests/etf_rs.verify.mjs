@@ -143,4 +143,26 @@ check('US rows unchanged by the KR benchmark switch', JSON.stringify((await q(`s
 await db.exec('set role service_role');
 check('service role KR benchmark rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
 await db.exec('reset role');
+
+// VALUE-2: traded_value_20d for every active instrument (equities size the sector heatmap).
+const value2 = readdirSync('supabase/migrations').find(name=>name.endsWith('_equity_traded_value.sql'));
+await db.exec(`update public.price_daily set volume=1000 where instrument_id='${ids.AAPL}'`);
+const classBefore=(await q(`select instrument_id,rs_rank,ibd_rs_estimate,tt_pass_count,leader_tt,stage,verdict,action_guide,traded_value_20d from public.market_metrics m join public.instruments i on i.id=m.instrument_id order by instrument_id,as_of`)).rows;
+await db.exec(readFileSync(`supabase/migrations/${value2}`,'utf8'));
+const expected=async id=>(await q(`with l as (select max(as_of) d from public.market_metrics where instrument_id=$1),
+  p as (select close*volume v from public.price_daily,l where instrument_id=$1 and trade_date<=l.d and close>0 and volume is not null order by trade_date desc limit 20)
+  select case when count(*)=20 then avg(v) end v from p`,[id])).rows[0].v;
+const eqRows=(await q(`select i.id,m.traded_value_20d v from public.instruments i join public.market_metrics m on m.instrument_id=i.id
+  where i.active and i.asset_class='Equity' and m.as_of=(select max(as_of) from public.market_metrics where instrument_id=i.id)`)).rows;
+let eqOk=eqRows.length>0;for(const r of eqRows){const e=await expected(r.id);eqOk&&=((e==null&&r.v==null)||Math.abs(Number(e)-Number(r.v))<1e-6)}
+check('VALUE-2 equities get the exact 20-session average trading value (or null)', eqOk);
+check('VALUE-2 fills at least one equity', eqRows.some(r=>r.v!=null));
+const classAfter=(await q(`select instrument_id,rs_rank,ibd_rs_estimate,tt_pass_count,leader_tt,stage,verdict,action_guide from public.market_metrics m join public.instruments i on i.id=m.instrument_id order by instrument_id,as_of`)).rows;
+check('VALUE-2 leaves ranks and classification unchanged', JSON.stringify(classAfter)===JSON.stringify(classBefore.map(({traded_value_20d,...r})=>r)));
+check('VALUE-2 keeps ETF trading values', JSON.stringify(classBefore.filter(r=>r.traded_value_20d!=null).map(r=>[r.instrument_id,r.traded_value_20d]).filter(([id])=>Object.values(ids).includes(id)&&[ids.QQQ,ids.SPY,ids.KRETF].includes(id)))===JSON.stringify((await q(`select instrument_id,traded_value_20d from public.market_metrics where instrument_id in ($1,$2,$3) and traded_value_20d is not null order by instrument_id,as_of`,[ids.QQQ,ids.SPY,ids.KRETF])).rows.map(r=>[r.instrument_id,r.traded_value_20d])));
+let value2Refused=false;try{await db.exec(readFileSync(`supabase/migrations/${value2}`,'utf8'))}catch(e){value2Refused=/differs from the repo/.test(String(e.message))}
+check('VALUE-2 refuses to re-apply over a changed definition', value2Refused);
+await db.exec('set role service_role');
+check('service role VALUE-2 rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
+await db.exec('reset role');
 console.log(`${passed} ETF RS checks passed`);

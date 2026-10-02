@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react'
 const endpoint='https://mhbcchegrbakearqptdr.supabase.co/functions/v1/price-history?client=peppercorn-public-read-v1'
 export type History={dates:string[];closes:number[]}
 const cache=new Map<string,History>()
+// Refresh: drop cached closes and tell mounted charts to refetch.
+let version=0
+const listeners=new Set<()=>void>()
+export function invalidatePriceHistory(){cache.clear();version++;listeners.forEach(f=>f())}
 
 async function load(ids:string[]){
   const missing=ids.filter(id=>!cache.has(id))
@@ -17,13 +21,15 @@ async function load(ids:string[]){
 export function usePriceHistory(ids:string[],enabled:boolean){
   const key=ids.join(',')
   const [state,setState]=useState<{status:'idle'|'loading'|'ok'|'error';error?:string}>({status:'idle'})
+  const [v,setV]=useState(version)
+  useEffect(()=>{const f=()=>setV(version);listeners.add(f);return()=>{listeners.delete(f)}},[])
   useEffect(()=>{
     if(!enabled||!ids.length)return
     let live=true
     setState({status:'loading'})
     load(ids).then(()=>{if(live)setState({status:'ok'})}).catch(e=>{if(live)setState({status:'error',error:String(e?.message??e)})})
     return()=>{live=false}
-  },[key,enabled])
+  },[key,enabled,v])
   return {...state,get:(id:string)=>cache.get(id)}
 }
 
