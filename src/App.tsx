@@ -487,22 +487,24 @@ const SectorHeatmap=memo(function SectorHeatmap({rows,market,sector,onSelect}:{r
   const groups=useMemo(()=>{
     const m=new Map<string,LeaderRow[]>()
     for(const r of rows)if(r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)){const k=sectorKey(r);m.set(k,[...(m.get(k)??[]),r])}
-    return [...m].map(([key,list])=>({key,n:list.length,first:list[0],list}))
+    return [...m].map(([key,list])=>{const vals=list.map(r=>r.traded_value_20d).filter((v):v is number=>v!=null&&v>0);return {key,n:list.length,first:list[0],list,traded:vals.reduce((a,b)=>a+b,0),valued:vals.length}})
   },[rows,sector])
   const valued=groups.map(g=>({...g,value:medianOf(g.list.map(r=>periodValue(r,period,'return')).filter((v):v is number=>v!=null))}))
   const height=width<520?220:260
   const markets=(['KR','US'] as const).filter(m=>valued.some(g=>g.first.market===m))
+  // VALUE-2: tile area = summed 20-session average trading value of member equities; member count until that data exists.
+  const byCount=Object.fromEntries(markets.map(m=>[m,!valued.some(g=>g.first.market===m&&g.traded>0)])) as Record<string,boolean>
   const [t1,t2]=HEAT_THRESHOLDS[period]
   return <div className="rs-chart sector-heat" role="figure" aria-label={`섹터 등락 ${period} 히트맵`}>
-    <div className="rs-chart-head"><span>섹터 · 등락 {period} 중앙값 <small>타일 크기=종목 수</small></span><PeriodToggle label="섹터" period={period} onPeriod={setPeriod}/></div>
-    <div ref={ref}>{markets.map(m=><div key={m} className="etf-heat-market"><div className="etf-heat-market-head"><b>{m}</b><span>섹터 {valued.filter(g=>g.first.market===m).length}개</span></div><div className="etf-heat-map" style={{height}} role="list" aria-label={`${m} 섹터 히트맵`}>
-      {(width?squarify(valued.filter(g=>g.first.market===m),g=>g.n,width,height):[]).map(({item:g,x,y,w,h})=>{
+    <div className="rs-chart-head"><span>섹터 · 등락 {period} 중앙값 <small>타일 크기=20일 평균 거래대금</small></span><PeriodToggle label="섹터" period={period} onPeriod={setPeriod}/></div>
+    <div ref={ref}>{markets.map(m=><div key={m} className="etf-heat-market"><div className="etf-heat-market-head"><b>{m}</b><span>{byCount[m]?`섹터 ${valued.filter(g=>g.first.market===m).length}개 · 거래대금 미집계로 종목 수 기준`:`20일 평균 거래대금 합계 ${tradedLabel(m,valued.filter(g=>g.first.market===m).reduce((a,g)=>a+g.traded,0))}`}</span></div><div className="etf-heat-map" style={{height}} role="list" aria-label={`${m} 섹터 히트맵`}>
+      {(width?squarify(valued.filter(g=>g.first.market===m&&(byCount[m]||g.traded>0)),g=>byCount[m]?g.n:g.traded,width,height):[]).map(({item:g,x,y,w,h})=>{
         const name=sectorName(g.first.market,g.first.sector),c=heatColor(g.value,HEAT_THRESHOLDS[period])
-        const tip=`${name} · 등락 ${period} 중앙값 ${g.value==null?'—':pct(g.value)} · 주식 ${g.n}`
+        const tip=`${name} · 등락 ${period} 중앙값 ${g.value==null?'—':pct(g.value)} · 주식 ${g.n}${g.traded>0?` · 20일 평균 거래대금 ${tradedLabel(g.first.market,g.traded)}`:''}`
         return <button key={g.key} type="button" role="listitem" className="etf-heat-tile" title={tip} aria-label={tip} onClick={()=>onSelect(g.key)}
           style={{left:x+1,top:y+1,width:Math.max(0,w-2),height:Math.max(0,h-2),background:c.bg,color:c.ink}}>
           {w>=64&&h>=40&&<><b>{name}</b><strong>{g.value==null?'—':pct(g.value)}</strong></>}
-          {w>=64&&h>=72&&<small>주식 {g.n}</small>}
+          {w>=64&&h>=72&&<small>{g.traded>0?tradedLabel(g.first.market,g.traded):`주식 ${g.n}`}</small>}
         </button>
       })}
     </div></div>)}</div>

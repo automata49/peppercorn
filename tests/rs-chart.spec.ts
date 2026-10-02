@@ -165,7 +165,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   const spy={...etfs[0],id:'spy',ticker:'SPY',name:'SPDR S&P 500',industry:'Broad Market'}
   const kr={...rows[0],id:'kr1',ticker:'005930',market:'KR',name:'한국 종목',sector:'Electronic Technology'}
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
-  await page.route('**/functions/v1/leaderboard?*',route=>{calls++;route.fulfill({json:{rows:[...rows,kr,...etfs,spy]}})})
+  await page.route('**/functions/v1/leaderboard?*',route=>{calls++;route.fulfill({json:{rows:[...rows.map((r,i)=>({...r,traded_value_20d:i<5?1e9:3e9})),kr,...etfs,spy]}})})
   await page.route('**/functions/v1/price-history?*',route=>{
     const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');asked.push(ids)
     // stock rises 1/day, SPY flat at 100: RS line = stock/SPY rebased.
@@ -176,6 +176,12 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   // Section toggles: the sector section switches to KR without touching 주도 종목; the global toggle resets all.
   const sectorPanel=page.locator('.dashboard-sector-panel')
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR','US'])
+  // VALUE-2: US tiles sized by summed trading value (Health Technology 15e9 vs Technology 5e9); KR has none yet → member count.
+  await expect(sectorPanel.locator('.etf-heat-market-head span').nth(1)).toContainText('20일 평균 거래대금 합계')
+  await expect(sectorPanel.locator('.etf-heat-market-head span').nth(0)).toContainText('종목 수 기준')
+  const area=async(re:RegExp)=>{const b=(await sectorPanel.getByRole('listitem',{name:re}).boundingBox())!;return (b.width+2)*(b.height+2)}
+  const ratio=await area(/^Health Technology ·/)/await area(/^Technology ·/)
+  expect(ratio).toBeGreaterThan(2.6);expect(ratio).toBeLessThan(3.4)
   await sectorPanel.locator('.section-market').getByRole('button',{name:'KR'}).click()
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR'])
   await expect(page.locator('.leadership-overview .section-market button.on')).toHaveText('전체')
