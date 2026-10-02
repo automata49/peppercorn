@@ -123,3 +123,20 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await context.close()
  })
 }
+
+test('phone: a failed live load shows a demo-data notice with a working retry',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
+  const page=await context.newPage()
+  let ok=false
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/leaderboard?*',route=>ok?route.fulfill({json:{rows:[...rows,...etfs]}}):route.fulfill({status:503,body:'down'}))
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  const banner=page.locator('.demo-banner')
+  await expect(banner).toContainText('예시 데이터')
+  ok=true
+  await banner.getByRole('button',{name:'다시 연결'}).click()
+  await expect(banner).toHaveCount(0)
+  await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 7')
+  await context.close()
+})
