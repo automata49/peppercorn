@@ -134,6 +134,7 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const banner=page.locator('.demo-banner')
   await expect(banner).toContainText('예시 데이터')
+  await expect(banner).toContainText('원인: Peppercorn API HTTP 503')
   ok=true
   await banner.getByRole('button',{name:'다시 연결'}).click()
   await expect(banner).toHaveCount(0)

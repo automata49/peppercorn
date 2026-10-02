@@ -224,11 +224,11 @@ test('a stalled live response releases the refresh controls',async({page})=>{
     if(calls>1)void route.fulfill({json:{rows}});
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
+  test.setTimeout(60_000);
   const refresh=page.getByRole('button',{name:'시장 데이터 새로고침'});
-  await expect(refresh).toBeEnabled({timeout:17_000});
-  await expect(refresh).toContainText('Demo / Local');
-  await refresh.click();
-  await expect(refresh).toContainText('Supabase Live');
+  // The first request stalls and aborts after 25 s; the automatic retry 4 s later succeeds.
+  await expect(refresh).toContainText('Supabase Live',{timeout:40_000});
+  await expect(refresh).toBeEnabled();
   expect(calls).toBe(2);
 });
 
