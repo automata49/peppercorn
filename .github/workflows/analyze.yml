@@ -75,7 +75,13 @@ jobs:
                   if (local.hour, local.minute) == (hour, minute):
                       allowed = True
                       break
-          print(f'{market} {today}: {"refresh" if allowed else "skip (holiday or different session hours)"}')
+              # GitHub can start a scheduled run hours late. A pre-open run that lands inside the session would store
+              # an intraday bar as the day's close, so it waits for the post-close slot instead.
+              now = dt.datetime.now(dt.timezone.utc)
+              if allowed and opened.to_pydatetime() <= now < closed.to_pydatetime():
+                  allowed = False
+                  print(f'{market} {today}: skip (run started during the session at {now.astimezone(zone):%H:%M})')
+          print(f'{market} {today}: {"refresh" if allowed else "skip (holiday, different session hours or delayed into the session)"}')
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
               output.write(f'run={str(allowed).lower()}\n')
           PY
