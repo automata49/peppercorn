@@ -15,7 +15,7 @@ import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
-import { RS_CHART_PERIODS, RS_CHART_VERSION, groupMedians, peerComparison, topByRs, type RsBar, type RsChartPeriod } from './lib/rsChart'
+import { RS_CHART_PERIODS, RS_CHART_VERSION, groupSeries, peerSeries, seriesOf, topByRs, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market } from './types'
@@ -406,71 +406,86 @@ function LiveLeaders({pool,live,onSelect}:{pool:LeaderRow[];live:boolean;onSelec
   </>
 }
 
-// RS-CHART-1: period toggle + RS bars (up red / down blue) built from rows already in memory; display only.
-type RsChartBar=RsBar&{onClick?:()=>void}
-function RsPeriodChart({title,period,onPeriod,bars,note}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;bars:RsChartBar[];note?:string}){
-  const max=Math.max(1e-9,...bars.map(b=>Math.abs(b.value??0)))
-  const diverging=bars.some(b=>(b.value??0)<0)
-  return <div className="rs-chart" role="figure" aria-label={`${title} RS ${period} 차트`} title={RS_CHART_VERSION}>
+// RS-CHART-2: line chart, x = period (5D…52W), y = % (RS vs benchmark or return); built from loaded rows, display only.
+const LINE_COLORS=['#28486f','#c33d36','#1f8a70','#c98a00','#7b52ab']
+const yLabel=(v:number,digits:number)=>`${v>0?'+':''}${(v*100).toFixed(digits)}%`
+function LineChart({series,yTitle,activePeriod,onPick}:{series:LineSeries[];yTitle:string;activePeriod?:RsChartPeriod;onPick?:(key:string)=>void}){
+  const [ref,width]=useElementWidth<HTMLDivElement>()
+  const H=204,L=46,R=10,T=24,B=24,w=Math.max(0,width-L-R),h=H-T-B
+  const {lo,hi,ticks,digits}=yScale(series)
+  const x=(i:number)=>L+(RS_CHART_PERIODS.length>1?i*w/(RS_CHART_PERIODS.length-1):0),y=(v:number)=>T+(hi-v)/(hi-lo)*h
+  const paths=(values:(number|null)[])=>{let d='',pen=false;values.forEach((v,i)=>{if(v==null){pen=false;return}d+=`${pen?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`;pen=true});return d}
+  return <div className="line-chart">
+    <div ref={ref} className="line-chart-plot">{width>0&&<svg width={width} height={H} role="img" aria-label={`${yTitle} 꺾은선 차트`}>
+      <text className="line-axis-title" x={4} y={10}>{yTitle}</text>
+      {ticks.map(t=><g key={t}><line x1={L} x2={L+w} y1={y(t)} y2={y(t)} className={t===0?'line-zero':'line-grid'}/><text x={L-6} y={y(t)+3.5} textAnchor="end" className="line-tick">{yLabel(t,digits)}</text></g>)}
+      {RS_CHART_PERIODS.map(([p],i)=><g key={p}>{p===activePeriod&&<line x1={x(i)} x2={x(i)} y1={T} y2={T+h} className="line-active"/>}<text x={x(i)} y={H-6} textAnchor="middle" className={'line-tick'+(p===activePeriod?' on':'')}>{p}</text></g>)}
+      {series.map((s,k)=>{const c=LINE_COLORS[k%LINE_COLORS.length];return <g key={s.key} className="line-series" data-key={s.key}>
+        <path d={paths(s.values)} fill="none" stroke={c} strokeWidth={s.highlight?2.4:1.6} strokeLinejoin="round" strokeLinecap="round" className="line-path" style={{color:c}}/>
+        {s.values.map((v,i)=>v==null?null:<circle key={i} cx={x(i)} cy={y(v)} r={s.highlight?4:3.2} className="line-dot" stroke={c} strokeWidth={s.highlight?2:1.6}><title>{`${s.label} · ${RS_CHART_PERIODS[i][0]} ${pct(v)}`}</title></circle>)}
+      </g>})}
+    </svg>}</div>
+    <ul className="line-legend">{series.map((s,k)=>{const last=activePeriod?s.values[RS_CHART_PERIODS.findIndex(([p])=>p===activePeriod)]:null
+      const body=<><i style={{color:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{activePeriod?pct(last):''}</em></>
+      return <li key={s.key}>{onPick?<button type="button" onClick={()=>onPick(s.key)} aria-label={`${s.label} 상세 보기`}>{body}</button>:<span>{body}</span>}</li>})}</ul>
+  </div>
+}
+
+// Dashboard charts: the period toggle picks the Top 5 by that period's RS; each line shows all six periods.
+function RsRankedChart({title,period,onPeriod,series,onPick,note}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;series:LineSeries[];onPick:(key:string)=>void;note:string}){
+  return <div className="rs-chart" role="figure" aria-label={`${title} RS 꺾은선 차트`} title={RS_CHART_VERSION}>
     <div className="rs-chart-head">
-      <span>{title} · RS {period} <small>벤치마크 대비</small></span>
+      <span>{title} · RS {period} 상위 <small>벤치마크 대비</small></span>
       <div className="mini-segment rs-period-toggle" role="group" aria-label={`${title} RS 기간`}>{RS_CHART_PERIODS.map(([p])=><button key={p} type="button" className={period===p?'on':''} aria-pressed={period===p} onClick={()=>onPeriod(p)}>{p}</button>)}</div>
     </div>
-    {bars.length?<ol className={'rs-chart-bars'+(diverging?' diverging':'')}>{bars.map(b=>{
-      const w=b.value==null?0:Math.abs(b.value)/max*(diverging?50:100)
-      const tone=b.value==null?'':b.value>0?'pos':b.value<0?'neg':''
-      const body=<>
-        <span className="rs-bar-label" title={b.sub?`${b.label} · ${b.sub}`:b.label}><b>{b.label}</b>{b.sub&&<small>{b.sub}</small>}</span>
-        <span className="rs-bar-track" aria-hidden="true"><i className={tone} style={{width:w+'%',left:diverging?((b.value??0)<0?50-w:50)+'%':0}}/></span>
-        <strong className={tone}>{pct(b.value)}</strong>
-      </>
-      return <li key={b.key} className={b.highlight?'self':''}>{b.onClick?<button type="button" className="rs-bar-row" onClick={b.onClick} aria-label={`${b.label} RS ${period} ${pct(b.value)} 상세 보기`}>{body}</button>:<div className="rs-bar-row">{body}</div>}</li>
-    })}</ol>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
-    {note&&<p className="rs-chart-note">{note}</p>}
+    {series.length?<LineChart series={series} yTitle="RS %" activePeriod={period} onPick={onPick}/>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
+    <p className="rs-chart-note">{note}</p>
   </div>
 }
 
 const chartNote=(shown:number,total:number,missing:number,unit:string)=>`${total}${unit} 중 RS 상위 ${shown}${missing?` · 값 없음 ${missing}${unit} 제외`:''}`
 const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
 
-const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
+function useRankedRows(rows:LeaderRow[],onSelect:(row:LeaderRow)=>void,sub:(r:LeaderRow)=>string){
   const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const {items,missing}=useMemo(()=>topByRs(rows,period,5),[rows,period])
+  const series=items.map(({row})=>({key:row.id,label:row.name,sub:sub(row),values:seriesOf(row,'rs')}))
+  const onPick=(key:string)=>{const hit=items.find(x=>x.row.id===key);if(hit)onSelect(hit.row)}
+  return {period,setPeriod,series,missing,onPick}
+}
+
+const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const pool=useMemo(()=>rows.filter(isLeaderClass),[rows])
-  const {items,missing}=useMemo(()=>topByRs(pool,period,10),[pool,period])
-  const bars=items.map(({row,value})=>({key:row.id,label:row.name,sub:`${row.market} · ${row.ticker} · ${leadership(row)}`,value,onClick:()=>onSelect(row)}))
-  return <RsPeriodChart title="주도 종목" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,pool.length,missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
+  const c=useRankedRows(pool,onSelect,r=>`${r.market} · ${r.ticker} · ${leadership(r)}`)
+  return <RsRankedChart title="주도 종목" period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,pool.length,c.missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
 })
 
 const SectorRsChart=memo(function SectorRsChart({rows,market,sector,onSelect}:{rows:LeaderRow[];market:string;sector:string|null;onSelect:(key:string)=>void}){
   const [period,setPeriod]=useState<RsChartPeriod>('20D')
-  const equities=useMemo(()=>rows.filter(r=>r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)),[rows,sector])
-  const medians=useMemo(()=>groupMedians(equities,period,sectorKey),[equities,period])
-  const firstOf=useMemo(()=>{const m=new Map<string,LeaderRow>();for(const r of equities)if(!m.has(sectorKey(r)))m.set(sectorKey(r),r);return m},[equities])
-  const all=[...medians].map(([key,m])=>{const r=firstOf.get(key)!;return {key,label:`${market==='ALL'?r.market+' · ':''}${sectorName(r.market,r.sector)}`,sub:`주식 ${m.n}`,value:m.value,onClick:()=>onSelect(key)}})
-  const bars=all.filter(b=>b.value!=null).sort((a,b)=>(b.value??0)-(a.value??0)).slice(0,10)
-  return <RsPeriodChart title="섹터" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,all.length,all.length-all.filter(b=>b.value!=null).length,'개 섹터')+' · 섹터 소속 주식 RS 중앙값'}/>
+  const groups=useMemo(()=>groupSeries(rows.filter(r=>r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)),sectorKey),[rows,sector])
+  const idx=RS_CHART_PERIODS.findIndex(([p])=>p===period)
+  const all=[...groups].map(([key,g])=>({key,label:`${market==='ALL'?g.first.market+' · ':''}${sectorName(g.first.market,g.first.sector)}`,sub:`주식 ${g.n}`,values:g.values}))
+  const ranked=all.filter(s=>s.values[idx]!=null).sort((a,b)=>(b.values[idx]??0)-(a.values[idx]??0))
+  return <RsRankedChart title="섹터" period={period} onPeriod={setPeriod} series={ranked.slice(0,5)} onPick={onSelect} note={chartNote(Math.min(5,ranked.length),all.length,all.length-ranked.length,'개 섹터')+' · 섹터 소속 주식 RS 중앙값'}/>
 })
 
 const EtfRsChart=memo(function EtfRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  const [period,setPeriod]=useState<RsChartPeriod>('20D')
   const etfs=useMemo(()=>rows.filter(r=>r.asset_class==='ETF'),[rows])
-  const {items,missing}=useMemo(()=>topByRs(etfs,period,10),[etfs,period])
-  const bars=items.map(({row,value})=>({key:row.id,label:row.name,sub:`${row.market} · ${row.ticker}${row.industry?' · '+row.industry:''}`,value,onClick:()=>onSelect(row)}))
-  return <RsPeriodChart title="ETF" period={period} onPeriod={setPeriod} bars={bars} note={chartNote(bars.length,etfs.length,missing,'개 ETF')}/>
+  const c=useRankedRows(etfs,onSelect,r=>`${r.market} · ${r.ticker}`)
+  return <RsRankedChart title="ETF" period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,etfs.length,c.missing,'개 ETF')}/>
 })
 
-const DetailRsChart=memo(function DetailRsChart({row,rows}:{row:LeaderRow;rows:LeaderRow[]}){
-  const [period,setPeriod]=useState<RsChartPeriod>('20D')
-  const bars=useMemo(()=>peerComparison(row,rows,period),[row,rows,period])
-  const kind=row.asset_class==='ETF'?'ETF':'주식'
-  return <RsPeriodChart title={kind==='ETF'?'ETF 비교':'종목 비교'} period={period} onPeriod={setPeriod} bars={bars} note={`같은 시장 ${kind}끼리의 RS 중앙값과 비교`}/>
+// Stock detail sections 02/03: the stock against same-market peer medians across all periods.
+const PeerLineChart=memo(function PeerLineChart({row,rows,kind}:{row:LeaderRow;rows:LeaderRow[];kind:ChartKind}){
+  const series=useMemo(()=>peerSeries(row,rows,kind),[row,rows,kind])
+  return <div className="peer-line" title={RS_CHART_VERSION}><LineChart series={series} yTitle={kind==='rs'?'RS %':'등락 %'}/><p className="rs-chart-note">같은 시장 {row.asset_class==='ETF'?'ETF':'주식'}끼리의 중앙값과 비교</p></div>
 })
 
 function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:string;children:any;wide?:boolean;valueClassName?:string}){
   return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong className={valueClassName}>{children}</strong></div>
 }
 
-function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>void;refreshing:boolean}){
+function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:LeaderRow[];onRefresh:()=>void;refreshing:boolean}){
   const ma200Gap=gapPct(row.price,row.ma200)
   const ma200Status=row.price!=null&&row.ma200!=null?(Number(row.price)>=Number(row.ma200)?'위 ':'아래 ')+ma200Gap:'—'
   const indexes=row.index_memberships?.length?row.index_memberships.join(' · '):'—'
@@ -498,10 +513,12 @@ function StockSnapshot({row,onRefresh,refreshing}:{row:LeaderRow;onRefresh:()=>v
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>02</span><h3>상대강도</h3></div><div><small>벤치마크 대비</small><button className="snapshot-refresh" aria-label="RS 새로고침" disabled={refreshing} onClick={onRefresh}>↻</button></div></div>
       <div className="signal-strip">{rsItems.map(([label,value])=><div key={label}><span>RS {label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
+      <PeerLineChart row={row} rows={peers} kind="rs"/>
     </section>
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>03</span><h3>가격 모멘텀</h3></div><small>기간 수익률</small></div>
       <div className="signal-strip">{retItems.map(([label,value])=><div key={label}><span>등락 {label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
+      <PeerLineChart row={row} rows={peers} kind="return"/>
     </section>
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>04</span><h3>추세 · 리스크</h3></div></div>
@@ -978,7 +995,7 @@ export default function App(){
       {scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
       <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
         <h3 className="analysis-part">Swing · 모멘텀</h3>
-        <StockSnapshot row={selected} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
+        <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
         <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div>
         <h3 className="analysis-part">Position · 펀더멘털</h3>
@@ -1070,8 +1087,7 @@ export default function App(){
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{stageLabel(drillStock.stage)}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
-        <div className="drill-animate"><DetailRsChart row={drillStock} rows={leaders}/></div>
-        <StockSnapshot row={drillStock} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
+        <StockSnapshot row={drillStock} peers={leaders} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
         <button className="primary-action" onClick={()=>recordAnalysis(drillStock,true)}>종목분석 기록 작성 →</button>
