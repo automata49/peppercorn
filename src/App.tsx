@@ -16,7 +16,7 @@ import { applyKrEtfNames } from './lib/krEtfNames'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
 import { usePriceHistory, rebased } from './lib/priceHistory'
-import { RS_CHART_PERIODS, RS_CHART_VERSION, groupSeries, peerSeries, periodValue, seriesOf, topByRs, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
+import { RS_CHART_PERIODS, RS_CHART_VERSION, medianOf, peerSeries, periodValue, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market } from './types'
@@ -436,28 +436,15 @@ function LineChart({series,yTitle,activePeriod,onPick,xLabels}:{series:LineSerie
 }
 
 // Dashboard charts: the period toggle picks the Top 5 by that period's RS; each line shows all six periods.
-// mode (optional): 'rs' = RS across periods; 'momentum' = Top 5 by the period's return, daily price rebased to 100.
-function RsRankedChart({title,period,onPeriod,series,onPick,note,mode,onMode,momentum}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;series:LineSeries[];onPick:(key:string)=>void;note:string;mode?:'rs'|'momentum';onMode?:(m:'rs'|'momentum')=>void;momentum?:any}){
-  const isMomentum=mode==='momentum'
-  return <div className="rs-chart" role="figure" aria-label={`${title} ${isMomentum?'가격 모멘텀':'RS'} 꺾은선 차트`} title={RS_CHART_VERSION}>
-    {onMode&&<div className="mini-segment rs-mode-toggle" role="group" aria-label={`${title} 차트 기준`}>{([['rs','RS 상위'],['momentum','가격 모멘텀 상위']] as const).map(([m,text])=><button key={m} type="button" className={mode===m?'on':''} aria-pressed={mode===m} onClick={()=>onMode(m)}>{text}</button>)}</div>}
-    <div className="rs-chart-head">
-      <span>{title} · {isMomentum?`등락 ${period} 상위`:`RS ${period} 상위`} <small>{isMomentum?'시작일=100 · 일별 종가':'벤치마크 대비'}</small></span>
-      <div className="mini-segment rs-period-toggle" role="group" aria-label={`${title} RS 기간`}>{RS_CHART_PERIODS.map(([p])=><button key={p} type="button" className={period===p?'on':''} aria-pressed={period===p} onClick={()=>onPeriod(p)}>{p}</button>)}</div>
-    </div>
-    {isMomentum?momentum:series.length?<LineChart series={series} yTitle="RS %" activePeriod={period} onPick={onPick}/>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
-    {!isMomentum&&<p className="rs-chart-note">{note}</p>}
-  </div>
+const SESSIONS:Record<RsChartPeriod,number>={'5D':5,'20D':20,'50D':50,'120D':120,'200D':200,'52W':252}
+function PeriodToggle({label,period,onPeriod}:{label:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void}){
+  return <div className="mini-segment rs-period-toggle" role="group" aria-label={`${label} 기간`}>{RS_CHART_PERIODS.map(([p])=><button key={p} type="button" className={period===p?'on':''} aria-pressed={period===p} onClick={()=>onPeriod(p)}>{p}</button>)}</div>
 }
 
-const chartNote=(shown:number,total:number,missing:number,unit:string)=>`${total}${unit} 중 RS 상위 ${shown}${missing?` · 값 없음 ${missing}${unit} 제외`:''}`
-const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
-
-const SESSIONS:Record<RsChartPeriod,number>={'5D':5,'20D':20,'50D':50,'120D':120,'200D':200,'52W':252}
-// MOMENTUM-LINES-1: Top 5 by the period's return (daily data), each line = daily close / close N sessions ago × 100.
+// MOMENTUM-LINES-2: Top 5 by the period's return (daily data), each line = daily close / close N sessions ago × 100.
 function MomentumLines({rows,period,onSelect,sub,unit}:{rows:LeaderRow[];period:RsChartPeriod;onSelect:(row:LeaderRow)=>void;sub:(r:LeaderRow)=>string;unit:string}){
   const top=useMemo(()=>rows.map(row=>({row,v:periodValue(row,period,'return')})).filter((x):x is {row:LeaderRow;v:number}=>x.v!=null).sort((a,b)=>b.v-a.v).slice(0,5),[rows,period])
-  const hist=usePriceHistory(top.map(x=>x.row.id),true)
+  const hist=usePriceHistory(top.map(x=>x.row.id),top.length>0)
   const lines=top.map(({row})=>({row,r:rebased(hist.get(row.id),SESSIONS[period])}))
   const dates=lines.reduce<string[]>((best,l)=>l.r&&l.r.dates.length>best.length?l.r.dates:best,[])
   const series=lines.filter(l=>l.r).map(({row,r})=>({key:row.id,label:row.name,sub:sub(row),values:dates.map(d=>{const i=r!.dates.indexOf(d);return i<0?null:r!.values[i]})}))
@@ -471,38 +458,71 @@ function MomentumLines({rows,period,onSelect,sub,unit}:{rows:LeaderRow[];period:
   </>
 }
 
-function useRankedRows(rows:LeaderRow[],onSelect:(row:LeaderRow)=>void,sub:(r:LeaderRow)=>string){
+function MomentumChart({title,rows,onSelect,sub,unit}:{title:string;rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;sub:(r:LeaderRow)=>string;unit:string}){
   const [period,setPeriod]=useState<RsChartPeriod>('20D')
-  const [mode,setMode]=useState<'rs'|'momentum'>('rs')
-  const {items,missing}=useMemo(()=>topByRs(rows,period,5),[rows,period])
-  const series=items.map(({row})=>({key:row.id,label:row.name,sub:sub(row),values:seriesOf(row,'rs')}))
-  const onPick=(key:string)=>{const hit=items.find(x=>x.row.id===key);if(hit)onSelect(hit.row)}
-  return {period,setPeriod,series,missing,onPick,mode,setMode}
+  return <div className="rs-chart" role="figure" aria-label={`${title} 가격 모멘텀 꺾은선 차트`} title={RS_CHART_VERSION}>
+    <div className="rs-chart-head"><span>{title} · 등락 {period} 상위 <small>시작일=100 · 일별 종가</small></span><PeriodToggle label={title} period={period} onPeriod={setPeriod}/></div>
+    <MomentumLines rows={rows} period={period} onSelect={onSelect} sub={sub} unit={unit}/>
+  </div>
 }
+
+const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
+const leaderSub=(r:LeaderRow)=>`${r.market} · ${r.ticker} · ${leadership(r)}`
+const etfSub=(r:LeaderRow)=>`${r.market} · ${r.ticker}`
 
 const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const pool=useMemo(()=>rows.filter(isLeaderClass),[rows])
-  const c=useRankedRows(pool,onSelect,r=>`${r.market} · ${r.ticker} · ${leadership(r)}`)
-  const sub=(r:LeaderRow)=>`${r.market} · ${r.ticker} · ${leadership(r)}`
-  return <RsRankedChart title="주도 종목" mode={c.mode} onMode={c.setMode} momentum={<MomentumLines rows={pool} period={c.period} onSelect={onSelect} sub={sub} unit="종목"/>} period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,pool.length,c.missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
-})
-
-const SectorRsChart=memo(function SectorRsChart({rows,market,sector,onSelect}:{rows:LeaderRow[];market:string;sector:string|null;onSelect:(key:string)=>void}){
-  const [period,setPeriod]=useState<RsChartPeriod>('20D')
-  const groups=useMemo(()=>groupSeries(rows.filter(r=>r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)),sectorKey),[rows,sector])
-  const idx=RS_CHART_PERIODS.findIndex(([p])=>p===period)
-  const all=[...groups].map(([key,g])=>({key,label:`${market==='ALL'?g.first.market+' · ':''}${sectorName(g.first.market,g.first.sector)}`,sub:`주식 ${g.n}`,values:g.values}))
-  const ranked=all.filter(s=>s.values[idx]!=null).sort((a,b)=>(b.values[idx]??0)-(a.values[idx]??0))
-  return <RsRankedChart title="섹터" period={period} onPeriod={setPeriod} series={ranked.slice(0,5)} onPick={onSelect} note={chartNote(Math.min(5,ranked.length),all.length,all.length-ranked.length,'개 섹터')+' · 섹터 소속 주식 RS 중앙값'}/>
+  return <MomentumChart title="주도 종목" rows={pool} onSelect={onSelect} sub={leaderSub} unit="종목"/>
 })
 
 const EtfRsChart=memo(function EtfRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const etfs=useMemo(()=>rows.filter(r=>r.asset_class==='ETF'),[rows])
-  const c=useRankedRows(etfs,onSelect,r=>`${r.market} · ${r.ticker}`)
-  return <RsRankedChart title="ETF" mode={c.mode} onMode={c.setMode} momentum={<MomentumLines rows={etfs} period={c.period} onSelect={onSelect} sub={r=>`${r.market} · ${r.ticker}`} unit="개 ETF"/>} period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,etfs.length,c.missing,'개 ETF')}/>
+  return <MomentumChart title="ETF" rows={etfs} onSelect={onSelect} sub={etfSub} unit="개 ETF"/>
 })
 
-// Stock detail sections 02/03: the stock against same-market peer medians across all periods.
+// SECTOR-HEAT-1: tile area = number of member equities, colour = median price return for the period (loaded rows only).
+const SectorHeatmap=memo(function SectorHeatmap({rows,market,sector,onSelect}:{rows:LeaderRow[];market:string;sector:string|null;onSelect:(key:string)=>void}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const [ref,width]=useElementWidth<HTMLDivElement>()
+  const groups=useMemo(()=>{
+    const m=new Map<string,LeaderRow[]>()
+    for(const r of rows)if(r.asset_class==='Equity'&&r.sector&&r.sector!=='분류 확인'&&(!sector||sectorKey(r)===sector)){const k=sectorKey(r);m.set(k,[...(m.get(k)??[]),r])}
+    return [...m].map(([key,list])=>({key,n:list.length,first:list[0],list}))
+  },[rows,sector])
+  const valued=groups.map(g=>({...g,value:medianOf(g.list.map(r=>periodValue(r,period,'return')).filter((v):v is number=>v!=null))}))
+  const height=width<520?260:300
+  const rects=width?squarify(valued,g=>g.n,width,height):[]
+  const [t1,t2]=HEAT_THRESHOLDS[period]
+  return <div className="rs-chart sector-heat" role="figure" aria-label={`섹터 등락 ${period} 히트맵`}>
+    <div className="rs-chart-head"><span>섹터 · 등락 {period} 중앙값 <small>타일 크기=종목 수</small></span><PeriodToggle label="섹터" period={period} onPeriod={setPeriod}/></div>
+    <div ref={ref} className="etf-heat-map" style={{height}} role="list" aria-label="섹터 히트맵">
+      {rects.map(({item:g,x,y,w,h})=>{
+        const name=`${market==='ALL'?g.first.market+' · ':''}${sectorName(g.first.market,g.first.sector)}`,c=heatColor(g.value,HEAT_THRESHOLDS[period])
+        const tip=`${name} · 등락 ${period} 중앙값 ${g.value==null?'—':pct(g.value)} · 주식 ${g.n}`
+        return <button key={g.key} type="button" role="listitem" className="etf-heat-tile" title={tip} aria-label={tip} onClick={()=>onSelect(g.key)}
+          style={{left:x+1,top:y+1,width:Math.max(0,w-2),height:Math.max(0,h-2),background:c.bg,color:c.ink}}>
+          {w>=64&&h>=40&&<><b>{name}</b><strong>{g.value==null?'—':pct(g.value)}</strong></>}
+          {w>=64&&h>=72&&<small>주식 {g.n}</small>}
+        </button>
+      })}
+    </div>
+    <p className="rs-chart-note">빨강 ≥ {pctLabel(t1)} · 진한 빨강 ≥ {pctLabel(t2)} · 파랑 ≤ {pctLabel(-t1)} · 회색 = 값 없음 · 타일을 누르면 섹터 종목을 봅니다</p>
+  </div>
+})
+
+// Stock detail 03: the stock's own daily close rebased to 100 at the start of the chosen period.
+const StockMomentumLine=memo(function StockMomentumLine({row}:{row:LeaderRow}){
+  const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const hist=usePriceHistory([row.id],true)
+  const r=rebased(hist.get(row.id),SESSIONS[period])
+  return <div className="peer-line stock-momentum">
+    <PeriodToggle label="가격 모멘텀" period={period} onPeriod={setPeriod}/>
+    {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
+      :r?<LineChart series={[{key:row.id,label:row.name,sub:`${SESSIONS[period]}거래일 전 종가=100`,values:r.values,highlight:true}]} yTitle="지수 (시작=100)" xLabels={r.dates}/>
+      :<p className="empty">{hist.status==='loading'?'일별 가격을 불러오는 중…':'일별 가격 이력이 없습니다.'}</p>}
+  </div>
+})
+
 const PeerLineChart=memo(function PeerLineChart({row,rows,kind}:{row:LeaderRow;rows:LeaderRow[];kind:ChartKind}){
   const series=useMemo(()=>peerSeries(row,rows,kind),[row,rows,kind])
   return <div className="peer-line" title={RS_CHART_VERSION}><LineChart series={series} yTitle={kind==='rs'?'RS %':'등락 %'}/><p className="rs-chart-note">같은 시장 {row.asset_class==='ETF'?'ETF':'주식'}끼리의 중앙값과 비교</p></div>
@@ -545,7 +565,7 @@ function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:Lea
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>03</span><h3>가격 모멘텀</h3></div><small>기간 수익률</small></div>
       <div className="signal-strip">{retItems.map(([label,value])=><div key={label}><span>등락 {label}</span><strong className={Number(value)>0?'pos':Number(value)<0?'neg':''}>{pct(value)}</strong></div>)}</div>
-      <PeerLineChart row={row} rows={peers} kind="return"/>
+      <StockMomentumLine row={row}/>
     </section>
     <section className="snapshot-section drill-animate">
       <div className="snapshot-section-head"><div><span>04</span><h3>추세 · 리스크</h3></div></div>
@@ -978,7 +998,7 @@ export default function App(){
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
-          <SectorRsChart rows={marketRows} market={market} sector={sector} onSelect={chartOpenSector}/>
+          <SectorHeatmap rows={marketRows} market={market} sector={sector} onSelect={chartOpenSector}/>
           <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
             {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
@@ -1123,12 +1143,14 @@ export default function App(){
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
         <button className="primary-action" onClick={()=>recordAnalysis(drillStock,true)}>종목분석 기록 작성 →</button>
       </div>:summaryTab?<div className="drill-content drill-summary-list">
+        <MomentumChart title="주도 종목" rows={summaryGroups[summaryTab]} onSelect={r=>{setSelected(r);setDrillStock(r)}} sub={leaderSub} unit="종목"/>
         <p className="drill-note">{market==='ALL'?'전체 시장':market} · {summaryGroups[summaryTab].length}종목 · RS순위 높은 순</p>
         <StockRows rows={summaryGroups[summaryTab].slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>:<div className="drill-industry-detail drill-content">
         {drillSector&&<div className="drill-summary"><Kpi label="판정" value={drillSector.verdict}/><Kpi label="종목 수" value={drillSector.n}/><Kpi label="핵심 주도 비율" value={pct(drillSector.coreShare)}/><Kpi label="MA50 위" value={pct(drillSector.breadth)}/><Kpi label="RS순위 중앙값" value={drillSector.medRank==null?'—':Math.round(drillSector.medRank)}/><Kpi label="RS 3M" value={pct(drillSector.medRs3m)}/></div>}
         {drillSector?.smallSample&&<p className="sample-explainer">소표본 섹터입니다. 종목 수를 별도 표시하고 더 엄격한 판정 기준을 적용합니다.</p>}
         <div className="tabs drill-tabs"><button className={stockTab==='core'?'on':''} onClick={()=>setStockTab('core')}>핵심 주도 <b>{drillStockGroups.core.length}</b></button><button className={stockTab==='candidates'?'on':''} onClick={()=>setStockTab('candidates')}>주도 후보 <b>{drillStockGroups.candidates.length}</b></button><button className={stockTab==='turns'?'on':''} onClick={()=>setStockTab('turns')}>강세 전환 <b>{drillStockGroups.turns.length}</b></button><button className={stockTab==='corrections'?'on':''} onClick={()=>setStockTab('corrections')}>조정 중 <b>{drillStockGroups.corrections.length}</b></button></div>
+        <MomentumChart title={{core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중'}[stockTab]} rows={drillStockGroups[stockTab]} onSelect={r=>{setSelected(r);setDrillStock(r)}} sub={leaderSub} unit="종목"/>
         <p className="drill-note">종목을 누르면 상세 지표를 확인합니다.</p>
         <StockRows rows={drillStockGroups[stockTab]} onSelect={r=>{setSelected(r);setDrillStock(r)}}/>
       </div>}
