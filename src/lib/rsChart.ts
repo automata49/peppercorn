@@ -52,12 +52,13 @@ export function peerSeries(row:LeaderRow,all:LeaderRow[],kind:ChartKind):LineSer
 }
 
 // Y axis: zero always included, ≤6 ticks on a 1-2-5 step.
-export function yScale(series:LineSeries[]){
+// base: the reference line kept in range (0 for RS/return %, 100 for a rebased price index).
+export function yScale(series:LineSeries[],base=0){
   const vals=series.flatMap(s=>s.values).filter((v):v is number=>v!=null)
-  let lo=Math.min(0,...vals),hi=Math.max(0,...vals)
+  let lo=Math.min(base,...vals),hi=Math.max(base,...vals)
   if(hi-lo<1e-9){lo-=.01;hi+=.01}
-  const step=[.005,.01,.02,.05,.1,.2,.5,1,2,5].find(s=>(hi-lo)/s<=5)??10
+  const step=[.005,.01,.02,.05,.1,.2,.5,1,2,5,10,20,50,100,200,500].find(s=>(hi-lo)/s<=5)??1000
   lo=Math.floor(lo/step)*step;hi=Math.ceil(hi/step)*step
   const ticks:number[]=[];for(let v=lo;v<=hi+step/2;v+=step)ticks.push(Math.round(v/step)*step)
-  return {lo,hi,ticks,digits:step<.01?1:0}
+  return {lo,hi,ticks,digits:step<.01?1:0,base}
 }

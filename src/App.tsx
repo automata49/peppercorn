@@ -15,7 +15,8 @@ import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
-import { RS_CHART_PERIODS, RS_CHART_VERSION, groupSeries, peerSeries, seriesOf, topByRs, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
+import { usePriceHistory, rebased } from './lib/priceHistory'
+import { RS_CHART_PERIODS, RS_CHART_VERSION, groupSeries, peerSeries, periodValue, seriesOf, topByRs, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market } from './types'
@@ -409,55 +410,81 @@ function LiveLeaders({pool,live,onSelect}:{pool:LeaderRow[];live:boolean;onSelec
 // RS-CHART-2: line chart, x = period (5D…52W), y = % (RS vs benchmark or return); built from loaded rows, display only.
 const LINE_COLORS=['#28486f','#c33d36','#1f8a70','#c98a00','#7b52ab']
 const yLabel=(v:number,digits:number)=>`${v>0?'+':''}${(v*100).toFixed(digits)}%`
-function LineChart({series,yTitle,activePeriod,onPick}:{series:LineSeries[];yTitle:string;activePeriod?:RsChartPeriod;onPick?:(key:string)=>void}){
+// xLabels: dates for a daily index (base 100) instead of the six periods; legend then shows the change since the first point.
+function LineChart({series,yTitle,activePeriod,onPick,xLabels}:{series:LineSeries[];yTitle:string;activePeriod?:RsChartPeriod;onPick?:(key:string)=>void;xLabels?:string[]}){
+  const labels=xLabels??RS_CHART_PERIODS.map(([p])=>p),daily=!!xLabels,n=labels.length
   const [ref,width]=useElementWidth<HTMLDivElement>()
   const H=204,L=46,R=10,T=24,B=24,w=Math.max(0,width-L-R),h=H-T-B
-  const {lo,hi,ticks,digits}=yScale(series)
-  const x=(i:number)=>L+(RS_CHART_PERIODS.length>1?i*w/(RS_CHART_PERIODS.length-1):0),y=(v:number)=>T+(hi-v)/(hi-lo)*h
+  const {lo,hi,ticks,digits}=yScale(series,daily?100:0)
+  const x=(i:number)=>L+(n>1?i*w/(n-1):0),y=(v:number)=>T+(hi-v)/(hi-lo)*h
   const paths=(values:(number|null)[])=>{let d='',pen=false;values.forEach((v,i)=>{if(v==null){pen=false;return}d+=`${pen?'L':'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`;pen=true});return d}
   return <div className="line-chart">
     <div ref={ref} className="line-chart-plot">{width>0&&<svg width={width} height={H} role="img" aria-label={`${yTitle} 꺾은선 차트`}>
       <text className="line-axis-title" x={4} y={10}>{yTitle}</text>
-      {ticks.map(t=><g key={t}><line x1={L} x2={L+w} y1={y(t)} y2={y(t)} className={t===0?'line-zero':'line-grid'}/><text x={L-6} y={y(t)+3.5} textAnchor="end" className="line-tick">{yLabel(t,digits)}</text></g>)}
-      {RS_CHART_PERIODS.map(([p],i)=><g key={p}>{p===activePeriod&&<line x1={x(i)} x2={x(i)} y1={T} y2={T+h} className="line-active"/>}<text x={x(i)} y={H-6} textAnchor="middle" className={'line-tick'+(p===activePeriod?' on':'')}>{p}</text></g>)}
+      {ticks.map(t=><g key={t}><line x1={L} x2={L+w} y1={y(t)} y2={y(t)} className={t===(daily?100:0)?'line-zero':'line-grid'}/><text x={L-6} y={y(t)+3.5} textAnchor="end" className="line-tick">{daily?t.toFixed(0):yLabel(t,digits)}</text></g>)}
+      {daily?[...new Set([0,1,2,3,4,5].map(k=>Math.round(k*(n-1)/5)))].map(i=><text key={i} x={x(i)} y={H-6} textAnchor={i===0?'start':i===n-1?'end':'middle'} className="line-tick">{labels[i].slice(5)}</text>):RS_CHART_PERIODS.map(([p],i)=><g key={p}>{p===activePeriod&&<line x1={x(i)} x2={x(i)} y1={T} y2={T+h} className="line-active"/>}<text x={x(i)} y={H-6} textAnchor="middle" className={'line-tick'+(p===activePeriod?' on':'')}>{p}</text></g>)}
       {series.map((s,k)=>{const c=LINE_COLORS[k%LINE_COLORS.length];return <g key={s.key} className="line-series" data-key={s.key}>
         <path d={paths(s.values)} fill="none" stroke={c} strokeWidth={s.highlight?2.4:1.6} strokeLinejoin="round" strokeLinecap="round" className="line-path" style={{color:c}}/>
-        {s.values.map((v,i)=>v==null?null:<circle key={i} cx={x(i)} cy={y(v)} r={s.highlight?4:3.2} className="line-dot" stroke={c} strokeWidth={s.highlight?2:1.6}><title>{`${s.label} · ${RS_CHART_PERIODS[i][0]} ${pct(v)}`}</title></circle>)}
+        {s.values.map((v,i)=>v==null||(daily&&i<n-1)?null:<circle key={i} cx={x(i)} cy={y(v)} r={s.highlight?4:3.2} className="line-dot" stroke={c} strokeWidth={s.highlight?2:1.6}><title>{daily?`${s.label} · ${labels[i]} ${v.toFixed(1)} (${pct(v/100-1)})`:`${s.label} · ${labels[i]} ${pct(v)}`}</title></circle>)}
       </g>})}
     </svg>}</div>
-    <ul className="line-legend">{series.map((s,k)=>{const last=activePeriod?s.values[RS_CHART_PERIODS.findIndex(([p])=>p===activePeriod)]:null
-      const body=<><i style={{color:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{activePeriod?pct(last):''}</em></>
+    <ul className="line-legend">{series.map((s,k)=>{const end=[...s.values].reverse().find(v=>v!=null)
+      const last=daily?(end==null?null:end/100-1):activePeriod?s.values[RS_CHART_PERIODS.findIndex(([p])=>p===activePeriod)]:null
+      const body=<><i style={{color:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{daily||activePeriod?pct(last):''}</em></>
       return <li key={s.key}>{onPick?<button type="button" onClick={()=>onPick(s.key)} aria-label={`${s.label} 상세 보기`}>{body}</button>:<span>{body}</span>}</li>})}</ul>
   </div>
 }
 
 // Dashboard charts: the period toggle picks the Top 5 by that period's RS; each line shows all six periods.
-function RsRankedChart({title,period,onPeriod,series,onPick,note}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;series:LineSeries[];onPick:(key:string)=>void;note:string}){
-  return <div className="rs-chart" role="figure" aria-label={`${title} RS 꺾은선 차트`} title={RS_CHART_VERSION}>
+// mode (optional): 'rs' = RS across periods; 'momentum' = Top 5 by the period's return, daily price rebased to 100.
+function RsRankedChart({title,period,onPeriod,series,onPick,note,mode,onMode,momentum}:{title:string;period:RsChartPeriod;onPeriod:(p:RsChartPeriod)=>void;series:LineSeries[];onPick:(key:string)=>void;note:string;mode?:'rs'|'momentum';onMode?:(m:'rs'|'momentum')=>void;momentum?:any}){
+  const isMomentum=mode==='momentum'
+  return <div className="rs-chart" role="figure" aria-label={`${title} ${isMomentum?'가격 모멘텀':'RS'} 꺾은선 차트`} title={RS_CHART_VERSION}>
+    {onMode&&<div className="mini-segment rs-mode-toggle" role="group" aria-label={`${title} 차트 기준`}>{([['rs','RS 상위'],['momentum','가격 모멘텀 상위']] as const).map(([m,text])=><button key={m} type="button" className={mode===m?'on':''} aria-pressed={mode===m} onClick={()=>onMode(m)}>{text}</button>)}</div>}
     <div className="rs-chart-head">
-      <span>{title} · RS {period} 상위 <small>벤치마크 대비</small></span>
+      <span>{title} · {isMomentum?`등락 ${period} 상위`:`RS ${period} 상위`} <small>{isMomentum?'시작일=100 · 일별 종가':'벤치마크 대비'}</small></span>
       <div className="mini-segment rs-period-toggle" role="group" aria-label={`${title} RS 기간`}>{RS_CHART_PERIODS.map(([p])=><button key={p} type="button" className={period===p?'on':''} aria-pressed={period===p} onClick={()=>onPeriod(p)}>{p}</button>)}</div>
     </div>
-    {series.length?<LineChart series={series} yTitle="RS %" activePeriod={period} onPick={onPick}/>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
-    <p className="rs-chart-note">{note}</p>
+    {isMomentum?momentum:series.length?<LineChart series={series} yTitle="RS %" activePeriod={period} onPick={onPick}/>:<p className="empty">RS {period} 값이 있는 항목이 없습니다.</p>}
+    {!isMomentum&&<p className="rs-chart-note">{note}</p>}
   </div>
 }
 
 const chartNote=(shown:number,total:number,missing:number,unit:string)=>`${total}${unit} 중 RS 상위 ${shown}${missing?` · 값 없음 ${missing}${unit} 제외`:''}`
 const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
 
+const SESSIONS:Record<RsChartPeriod,number>={'5D':5,'20D':20,'50D':50,'120D':120,'200D':200,'52W':252}
+// MOMENTUM-LINES-1: Top 5 by the period's return (daily data), each line = daily close / close N sessions ago × 100.
+function MomentumLines({rows,period,onSelect,sub,unit}:{rows:LeaderRow[];period:RsChartPeriod;onSelect:(row:LeaderRow)=>void;sub:(r:LeaderRow)=>string;unit:string}){
+  const top=useMemo(()=>rows.map(row=>({row,v:periodValue(row,period,'return')})).filter((x):x is {row:LeaderRow;v:number}=>x.v!=null).sort((a,b)=>b.v-a.v).slice(0,5),[rows,period])
+  const hist=usePriceHistory(top.map(x=>x.row.id),true)
+  const lines=top.map(({row})=>({row,r:rebased(hist.get(row.id),SESSIONS[period])}))
+  const dates=lines.reduce<string[]>((best,l)=>l.r&&l.r.dates.length>best.length?l.r.dates:best,[])
+  const series=lines.filter(l=>l.r).map(({row,r})=>({key:row.id,label:row.name,sub:sub(row),values:dates.map(d=>{const i=r!.dates.indexOf(d);return i<0?null:r!.values[i]})}))
+  const short=lines.filter(l=>l.r&&!l.r.complete).length
+  return <>
+    {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
+      :!top.length?<p className="empty">등락 {period} 값이 있는 항목이 없습니다.</p>
+      :series.length?<LineChart series={series} yTitle="지수 (시작=100)" xLabels={dates} onPick={key=>{const hit=top.find(x=>x.row.id===key);if(hit)onSelect(hit.row)}}/>
+      :<p className="empty">일별 가격을 불러오는 중…</p>}
+    <p className="rs-chart-note">{rows.length}{unit} 중 등락 {period} 상위 {top.length} · {SESSIONS[period]}거래일 전 종가=100{short?` · 이력이 짧은 ${short}${unit}은 가능한 기간만`:''}</p>
+  </>
+}
+
 function useRankedRows(rows:LeaderRow[],onSelect:(row:LeaderRow)=>void,sub:(r:LeaderRow)=>string){
   const [period,setPeriod]=useState<RsChartPeriod>('20D')
+  const [mode,setMode]=useState<'rs'|'momentum'>('rs')
   const {items,missing}=useMemo(()=>topByRs(rows,period,5),[rows,period])
   const series=items.map(({row})=>({key:row.id,label:row.name,sub:sub(row),values:seriesOf(row,'rs')}))
   const onPick=(key:string)=>{const hit=items.find(x=>x.row.id===key);if(hit)onSelect(hit.row)}
-  return {period,setPeriod,series,missing,onPick}
+  return {period,setPeriod,series,missing,onPick,mode,setMode}
 }
 
 const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const pool=useMemo(()=>rows.filter(isLeaderClass),[rows])
   const c=useRankedRows(pool,onSelect,r=>`${r.market} · ${r.ticker} · ${leadership(r)}`)
-  return <RsRankedChart title="주도 종목" period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,pool.length,c.missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
+  const sub=(r:LeaderRow)=>`${r.market} · ${r.ticker} · ${leadership(r)}`
+  return <RsRankedChart title="주도 종목" mode={c.mode} onMode={c.setMode} momentum={<MomentumLines rows={pool} period={c.period} onSelect={onSelect} sub={sub} unit="종목"/>} period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,pool.length,c.missing,'종목')+' · 핵심 주도·주도 후보·강세 전환'}/>
 })
 
 const SectorRsChart=memo(function SectorRsChart({rows,market,sector,onSelect}:{rows:LeaderRow[];market:string;sector:string|null;onSelect:(key:string)=>void}){
@@ -472,7 +499,7 @@ const SectorRsChart=memo(function SectorRsChart({rows,market,sector,onSelect}:{r
 const EtfRsChart=memo(function EtfRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const etfs=useMemo(()=>rows.filter(r=>r.asset_class==='ETF'),[rows])
   const c=useRankedRows(etfs,onSelect,r=>`${r.market} · ${r.ticker}`)
-  return <RsRankedChart title="ETF" period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,etfs.length,c.missing,'개 ETF')}/>
+  return <RsRankedChart title="ETF" mode={c.mode} onMode={c.setMode} momentum={<MomentumLines rows={etfs} period={c.period} onSelect={onSelect} sub={r=>`${r.market} · ${r.ticker}`} unit="개 ETF"/>} period={c.period} onPeriod={c.setPeriod} series={c.series} onPick={c.onPick} note={chartNote(c.series.length,etfs.length,c.missing,'개 ETF')}/>
 })
 
 // Stock detail sections 02/03: the stock against same-market peer medians across all periods.
