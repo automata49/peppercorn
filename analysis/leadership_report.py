@@ -12,6 +12,7 @@ The conditions mirror recalculate_market_leadership() (supabase/migrations/*_kr_
 """
 from __future__ import annotations
 
+import datetime
 import json
 import math
 import os
@@ -117,6 +118,9 @@ def single_day(closes: list[float], window: int = 63) -> dict | None:
 
 def fundamental_flags(market: str, f: dict | None) -> dict:
     """Flags from filed values; a missing value stays unknown, never zero."""
+    if f and f.get("revenue") is None and f.get("files_without_revenue"):
+        return {"status": "known", "no_revenue": True, "no_revenue_filed": True, "loss": None if f.get("net_income") is None else f["net_income"] < 0,
+                "shrinking": None, "revenue": None, "revenue_growth": None, "net_income": f.get("net_income")}
     if not f or f.get("revenue") is None:
         return {"status": "unknown", "no_revenue": None, "loss": None if not f or f.get("net_income") is None else f["net_income"] < 0, "shrinking": None}
     rev, ni, prev = f.get("revenue"), f.get("net_income"), f.get("revenue_prev")
@@ -170,7 +174,9 @@ def markdown(rep: dict) -> str:
               f"| 매출 없음·미미 (연 매출 < {'$10M' if m == 'US' else '100억원'}) | {fd['no_revenue']} | {pct(fd['no_revenue'] / fd['known'] if fd['known'] else None)} |",
               f"| 적자 (최근 연간 순이익 < 0) | {fd['loss']} | {pct(fd['loss'] / fd['loss_known'] if fd['loss_known'] else None)} |",
               f"| 매출 감소 | {fd['shrinking']} | {pct(fd['shrinking'] / fd['growth_known'] if fd['growth_known'] else None)} |", "",
-              "매출 없음·미미 종목: " + (", ".join(fd["no_revenue_list"][:40]) or "없음")]
+              f"(이 중 매출 항목 없이 순이익만 공시하는 회사: {fd['no_revenue_filed']}개)", "",
+              "매출 없음·미미 종목: " + (", ".join(fd["no_revenue_list"][:40]) or "없음"), "",
+              "공시 확인 불가: " + (", ".join(fd["unknown_list"][:60]) or "없음")]
         gp = x["gaps"]
         L += ["", "### 7. 단일일 급등 의존 (최근 63거래일)", "",
               f"주가 확인 {gp['priced']} / {gp['n']} · 하루 상승률 ≥{GAP_MIN_DAY:.0%}이고 그 하루가 63일 로그 수익의 {GAP_MIN_SHARE:.0%} 이상: {gp['flagged']}개", "",
@@ -224,6 +230,8 @@ def summarize(rows: list[dict], funda: dict, closes: dict, as_of: str) -> dict:
                 "n": len(leaders), "known": len(known), "unknown": len(leaders) - len(known),
                 "no_revenue": sum(1 for f in flags.values() if f["no_revenue"]),
                 "no_revenue_list": [f"{t} {by_ticker[t].get('name') or ''}".strip() for t, f in flags.items() if f["no_revenue"]],
+                "no_revenue_filed": sum(1 for f in flags.values() if f.get("no_revenue_filed")),
+                "unknown_list": [t for t, f in flags.items() if f["status"] == "unknown"],
                 "loss": sum(1 for f in flags.values() if f["loss"]), "loss_known": sum(1 for f in flags.values() if f["loss"] is not None),
                 "shrinking": sum(1 for f in flags.values() if f["shrinking"]), "growth_known": sum(1 for f in flags.values() if f["shrinking"] is not None),
             },
@@ -257,8 +265,44 @@ def us_fundamentals(ua: str, tickers: list[str]) -> dict:  # pragma: no cover - 
     for t in tickers:
         cik = ciks.get(t.upper().replace(".", "-")) or ciks.get(t.upper())
         if cik:
-            out[("US", t)] = {"revenue": rev["CY2025"].get(cik), "revenue_prev": rev["CY2024"].get(cik), "net_income": ni.get(cik)}
+            out[("US", t)] = {"revenue": rev["CY2025"].get(cik), "revenue_prev": rev["CY2024"].get(cik), "net_income": ni.get(cik), "cik": cik}
+            if out[("US", t)]["revenue"] is None:
+                out[("US", t)] |= company_annual(ua, cik)
     return out
+
+
+def latest_annual(facts: dict, concepts: tuple[str, ...]) -> tuple[float | None, float | None]:
+    """Latest and prior full-year values (10-K/20-F, about 12 months) across the given concepts."""
+    best = {}
+    for ns in ("us-gaap", "ifrs-full"):
+        for c in concepts:
+            for unit, items in ((facts.get("facts", {}).get(ns, {}).get(c) or {}).get("units") or {}).items():
+                if unit != "USD":
+                    continue
+                for it in items:
+                    if it.get("form") not in ("10-K", "20-F", "10-K/A", "20-F/A") or not it.get("start") or not it.get("end"):
+                        continue
+                    days = (datetime.date.fromisoformat(it["end"]) - datetime.date.fromisoformat(it["start"])).days
+                    if 350 <= days <= 380 and it["end"] >= "2023-01-01":
+                        best[it["end"]] = max(best.get(it["end"], it["val"]), it["val"])
+    ends = sorted(best)
+    return (best[ends[-1]] if ends else None, best[ends[-2]] if len(ends) > 1 else None)
+
+
+def company_annual(ua: str, cik: int) -> dict:  # pragma: no cover - network
+    """Fallback for a company missing from the CY2025 frames: its own filings, and whether it files without revenue."""
+    import requests
+    r = requests.get(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json", headers={"User-Agent": ua}, timeout=120)
+    time.sleep(.15)
+    if r.status_code != 200:
+        return {}
+    facts = r.json()
+    rev, prev = latest_annual(facts, REVENUE_TAGS + ("Revenue", "RevenueFromContractsWithCustomers"))
+    ni, _ = latest_annual(facts, ("NetIncomeLoss", "ProfitLoss"))
+    if rev is not None:
+        return {"revenue": rev, "revenue_prev": prev, "net_income": ni}
+    # Files annual net income but no revenue line at all: a pre-revenue company (e.g. clinical-stage biotech).
+    return {"net_income": ni, "files_without_revenue": ni is not None}
 
 
 def kr_fundamentals(key: str, tickers: list[str]) -> dict:  # pragma: no cover - network
@@ -307,7 +351,6 @@ def yahoo_closes(rows: list[dict]) -> dict:  # pragma: no cover - network
 
 
 def main():  # pragma: no cover - network
-    import datetime
     import requests
     rows = requests.get(LEADERBOARD_URL, params={"client": "peppercorn-public-read-v1"}, timeout=120).json()["rows"]
     leaders = [r for r in rows if r.get("asset_class") == "Equity" and r.get("leadership_class") in LEAD and r.get("market") in ("US", "KR")]

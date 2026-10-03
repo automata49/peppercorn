@@ -81,3 +81,17 @@ def test_summarize_and_markdown_render():
     assert us["semis"]["watch"][0]["ticker"] == "NVDA" and "RS순위 ≥95" in us["semis"]["watch"][0]["fails"]
     md = lr.markdown(rep)
     assert "주도 종목 진단" in md and "KOD Kodiak" in md and "1.0배" not in md.split("### 2.")[0]
+
+
+def test_files_without_revenue_counts_as_no_revenue():
+    f = lr.fundamental_flags("US", {"revenue": None, "net_income": -3e8, "files_without_revenue": True})
+    assert f["status"] == "known" and f["no_revenue"] and f["no_revenue_filed"] and f["loss"]
+
+
+def test_latest_annual_picks_full_year_filings():
+    item = lambda start, end, val, form="10-K": {"start": start, "end": end, "val": val, "form": form}
+    facts = {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
+        item("2024-01-01", "2024-12-31", 100.0), item("2025-01-01", "2025-12-31", 150.0),
+        item("2025-10-01", "2025-12-31", 40.0), item("2026-01-01", "2026-06-30", 90.0, "10-Q")]}}}}}
+    assert lr.latest_annual(facts, ("Revenues",)) == (150.0, 100.0)
+    assert lr.latest_annual({"facts": {}}, ("Revenues",)) == (None, None)
