@@ -54,5 +54,9 @@ Deno.serve(async(req:Request)=>{
 
   const active=await fetch(base+"/rest/v1/rpc/activate_index_universe",{method:"POST",headers,body:"{}"});
   if(!active.ok)return Response.json({error:"activation_failed",detail:await active.text()},{status:502});
-  return Response.json({ok:true,instruments:instruments.length,memberships:mapped.length,activated:await active.json()});
+  const activated=await active.json();
+  // UNIVERSE-USER-1: equities on any user's lists stay active. Absent until the retention migration is applied.
+  const keep=await fetch(base+"/rest/v1/rpc/keep_user_referenced_active",{method:"POST",headers,body:"{}"});
+  const kept=keep.ok?await keep.json():{skipped:keep.status,detail:(await keep.text()).slice(0,200)};
+  return Response.json({ok:true,instruments:instruments.length,memberships:mapped.length,activated,user_referenced_kept:kept});
 });

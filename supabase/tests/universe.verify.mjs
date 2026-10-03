@@ -28,24 +28,27 @@ await q('insert into public.portfolio_positions(user_id,instrument_id) values($1
 await q('insert into public.stock_analyses(user_id,instrument_id) values($1,$2)',[user,id(4)]);
 await q('insert into public.trade_journal(user_id,instrument_id) values($1,$2)',[user,id(5)]);
 
+// A deployed activate_index_universe() that differs from schema.sql must survive the migration untouched.
+await q("create or replace function public.activate_index_universe() returns integer language plpgsql security definer set search_path = '' as $f$ declare n integer; begin update public.instruments i set active = exists (select 1 from public.universe_memberships um where um.instrument_id=i.id and um.entry_type='INDEX') where i.asset_class='Equity'; get diagnostics n = row_count; return n; end $f$");
+const before = (await q(`select md5(prosrc) m from pg_proc where oid='public.activate_index_universe()'::regprocedure`)).rows[0].m;
 await db.exec(sql);
 await db.exec(sql);
-check('migration re-applies (guard accepts its own definition)', true);
+check('migration re-applies', true);
+check('deployed activate_index_universe() is left as deployed', (await q(`select md5(prosrc) m from pg_proc where oid='public.activate_index_universe()'::regprocedure`)).rows[0].m === before);
 const active = async () => Object.fromEntries((await q('select ticker,active from public.instruments order by ticker')).rows.map(r => [r.ticker, r.active]));
-check('activation runs as service role', Number((await q('select public.activate_index_universe() n')).rows[0].n) === 6);
-const a = await active();
+await q('select public.activate_index_universe()');
+let a = await active();
+check('activation alone deactivates non-members, including user-referenced ones', a.IDX && !a.WATCH && !a.GONE);
+check('keep re-activates exactly the four user-referenced equities', Number((await q('select public.keep_user_referenced_active() n')).rows[0].n) === 4);
+a = await active();
 check('index member stays active', a.IDX === true);
 check('watchlist, portfolio, analysis and journal references stay active', a.WATCH && a.PORT && a.ANAL && a.JOUR);
-check('unreferenced non-member becomes inactive', a.GONE === false);
-check('ETFs are not touched by equity activation', a.ETF1 === true);
+check('unreferenced non-member stays inactive', a.GONE === false);
+check('ETFs are not touched', a.ETF1 === true);
+check('keep is a no-op when nothing changed', Number((await q('select public.keep_user_referenced_active() n')).rows[0].n) === 0);
 await q('delete from public.watchlist where instrument_id=$1',[id(2)]);
-await q('select public.activate_index_universe()');
-check('removing the last reference deactivates', (await active()).WATCH === false);
-
-let refused = false;
-await q("create or replace function public.activate_index_universe() returns integer language sql as $$ select 0 $$");
-try { await db.exec(sql); } catch (e) { refused = /differs from the repo/.test(String(e.message)); }
-check('guard refuses an unknown deployed definition', refused);
+await q('select public.activate_index_universe()');await q('select public.keep_user_referenced_active()');
+check('removing the last reference lets activation deactivate it', (await active()).WATCH === false);
 
 // Retention
 const day = n => new Date(Date.UTC(2024,0,1) + n*86400000).toISOString().slice(0,10);
@@ -82,8 +85,8 @@ for (const role of ['anon','authenticated']) {
   let denied = false;
   try { await q('select public.prune_market_history()'); } catch (e) { denied = /permission denied/.test(String(e.message)); }
   let deniedAct = false;
-  try { await q('select public.activate_index_universe()'); } catch (e) { deniedAct = /permission denied/.test(String(e.message)); }
+  try { await q('select public.keep_user_referenced_active()'); } catch (e) { deniedAct = /permission denied/.test(String(e.message)); }
   await db.exec('reset role');
-  check(`${role} cannot prune or activate`, denied && deniedAct);
+  check(`${role} cannot prune or keep`, denied && deniedAct);
 }
 console.log(`${passed} universe checks passed`);
