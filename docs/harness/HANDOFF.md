@@ -350,4 +350,4 @@ Result (63-session excess vs benchmark, selection 2022-10~2024-12 / holdout 2025
 - KR: v1 +6.2 / +7.4; v1-sepa +14.4 / +9.2 (passes); sepa +13.7 / −4.9; tt8 +8.1 / −2.9; v1-growth +11.0 / +10.5 (passes).
 - Latest composition (2026-10-02): US v1 279 (semis 15, Health Care 59) vs sepa 66 (semis 8, IT 24, Energy 12); KR v1 29 vs v1-sepa 10, sepa 16 (semis 10).
 Verdict: no variant passed in both markets; SEPA stays a badge/filter and v1 stays live. The gain comes from the growth requirement, not the Trend Template. A default growth filter would be a new decision needing a new registration and data not used here (e.g. walk-forward months after 2026-06).
-Validation: `python -m pytest -q analysis/tests` (54), `npm run harness:check`. The temporary push trigger was removed.
+Validation: `python -m pytest -q analysis/tests` (53), `npm run harness:check`. The temporary push trigger was removed.
