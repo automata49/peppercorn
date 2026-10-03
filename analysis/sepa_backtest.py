@@ -47,6 +47,11 @@ RULES = {
               "(restatements leak), DART cumulative half-year/Q3 amounts; app RS rank, not IBD's",
     "results": None,
 }
+# Corrections after run 37133691382, decided before any re-run and outside the registration hash: none of them changes a
+# rule, variant or gate. C1: tt8 treated any missing Yahoo day in its 273-session window as a failure, unlike the live
+# badge, which skips missing days; a KR day missing for every stock made tt8/SEPA fail for all KR stocks for 273 sessions
+# (KR tt8 = 0 at 2026-10-02). tt8 now skips missing days.
+CORRECTIONS = {"C1": "tt8 skips missing daily closes instead of failing (run 37133691382 KR tt8 = 0)"}
 RULES_SHA = hashlib.sha256(json.dumps({k: v for k, v in RULES.items() if k != "results"}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
 VARIANTS = list(RULES["variants"])
 REV_MIN, EPS_MIN = .20, .25
@@ -88,10 +93,11 @@ def growth_pass(g: dict | None) -> bool:
 def tt8(close, i: int, t: str, rs_rank) -> bool:
     """The 8 Trend Template conditions at session i from closes (sessions x tickers DataFrame)."""
     import numpy as np
-    s = close[t].iloc[max(0, i - 272): i + 1]
-    if len(s) < 273 or s.isna().any():
+    # Missing days are skipped, as in the live badge (stock_flags.trend_template); see CORRECTIONS.
+    s = close[t].iloc[max(0, i - 400): i + 1].dropna()
+    if len(s) < 273:
         return False
-    v = s.to_numpy(dtype=float)
+    v = s.to_numpy(dtype=float)[-273:]
     p = v[-1]
     ma = lambda n, end=len(v): v[end - n:end].mean()
     m50, m150, m200, m200_then = ma(50), ma(150), ma(200), ma(200, len(v) - 21)

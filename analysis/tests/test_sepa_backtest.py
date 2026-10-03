@@ -52,6 +52,10 @@ def test_trend_template_needs_history_and_rs():
     assert not sb.tt8(f["close"], 400, "LEAD", 69)
     assert not sb.tt8(f["close"], 250, "LEAD", 99)                     # under 273 sessions
     assert not sb.tt8(f["close"], 400, "FLAT", 99)
+    # C1: a missing day inside the window is skipped, not a failure.
+    gap = f["close"].copy()
+    gap.iloc[300, gap.columns.get_loc("LEAD")] = float("nan")
+    assert sb.tt8(gap, 400, "LEAD", 99)
 
 
 def test_variants_end_to_end():
