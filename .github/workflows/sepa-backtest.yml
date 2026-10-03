@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:  # temporary: one run from this branch, removed before merge
     branches: [claude/leader-topdown-sepa]
-    paths: [.github/workflows/sepa-backtest.yml]
+    paths: [.github/workflows/sepa-backtest.yml, analysis/leadership_report.py]
 
 permissions:
   contents: read

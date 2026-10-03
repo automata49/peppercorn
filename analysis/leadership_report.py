@@ -247,7 +247,15 @@ def summarize(rows: list[dict], funda: dict, closes: dict, as_of: str) -> dict:
 # ---- network (not unit tested) -------------------------------------------------------------------------------
 def sec_frames(ua: str, concept: str, period: str, unit: str = "USD") -> dict[int, float]:  # pragma: no cover - network
     import requests
-    r = requests.get(f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/{unit}/{period}.json", headers={"User-Agent": ua}, timeout=120)
+    url = f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/{unit}/{period}.json"
+    for attempt in range(4):  # SEC sometimes ends a large response early; retry before giving up
+        try:
+            r = requests.get(url, headers={"User-Agent": ua}, timeout=120)
+            break
+        except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout):
+            if attempt == 3:
+                raise
+            time.sleep(2 ** (attempt + 1))
     time.sleep(.15)
     if r.status_code != 200:
         return {}
