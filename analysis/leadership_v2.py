@@ -43,7 +43,10 @@ RULES = {
         "adoption": "the selected variant must pass G1-G3 in the holdout in both markets; otherwise v2 is not adopted",
     },
     "limits": "current universe members only (survivorship bias); Yahoo daily closes; static group membership",
-    "results": None,
+    # Run 37121393290 (commit 0a9c35b, registration hash 44f969ace94d), recorded unchanged.
+    "results": {"run": 37121393290, "registration_sha": "44f969ace94d", "passing_selection": [], "chosen": None, "adopted": False,
+                "note": "no variant passed G1-G2 in the KR selection period; group gates lowered selection-period excess "
+                        "return in both markets; loss exclusion improved US hit rate and drawdown but not KR excess return"},
 }
 RULES_SHA = hashlib.sha256(json.dumps({k: v for k, v in RULES.items() if k != "results"}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:12]
 

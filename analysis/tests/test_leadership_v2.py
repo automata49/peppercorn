@@ -17,7 +17,7 @@ def m(**k):
 
 
 def test_registration_is_frozen_and_inactive():
-    assert v2.RULES["active"] is False and v2.RULES["results"] is None
+    assert v2.RULES["active"] is False and v2.RULES["results"]["adopted"] is False and v2.RULES["results"]["chosen"] is None
     assert len(v2.VARIANTS) == 8 and {v["group_top"] for v in v2.VARIANTS} == {None, .4, .3, .2}
     assert len(v2.RULES_SHA) == 12
 
