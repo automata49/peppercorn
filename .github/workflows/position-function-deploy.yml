@@ -9,7 +9,7 @@ on:
       function:
         description: 배포할 함수
         type: choice
-        options: [position-ingest, position-public, quotes, price-history, universe-import, workspace]
+        options: [position-ingest, position-public, quotes, price-history, universe-import, workspace, auth]
         default: position-ingest
       target:
         description: 배포 대상
@@ -57,8 +57,10 @@ jobs:
           # endpoints guarded by origin and client token like leaderboard. None uses a Supabase JWT.
           # universe-import authenticates with a GitHub OIDC token as well. workspace keeps the gateway's Supabase JWT check
           # (it reads the user id from the token and forwards it to PostgREST under RLS), so it deploys with verify_jwt on.
+          # auth (login, refresh, Google PKCE exchange) is called before the user has a token, so the gateway check is off;
+          # it validates its own inputs and uses the service key only server-side.
           case "$FUNCTION" in
-            position-ingest|position-public|quotes|price-history|universe-import) supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt ;;
+            position-ingest|position-public|quotes|price-history|universe-import|auth) supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt ;;
             workspace) supabase functions deploy "$FUNCTION" --project-ref "$ref" ;;
             *) echo "::error::unknown function $FUNCTION"; exit 1;;
           esac
