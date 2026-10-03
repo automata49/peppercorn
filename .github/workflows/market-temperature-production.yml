@@ -1,0 +1,66 @@
+name: Market temperature migration (production)
+
+# TEMP-1 시장 온도계. Manual: Actions → "Market temperature migration (production)" → Run workflow, confirm: apply.
+# Applies supabase/migrations/*_market_temperature.sql in one transaction (additive, re-runnable), then checks RLS,
+# the four owner policies, no anon privilege, and that the latest market metrics are unchanged.
+# Afterwards redeploy the workspace function: Actions → "Edge function deploy", function workspace, target prod.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: apply 입력
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: market-temperature-migration
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm target
+        shell: bash
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          [ "$CONFIRM" = "apply" ] || { echo "::error::confirm input must be 'apply'"; exit 1; }
+          [ -n "$PROD_SUPABASE_DB_URL" ] || { echo "::error::repository secret PROD_SUPABASE_DB_URL is not set"; exit 1; }
+          case "$PROD_SUPABASE_DB_URL" in *"$PRODUCTION_REF"*) ;; *) echo "::error::PROD_SUPABASE_DB_URL does not point at the production project"; exit 1 ;; esac
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+
+      - name: Migrate and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest() { psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_rank,l.stage),',' order by l.instrument_id),''))
+            from (select distinct on (instrument_id) * from public.market_metrics order by instrument_id,as_of desc) l"; }
+          before=$(latest)
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/migrations/*_market_temperature.sql
+          [ "$before" = "$(latest)" ] || { echo "::error::latest metrics changed"; exit 1; }
+          out=$(psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select concat_ws('|',
+              (select relrowsecurity from pg_class where oid='public.market_temperature_entries'::regclass),
+              (select count(*) from pg_policies where schemaname='public' and tablename='market_temperature_entries'),
+              has_table_privilege('anon','public.market_temperature_entries','select'),
+              has_table_privilege('authenticated','public.market_temperature_entries','insert'),
+              (select count(*) from public.market_temperature_entries))")
+          echo "rls|policies|anon select|authenticated insert|rows = $out"
+          IFS='|' read -r rls pol anon auth rows <<<"$out"
+          [ "$rls" = "t" ] || { echo "::error::RLS is not enabled"; exit 1; }
+          [ "$pol" = "4" ] || { echo "::error::expected 4 policies, found $pol"; exit 1; }
+          [ "$anon" = "f" ] || { echo "::error::anon can read the table"; exit 1; }
+          [ "$auth" = "t" ] || { echo "::error::authenticated cannot insert"; exit 1; }
+          echo "Market temperature table ready; latest metrics unchanged."
