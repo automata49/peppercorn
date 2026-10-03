@@ -372,9 +372,12 @@ def build_v2(sp500,krx_desc,kospi200,kosdaq150):
         return (tv,"traded_value_20d") if tv is not None else (day_value,"listing_day" if day_value is not None else None)
 
     candidates=[];screen={}
+    # Existing share-class tickers may be stored without the dot (BRKB); keep that spelling so history is not split.
+    undotted={t.replace(".",""):t for m,t in existing if m=="US"}
     for exchange in ("nasdaq","nyse","amex"):
         for r in fetch_screener(exchange):
             t=norm_us(r.get("symbol"))
+            if t and ("US",t) not in existing and t.replace(".","") in undotted:t=undotted[t.replace(".","")]
             if not t or ("US",t) in screen:continue
             screen[("US",t)]=r
             price=uv2.to_float(r.get("lastsale"));vol=uv2.to_float(r.get("volume"))
