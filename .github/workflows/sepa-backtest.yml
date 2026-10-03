@@ -4,9 +4,6 @@ name: SEPA default backtest (read-only)
 # 공개 leaderboard(유니버스·업종), Yahoo 5년 일봉, SEC frames, OpenDART만 읽고 Supabase 에는 쓰지 않는다.
 on:
   workflow_dispatch:
-  push:  # temporary: one run from this branch, removed before merge
-    branches: [claude/leader-topdown-sepa]
-    paths: [.github/workflows/sepa-backtest.yml, analysis/leadership_report.py, analysis/sepa_backtest.py]
 
 permissions:
   contents: read

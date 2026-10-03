@@ -11,7 +11,7 @@ D = datetime.date
 
 
 def test_registration_is_frozen_and_inactive():
-    assert sb.RULES["active"] is False and sb.RULES["results"] is None
+    assert sb.RULES["active"] is False and sb.RULES["results"]["adopted"] is False and sb.RULES["results"]["passes"] == []
     assert sb.VARIANTS == ["v1-sepa", "sepa", "tt8", "v1-growth"] and len(sb.RULES_SHA) == 12
 
 

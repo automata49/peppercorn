@@ -45,7 +45,12 @@ RULES = {
              "only with G1-G4 in the selection period AND G1-G3 in the holdout, in both markets",
     "limits": "current universe members only (survivorship bias); Yahoo daily closes; SEC frames hold the latest filed value "
               "(restatements leak), DART cumulative half-year/Q3 amounts; app RS rank, not IBD's",
-    "results": None,
+    # Run 37136134136 (commit afbd0e7, registration c7c3f195780d, correction C1), recorded unchanged.
+    "results": {"run": 37136134136, "registration_sha": "c7c3f195780d", "passes": [], "adopted": False,
+                "note": "no variant passed: all four beat v1 in the selection period in both markets except tt8; in the US "
+                        "holdout v1-sepa (+2.9 % vs +3.1 %) and sepa (+1.4 %) trailed v1 and v1-growth (+3.8 %) missed G2 by "
+                        "0.4 pp hit rate; in the KR holdout v1-sepa (+9.2 % vs +7.4 %) and v1-growth (+10.5 %) passed while "
+                        "sepa (-4.9 %) and tt8 (-2.9 %) failed. The gain comes from the growth requirement, not the Trend Template."},
 }
 # Corrections after run 37133691382, decided before any re-run and outside the registration hash: none of them changes a
 # rule, variant or gate. C1: tt8 treated any missing Yahoo day in its 273-session window as a failure, unlike the live
