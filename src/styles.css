@@ -1456,3 +1456,29 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .stock-snapshot .stock-flags{margin:4px 0 0}
 .hero-chips .stock-flag{font-size:11px;padding:3px 8px;border-radius:999px}
 .group-rank{white-space:nowrap}
+/* LEADER-LENS-1 / GROWTH-1 / SEPA-1 / BIGCAP-1 (display only) */
+.stock-flag.sepa{background:var(--green);color:#fff}
+.stock-flag.growth{background:var(--green-bg);color:var(--green)}
+.group-rank-mini{color:#7f632f}
+.summary-tabs{flex-wrap:wrap}
+.summary-tabs button b{margin-left:3px}
+.lens-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px}
+.lens-bar .mini-segment button{padding:5px 10px;font-size:11px}
+.lens-chip{border:1px dashed #c9d3de;background:#fff;border-radius:999px;padding:5px 10px;font-size:11px;color:#526176;cursor:pointer}
+.lens-chip.on{border-style:solid;border-color:var(--green);background:var(--green-bg);color:var(--green);font-weight:700}
+.lens-chip:disabled{opacity:.5;cursor:not-allowed}
+.lens-groups{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 10px}
+.lens-group{border:1px solid #d7dfe8;background:#fff;border-radius:8px;padding:4px 8px;font-size:11px;color:#526176;cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lens-group small{color:#8a95a4}
+.lens-group b{margin-left:2px;color:#28394e}
+.lens-group.top{border-color:#b9dcc6;background:#f3faf5}
+.lens-group.on{background:#28486f;border-color:#28486f;color:#fff}
+.lens-group.on small,.lens-group.on b{color:#fff}
+.lens-group.more{border-style:dashed}
+.lens-explain{font-size:11px;color:#697586;line-height:1.55;margin:0 0 10px;word-break:keep-all}
+.bigcap-link{display:flex;align-items:center;gap:8px;width:100%;margin-top:10px;border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 14px;cursor:pointer;text-align:left}
+.bigcap-link span{font-size:13px;font-weight:700;color:#28394e}
+.bigcap-link b{font-size:16px;color:var(--navy)}
+.bigcap-link small{flex:1;min-width:0;color:#8a95a4;font-size:11px;word-break:keep-all}
+.bigcap-link i{font-style:normal;color:#8a95a4}
+.bigcap-link:hover{background:#f7f9fc}
