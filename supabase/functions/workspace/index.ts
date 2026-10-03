@@ -27,9 +27,12 @@ Deno.serve(async(req:Request)=>{
   if(req.method==="POST"){
     let body:any;try{body=await req.json()}catch{return json({error:"invalid_json"},400,headers)}const rows=Array.isArray(body?.rows)?body.rows:[];
     try{
-      const instruments=await rest("instruments?select=id,market,ticker,name&active=eq.true&limit=2000");const byKey=new Map<string,any>();const byTicker=new Map<string,any[]>();
+      // Every instrument, paged: PostgREST caps a response at 1,000 rows, and an inactive instrument must still resolve,
+      // otherwise the delete-then-insert below would silently drop the user's rows for it.
+      const instruments:any[]=[];for(let offset=0;;offset+=1000){const page=await rest("instruments?select=id,market,ticker,name,active&order=id.asc&offset="+offset+"&limit=1000");instruments.push(...page);if(page.length<1000)break}
+      const byKey=new Map<string,any>();const byTicker=new Map<string,any[]>();
       for(const i of instruments){byKey.set(String(i.market)+"|"+String(i.ticker),i);const t=String(i.ticker);const list=byTicker.get(t)||[];list.push(i);byTicker.set(t,list)}
-      const resolve=(r:any)=>{let inst=null;if(r.market&&r.ticker)inst=byKey.get(String(r.market)+"|"+String(r.ticker));if(!inst&&r.ticker){const list=byTicker.get(String(r.ticker))||[];if(list.length===1)inst=list[0]}return inst};
+      const resolve=(r:any)=>{let inst=null;if(r.market&&r.ticker)inst=byKey.get(String(r.market)+"|"+String(r.ticker));if(!inst&&r.ticker){const list=byTicker.get(String(r.ticker))||[];const active=list.filter(i=>i.active);if(list.length===1)inst=list[0];else if(active.length===1)inst=active[0]}return inst};
 
       if(resource==="watchlist"){
         await rest("watchlist?user_id=eq."+uid,{method:"DELETE"});const payload=rows.map((r:any)=>{const inst=resolve(r);if(!inst)return null;return{user_id:uid,instrument_id:inst.id,interest_price:r.interest_price===""?null:r.interest_price,stop_pct:r.stop_pct===""?null:r.stop_pct,priority:r.priority||null,note:r.note||null,status:r.status||"WATCH"}}).filter(Boolean);

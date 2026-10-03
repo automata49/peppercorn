@@ -95,7 +95,7 @@ jobs:
           get_token() {
             curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
           }
-          for OFFSET in $(seq 0 120 1920); do
+          for OFFSET in $(seq 0 120 6000); do
             TOKEN=$(get_token); echo "::add-mask::$TOKEN"
             PAYLOAD=$(printf '{"offset":%s,"limit":120,"market":"%s"}' "$OFFSET" "$TARGET_MARKET")
             RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "$PAYLOAD")

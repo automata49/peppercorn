@@ -2,6 +2,11 @@ name: Sync investment universe
 
 on:
   workflow_dispatch:
+    inputs:
+      universe_version:
+        description: '1 = 지수 구성 + NASDAQ 시총 채움(기존), 2 = UNIVERSE-2 투자 가능 종목 기준. 비우면 저장소 변수 UNIVERSE_VERSION(없으면 1)'
+        required: false
+        type: string
   push:
     branches: [main]
     paths:
@@ -34,11 +39,20 @@ jobs:
         with:
           python-version: '3.13'
       - run: pip install -r analysis/requirements.txt
-      - name: Build 1500-stock universe payload
+      - name: Build universe payload
         run: python analysis/sync_universe.py
         env:
           PEPPERCORN_TARGET_EQUITIES: '1500'
+          PEPPERCORN_UNIVERSE_VERSION: ${{ inputs.universe_version || vars.UNIVERSE_VERSION || '1' }}
           UNIVERSE_OUTPUT: universe_payload.json
+          UNIVERSE_DECISIONS_OUTPUT: universe_decisions.json
+      - name: Keep the screening decisions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: universe-decisions
+          path: universe_decisions.json
+          if-no-files-found: ignore
       - name: Validate constituents and classifications
         run: python analysis/validate_universe.py
         env:
@@ -58,7 +72,7 @@ jobs:
           get_token() {
             curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
           }
-          for OFFSET in $(seq 0 120 1920); do
+          for OFFSET in $(seq 0 120 6000); do
             TOKEN=$(get_token); echo "::add-mask::$TOKEN"
             PAYLOAD=$(printf '{"offset":%s,"limit":120}' "$OFFSET")
             RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "$PAYLOAD")

@@ -25,14 +25,24 @@ def main():
 
     sp=groups.get("S&P500",0);k200=groups.get("KOSPI200",0);k150=groups.get("KOSDAQ150",0);nas=groups.get("NASDAQ",0)
     total=len(by_key)
-    if not 490<=sp<=520:fail(f"S&P500 count out of range: {sp}")
-    if not 190<=k200<=210:fail(f"KOSPI200 count out of range: {k200}")
-    if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
-    if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
-    if nas<700:fail(f"NASDAQ coverage unexpectedly small: {nas}")
+    if payload.get("universe_version")=="UNIVERSE-2":
+        # Screened universe: index groups are display metadata, so they may be slightly below full constituent counts.
+        us2=groups.get("UNIVERSE-2 US",0);kr2=groups.get("UNIVERSE-2 KR",0)
+        if us2+kr2!=total:fail(f"every instrument needs one UNIVERSE-2 membership: {us2}+{kr2} != {total}")
+        if not 1000<=us2<=3500:fail(f"UNIVERSE-2 US count out of range: {us2}")
+        if not 400<=kr2<=1500:fail(f"UNIVERSE-2 KR count out of range: {kr2}")
+        if sp<450:fail(f"too few S&P500 constituents passed the screen: {sp}")
+        if k200<170:fail(f"too few KOSPI200 constituents passed the screen: {k200}")
+    else:
+        if not 490<=sp<=520:fail(f"S&P500 count out of range: {sp}")
+        if not 190<=k200<=210:fail(f"KOSPI200 count out of range: {k200}")
+        if not 140<=k150<=160:fail(f"KOSDAQ150 count out of range: {k150}")
+        if not 1400<=total<=1600:fail(f"unique universe count out of range: {total}")
+        if nas<700:fail(f"NASDAQ coverage unexpectedly small: {nas}")
     allowed_kr={"OFFICIAL_KRX","OFFICIAL_KRX_ADAPTER","MARKET_PROXY_TRADINGVIEW","PROXY_VALIDATED"}
     for group in ("KOSPI200","KOSDAQ150"):
         status=statuses.get(group) or set()
+        if not status and payload.get("universe_version")=="UNIVERSE-2":continue
         if len(status)!=1 or not status.issubset(allowed_kr):fail(f"{group} invalid composition status: {status}")
         if status & {"MARKET_PROXY_TRADINGVIEW","PROXY_VALIDATED"}:print(f"VALIDATION WARNING: {group} uses validated market proxy because KRX anonymous access is blocked: {status}")
 

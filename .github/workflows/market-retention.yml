@@ -1,0 +1,100 @@
+name: Market retention (production)
+
+# UNIVERSE-USER-1 + RETENTION-1. Manual: Actions → "Market retention (production)" → Run workflow.
+#   step=migrate : applies supabase/migrations/*_universe_user_retention.sql in one transaction (confirm: apply).
+#   step=dry-run : reports how many price_daily / market_metrics rows pruning would delete (no change).
+#   step=prune   : deletes them (confirm: apply). Irreversible; run dry-run first.
+# Weekly schedule (Sunday 19:05 UTC) prunes only when the repository variable MARKET_RETENTION_SCHEDULE is 'apply'.
+on:
+  workflow_dispatch:
+    inputs:
+      step:
+        description: 실행 단계
+        required: true
+        type: choice
+        default: dry-run
+        options: [migrate, dry-run, prune]
+      confirm:
+        description: migrate/prune 은 apply 입력
+        required: false
+        type: string
+  schedule:
+    - cron: '5 19 * * 0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: market-retention
+  cancel-in-progress: false
+
+env:
+  PRODUCTION_REF: mhbcchegrbakearqptdr
+  PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+
+jobs:
+  retention:
+    if: github.event_name != 'schedule' || vars.MARKET_RETENTION_SCHEDULE == 'apply'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Confirm target
+        shell: bash
+        env:
+          STEP: ${{ github.event_name == 'schedule' && 'prune' || inputs.step }}
+          CONFIRM: ${{ github.event_name == 'schedule' && 'apply' || inputs.confirm }}
+        run: |
+          set -euo pipefail
+          case "$STEP" in migrate|prune) [ "$CONFIRM" = "apply" ] || { echo "::error::confirm input must be 'apply' for $STEP"; exit 1; } ;; dry-run) ;; *) echo "::error::unknown step"; exit 1 ;; esac
+          [ -n "$PROD_SUPABASE_DB_URL" ] || { echo "::error::repository secret PROD_SUPABASE_DB_URL is not set"; exit 1; }
+          case "$PROD_SUPABASE_DB_URL" in *"$PRODUCTION_REF"*) ;; *) echo "::error::PROD_SUPABASE_DB_URL does not point at the production project"; exit 1 ;; esac
+          command -v psql || (sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client)
+          echo "STEP=$STEP" >> "$GITHUB_ENV"
+
+      - name: Storage before
+        run: |
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select pg_size_pretty(pg_database_size(current_database())) database,
+                   pg_size_pretty(pg_total_relation_size('public.price_daily')) price_daily,
+                   pg_size_pretty(pg_total_relation_size('public.market_metrics')) market_metrics,
+                   (select count(*) from public.price_daily) price_rows,
+                   (select count(*) from public.market_metrics) metric_rows"
+
+      - name: Migrate and check the latest metrics are unchanged
+        if: env.STEP == 'migrate'
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest() { psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_rank,l.stage),',' order by l.instrument_id),''))
+            from (select distinct on (instrument_id) * from public.market_metrics order by instrument_id,as_of desc) l"; }
+          before=$(latest)
+          psql "$PROD_SUPABASE_DB_URL" -X -q -v ON_ERROR_STOP=1 --single-transaction -f supabase/migrations/*_universe_user_retention.sql
+          [ "$before" = "$(latest)" ] || { echo "::error::latest metrics changed"; exit 1; }
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "select public.prune_market_history() as dry_run"
+
+      - name: Dry run
+        if: env.STEP == 'dry-run'
+        run: psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "select public.prune_market_history() as dry_run"
+
+      - name: Prune
+        if: env.STEP == 'prune'
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest() { psql "$PROD_SUPABASE_DB_URL" -X -A -t -v ON_ERROR_STOP=1 -c "
+            select md5(coalesce(string_agg(concat_ws('|',l.instrument_id,l.as_of,l.rs_rank,l.stage),',' order by l.instrument_id),''))
+            from (select distinct on (instrument_id) * from public.market_metrics order by instrument_id,as_of desc) l"; }
+          before=$(latest)
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 --single-transaction -c "select public.prune_market_history(400,30,true) as pruned"
+          [ "$before" = "$(latest)" ] || { echo "::error::latest metrics changed"; exit 1; }
+          echo "Latest metrics unchanged."
+
+      - name: Storage after
+        if: env.STEP != 'dry-run'
+        run: |
+          psql "$PROD_SUPABASE_DB_URL" -X -v ON_ERROR_STOP=1 -c "
+            select pg_size_pretty(pg_database_size(current_database())) database,
+                   (select count(*) from public.price_daily) price_rows,
+                   (select count(*) from public.market_metrics) metric_rows"
