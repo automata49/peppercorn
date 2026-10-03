@@ -75,8 +75,29 @@ function normalizeRow(raw:unknown,index:number):LeaderRow{
 
 const normalizeRows=(rows:unknown[])=>rows.map(normalizeRow)
 
+// LEADERBOARD-STATIC-1: after each scheduled recalculation the Pages deployment publishes the same payload as
+// data/leaderboard.json (served compressed from the GitHub Pages CDN, outside Supabase egress). Scheduled reloads read
+// it first; a missing, unreadable or stale (>20 h) snapshot and every user-initiated refresh go to the live function.
+const SNAPSHOT_MAX_AGE_MS=20*3600_000
+async function loadSnapshot():Promise<LeaderRow[]|null>{
+  const controller=new AbortController()
+  const timeout=window.setTimeout(()=>controller.abort(),15_000)
+  try{
+    const res=await fetch(import.meta.env.BASE_URL+'data/leaderboard.json',{signal:controller.signal,cache:'no-cache'})
+    if(!res.ok)return null
+    const payload=await res.json() as {rows?:unknown[];published_at?:string}
+    const age=Date.now()-Date.parse(payload.published_at||'')
+    if(!payload.rows?.length||!(age>=0&&age<=SNAPSHOT_MAX_AGE_MS))return null
+    return normalizeRows(payload.rows)
+  }catch{return null}finally{window.clearTimeout(timeout)}
+}
+
 // error says why live data was not used, so a device without the header badge can report it.
-export async function loadLeaderboard(): Promise<{rows:LeaderRow[];source:'supabase'|'demo';error?:string}> {
+export async function loadLeaderboard({live=false}:{live?:boolean}={}): Promise<{rows:LeaderRow[];source:'supabase'|'demo';error?:string}> {
+  if(!live){
+    const snapshot=await loadSnapshot()
+    if(snapshot)return {rows:snapshot,source:'supabase'}
+  }
   const controller=new AbortController()
   // 25 s: the full leaderboard is ~2.6 MB before compression; slow mobile links exceeded the former 12 s.
   const timeout=window.setTimeout(()=>controller.abort(),25_000)

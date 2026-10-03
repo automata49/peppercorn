@@ -10,11 +10,16 @@ import pandas as pd
 import requests
 from pykrx import stock as pykrx_stock
 from kr_classification import fetch_wics_classifications
+import universe_v2 as uv2
 
 TODAY=date.today().isoformat()
 NOW=datetime.now(timezone.utc).isoformat()
 TARGET_EQUITIES=int(os.environ.get("PEPPERCORN_TARGET_EQUITIES","1500"))
 OUTPUT=Path(os.environ.get("UNIVERSE_OUTPUT","universe_payload.json"))
+# "1": index constituents + NASDAQ market-cap fill to TARGET_EQUITIES (legacy). "2": UNIVERSE-2 investable screen.
+UNIVERSE_VERSION=os.environ.get("PEPPERCORN_UNIVERSE_VERSION","1")
+DECISIONS_OUTPUT=Path(os.environ.get("UNIVERSE_DECISIONS_OUTPUT","universe_decisions.json"))
+FUNCTIONS_URL=os.environ.get("FUNCTIONS_URL","https://mhbcchegrbakearqptdr.supabase.co/functions/v1")
 NASDAQ_SCREENER="https://api.nasdaq.com/api/screener/stocks"
 SOURCES={
     "S&P500":"Wikipedia S&P 500 constituent table via FinanceDataReader; benchmark owner: S&P DJI",
@@ -49,6 +54,15 @@ def is_common_equity(row):
     if not symbol or any(x in name for x in [" warrant","warrant "," unit"," rights","right to"," preferred"," depositary"," senior notes"," notes due "]):return False
     if symbol.endswith(("W","WS","U","R")) and len(symbol)>4:return False
     return True
+
+def fetch_screener(exchange):
+    """All rows the Nasdaq Stock Screener lists for one exchange (nasdaq, nyse or amex), unfiltered."""
+    params={"tableonly":"true","limit":"10000","exchange":exchange,"download":"true"}
+    headers={"User-Agent":"Mozilla/5.0 (Peppercorn Capital universe sync)","Accept":"application/json, text/plain, */*","Referer":"https://www.nasdaq.com/market-activity/stocks/screener"}
+    r=requests.get(NASDAQ_SCREENER,params=params,headers=headers,timeout=60);r.raise_for_status()
+    data=r.json().get("data") or {};rows=data.get("rows") or (data.get("table") or {}).get("rows") or []
+    if len(rows)<100:raise RuntimeError(f"Nasdaq screener returned only {len(rows)} rows for {exchange}")
+    return rows
 
 def fetch_nasdaq():
     params={"tableonly":"true","limit":"10000","exchange":"nasdaq","download":"true"}
@@ -294,7 +308,177 @@ def fetch_kr_index_with_fallback(code,minimum,tradingview_fn,proxy_fn):
 
 def records(df): return df.where(pd.notna(df),None).to_dict("records")
 
+# ---------------------------------------------------------------- UNIVERSE-2
+
+def _scale_to(value,target_lo,target_hi,multipliers):
+    """Pick the unit multiplier that puts a known reference value (Samsung Electronics) in its plausible range."""
+    for m in multipliers:
+        if value is not None and target_lo<=value*m<=target_hi:return m
+    return None
+
+def fetch_krx_market():
+    """KOSPI/KOSDAQ listing with close, market cap (KRW), one-session trading value (KRW) and department.
+
+    FinanceDataReader's KRX listing first; Naver's mobile market-value list as a fallback. Naver's units are not
+    documented, so they are calibrated against Samsung Electronics (005930) and the run fails if that is implausible.
+    """
+    try:
+        df=fdr.StockListing("KRX")
+        df=df[df["Market"].isin(["KOSPI","KOSDAQ","KOSDAQ GLOBAL"])].copy()
+        if len(df)<2000:raise RuntimeError(f"KRX listing returned {len(df)} rows")
+        out=[]
+        for r in records(df):
+            out.append({"code":norm_kr(r.get("Code")),"name":r.get("Name"),"board":"KOSDAQ" if str(r.get("Market","")).startswith("KOSDAQ") else "KOSPI",
+                        "dept":r.get("Dept"),"close":uv2.to_float(r.get("Close")),"market_cap":uv2.to_float(r.get("Marcap")),"traded_value":uv2.to_float(r.get("Amount"))})
+        return out,"FinanceDataReader KRX listing"
+    except Exception as exc:
+        print("KRX listing via FinanceDataReader unavailable:",exc)
+    rows=[]
+    for board in ("KOSPI","KOSDAQ"):
+        for page in range(1,60):
+            r=requests.get(f"https://m.stock.naver.com/api/stocks/marketValue/{board}",params={"page":page,"pageSize":100},
+                           headers={"User-Agent":"Mozilla/5.0 PeppercornCapital/1.0"},timeout=30)
+            r.raise_for_status();items=(r.json() or {}).get("stocks") or []
+            for x in items:
+                rows.append({"code":norm_kr(x.get("itemCode")),"name":x.get("stockName"),"board":board,"dept":None,
+                             "close":uv2.to_float(x.get("closePrice")),"market_cap":uv2.to_float(x.get("marketValue")),
+                             "traded_value":uv2.to_float(x.get("accumulatedTradingValue")),
+                             "stock_end_type":x.get("stockEndType")})
+            if len(items)<100:break
+    ref=next((x for x in rows if x["code"]=="005930"),None)
+    if not ref:raise RuntimeError("Naver market-value list has no 005930 reference")
+    cap_m=_scale_to(ref["market_cap"],1e14,3e15,(1,1e6,1e8))
+    tv_m=_scale_to(ref["traded_value"],5e10,2e13,(1,1e3,1e6))
+    if cap_m is None or tv_m is None:raise RuntimeError(f"cannot calibrate Naver units: {ref}")
+    for x in rows:
+        x["market_cap"]=x["market_cap"]*cap_m if x["market_cap"] is not None else None
+        x["traded_value"]=x["traded_value"]*tv_m if x["traded_value"] is not None else None
+        if x.get("stock_end_type") not in (None,"stock"):x["dept"]="non_stock:"+str(x.get("stock_end_type"))
+    if len(rows)<2000:raise RuntimeError(f"Naver market-value list returned only {len(rows)} rows")
+    return rows,f"Naver Finance market value (units x{cap_m:g} cap, x{tv_m:g} value, calibrated on 005930)"
+
+def fetch_current_universe():
+    """Active instruments and their own 20-session trading value, from the public leaderboard function."""
+    r=requests.get(FUNCTIONS_URL+"/leaderboard",params={"client":"peppercorn-public-read-v1"},timeout=90);r.raise_for_status()
+    return [x for x in r.json().get("rows") or [] if x.get("asset_class")=="Equity"]
+
+def build_v2(sp500,krx_desc,kospi200,kosdaq150):
+    current=fetch_current_universe()
+    existing={(x["market"],x["ticker"]) for x in current}
+    own_tv={(x["market"],x["ticker"]):uv2.to_float(x.get("traded_value_20d")) for x in current}
+    sp_rows={norm_us(pick(r,"Symbol","Ticker")):r for r in records(sp500)}
+    def liquidity(key,day_value):
+        tv=own_tv.get(key)
+        return (tv,"traded_value_20d") if tv is not None else (day_value,"listing_day" if day_value is not None else None)
+
+    candidates=[];screen={}
+    # Existing share-class tickers may be stored without the dot (BRKB); keep that spelling so history is not split.
+    undotted={t.replace(".",""):t for m,t in existing if m=="US"}
+    for exchange in ("nasdaq","nyse","amex"):
+        for r in fetch_screener(exchange):
+            t=norm_us(r.get("symbol"))
+            if t and ("US",t) not in existing and t.replace(".","") in undotted:t=undotted[t.replace(".","")]
+            if not t or ("US",t) in screen:continue
+            screen[("US",t)]=r
+            price=uv2.to_float(r.get("lastsale"));vol=uv2.to_float(r.get("volume"))
+            tv,src=liquidity(("US",t),price*vol if price is not None and vol is not None else None)
+            candidates.append(uv2.Candidate("US",t,str(r.get("name") or t).strip(),exchange.upper(),price,uv2.to_float(r.get("marketCap")),tv,src,
+                None,uv2.us_flags(t,str(r.get("name") or ""),r.get("industry")),str(r.get("sector") or "").strip() or None,str(r.get("industry") or "").strip() or None))
+    kr_rows,kr_source=fetch_krx_market()
+    listing={norm_kr(pick(r,"Code","Symbol")):r for r in records(krx_desc)} if len(krx_desc) else {}
+    today=pd.Timestamp(TODAY)
+    for r in kr_rows:
+        code=r["code"]
+        if not code:continue
+        ld=pd.to_datetime((listing.get(code) or {}).get("ListingDate"),errors="coerce")
+        days=None if pd.isna(ld) else int((today-ld).days)
+        tv,src=liquidity(("KR",code),r["traded_value"])
+        flags=uv2.kr_flags(code,str(r["name"] or ""),r.get("dept"))
+        if str(r.get("dept") or "").startswith("non_stock:"):flags.add("non_stock")
+        candidates.append(uv2.Candidate("KR",code,str(r["name"] or code),r["board"],r["close"],r["market_cap"],tv,src,days,flags))
+
+    decisions=uv2.select(candidates,existing)
+    selected=[d.candidate for d in decisions if d.included]
+    print(json.dumps({"version":uv2.VERSION,"kr_source":kr_source,"summary":uv2.summarize(decisions)},ensure_ascii=False))
+
+    us_missing=[c.ticker for c in selected if c.market=="US" and c.ticker not in sp_rows and (not c.sector or not c.industry)]
+    tv_us=fetch_tradingview_us_classifications(us_missing) if us_missing else {}
+    kr_codes=[c.ticker for c in selected if c.market=="KR"]
+    wics_kr,wics_as_of=fetch_wics_classifications(kr_codes)
+
+    instruments=[];memberships=[]
+    def member(c,group,source,status,rank):
+        memberships.append({"id":str(uuid.uuid5(uuid.NAMESPACE_URL,f"peppercorn:index:{c.market}:{c.ticker}:{group}")),"market":c.market,"ticker":c.ticker,
+            "entry_type":"INDEX","theme_group":group,"parent_etf_ticker":None,"holding_rank":rank,"weight":None,"as_of":TODAY,"source":source,
+            "validation_status":"AUTO_CURRENT","composition_status":status})
+    k200={norm_kr(x) for x in kospi200.get("Code",[])};k150={norm_kr(x) for x in kosdaq150.get("Code",[])}
+    for rank,c in enumerate(sorted(selected,key=lambda c:(c.market,-(c.market_cap or 0))),1):
+        if c.market=="US":
+            sp=sp_rows.get(c.ticker)
+            if sp is not None:
+                sector,industry=pick(sp,"Sector"),pick(sp,"Industry");scheme="GICS sector · sub-industry"
+                source="AUTO:Wikipedia S&P 500 table via FinanceDataReader; benchmark reference: S&P DJI"
+            elif c.sector and c.industry:
+                sector,industry=c.sector,c.industry;scheme="Nasdaq SIC mapped sector/industry";source="AUTO:Nasdaq Stock Screener / Quotemedia SIC mapping"
+            elif c.ticker in tv_us:
+                sector,industry=tv_us[c.ticker]["sector"],tv_us[c.ticker]["industry"];scheme="TradingView market sector · industry"
+                source="AUTO:TradingView America scanner fallback for missing Nasdaq classification"
+            else:
+                sector=industry=None;scheme="Unclassified";source="AUTO:Nasdaq Stock Screener; classification unavailable"
+            instruments.append({"market":"US","ticker":c.ticker,"name":c.name,"asset_class":"Equity","exchange":c.exchange,"sector":sector,"industry":industry,
+                "benchmark_ticker":"SPY","currency":"USD","active":True,"classification_scheme":scheme,"classification_source":source,
+                "classification_as_of":TODAY,"universe_updated_at":NOW})
+            if sp is not None:member(c,"S&P500",SOURCES["S&P500"],"REFERENCE_TABLE",None)
+        else:
+            industry,sector=wics_kr.get(c.ticker,(None,None))
+            instruments.append({"market":"KR","ticker":c.ticker,"name":c.name,"asset_class":"Equity","exchange":c.exchange,"sector":sector,"industry":industry,
+                "benchmark_ticker":"226490","currency":"KRW","active":True,
+                "classification_scheme":"WICS 대분류 · 중분류" if sector else "WICS 확인 필요",
+                "classification_source":"AUTO:WiseIndex WICS middle-group index constituents; FnGuide company WICS fallback" if sector else "AUTO:WiseIndex/FnGuide WICS classification unavailable",
+                "classification_as_of":f"{wics_as_of[:4]}-{wics_as_of[4:6]}-{wics_as_of[6:]}" if wics_as_of else TODAY,"universe_updated_at":NOW})
+            if c.ticker in k200:member(c,"KOSPI200",SOURCES["KOSPI200"],kospi200.attrs.get("composition_status","UNKNOWN"),None)
+            if c.ticker in k150:member(c,"KOSDAQ150",SOURCES["KOSDAQ150"],kosdaq150.attrs.get("composition_status","UNKNOWN"),None)
+        member(c,"UNIVERSE-2 "+c.market,f"{uv2.VERSION} investable screen ({'Nasdaq Stock Screener' if c.market=='US' else kr_source})","SCREENED",rank)
+
+    DECISIONS_OUTPUT.write_text(json.dumps({"version":uv2.VERSION,"generated_at":NOW,"kr_source":kr_source,"thresholds":uv2.THRESHOLDS,"buffer":uv2.BUFFER,
+        "decisions":[{"market":d.candidate.market,"ticker":d.candidate.ticker,"name":d.candidate.name,"exchange":d.candidate.exchange,
+                      "price":d.candidate.price,"market_cap":d.candidate.market_cap,"traded_value":d.candidate.traded_value,
+                      "traded_value_source":d.candidate.traded_value_source,"existing":(d.candidate.market,d.candidate.ticker) in existing,
+                      "included":d.included,"reason":d.reason} for d in decisions]},ensure_ascii=False),encoding="utf-8")
+    return instruments,memberships
+
+
+def fetch_kr_indexes(krx):
+    kospi200=fetch_kr_index_with_fallback(
+        "1028",190,
+        lambda:fetch_tradingview_index("SYML:KRX;KOSPI200",200,krx,"KOSPI","KOSPI200"),
+        lambda:fetch_etf_holdings_proxy("069500",200,krx,"KOSPI","KOSPI200"),
+    )
+    kosdaq150=fetch_kr_index_with_fallback(
+        "2203",145,
+        lambda:fetch_tradingview_index("SYML:KRX;KOSDAQ150",150,krx,"KOSDAQ","KOSDAQ150"),
+        lambda:fetch_etf_holdings_proxy("229200",150,krx,"KOSDAQ","KOSDAQ150"),
+    )
+    return kospi200,kosdaq150
+
+def main_v2():
+    sp500=fetch_sp500()
+    # The KRX-DESC cache (listing dates) and the KR index constituents are display/secondary inputs in UNIVERSE-2:
+    # without them the one-month listing rule and the KOSPI200/KOSDAQ150 labels are skipped, not the screen.
+    try:krx=fetch_krx_listing()
+    except Exception as exc:
+        print("::warning::KRX-DESC listing unavailable; listing-date rule skipped:",exc);krx=pd.DataFrame({"Code":[],"ListingDate":[]})
+    try:kospi200,kosdaq150=fetch_kr_indexes(krx)
+    except Exception as exc:
+        print("::warning::KR index constituents unavailable; KOSPI200/KOSDAQ150 labels skipped:",exc)
+        kospi200,kosdaq150=pd.DataFrame({"Code":[]}),pd.DataFrame({"Code":[]})
+    instruments,memberships=build_v2(sp500,krx,kospi200,kosdaq150)
+    payload={"generated_at":NOW,"universe_version":uv2.VERSION,"instruments":instruments,"memberships":memberships}
+    OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
+    print(json.dumps({"output":str(OUTPUT),"instruments":len(instruments),"memberships":len(memberships)},ensure_ascii=False))
+
 def main():
+    if UNIVERSE_VERSION=="2":return main_v2()
     sp500=fetch_sp500();nasdaq=fetch_nasdaq();krx=fetch_krx_listing()
     missing_nasdaq=[
         norm_us(r.get("symbol")) for r in nasdaq[:1800]

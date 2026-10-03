@@ -1,0 +1,48 @@
+name: Universe report (UNIVERSE-2 simulation)
+
+# Read-only. Builds the UNIVERSE-2 screen (no import), prices both populations from Yahoo and reports how many stocks
+# enter/leave and how RS ranks and 핵심 주도 / 주도 후보 / 강세 전환 counts would change. Writes nothing to Supabase.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r analysis/requirements.txt
+      - name: Screen (UNIVERSE-2, no import)
+        run: python analysis/sync_universe.py
+        env:
+          PEPPERCORN_UNIVERSE_VERSION: '2'
+          UNIVERSE_OUTPUT: universe_payload.json
+          UNIVERSE_DECISIONS_OUTPUT: universe_decisions.json
+      - name: Validate the screened payload
+        continue-on-error: true
+        run: python analysis/validate_universe.py
+        env:
+          UNIVERSE_OUTPUT: universe_payload.json
+      - name: Simulate RS ranks and leadership classes
+        run: python analysis/universe_report.py && cat universe_report.md >> "$GITHUB_STEP_SUMMARY"
+        env:
+          UNIVERSE_DECISIONS_OUTPUT: universe_decisions.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: universe-report
+          path: |
+            universe_decisions.json
+            universe_payload.json
+            universe_report.md
+            universe_report.json
+          if-no-files-found: ignore

@@ -25,8 +25,8 @@ Deno.serve(async(req:Request)=>{
   let body:any;try{body=await req.json()}catch{return Response.json({error:"invalid_json"},{status:400})}
   const instruments=Array.isArray(body?.instruments)?body.instruments:[];
   const memberships=Array.isArray(body?.memberships)?body.memberships:[];
-  if(instruments.length<1400||instruments.length>1600)return Response.json({error:"invalid_instrument_count",count:instruments.length},{status:400});
-  if(memberships.length<1400||memberships.length>3000)return Response.json({error:"invalid_membership_count",count:memberships.length},{status:400});
+  if(instruments.length<1400||instruments.length>5000)return Response.json({error:"invalid_instrument_count",count:instruments.length},{status:400});
+  if(memberships.length<1400||memberships.length>12000)return Response.json({error:"invalid_membership_count",count:memberships.length},{status:400});
 
   const idMap=new Map<string,string>();
   for(const batch of chunks(instruments)){

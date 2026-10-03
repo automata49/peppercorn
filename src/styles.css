@@ -1244,3 +1244,78 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
 .topbar-refresh:disabled{opacity:.6;cursor:default}
 @media(max-width:1279px){.topbar .topbar-refresh{order:3;margin-left:auto}.topbar .topbar-menu{order:4;margin-left:0}}
 @media(min-width:1280px){.topbar-refresh{order:5;margin-left:8px}}
+
+/* ANALYSIS-SEARCH-1, CHECKUP-1, vertical analysis sheet and compare view (종목 분석) */
+.stock-search{position:sticky;top:-1px;z-index:2;background:var(--card);padding:4px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.stock-search input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px;background:#fff;font-size:14px}
+.stock-search input:focus{outline:2px solid var(--blue-bg);border-color:var(--blue)}
+.stock-search-results{list-style:none;margin:6px 0 0;padding:4px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 8px 22px rgba(30,45,70,.10);max-height:320px;overflow:auto}
+.stock-search-results li{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 9px;border-radius:8px;cursor:pointer}
+.stock-search-results li b{font-size:14px;color:var(--ink);word-break:keep-all}
+.stock-search-results li span{font-size:12px;color:var(--muted);justify-self:end}
+.stock-search-results li em{grid-column:1/-1;font-style:normal;font-size:12px;color:var(--muted)}
+.stock-search-results li[aria-selected="true"]{background:var(--navy-soft)}
+.stock-search-results li.empty{display:block;cursor:default;color:var(--muted);font-size:13px;word-break:keep-all}
+.recent-stocks{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.recent-stocks span{font-size:12px;color:var(--muted)}
+.recent-stocks button{border:1px solid var(--line);background:var(--gray-bg);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer}
+.stock-title-actions{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.compare-toggle,.secondary-action{border:1px solid var(--navy);background:#fff;color:var(--navy);border-radius:9px;padding:6px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.compare-toggle[aria-pressed="true"]{background:var(--navy-soft)}
+.compare-toggle:disabled{opacity:.5;cursor:not-allowed}
+.secondary-action{margin-top:12px}
+.mark-dot{display:inline-block;width:10px;height:10px;border-radius:50%;flex:0 0 auto;border:2px solid transparent}
+.mark-pass{background:var(--green)}.mark-neutral{background:#d4a017}.mark-fail{background:var(--red)}.mark-unknown{background:#fff;border-color:#b8c1cc}
+.checkup{margin:16px 0 6px}
+.checkup-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.checkup-card{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fbfcfe;min-width:0}
+.checkup-card header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.checkup-card h3{font-size:15px;color:var(--ink)}
+.checkup-card header span{font-size:12px;color:var(--muted)}
+.checkup-count{font-size:13px;color:var(--muted);margin:6px 0 8px;word-break:keep-all}
+.checkup-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.checkup-list li{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:13px}
+.checkup-list li span{color:#3b4757;word-break:keep-all}
+.checkup-list li b{font-variant-numeric:tabular-nums;text-align:right}
+.checkup-note{font-size:12px;color:var(--muted);margin-top:10px;word-break:keep-all;line-height:1.5}
+.checkup-quadrant{display:flex;align-items:center;gap:14px;margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--gray-bg)}
+.quad-map{display:grid;grid-template-columns:auto 56px 56px;grid-auto-rows:auto;gap:3px;flex:0 0 auto;align-items:center}
+.quad-axis{font-size:11px;color:var(--muted);text-align:center;white-space:nowrap}
+.quad-row{text-align:right;padding-right:4px}
+.quad-cell{height:30px;border-radius:6px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.quad-cell.on{background:var(--navy)}
+.checkup-quadrant p{display:grid;gap:3px;min-width:0}
+.checkup-quadrant p b{font-size:14px;color:var(--ink);word-break:keep-all}
+.checkup-quadrant p span{font-size:12px;color:var(--muted);word-break:keep-all}
+.analysis-sheet{margin-top:10px}
+.analysis-sheet.empty-sheet{padding:14px;border:1px dashed var(--line);border-radius:12px;color:var(--muted)}
+.sheet-meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.sheet-meta b{color:var(--navy)}
+.sheet-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+.sheet-table th,.sheet-table td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:middle}
+.sheet-table thead th{font-size:12px;color:var(--muted);font-weight:600}
+.sheet-table thead th:nth-child(1){width:34%}.sheet-table thead th:nth-child(2){width:30%}.sheet-table thead th:nth-child(4){width:46px}
+.sheet-table tbody th{font-weight:600;color:#3b4757;word-break:keep-all}
+.sheet-table tbody th small{display:block;font-weight:400;color:var(--muted);font-size:11px}
+.sheet-table td.cell-num{text-align:right;font-variant-numeric:tabular-nums}
+.sheet-table input,.sheet-table select,.sheet-table textarea{width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 7px;background:#fff;font:inherit;min-width:0}
+.sheet-table textarea{resize:vertical;line-height:1.4}
+.sheet-input{display:flex;align-items:center;gap:4px}.sheet-input input{text-align:right}.sheet-input i{font-style:normal;color:var(--muted)}
+.sheet-note{font-size:12px;color:var(--muted);margin-top:8px;word-break:keep-all}
+.compare-head small{font-size:12px;color:var(--muted);font-weight:500}
+.compare-view{margin-bottom:8px}
+.compare-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.compare-view table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.compare-view th,.compare-view td{padding:7px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.compare-view thead th{vertical-align:top;background:#fbfcfe}
+.compare-view tbody th,.compare-view thead th:first-child{position:sticky;left:0;background:#fff;z-index:1;font-weight:600;color:#3b4757}
+.compare-view td{font-variant-numeric:tabular-nums}
+.compare-view td span{margin-left:6px}
+.compare-name{border:0;background:none;padding:0;font-weight:700;color:var(--navy);cursor:pointer;font-size:13px}
+.compare-view thead small{display:block;color:var(--muted);font-weight:400}
+.compare-remove{border:0;background:none;color:var(--muted);cursor:pointer;font-size:15px;padding:0 0 0 4px}
+@media (max-width:640px){
+  .checkup-cards{grid-template-columns:1fr}
+  .sheet-table thead th:nth-child(1){width:38%}.sheet-table thead th:nth-child(2){width:26%}
+  .sheet-table{font-size:12px}
+}

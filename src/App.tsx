@@ -10,6 +10,8 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
+import { pushRecent, readRecent, type RecentStock } from './lib/search'
+import { AnalysisSheet, CheckupSummary, CompareView, StockSearch } from './components/AnalysisWorkbench'
 import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
@@ -695,6 +697,10 @@ export default function App(){
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
+  const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
+  // Compare tray (<=4 stocks), remembered per device as a convenience.
+  const [compareKeys,setCompareKeys]=useState<string[]>(()=>{try{const v=JSON.parse(localStorage.getItem('peppercorn-compare-v1')||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string').slice(0,4):[]}catch{return []}})
+  useEffect(()=>{try{localStorage.setItem('peppercorn-compare-v1',JSON.stringify(compareKeys))}catch{/* storage unavailable */}},[compareKeys])
   const [drillSectorKey,setDrillSectorKey]=useState<string|null>(null)
   const [drillStock,setDrillStock]=useState<LeaderRow|null>(null)
   const [analysisDeleteTarget,setAnalysisDeleteTarget]=useState<EditableRow|null>(null)
@@ -724,11 +730,12 @@ export default function App(){
   const updateSession=(next:Session|null)=>{setSessionState(next);storeSession(next);setSyncState(next?'saved':'local')}
   const sectorTableStyle={'--sector-name-width':`${sectorNameWidth}px`} as CSSProperties
 
-  const refreshLeaderboard=async()=>{
+  // live=true skips the published snapshot (user-initiated refresh); scheduled reloads read the snapshot first.
+  const refreshLeaderboard=async(live=false)=>{
     if(refreshingRef.current)return
     refreshingRef.current=true;setRefreshing(true)
     try{
-      const [result,positionResult]=await Promise.all([loadLeaderboard(),loadPosition()])
+      const [result,positionResult]=await Promise.all([loadLeaderboard({live}),loadPosition()])
       // Keep the last good Position rows through a transient failure, as with the leaderboard.
       setPosition(previous=>positionResult.status==='live'||!previous.rows.size?{...positionResult,loading:false}:{...previous,loading:false})
       lastLoadRef.current=Date.now()
@@ -990,11 +997,15 @@ export default function App(){
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ticker · 종목 · 산업 · 섹터 검색"/>
   </div>
 
-  const recordAnalysis=(row:LeaderRow,navigate=false)=>{
+  const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true)=>{
     setSelected(row)
     updateAnalysis([{id:crypto.randomUUID(),date:new Date().toISOString().slice(0,10),market:row.market,ticker:row.ticker,name:row.name},...analysis])
     if(navigate){setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null);setPage('analysis')}
-    setScrollToAnalysis(true)
+    if(scroll)setScrollToAnalysis(true)
+  }
+  const updateAnalysisField=(record:EditableRow,field:string,value:string|number|boolean|null)=>{
+    const index=Math.max(0,Number(record.no||1)-1)
+    updateAnalysis(analysis.map((r,i)=>(record.id?r.id===record.id:i===index)?{...r,[field]:value}:r))
   }
   const addTickerRecord=(resource:WorkspaceResource,input:string):string|null=>{
     const raw=input.trim().toUpperCase()
@@ -1112,21 +1123,34 @@ export default function App(){
     content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><LiveGridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
     const scoped=visible.filter(r=>analysisScope==='all'||(analysisScope==='leaders'?LEADING_CLASSES.has(leadership(r)):position.rows.has(positionKey(r.market,r.ticker))))
+    const pickStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
+    const positionOf=(r:LeaderRow)=>position.rows.get(positionKey(r.market,r.ticker))
+    const keyOf=(r:LeaderRow)=>r.market+'|'+r.ticker
+    const record=selected?(enrichedAnalysis as EditableRow[]).find(r=>r.market===selected.market&&r.ticker===selected.ticker):undefined
+    const compareRows=compareKeys.map(k=>leaders.find(r=>keyOf(r)===k)).filter((r):r is LeaderRow=>!!r)
+    const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>RS가 강한 순 · P는 Position 데이터 있음</p></div></div>
+      <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
       <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['leaders','주도 종목'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
-      {scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>setSelected(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
-      <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill></div></div>
+      {scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
+      <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div className="stock-title-actions"><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill>
+          <button type="button" className="compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4}
+            onClick={()=>setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}>{inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'}</button></div></div>
+        <CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/>
+        {compareRows.length>0&&<><h3 className="analysis-part compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
+          <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></>}
         <h3 className="analysis-part">Swing · 모멘텀</h3>
-        <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
+        <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
         <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
         <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div>
         <h3 className="analysis-part">Position · 펀더멘털</h3>
         <PositionPanel row={selected} position={position.rows.get(positionKey(selected.market,selected.ticker))} status={position.loading?'loading':position.status}/>
         <h3 className="analysis-part">내 분석</h3>
         <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. Swing과 Position은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</p>
-        <button className="primary-action" onClick={addSelectedAnalysis}>이 종목 분석행 추가</button>
+        <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
+        {record&&<button className="secondary-action" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
       </>:<p>종목을 선택하세요.</p>}</div></div>
-      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
+      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록 · 목록 보기</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
   }else if(page==='research'){
     content=<><div className="page-note"><b>Research Notes</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·단계·RS가 연결됩니다. 팩트 → 해석 → 영향 → 다음 확인 순서로 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
   }else if(page==='journal'){
@@ -1209,7 +1233,7 @@ export default function App(){
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{stageLabel(drillStock.stage)}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
-        <StockSnapshot row={drillStock} peers={leaders} onRefresh={()=>void refreshLeaderboard()} refreshing={refreshing}/>
+        <StockSnapshot row={drillStock} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
         <div className="drill-guide drill-animate"><span>액션 가이드</span><strong>{drillStock.action_guide}</strong></div>
         <div className="drill-checks drill-animate"><span>Trend Template</span><b>{drillStock.leader_tt?'PASS':'CHECK'}</b><span>추세</span><b>{drillStock.price&&drillStock.ma50&&drillStock.ma200&&drillStock.price>drillStock.ma50&&drillStock.ma50>drillStock.ma200?'Price > MA50 > MA200':'확인 필요'}</b></div>
         <button className="primary-action" onClick={()=>recordAnalysis(drillStock,true)}>종목분석 기록 작성 →</button>
@@ -1234,5 +1258,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard()}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?'…':'↻'}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard()}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard()} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className="shell"><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen}/><main><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}>☰</button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?'…':'↻'}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>setAuthOpen(false)} onAuthenticated={updateSession}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><img className="launch-emblem" src="./folio-icon.webp" alt=""/><img className="launch-wordmark" src="./folio-wordmark.webp" alt="Folio"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
 }
