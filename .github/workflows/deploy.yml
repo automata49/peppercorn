@@ -48,6 +48,8 @@ jobs:
         run: npm run test:etf-rs
       - if: github.event_name != 'workflow_run'
         run: npm run test:universe-db
+      - if: github.event_name != 'workflow_run'
+        run: npm run test:temperature-db
       - run: npm run build
       - if: github.event_name != 'workflow_run'
         run: npx playwright install --with-deps chromium

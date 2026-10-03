@@ -19,6 +19,7 @@ Deno.serve(async(req:Request)=>{
       if(resource==="portfolio")return json({rows:await rest("portfolio_view?user_id=eq."+uid+"&select=*&order=updated_at.desc")},200,headers);
       if(resource==="research")return json({rows:await rest("research_notes?user_id=eq."+uid+"&select=*&order=written_at.desc,created_at.desc")},200,headers);
       if(resource==="analysis")return json({rows:await rest("stock_analysis_view?user_id=eq."+uid+"&select=*&order=analysis_date.desc,created_at.desc")},200,headers);
+      if(resource==="temperature")return json({rows:await rest("market_temperature_entries?user_id=eq."+uid+"&select=recorded_on,checklist_version,marks,evidence,note&order=recorded_on.desc")},200,headers);
       if(resource==="journal")return json({rows:await rest("trade_journal_view?user_id=eq."+uid+"&select=*&order=trade_date.desc,created_at.desc")},200,headers);
       return json({error:"unknown_resource"},400,headers);
     }catch(e){return json({error:"read_failed",detail:String(e)},502,headers)}
@@ -26,6 +27,17 @@ Deno.serve(async(req:Request)=>{
 
   if(req.method==="POST"){
     let body:any;try{body=await req.json()}catch{return json({error:"invalid_json"},400,headers)}const rows=Array.isArray(body?.rows)?body.rows:[];
+    // TEMP-1: the user's own market temperature entries; no instrument lookup.
+    if(resource==="temperature"){
+      try{
+        const ok=(r:any)=>r&&/^\d{4}-\d{2}-\d{2}$/.test(String(r.date||""))&&r.marks&&typeof r.marks==="object"&&!Array.isArray(r.marks);
+        const clean=(o:any,keep:(v:any)=>boolean)=>Object.fromEntries(Object.entries(o||{}).filter(([k,v])=>/^[a-z_]{1,40}$/.test(k)&&keep(v)));
+        const byDate=new Map<string,any>();for(const r of rows.filter(ok))byDate.set(String(r.date),r);
+        const payload=[...byDate.values()].map((r:any)=>({user_id:uid,recorded_on:r.date,checklist_version:String(r.version||"marks-temperature-1").slice(0,40),marks:clean(r.marks,v=>Number.isInteger(v)&&v>=0&&v<=4),evidence:clean(r.evidence,v=>typeof v==="string"&&v.trim()!==""),note:r.note?String(r.note).slice(0,2000):null}));
+        await rest("market_temperature_entries?user_id=eq."+uid,{method:"DELETE"});
+        if(payload.length)await rest("market_temperature_entries",{method:"POST",headers:{Prefer:"return=minimal"},body:JSON.stringify(payload)});return json({ok:true,count:payload.length},200,headers);
+      }catch(e){return json({error:"write_failed",detail:String(e)},502,headers)}
+    }
     try{
       // Every instrument, paged: PostgREST caps a response at 1,000 rows, and an inactive instrument must still resolve,
       // otherwise the delete-then-insert below would silently drop the user's rows for it.

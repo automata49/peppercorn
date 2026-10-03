@@ -5,7 +5,7 @@ export type Session = {
   user: { id: string; email?: string }
 }
 
-export type WorkspaceResource = 'watchlist' | 'portfolio' | 'research' | 'analysis' | 'journal'
+export type WorkspaceResource = 'watchlist' | 'portfolio' | 'research' | 'analysis' | 'journal' | 'temperature'
 
 const BASE = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1'
 const STORAGE_KEY = 'peppercorn-session'
@@ -29,6 +29,7 @@ function normalize(resource:WorkspaceResource,rows:any[]):any[]{
   if(resource==='research')return rows.map(r=>({...r,date:r.written_at,type:r.note_type,verification:r.verification||(r.verified===true?'확인됨':r.verified===false?'반박됨':'미검증')}))
   if(resource==='analysis')return rows.map(r=>({...r,date:r.analysis_date}))
   if(resource==='journal')return rows.map(r=>({...r,date:r.trade_date}))
+  if(resource==='temperature')return rows.map(r=>({date:r.recorded_on,marks:r.marks||{},evidence:r.evidence||{},note:r.note||undefined,version:r.checklist_version}))
   return rows
 }
 

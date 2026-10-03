@@ -21,6 +21,8 @@ import { invalidatePriceHistory, usePriceHistory, rebased } from './lib/priceHis
 import { BENCHMARK, PRICE_RS_VERSION, priceRs, type PriceRsData } from './lib/benchmarkChart'
 import { RS_CHART_PERIODS, RS_CHART_VERSION, medianOf, peerSeries, periodValue, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
+import { MarketTemperature, TemperatureCard } from './components/MarketTemperature'
+import type { TempEntry } from './lib/temperature'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market, PositionRow } from './types'
 
@@ -763,6 +765,9 @@ export default function App(){
   const [research,setResearch]=useLocalRows<EditableRow>('peppercorn-research',initialResearch)
   const [analysis,setAnalysis]=useLocalRows<EditableRow>('peppercorn-analysis',initialAnalysis)
   const [journal,setJournal]=useLocalRows<EditableRow>('peppercorn-journal',initialJournal)
+  const [tempEntries,setTempEntries]=useLocalRows<TempEntry>('peppercorn-temperature',[])
+  // TEMP-1: cloud sync only after the cloud entries loaded, so a failed read never overwrites them with this device's copy.
+  const tempCloudRef=useRef(false)
   const [session,setSessionState]=useState<Session|null>(()=>loadStoredSession())
   const [authOpen,setAuthOpen]=useState(false)
   const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
@@ -897,6 +902,9 @@ export default function App(){
       if(w.session.access_token!==session.access_token) updateSession(w.session)
       setSyncState('saved')
     }).catch(()=>{if(!cancelled)setSyncState('error')})
+    tempCloudRef.current=false
+    // Loaded on its own so a workspace function or database without TEMP-1 leaves the other lists working.
+    loadWorkspace(session,'temperature').then(t=>{if(cancelled)return;tempCloudRef.current=true;setTempEntries(t.rows as TempEntry[])}).catch(()=>{})
     return()=>{cancelled=true}
   },[session?.user?.id])
 
@@ -914,6 +922,7 @@ export default function App(){
   const updateResearch=(rows:EditableRow[])=>{setResearch(rows);void syncRows('research',rows)}
   const updateAnalysis=(rows:EditableRow[])=>{setAnalysis(rows);void syncRows('analysis',rows)}
   const updateJournal=(rows:EditableRow[])=>{setJournal(rows);void syncRows('journal',rows)}
+  const updateTemperature=(rows:TempEntry[])=>{setTempEntries(rows);if(!session||tempCloudRef.current)void syncRows('temperature',rows as unknown as EditableRow[]);else setSyncState('error')}
 
   const marketRows=useMemo(()=>leaders.filter(r=>market==='ALL'||r.market===market),[leaders,market])
   const visible=useMemo(()=>{
@@ -1111,6 +1120,8 @@ export default function App(){
         </div>}
       </section>
 
+      <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
+
       <section className="sector-strip panel compact-panel dashboard-sector-filter">
         <div className="panel-head"><div><h2>섹터 필터</h2><p>시장과 섹터를 선택해 주도 종목을 좁혀보세요.</p></div></div>
         <div className="chips"><button className={!sector?'chip on':'chip'} onClick={()=>{setSector(null);setSectorKeySelected(null);setDrillSectorKey(null)}}>전체 섹터</button>{sectorOptions.map(g=><button key={g.key} className={sector===g.key?'chip on':'chip'} onClick={()=>{setSector(sector===g.key?null:g.key);setSectorKeySelected(null);setDrillSectorKey(null)}}>{sectorLabel(g)}</button>)}</div>
@@ -1227,8 +1238,10 @@ export default function App(){
       </div>:<p className="empty">종목을 검색하거나 목록에서 고르세요.</p>}
       </div>
       <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록 · 목록 보기</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
-  }else if(page==='research'){
-    content=<><div className="page-note"><b>Research Notes</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·단계·RS가 연결됩니다. 팩트 → 해석 → 영향 → 다음 확인 순서로 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
+  }else if(page==='temperature'){
+    const tempFacts=[{label:'MA200 위 비율'+(market==='ALL'?'':' · '+market),value:ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'},{label:'52W 고점 근접',value:high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'},{label:'상승/하락 (1W)',value:advanceCount+declineCount?(advanceDeclineRatio||0).toFixed(1)+' : 1':'—'}]
+    content=<><MarketTemperature entries={tempEntries} onChange={updateTemperature} facts={tempFacts}/>
+      <details className="panel legacy-research"><summary>이전 Research 기록 ({research.length})</summary><p className="note">시장 온도계 이전의 Research 기록입니다. 지우지 않고 그대로 보관합니다.</p><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={520}/></details></>
   }else if(page==='journal'){
     content=<><div className="page-note"><b>Trading Journal</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·RS가 연결됩니다. 매수 가설과 결과 복기를 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
   }else if(page==='universe'){
@@ -1239,10 +1252,10 @@ export default function App(){
       <span>S&P500·KOSPI200·KOSDAQ150 같은 지수 편입은 참고 정보로만 표시합니다. 분류는 미국 GICS(S&P500)·Nasdaq SIC, 한국 WICS를 씁니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
   }else{
     content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="setting"><span>52W 계산</span><b>52W 고점: 최근 최대 252개 거래 세션의 최고가(이력 부족 시 확보된 기간) · RS/등락 52W: 252거래일 전 종가 대비</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 주식 가격 이력 253거래일 미만은 공란입니다. ETF는 주식 순위와 섞지 않고 같은 시장 ETF끼리 따로 RS순위·IBD식 RS를 산정하며, 같은 Trend Template·단계·최종 판단·액션 가이드 규칙을 적용합니다(주도 분류는 주식 전용). 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
-      <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / Research / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
+      <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
-  const pageTitle:Record<string,string>={dashboard:'Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',research:'Research Notes',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={dashboard:'Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{

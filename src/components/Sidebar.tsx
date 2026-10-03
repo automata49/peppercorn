@@ -3,7 +3,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 const pages=[
   ['dashboard','◫','Dashboard'],
   ['analysis','▦','종목 분석'],
-  ['research','⌕','Research'],
+  ['temperature','◐','시장 온도계'],
   ['watchlist','◎','Watchlist'],
   ['portfolio','◆','Portfolio'],
   ['journal','✎','Journal'],

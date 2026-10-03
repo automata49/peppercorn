@@ -53,7 +53,7 @@ export function AuthModal({
       {mode==='signup'&&<label>Setup Code<input value={setupCode} onChange={e=>setSetupCode(e.target.value.toUpperCase())} placeholder="PC-XXXX-XXXX-XXXX" /></label>}
       {error&&<div className="auth-error">{error}</div>}
       <button className="auth-submit" disabled={busy||!email||password.length<8} onClick={submit}>{busy?'처리 중…':mode==='login'?'로그인':'계정 생성'}</button>
-      <DialogDescription className="auth-description">로그인하면 Watchlist · Portfolio · Research · 종목 분석 · Journal이 Supabase에 저장됩니다.</DialogDescription>
+      <DialogDescription className="auth-description">로그인하면 Watchlist · Portfolio · 시장 온도계 · 종목 분석 · Journal이 Supabase에 저장됩니다.</DialogDescription>
     </DialogContent>
   </Dialog>
 }
