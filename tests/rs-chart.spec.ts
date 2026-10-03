@@ -5,7 +5,7 @@ import type {LeaderRow} from '../src/types'
 
 const base={asset_class:'Equity',exchange:'NASDAQ',index_memberships:['S&P 500'],price:100,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}
 // RS 20D rises with i; RS 5D falls with i, so switching the period reverses the order. TEST9 has no RS 20D.
-const rows=Array.from({length:10},(_,i)=>({...base,id:String(i),ticker:'TEST'+i,market:'US',name:'검증 종목 '+i,sector:i<5?'Technology':'Health Technology',industry:i<5?'Semiconductors':'Biotechnology',rs_rank:99-i,leadership_class:i<4?'핵심 주도':i<8?'주도 후보':'중립',rs_5d:(5-i)/100,rs_20d:i===9?null:(i-3)/100,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06}))
+const rows=Array.from({length:10},(_,i)=>({...base,id:String(i),ticker:'TEST'+i,market:'US',name:'검증 종목 '+i,sector:i<5?'Information Technology':'Health Technology',industry:i<5?'Semiconductors':'Biotechnology',rs_rank:99-i,leadership_class:i<4?'핵심 주도':i<8?'주도 후보':'중립',rs_5d:(5-i)/100,rs_20d:i===9?null:(i-3)/100,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06}))
 const etfs=Array.from({length:3},(_,i)=>({...base,id:'etf-'+i,ticker:'ETF'+i,market:'US',name:'검증 ETF '+i,asset_class:'ETF',sector:'Information Technology',industry:'Semiconductors',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립',rs_1m:i/100,rs_3m:i/100,rs_5d:-i/100,rs_20d:i/100,rs_50d:null,rs_120d:null,rs_200d:null,rs_12m:null}))
 
 test('RS-CHART-2 helpers build period series, medians and a zero-inclusive axis',()=>{
@@ -17,7 +17,7 @@ test('RS-CHART-2 helpers build period series, medians and a zero-inclusive axis'
   expect(top.items.map(x=>x.row.ticker)).toEqual(['TEST8','TEST7','TEST6'])
   expect(top.missing).toBe(1)
   const g=groupSeries(r,x=>String(x.sector))
-  expect(g.get('Technology')!.values[1]).toBeCloseTo(-.01)
+  expect(g.get('Information Technology')!.values[1]).toBeCloseTo(-.01)
   expect(g.get('Health Technology')!.values[1]).toBeCloseTo(.035)
   const cmp=peerSeries(r[0],[...r,...(etfs as unknown as LeaderRow[])],'rs')
   expect(cmp.map(s=>s.key)).toEqual(['self','industry','sector','market'])
@@ -86,7 +86,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
 
   // Sector tile → sector popup (momentum lines on top) → stock detail (own daily line in 03 가격 모멘텀).
   await expect(sectorChart.locator('.etf-heat-market-head b')).toHaveText(['US'])
-  await sectorChart.getByRole('listitem',{name:/^Technology ·/}).click()
+  await sectorChart.getByRole('listitem',{name:/^Information Technology ·/}).click()
   const drill=page.locator('.drill-sheet')
   await expect(drill.locator('.drill-tabs')).toBeVisible()
   await expect(drill.locator('.rs-chart svg .line-axis-title')).toHaveText('지수 (시작=100)')
@@ -202,7 +202,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(sectorPanel.locator('.etf-heat-market-head span').nth(1)).toContainText('20일 평균 거래대금 합계')
   await expect(sectorPanel.locator('.etf-heat-market-head span').nth(0)).toContainText('종목 수 기준')
   const area=async(re:RegExp)=>{const b=(await sectorPanel.getByRole('listitem',{name:re}).boundingBox())!;return (b.width+2)*(b.height+2)}
-  const ratio=await area(/^Health Technology ·/)/await area(/^Technology ·/)
+  const ratio=await area(/^Health Technology ·/)/await area(/^Information Technology ·/)
   expect(ratio).toBeGreaterThan(2.6);expect(ratio).toBeLessThan(3.4)
   await sectorPanel.locator('.section-market').getByRole('button',{name:'KR'}).click()
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR'])

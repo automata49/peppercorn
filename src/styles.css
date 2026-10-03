@@ -1447,3 +1447,12 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .auth-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid #d5dde6;color:#25364b;font-weight:700;border-radius:9px;padding:11px;cursor:pointer;margin-bottom:12px}
 .auth-google:hover{background:#f6f8fb}.auth-google:disabled{opacity:.5;cursor:default}
 .auth-or{display:flex;align-items:center;gap:10px;color:#8a95a4;font-size:11px;margin:2px 0 12px}.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:#e3e8ef}
+/* STOCK-FLAGS-1 badges, GROUP-RANK-1 label */
+.stock-flags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.stock-flag{display:inline-block;border-radius:5px;padding:1px 5px;font-size:10px;font-weight:700;line-height:1.5;white-space:nowrap;background:var(--amber-bg);color:var(--amber)}
+.stock-flag.no_revenue,.stock-flag.loss{background:var(--red-bg);color:var(--red)}
+.stock-flag.jump{background:var(--violet-bg);color:var(--violet)}
+.hero-chips .stock-flags,.stock-snapshot>.stock-flags{display:inline-flex;margin-top:0;align-items:center}
+.stock-snapshot .stock-flags{margin:4px 0 0}
+.hero-chips .stock-flag{font-size:11px;padding:3px 8px;border-radius:999px}
+.group-rank{white-space:nowrap}

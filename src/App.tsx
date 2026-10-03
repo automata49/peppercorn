@@ -15,6 +15,8 @@ import { AnalysisSheet, CheckupSummary, CompareView, StockSearch } from './compo
 import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
+import { GROUP_MIN_MEMBERS, normalizeUsSectors, withGroupRanks } from './lib/groupRank'
+import { flagBadges, flagKey, useStockFlags } from './lib/stockFlags'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
 import { invalidatePriceHistory, usePriceHistory, rebased } from './lib/priceHistory'
@@ -163,6 +165,7 @@ const leaderCols:ColDef<LeaderRow>[]=[
   {field:'price',headerName:'현재가',valueFormatter:p=>num(p.value)},
   {field:'ibd_rs_estimate',headerName:'IBD식 RS',width:128,flex:0,headerTooltip:'IBD 공식 점수가 아닌 KR/US 시장별 253거래일 가격 기반 추정치',valueFormatter:p=>p.value??'—'},
   {field:'rs_rank',headerName:'RS순위',cellClassRules:{'rank-high':p=>Number(p.value)>=70,'rank-top':p=>Number(p.value)>=90}},
+  {field:'group_rank',headerName:'업종 순위',width:112,flex:0,headerTooltip:'같은 시장에서 5종목 이상 업종을 RS순위 중앙값으로 정렬한 순위 (표시용)',valueFormatter:p=>p.value==null?'—':`${p.value}/${p.data?.group_total??'—'}`},
   {field:'rs_5d',headerName:'RS 5D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'rs_20d',headerName:'RS 20D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'rs_50d',headerName:'RS 50D',valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
@@ -391,12 +394,20 @@ function LiveGridTable(props:Parameters<typeof GridTable>[0]){
   return <GridTable {...props} rows={rows}/>
 }
 
+// STOCK-FLAGS-1 warning badges and GROUP-RANK-1 label (display only).
+function StockBadges({row}:{row:LeaderRow}){
+  const file=useStockFlags()
+  const badges=row.asset_class==='Equity'?flagBadges(file?.flags[flagKey(row)]):[]
+  return badges.length?<span className="stock-flags">{badges.map(b=><span key={b.key} className={'stock-flag '+b.key} title={b.title}>{b.label}</span>)}</span>:null
+}
+const groupRankTitle=(r:LeaderRow)=>`업종 순위: ${r.market} ${r.group_name||''} · ${GROUP_MIN_MEMBERS}종목 이상 업종을 RS순위 중앙값으로 정렬 (IBD 업종 순위 방식, 표시용)`
+const groupRankText=(r:LeaderRow)=>r.group_rank!=null&&r.group_total?`업종 ${r.group_rank}/${r.group_total}위`:null
 function StockRows({rows,onSelect,label='종목',nameWidth,onResizeStart}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;label?:string;nameWidth?:number;onResizeStart?:(event:any)=>void}){
   const [ownWidth,startOwnResize]=useColumnWidth(STOCK_NAME_WIDTH_KEY,STOCK_NAME_DEFAULT_WIDTH,STOCK_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
   const width=nameWidth??ownWidth
   const live=useLiveQuotes(rows)
   return <div className="stock-rows" style={{'--stock-name-width':`${width}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">{label}<button type="button" className="stock-column-resizer" aria-label={`${label} 열 너비 조절`} title={`드래그하여 ${label} 열 너비 조절`} onPointerDown={onResizeStart??startOwnResize}/></span><span>현재가</span><span>현재가 등락</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
-    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small></div>{(q=><><span className={'stock-price'+(q?' live-price':'')} title={q?liveQuoteTitle(q):'일간 종가 기준'}>{num(q?.price??r.price)}</span>{(c=><span className={'live-change'+(c!=null&&c>0?' pos':c!=null&&c<0?' neg':'')} title={q?'전일 종가 대비 실시간 등락':'실시간 시세 없음'}>{pct(c)}</span>)(liveChange(q))}</>)(live(r))}<ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
+    <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}</small><StockBadges row={r}/></div>{(q=><><span className={'stock-price'+(q?' live-price':'')} title={q?liveQuoteTitle(q):'일간 종가 기준'}>{num(q?.price??r.price)}</span>{(c=><span className={'live-change'+(c!=null&&c>0?' pos':c!=null&&c<0?' neg':'')} title={q?'전일 종가 대비 실시간 등락':'실시간 시세 없음'}>{pct(c)}</span>)(liveChange(q))}</>)(live(r))}<ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
     {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
 }
@@ -619,7 +630,7 @@ function AnalysisHero({row}:{row:LeaderRow}){
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={finvizUrl(row)}>Finviz ↗</a>}
     </div>
-    <div className="hero-chips"><ValuePill tone={leadTone(leadership(row))}>{leadership(row)||'관찰'}</ValuePill>{row.stage&&<ValuePill tone={stageTone(row.stage)}>{stageLabel(row.stage)}</ValuePill>}{rank!=null&&<ValuePill tone="red">{row.asset_class==='ETF'?'ETF RS':'RS'} {rank}</ValuePill>}</div>
+    <div className="hero-chips"><ValuePill tone={leadTone(leadership(row))}>{leadership(row)||'관찰'}</ValuePill>{row.stage&&<ValuePill tone={stageTone(row.stage)}>{stageLabel(row.stage)}</ValuePill>}{rank!=null&&<ValuePill tone="red">{row.asset_class==='ETF'?'ETF RS':'RS'} {rank}</ValuePill>}{groupRankText(row)&&<span className="pill gray group-rank" title={groupRankTitle(row)}>{groupRankText(row)}</span>}<StockBadges row={row}/></div>
   </section>
 }
 function KeyStats({row,filed}:{row:LeaderRow;filed?:PositionRow}){
@@ -667,7 +678,7 @@ function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:Lea
         <div className="leadership-score ibd-score" title={ibdTitle(row)}><span>IBD식 RS</span><strong>{row.ibd_rs_estimate??'—'}</strong></div>
         <div className="leadership-copy"><span>최종 판단</span><ValuePill tone={stageTone(row.stage)}>{row.verdict||'—'}</ValuePill><small>{row.stage||'—'}</small></div>
       </div>
-      <p className="classification-summary">{row.market} · {sectorName(row.market,row.sector||'분류 확인')} · {row.industry||'분류 확인'} · {row.exchange||row.market}</p>
+      <p className="classification-summary">{row.market} · {sectorName(row.market,row.sector||'분류 확인')} · {row.industry||'분류 확인'} · {row.exchange||row.market}{groupRankText(row)&&<> · <span className="group-rank" title={groupRankTitle(row)}>{groupRankText(row)}</span></>}</p><StockBadges row={row}/>
       <p className="classification-meta" title={row.classification_source||undefined}>지수 {indexes} · 데이터 {row.data_status||'정상'}{row.classification_as_of&&` · 분류 ${row.classification_as_of}`}{row.classification_source&&` · 출처 ${sourceName(row.classification_source)}`}</p>
     </section>
     <section className="snapshot-section drill-animate">
@@ -797,7 +808,7 @@ export default function App(){
       setLoadError(result.error??'')
       if(result.source==='demo'&&sourceRef.current==='supabase')return
       sourceRef.current=result.source
-      const rows=withEtfRanks(applyKrEtfNames(result.rows))
+      const rows=withGroupRanks(normalizeUsSectors(withEtfRanks(applyKrEtfNames(result.rows))))
       setLeaders(rows);setSource(result.source)
       const matching=(row:LeaderRow|null)=>rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
       setSelected(previous=>matching(previous)??rows[0]??null)

@@ -86,6 +86,8 @@ def test_summarize_and_markdown_render():
 def test_files_without_revenue_counts_as_no_revenue():
     f = lr.fundamental_flags("US", {"revenue": None, "net_income": -3e8, "files_without_revenue": True})
     assert f["status"] == "known" and f["no_revenue"] and f["no_revenue_filed"] and f["loss"]
+    # A profitable filer without a matched revenue tag (bank, shipping) is a tag miss, so it stays unknown.
+    assert lr.fundamental_flags("US", {"revenue": None, "net_income": 5e8, "files_without_revenue": True})["status"] == "unknown"
 
 
 def test_latest_annual_picks_full_year_filings():
@@ -95,3 +97,9 @@ def test_latest_annual_picks_full_year_filings():
         item("2025-10-01", "2025-12-31", 40.0), item("2026-01-01", "2026-06-30", 90.0, "10-Q")]}}}}}
     assert lr.latest_annual(facts, ("Revenues",)) == (150.0, 100.0)
     assert lr.latest_annual({"facts": {}}, ("Revenues",)) == (None, None)
+
+
+def test_correction_counts_by_stage():
+    rows = [row(ticker="A", stage="◇ 조정 중 주도주", leadership_class="중립"), row(ticker="B", stage="▲ 돌파 매수권", leadership_class="핵심 주도")]
+    c = lr.summarize(rows, {}, {}, "2026-10-03")["markets"]["US"]["classes"]
+    assert c["조정 중"] == 1 and c["핵심 주도"] == 1

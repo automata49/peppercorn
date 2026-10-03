@@ -118,7 +118,9 @@ def single_day(closes: list[float], window: int = 63) -> dict | None:
 
 def fundamental_flags(market: str, f: dict | None) -> dict:
     """Flags from filed values; a missing value stays unknown, never zero."""
-    if f and f.get("revenue") is None and f.get("files_without_revenue"):
+    # Files annual results without any revenue line AND loses money: a pre-revenue company (clinical biotech, explorer).
+    # A profitable filer without a matched revenue tag (banks, shipping, IFRS extensions) is a tag miss, not "no revenue".
+    if f and f.get("revenue") is None and f.get("files_without_revenue") and (f.get("net_income") or 0) < 0:
         return {"status": "known", "no_revenue": True, "no_revenue_filed": True, "loss": None if f.get("net_income") is None else f["net_income"] < 0,
                 "shrinking": None, "revenue": None, "revenue_growth": None, "net_income": f.get("net_income")}
     if not f or f.get("revenue") is None:
@@ -209,7 +211,8 @@ def summarize(rows: list[dict], funda: dict, closes: dict, as_of: str) -> dict:
             if g:
                 gaps.append({**g, "ticker": r["ticker"], "name": r.get("name") or "", "sector": r.get("sector") or "—"})
         rep["markets"][m] = {
-            "classes": {c: sum(1 for r in eq if r.get("leadership_class") == c) for c in CLASSES} | {"전체 주식": len(eq)},
+            # 조정 중 is a stage ('◇ 조정 중 주도주'), not a leadership_class value; the app counts it the same way.
+            "classes": {c: sum(1 for r in eq if (("조정 중" in str(r.get("stage") or "")) if c == "조정 중" else r.get("leadership_class") == c)) for c in CLASSES} | {"전체 주식": len(eq)},
             "sectors": sector_mix(eq),
             "industry_rank": industry_rank(eq),
             "semis": {
@@ -251,7 +254,9 @@ def sec_frames(ua: str, concept: str, period: str) -> dict[int, float]:  # pragm
     return {int(d["cik"]): float(d["val"]) for d in r.json().get("data", []) if d.get("val") is not None}
 
 
-def us_fundamentals(ua: str, tickers: list[str]) -> dict:  # pragma: no cover - network
+def us_fundamentals(ua: str, tickers: list[str], fallback: set[str] | None = None) -> dict:  # pragma: no cover - network
+    """Annual revenue/net income from SEC frames; companies missing there are read from their own filings when they
+    are in `fallback` (None = every ticker)."""
     sys.path.insert(0, str(Path(__file__).parent / "fundamentals"))
     import targets
     ciks = targets.sec_ciks(ua)
@@ -266,7 +271,7 @@ def us_fundamentals(ua: str, tickers: list[str]) -> dict:  # pragma: no cover - 
         cik = ciks.get(t.upper().replace(".", "-")) or ciks.get(t.upper())
         if cik:
             out[("US", t)] = {"revenue": rev["CY2025"].get(cik), "revenue_prev": rev["CY2024"].get(cik), "net_income": ni.get(cik), "cik": cik}
-            if out[("US", t)]["revenue"] is None:
+            if out[("US", t)]["revenue"] is None and (fallback is None or t in fallback):
                 out[("US", t)] |= company_annual(ua, cik)
     return out
 

@@ -113,6 +113,17 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         run: node scripts/publish-leaderboard.mjs
+      # STOCK-FLAGS-1: display-only warning badges (loss, no revenue, shrinking revenue, one-day jump). A failure only
+      # leaves the badges out; the app works without the file.
+      - name: Publish stock flags
+        continue-on-error: true
+        timeout-minutes: 12
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          python -m pip install --quiet 'yfinance==0.2.65' 'pandas==2.3.2' 'numpy==2.3.3'
+          python analysis/stock_flags.py --out dist/data/stock-flags.json
       - name: Keep branch Pages source deployable
         if: github.event_name != 'workflow_run'
         run: |
