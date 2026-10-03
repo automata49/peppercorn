@@ -113,11 +113,12 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         run: node scripts/publish-leaderboard.mjs
-      # STOCK-FLAGS-1: display-only warning badges (loss, no revenue, shrinking revenue, one-day jump). A failure only
+      # STOCK-FLAGS-1 + GROWTH-1/SEPA-1: display-only badges (loss, no revenue, shrinking revenue, one-day jump,
+      # quarterly growth, SEPA). A failure only
       # leaves the badges out; the app works without the file.
       - name: Publish stock flags
         continue-on-error: true
-        timeout-minutes: 12
+        timeout-minutes: 15
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}

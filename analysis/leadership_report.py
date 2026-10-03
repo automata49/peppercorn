@@ -245,9 +245,9 @@ def summarize(rows: list[dict], funda: dict, closes: dict, as_of: str) -> dict:
 
 
 # ---- network (not unit tested) -------------------------------------------------------------------------------
-def sec_frames(ua: str, concept: str, period: str) -> dict[int, float]:  # pragma: no cover - network
+def sec_frames(ua: str, concept: str, period: str, unit: str = "USD") -> dict[int, float]:  # pragma: no cover - network
     import requests
-    r = requests.get(f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/USD/{period}.json", headers={"User-Agent": ua}, timeout=120)
+    r = requests.get(f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/{unit}/{period}.json", headers={"User-Agent": ua}, timeout=120)
     time.sleep(.15)
     if r.status_code != 200:
         return {}
@@ -336,7 +336,7 @@ def kr_fundamentals(key: str, tickers: list[str]) -> dict:  # pragma: no cover -
     return out
 
 
-def yahoo_closes(rows: list[dict]) -> dict:  # pragma: no cover - network
+def yahoo_closes(rows: list[dict], period: str = "5mo") -> dict:  # pragma: no cover - network
     import yfinance as yf
     sym = {}
     for r in rows:
@@ -345,7 +345,7 @@ def yahoo_closes(rows: list[dict]) -> dict:  # pragma: no cover - network
     out, keys = {}, list(sym)
     for i in range(0, len(keys), 200):
         batch = keys[i:i + 200]
-        frame = yf.download(batch, period="5mo", interval="1d", auto_adjust=False, progress=False, threads=True, group_by="ticker")
+        frame = yf.download(batch, period=period, interval="1d", auto_adjust=False, progress=False, threads=True, group_by="ticker")
         for s in batch:
             try:
                 f = frame[s] if len(batch) > 1 else frame

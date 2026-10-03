@@ -1,0 +1,28 @@
+name: Stock flags dry run (temporary)
+on:
+  push:
+    branches: [claude/leader-topdown-sepa]
+    paths: [analysis/stock_flags.py, .github/workflows/stock-flags-dryrun.yml]
+permissions: {contents: read}
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: |
+          python -m pip install --quiet requests 'yfinance==0.2.65' 'pandas==2.3.2' 'numpy==2.3.3'
+          time python analysis/stock_flags.py --out out/stock-flags.json
+          ls -la out
+          python - <<'PY'
+          import json
+          d=json.load(open('out/stock-flags.json'))
+          print(d['growth_period'], d['sources'])
+          g=[k for k,f in d['flags'].items() if 'growth' in f]
+          print('growth', len(g), 'US', sum(k.startswith('US') for k in g), 'KR', sum(k.startswith('KR') for k in g))
+          PY
