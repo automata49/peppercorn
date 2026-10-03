@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test'
 import {groupSeries,peerSeries,rsValue,seriesOf,topByRs,yScale} from '../src/lib/rsChart'
+import {priceRs} from '../src/lib/benchmarkChart'
 import type {LeaderRow} from '../src/types'
 
 const base={asset_class:'Equity',exchange:'NASDAQ',index_memberships:['S&P 500'],price:100,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}
@@ -25,6 +26,26 @@ test('RS-CHART-2 helpers build period series, medians and a zero-inclusive axis'
   expect(peerSeries(etfs[2] as unknown as LeaderRow,[...r,...(etfs as unknown as LeaderRow[])],'return').map(s=>s.key)).toEqual(['self','industry','market'])
   const y=yScale(cmp)
   expect(y.lo).toBeLessThanOrEqual(-.03);expect(y.hi).toBeGreaterThanOrEqual(.06);expect(y.ticks).toContain(0)
+})
+
+test('PRICE-RS-1 aligns the benchmark by date, rebases both lines and marks RS new highs',()=>{
+  const dates=Array.from({length:8},(_,i)=>`2026-09-0${i+1}`)
+  // Stock peaks on day 5 then dips; the benchmark falls harder, so the RS line keeps making highs.
+  const stock={dates,closes:[100,102,104,106,110,108,107,109]}
+  const bench={dates:dates.filter(d=>d!=='2026-09-04'),closes:[100,100,100,100,96,92,90]}
+  const d=priceRs(stock,bench,5)!
+  expect(d.dates).toEqual(dates.slice(2))
+  expect(d.price[0]).toBe(100);expect(d.price[5]).toBeCloseTo(109/104*100)
+  expect(d.bench![1]).toBeNull() // no benchmark close on 09-04: a gap, not a zero
+  expect(d.bench![5]).toBeCloseTo(90)
+  expect(d.rs![1]).toBeNull()
+  expect(d.rs![5]).toBeCloseTo((109/90)/(104/100)*100)
+  expect(d.rsHigh).toEqual([true,false,true,true,true,true]) // the missing day is never a new high
+  expect(d.belowPriceHigh).toBe(true)
+  expect(d.complete).toBe(true)
+  const short=priceRs(stock,undefined,20)!
+  expect(short.complete).toBe(false);expect(short.dates).toHaveLength(8);expect(short.rs).toBeNull();expect(short.bench).toBeNull()
+  expect(priceRs({dates:['a'],closes:[1]},bench,5)).toBeNull()
 })
 
 const mockHistory=(page:any,asked:string[][]=[])=>page.route('**/functions/v1/price-history?*',(route:any)=>{
@@ -75,9 +96,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const back=drill.locator('.drill-back')
   await expect(back).toHaveText('‹ 목록으로')
   const section=(name:string)=>drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name})})
-  // 02 상대강도: daily RS line vs the market benchmark; these fixtures have no SPY row, so it says so.
-  await expect(section('상대강도')).toContainText('벤치마크(SPY) 가격이 없어')
-  await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
+  // PRICE-RS-1: 02 상대강도 keeps the RS numbers only; 03 holds the combined chart. No SPY row here, so no RS panel.
+  await expect(section('상대강도').locator('svg')).toHaveCount(0)
+  await expect(section('가격 모멘텀')).toContainText('벤치마크(SPY) 가격이 없어')
+  await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)'])
   await expect(section('가격 모멘텀').locator('.line-legend li')).toHaveCount(1)
   await expect(section('가격 모멘텀').locator('.rs-period-toggle button')).toHaveCount(6)
   await expect(drill.locator('.rs-chart')).toHaveCount(0)
@@ -105,7 +127,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.locator('.dashboard-etf-panel').getByRole('button',{name:'전체 보기 →'}).click()
   await page.locator('.etf-summary-dialog .stock-row').first().click()
   await expect(back).toHaveText('‹ ETF 목록으로')
-  await expect(drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})}).locator('.rs-period-toggle button')).toHaveCount(6)
+  await expect(drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})}).locator('.rs-period-toggle button')).toHaveCount(6)
   await back.click()
   await expect(page.locator('.etf-summary-dialog')).toBeVisible()
   await expect(drill).toHaveCount(0)
@@ -192,9 +214,15 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   await page.locator('.leadership-overview .line-legend button').first().click()
-  const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})})
-  await expect(rs.locator('svg .line-axis-title')).toHaveText('RS 라인 (시작=100)')
-  await expect(rs.locator('.line-legend em')).toHaveText(`+${((159/109-1)*100).toFixed(1)}%`)
+  const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
+  await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
+  // Legend: stock, benchmark (flat SPY → +0.0%), RS line (= stock change against a flat benchmark).
+  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 0','SPY','RS 라인'])
+  await expect(chart.locator('.line-legend em')).toHaveText([`+${((159/109-1)*100).toFixed(1)}%`,'+0.0%',`+${((159/109-1)*100).toFixed(1)}%`])
+  await expect(chart.locator('[data-key="bench"]')).toHaveCount(1)
+  // Rising stock vs flat SPY: all 51 shown days are RS new highs (history starts 9 sessions earlier); the price is at its high too, so no callout.
+  await expect(chart.locator('.price-rs-new-high')).toHaveCount(51)
+  await expect(chart.locator('.price-rs-callout')).toHaveCount(0)
   expect(asked.some(ids=>ids.includes('spy'))).toBeTruthy()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   // Refresh: reloads the leaderboard and refetches daily prices.
