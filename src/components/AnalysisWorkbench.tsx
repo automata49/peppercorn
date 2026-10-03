@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { EditableRow, LeaderRow, PositionRow } from '../types'
 import { searchRows, type RecentStock } from '../lib/search'
 import { fundamentalChecks, markCounts, quadrant, swingChecks, type CheckItem, type Mark } from '../lib/checkup'
@@ -58,31 +58,26 @@ export function CheckupSummary({ row, position, leadership }: { row: LeaderRow; 
   const quadText = q.fundamental === 'unknown'
     ? (q.swing === 'strong' ? 'Swing 강함 · 펀더멘털 확인 불가' : 'Swing 약함 · 펀더멘털 확인 불가')
     : `Swing ${q.swing === 'strong' ? '강함' : '약함'} × 펀더멘털 ${q.fundamental === 'good' ? '양호' : '확인 필요'}`
+  const dots = (items: CheckItem[]) => <div className="checkup-dots" aria-hidden="true">{items.map(i => <MarkDot key={i.key} mark={i.mark} />)}</div>
   return <section className="checkup" aria-label="종합 요약">
     <div className="checkup-cards">
       <article className="checkup-card">
         <header><h3>Swing · 모멘텀</h3><span>{leadership || '관찰'}</span></header>
+        <p className="checkup-score">{s.known ? `${s.pass} / ${s.known} 통과` : '—'}</p>
+        {dots(swing)}
         <p className="checkup-count">통과 {s.pass} · 중립 {s.neutral} · 미달 {s.fail}</p>
-        <CheckList items={swing} />
+        <details><summary>항목 보기</summary><CheckList items={swing} /></details>
       </article>
       <article className="checkup-card">
-        <header><h3>펀더멘털 · 공시</h3><span>{position?.status === 'ok' ? '라벨 활성' : 'Position 라벨 검증 중'}</span></header>
+        <header><h3>펀더멘털 · 공시</h3><span>{position?.status === 'ok' ? '라벨 활성' : '라벨 검증 중'}</span></header>
+        <p className="checkup-score">{fund.usable && f.known ? `${f.pass} / ${f.known} 통과` : '—'}</p>
+        {dots(fund.items)}
         <p className="checkup-count">{fund.usable ? `통과 ${f.pass} · 중립 ${f.neutral} · 미달 ${f.fail}` : fund.reason}</p>
-        <CheckList items={fund.items} />
-        <p className="checkup-note">{fund.usable ? fund.reason + ' · 공시 사실에 기존 자동 판정 기준을 대어 본 참고 표시이며 Position 라벨이 아닙니다.' : 'Position 라벨과 별개인 참고 표시입니다.'}</p>
+        <details><summary>항목 보기</summary><CheckList items={fund.items} />
+          <p className="checkup-note">{fund.usable ? fund.reason + ' · 공시 사실에 기존 자동 판정 기준을 대어 본 참고 표시이며 Position 라벨이 아닙니다.' : 'Position 라벨과 별개인 참고 표시입니다.'}</p></details>
       </article>
     </div>
-    <div className="checkup-quadrant" aria-label={'위치: ' + quadText}>
-      <div className="quad-map" aria-hidden="true">
-        <span />
-        <span className="quad-axis">Swing 강함</span><span className="quad-axis">Swing 약함</span>
-        {(['good', 'weak'] as const).map(fu => <Fragment key={fu}>
-          <span className="quad-axis quad-row">{fu === 'good' ? '펀더멘털 양호' : '확인 필요'}</span>
-          {(['strong', 'weak'] as const).map(sw => <span key={sw + fu} className={'quad-cell' + (q.swing === sw && q.fundamental === fu ? ' on' : '')}>{q.swing === sw && q.fundamental === fu ? '●' : ''}</span>)}
-        </Fragment>)}
-      </div>
-      <p><b>{quadText}</b><span>두 축은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</span></p>
-    </div>
+    <p className="checkup-quadrant"><b>{quadText}</b><span>두 축은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</span></p>
   </section>
 }
 

@@ -22,7 +22,7 @@ import { BENCHMARK, PRICE_RS_VERSION, priceRs, type PriceRsData } from './lib/be
 import { RS_CHART_PERIODS, RS_CHART_VERSION, medianOf, peerSeries, periodValue, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
-import type { EditableRow, LeaderRow, Market } from './types'
+import type { EditableRow, LeaderRow, Market, PositionRow } from './types'
 
 const pct=(v:unknown)=>{const n=Number(v);return v==null||!Number.isFinite(n)?'—':(n>=0?'+':'')+(n*100).toFixed(1)+'%'}
 const num=(v:unknown)=>{const n=Number(v);return v==null||!Number.isFinite(n)?'—':n.toLocaleString('ko-KR')}
@@ -597,6 +597,52 @@ function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:strin
   return <div className={'snapshot-item'+(wide?' wide':'')}><span>{label}</span><strong className={valueClassName}>{children}</strong></div>
 }
 
+// ANALYSIS-LAYOUT-2 (by user decision 2026-10-03, Robinhood-style): price header, one big chart, summary, key stats,
+// same-industry leaders, and a 내 판단 panel (right column at >=1280px, below with a fixed action bar otherwise).
+const priceText=(r:LeaderRow,v:number|null|undefined)=>v==null||!Number.isFinite(Number(v))?'—':r.market==='KR'?Math.round(Number(v)).toLocaleString('ko-KR')+'원':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
+const tradedText=(r:LeaderRow,v:number|null|undefined)=>v==null||!Number.isFinite(Number(v))?'—':r.market==='KR'?Math.round(Number(v)/1e8).toLocaleString('ko-KR')+'억원':'$'+(Number(v)/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+'M'
+const signTone=(v:number|null|undefined)=>v==null?'':v>0?'pos':v<0?'neg':''
+function AnalysisHero({row}:{row:LeaderRow}){
+  const q=useLiveQuotes([row],1)(row)
+  const change=liveChange(q)
+  const diff=q&&q.previous_close?q.price-q.previous_close:null
+  const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
+  return <section className="analysis-hero">
+    <p className="hero-meta">{row.market} · {row.ticker} · {row.exchange||row.market} · {row.industry||'분류 확인'}</p>
+    <h2 className="hero-name">{row.name}</h2>
+    <div className={'hero-price'+(q?' live-price':'')}>{priceText(row,q?.price??row.price)}</div>
+    <div className={'hero-change '+signTone(change)}>{q&&change!=null?<>{change>0?'▲ ':change<0?'▼ ':''}{diff==null?'':priceText(row,Math.abs(diff))+' '}({pct(change)})</>:'일간 종가'}<span> · {q?'실시간'+(q.time?' '+liveQuoteTime(q):''):'장 마감 기준'}</span></div>
+    <div className="external-links hero-links">
+      <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
+      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
+      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={finvizUrl(row)}>Finviz ↗</a>}
+    </div>
+    <div className="hero-chips"><ValuePill tone={leadTone(leadership(row))}>{leadership(row)||'관찰'}</ValuePill>{row.stage&&<ValuePill tone={stageTone(row.stage)}>{stageLabel(row.stage)}</ValuePill>}{rank!=null&&<ValuePill tone="red">{row.asset_class==='ETF'?'ETF RS':'RS'} {rank}</ValuePill>}</div>
+  </section>
+}
+function KeyStats({row,filed}:{row:LeaderRow;filed?:PositionRow}){
+  const {pe}=valuation(row,filed)
+  const items:[string,string,string][]=[
+    [row.asset_class==='ETF'?'ETF RS순위':'RS순위',String((row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank)??'—'),''],
+    ['IBD식 RS',String(row.ibd_rs_estimate??'—'),''],
+    ['52주 고점 대비',pct(row.high_52w_distance),signTone(row.high_52w_distance)],
+    ['50일선 대비',gapPct(row.price,row.ma50),''],
+    ['200일선 대비',gapPct(row.price,row.ma200),''],
+    ['RS 3개월',pct(row.rs_3m),signTone(row.rs_3m)],
+    ['20일 평균 거래대금',tradedText(row,row.traded_value_20d),''],
+    ['PER (공시 EPS)',pe==null?'—':pe.toFixed(1)+'배',''],
+  ]
+  return <div className="key-stats">{items.map(([label,value,tone])=><div key={label}><span>{label}</span><b className={tone}>{value}</b></div>)}</div>
+}
+function PeerStrip({row,rows,onPick}:{row:LeaderRow;rows:LeaderRow[];onPick:(r:LeaderRow)=>void}){
+  const peers=rows.filter(r=>r.market===row.market&&r.asset_class===row.asset_class&&r.industry&&r.industry===row.industry&&r.id!==row.id)
+    .sort((a,b)=>Number(LEADING_CLASSES.has(leadership(b)))-Number(LEADING_CLASSES.has(leadership(a)))||(b.rs_rank??b.etf_rs_rank??0)-(a.rs_rank??a.etf_rs_rank??0)).slice(0,8)
+  if(!peers.length)return <p className="empty">같은 산업에 다른 종목이 없습니다.</p>
+  return <div className="peer-strip">{peers.map(r=><button key={r.id} type="button" onClick={()=>onPick(r)}>
+    <b>{r.name}</b><span>{r.ticker} · {leadership(r)}</span><em className={signTone(r.return_3m)}>{pct(r.return_3m)} <small>3개월</small></em>
+  </button>)}</div>
+}
+
 function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:LeaderRow[];onRefresh:()=>void;refreshing:boolean}){
   const ma200Gap=gapPct(row.price,row.ma200)
   const ma200Status=row.price!=null&&row.ma200!=null?(Number(row.price)>=Number(row.ma200)?'위 ':'아래 ')+ma200Gap:'—'
@@ -1116,7 +1162,11 @@ export default function App(){
       </section>
     </>
   }else if(page==='leaderboard'){
-    content=<><div className="page-note"><b>읽는 순서</b><span>섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
+    const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
+    const lbCount=(c:string)=>lbEquities.filter(r=>leadership(r)===c).length
+    content=<><div className="page-note page-guide"><b>Leaderboard</b><span>유니버스 전체(주식 {lbEquities.length.toLocaleString('ko-KR')}개 · ETF {lbEtfs.toLocaleString('ko-KR')}개)를 RS순위 순으로 보여주는 전체 표입니다. 매 거래일 장 마감 뒤 가격을 받아 RS·추세·분류를 다시 계산합니다.</span>
+      <span>분류 기준: <b>핵심 주도</b>({lbCount('핵심 주도')}) 추세 템플릿 통과 · RS순위 ≥ 95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0 / <b>주도 후보</b>({lbCount('주도 후보')}) 추세 통과 · IBD식 RS ≥ 80 · 고점 -25% 이내 · RS 3M &gt; 0 / <b>강세 전환</b>({lbCount('강세 전환')}) 추세 미통과지만 50일선 위 · 고점 -30% 이내 · RS순위 ≥ 70 · RS 1W/1M &gt; 0. ETF는 ETF끼리만 순위를 매기고 주도 분류에서 제외합니다.</span>
+      <span>읽는 순서: 섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드. 한 종목을 깊게 보려면 종목 분석에서 검색하세요.</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
     content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><LiveGridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
   }else if(page==='portfolio'){
@@ -1129,27 +1179,53 @@ export default function App(){
     const record=selected?(enrichedAnalysis as EditableRow[]).find(r=>r.market===selected.market&&r.ticker===selected.ticker):undefined
     const compareRows=compareKeys.map(k=>leaders.find(r=>keyOf(r)===k)).filter((r):r is LeaderRow=>!!r)
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
-    content=<><div className="analysis-layout"><div className="panel stock-list"><div className="panel-head"><div><h2>종목 선택</h2><p>RS가 강한 순 · P는 Position 데이터 있음</p></div></div>
-      <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
-      <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['leaders','주도 종목'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
-      {scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
-      <div className="panel analysis-card">{selected?<><div className="stock-title"><div><span>{selected.market} · <b>{selected.industry}</b> · {selected.sector}</span><h2>{selected.name} <small>{selected.ticker}</small></h2></div><div className="stock-title-actions"><ValuePill tone={leadTone(leadership(selected))}>{leadership(selected)||'관찰'}</ValuePill>
-          <button type="button" className="compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4}
-            onClick={()=>setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}>{inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'}</button></div></div>
-        <CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/>
-        {compareRows.length>0&&<><h3 className="analysis-part compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
-          <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></>}
-        <h3 className="analysis-part">Swing · 모멘텀</h3>
-        <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
-        <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
-        <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide}</strong></div>
-        <h3 className="analysis-part">Position · 펀더멘털</h3>
-        <PositionPanel row={selected} position={position.rows.get(positionKey(selected.market,selected.ticker))} status={position.loading?'loading':position.status}/>
-        <h3 className="analysis-part">내 분석</h3>
-        <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. Swing과 Position은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</p>
-        <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
-        {record&&<button className="secondary-action" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
-      </>:<p>종목을 선택하세요.</p>}</div></div>
+    const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
+    const addWatch=()=>{if(selected&&!inWatch)addTickerRecord('watchlist',selected.market+':'+selected.ticker)}
+    const toggleCompare=()=>{if(selected)setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
+    const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);window.setTimeout(()=>document.getElementById('analysis-judgement')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+    const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
+    content=<><div className="analysis-page">
+      <div className="analysis-finder">
+        <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
+        <details className="analysis-browse"><summary>목록에서 고르기</summary>
+          <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['leaders','주도 종목'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
+          <div className="stock-list">{scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
+        </details>
+      </div>
+      {selected?<div className="analysis-body">
+        <div className="analysis-main analysis-card">
+          <section className="analysis-block"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>
+          <section className="analysis-block"><h3 className="block-title">한눈에 보기</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
+          {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
+            <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
+          <section className="analysis-block"><h3 className="block-title">주요 지표</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
+          <section className="analysis-block"><h3 className="block-title">같은 산업 종목</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
+          <details className="analysis-block analysis-more"><summary>상세 지표 · 공시 더 보기</summary>
+            <h3 className="analysis-part">Swing · 모멘텀</h3>
+            <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
+            <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
+            <h3 className="analysis-part">Position · 펀더멘털</h3>
+            <PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/>
+          </details>
+        </div>
+        <aside className="analysis-judgement" id="analysis-judgement" aria-label="내 판단">
+          <h3 className="analysis-part">내 분석</h3>
+          <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div>
+          <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. Swing과 Position은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</p>
+          <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
+          <div className="judgement-actions">
+            <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
+            <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
+            {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
+          </div>
+        </aside>
+        <div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
+          <button type="button" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★':'☆'}</button>
+          <button type="button" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</button>
+          <button type="button" className="primary" onClick={goJudgement}>{record?'내 분석 보기':'분석 기록 쓰기'}</button>
+        </div>
+      </div>:<p className="empty">종목을 검색하거나 목록에서 고르세요.</p>}
+      </div>
       <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록 · 목록 보기</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
   }else if(page==='research'){
     content=<><div className="page-note"><b>Research Notes</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·단계·RS가 연결됩니다. 팩트 → 해석 → 영향 → 다음 확인 순서로 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><div className="panel"><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={680}/></div></>
@@ -1157,7 +1233,10 @@ export default function App(){
     content=<><div className="page-note"><b>Trading Journal</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·RS가 연결됩니다. 매수 가설과 결과 복기를 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
-    content=<><div className="page-note"><b>Universe</b><span>S&P500 · NASDAQ · KOSPI200 · KOSDAQ150 구성과 분류 출처를 자동 동기화합니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
+    const uvEq=leaders.filter(r=>r.asset_class==='Equity'),uvUS=uvEq.filter(r=>r.market==='US').length,uvKR=uvEq.length-uvUS
+    content=<><div className="page-note page-guide"><b>Universe</b><span>리더보드에 들어가는 종목 범위입니다(UNIVERSE-2, 현재 미국 {uvUS.toLocaleString('ko-KR')}개 · 한국 {uvKR.toLocaleString('ko-KR')}개). 미국 NASDAQ·NYSE·NYSE American, 한국 KOSPI·KOSDAQ 상장 보통주 가운데 아래 기준을 넘는 종목을 매주 일요일 다시 고릅니다.</span>
+      <span>기준: 미국 주가 $5 · 시가총액 $300M · 20일 평균 거래대금 $5M 이상 / 한국 1,000원 · 1,000억원 · 20억원 이상. 우선주·스팩·펀드·리츠·관리종목·투자주의 환기종목은 제외합니다. 이미 들어 있는 종목은 기준의 70% 아래로 내려갈 때만 빠지고, 내 Watchlist·Portfolio·종목 분석·Journal에 있는 종목은 항상 남습니다.</span>
+      <span>S&P500·KOSPI200·KOSDAQ150 같은 지수 편입은 참고 정보로만 표시합니다. 분류는 미국 GICS(S&P500)·Nasdaq SIC, 한국 WICS를 씁니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
   }else{
     content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="setting"><span>52W 계산</span><b>52W 고점: 최근 최대 252개 거래 세션의 최고가(이력 부족 시 확보된 기간) · RS/등락 52W: 252거래일 전 종가 대비</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 주식 가격 이력 253거래일 미만은 공란입니다. ETF는 주식 순위와 섞지 않고 같은 시장 ETF끼리 따로 RS순위·IBD식 RS를 산정하며, 같은 Trend Template·단계·최종 판단·액션 가이드 규칙을 적용합니다(주도 분류는 주식 전용). 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / Research / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>

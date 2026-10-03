@@ -66,22 +66,23 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await search.fill('ㅈㅇㅆ')
   await expect(page.getByRole('option')).toHaveCount(1)
   await search.press('Enter')
-  const card=page.locator('.analysis-card')
-  await expect(card.locator('.stock-title h2')).toContainText('지엔씨에너지')
+  const card=page.locator('.analysis-body')
+  await expect(card.locator('.hero-name')).toContainText('지엔씨에너지')
   await expect(page.locator('.recent-stocks button')).toHaveText(['지엔씨에너지'])
   await expect(card.locator('.checkup-quadrant b')).toHaveText('Swing 약함 · 펀더멘털 확인 불가')
   // Enter picks the best match (ticker prefix).
   await search.fill('ok')
   await search.press('Enter')
-  await expect(card.locator('.stock-title h2')).toContainText('Oklo')
+  await expect(card.locator('.hero-name')).toContainText('Oklo')
   await search.fill('대덕')
   await page.getByRole('option').first().click()
-  await expect(card.locator('.stock-title h2')).toContainText('대덕전자')
+  await expect(card.locator('.hero-name')).toContainText('대덕전자')
   const cards=card.locator('.checkup-card')
   await expect(cards).toHaveCount(2)
   await expect(cards.nth(0).locator('.checkup-count')).toHaveText('통과 5 · 중립 0 · 미달 0')
   await expect(cards.nth(1).locator('.checkup-count')).toHaveText('통과 6 · 중립 1 · 미달 0')
   await expect(card.locator('.checkup-quadrant b')).toHaveText('Swing 강함 × 펀더멘털 양호')
+  await card.locator('.analysis-more > summary').click()
   await expect(card.locator('.analysis-part')).toContainText(['Swing · 모멘텀','Position · 펀더멘털','내 분석'])
   // Vertical sheet: create, enter a value as a percentage, see it stored and judged.
   await card.getByRole('button',{name:'분석 기록 만들기'}).click()
@@ -110,6 +111,78 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(compare.locator('thead .compare-name')).toHaveText(['대덕전자'])
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
   await card.screenshot({path:`test-results/workbench-${view.name}.png`})
+  await context.close()
+ })
+}
+
+// ANALYSIS-LAYOUT-2: price header, key stats, same-industry stocks, 내 판단 panel / action bar, nav order and page guides.
+for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
+ test(view.name+' analysis layout follows the Robinhood-style mockup',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
+  const page=await context.newPage()
+  const peers=[...rows,{...rows[0],id:'p1',ticker:'007660',name:'이수페타시스',rs_rank:98,leadership_class:'핵심 주도',industry:'Semiconductors',return_3m:.382},
+    {...rows[0],id:'p2',ticker:'222800',name:'심텍',rs_rank:80,leadership_class:'중립',industry:'Semiconductors',return_3m:-.05},
+    {...rows[0],id:'etfx',ticker:'091160',name:'KODEX 반도체',asset_class:'ETF',industry:'Semiconductors'}]
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:peers.map(r=>({...r,traded_value_20d:r.id==='a'?1.6e11:null}))}}))
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
+  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  const side=page.locator('.sidebar nav')
+  if(await side.isVisible()){
+    await expect(side.locator('.nav-label')).toHaveText(['Dashboard','종목 분석','Research','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
+  }
+  if(await side.isVisible())await side.getByRole('button',{name:'종목 분석'}).click()
+  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'종목'}).click()
+  await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
+  const body=page.locator('.analysis-body')
+  await expect(body.locator('.hero-meta')).toHaveText('KR · 353200 · KOSPI · Semiconductors')
+  await expect(body.locator('.hero-price')).toHaveText('110원')
+  await expect(body.locator('.hero-change')).toContainText('일간 종가')
+  await expect(body.locator('.hero-chips .pill')).toHaveText(['핵심 주도','▲ 돌파 매수권','RS 97'])
+  const stat=(label:string)=>body.locator('.key-stats > div').filter({hasText:label}).locator('b')
+  await expect(body.locator('.key-stats > div')).toHaveCount(8)
+  await expect(stat('20일 평균 거래대금')).toHaveText('1,600억원')
+  await expect(stat('PER (공시 EPS)')).toHaveText('22.0배')
+  await expect(stat('52주 고점 대비')).toHaveText('-5.0%')
+  // Same market and industry, equities only, leaders first; the ETF and US names are excluded.
+  // Fixture rows share one industry: leaders first (by RS), at most 8, never the ETF or a US name.
+  await expect(body.locator('.peer-strip b')).toHaveCount(8)
+  await expect(body.locator('.peer-strip b').nth(0)).toHaveText('이수페타시스')
+  await expect(body.locator('.peer-strip span')).not.toContainText(['091160'])
+  expect(await body.locator('.peer-strip b').allTextContents()).not.toContain('Oklo Inc.')
+  await expect(body.locator('.peer-strip em').first()).toContainText('+38.2%')
+  await expect(body.locator('.analysis-more')).not.toHaveAttribute('open','')
+  const panel=body.locator('.analysis-judgement'),bar=body.locator('.analysis-actionbar')
+  const [main,aside]=await Promise.all([body.locator('.analysis-main').boundingBox(),panel.boundingBox()])
+  if(view.width>=1280){
+    expect(aside!.x).toBeGreaterThan(main!.x+main!.width-1)
+    await expect(bar).toBeHidden()
+    await panel.getByRole('button',{name:'☆ 관심 추가'}).click()
+    await expect(panel.getByRole('button',{name:'★ 관심 등록됨'})).toBeDisabled()
+  }else{
+    expect(aside!.y).toBeGreaterThan(main!.y+main!.height-1)
+    await expect(bar).toBeVisible()
+    await bar.getByRole('button',{name:'관심 추가'}).click()
+    await expect(bar.getByRole('button',{name:'관심 등록됨'})).toBeDisabled()
+    await bar.getByRole('button',{name:'분석 기록 쓰기'}).click()
+    await expect(panel.locator('.sheet-table')).toBeVisible()
+    await expect(bar.getByRole('button',{name:'내 분석 보기'})).toBeVisible()
+  }
+  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-watchlist')||'[]').map((r:any)=>r.ticker))).toContain('353200')
+  await body.locator('.peer-strip button').first().click()
+  await expect(body.locator('.hero-name')).toHaveText('이수페타시스')
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
+  await page.screenshot({path:`test-results/analysis-layout-${view.name}.png`,fullPage:true})
+  // Page guides for Leaderboard and Universe.
+  await page.evaluate(()=>window.scrollTo(0,0))
+  if(await side.isVisible()){
+    await side.getByRole('button',{name:'Leaderboard'}).click()
+    await expect(page.locator('.page-guide')).toContainText('주식 17개 · ETF 1개')
+    await side.getByRole('button',{name:'Universe'}).click()
+    await expect(page.locator('.page-guide')).toContainText('미국 7개 · 한국 10개')
+    await expect(page.locator('.page-guide')).toContainText('1,000억원')
+  }
   await context.close()
  })
 }
