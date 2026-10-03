@@ -85,6 +85,40 @@ Deno.serve(async (req: Request) => {
     },200,headers);
   }
 
+  // GOOGLE-LOGIN-1: exchange the PKCE code from the Google redirect. The app has a single owner account, so a Google
+  // login is accepted only when it resolves to an account created through the invite flow (an email identity; Supabase
+  // links a verified Google identity with the same email to it). Any other Google login is refused, and a user it
+  // created moments ago is removed so the single-account rule holds even if sign-ups are left open.
+  if(action==="pkce"){
+    const authCode=String(body?.auth_code||"");const verifier=String(body?.code_verifier||"");
+    if(!authCode||!/^[A-Za-z0-9._~-]{43,128}$/.test(verifier)) return json({error:"pkce_required"},400,headers);
+    const token=await fetch(url+"/auth/v1/token?grant_type=pkce",{
+      method:"POST",
+      headers:{apikey:anon,"Content-Type":"application/json"},
+      body:JSON.stringify({auth_code:authCode,code_verifier:verifier})
+    });
+    const payload=await token.json().catch(()=>({}));
+    if(!token.ok) return json({error:"oauth_failed"},401,headers);
+    const user=payload.user||{};
+    const identities=Array.isArray(user.identities)?user.identities:[];
+    const providers=Array.isArray(user.app_metadata?.providers)?user.app_metadata.providers:[];
+    const owner=identities.some((i:any)=>i?.provider==="email")||providers.includes("email");
+    if(!owner){
+      const created=Date.parse(String(user.created_at||""));
+      if(user.id&&Number.isFinite(created)&&Date.now()-created<10*60*1000){
+        await fetch(url+"/auth/v1/admin/users/"+encodeURIComponent(String(user.id)),{method:"DELETE",headers:{apikey:service,Authorization:"Bearer "+service}}).catch(()=>null);
+      }
+      return json({error:"google_not_linked"},403,headers);
+    }
+    return json({
+      access_token:payload.access_token,
+      refresh_token:payload.refresh_token,
+      expires_in:payload.expires_in,
+      expires_at:payload.expires_at,
+      user:{id:user.id,email:user.email}
+    },200,headers);
+  }
+
   if(action==="refresh"){
     const refreshToken=String(body?.refresh_token||"");
     if(!refreshToken) return json({error:"refresh_token_required"},400,headers);
