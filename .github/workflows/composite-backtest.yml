@@ -1,0 +1,37 @@
+name: Composite backtest (COMPOSITE-1 stage A)
+
+# Read-only. Runs the pre-registered stage A backtest in analysis/composite.py and reports the gates.
+# A pass does not activate anything: showing the Composite in the app is a separate, reviewed change.
+on:
+  workflow_dispatch:
+  # TEMPORARY: lets the branch run the backtest before merge; remove before merging.
+  push:
+    branches: [claude/universe2-analysis]
+    paths: ['.github/workflows/composite-backtest.yml', 'analysis/composite*.py']
+
+permissions:
+  contents: read
+
+env:
+  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r analysis/requirements.txt
+      - name: Stage A backtest
+        run: python analysis/composite_backtest.py && cat composite_report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: composite-report
+          path: |
+            composite_report.md
+            composite_report.json
+          if-no-files-found: ignore
