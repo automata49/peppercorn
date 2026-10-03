@@ -4,10 +4,6 @@ name: Universe report (UNIVERSE-2 simulation)
 # enter/leave and how RS ranks and 핵심 주도 / 주도 후보 / 강세 전환 counts would change. Writes nothing to Supabase.
 on:
   workflow_dispatch:
-  # TEMPORARY: lets the branch run the simulation before merge; remove before merging.
-  push:
-    branches: [claude/universe2-analysis]
-    paths: ['.github/workflows/universe-report.yml', 'analysis/sync_universe.py', 'analysis/universe_*.py']
 
 permissions:
   contents: read

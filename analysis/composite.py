@@ -40,6 +40,11 @@ COMPOSITE_RULES = {
         "A4": "Composite top decile has positive mean excess return in both halves of the period (stability)",
         "A5": ">= 24 rebalance dates and >= 30 stocks in each top decile on average",
     },
+    # Recorded, not tuned. Run 37097986354 (2026-10-03, current universe, 6y Yahoo, survivorship-biased):
+    # US FAIL (A1-A4: top decile +1.94% vs RS-only +6.81%, win 32%, Spearman 0.0), KR PASS (A1-A5: +5.16% vs +3.88%,
+    # win 56%, Spearman 1.0), pooled FAIL. The rules did not fix whether gates apply per market or pooled, so nothing
+    # activates; a KR-only use would need its own decision and an out-of-sample check.
+    "results": {"run": 37097986354, "US": "fail", "KR": "pass", "pooled": "fail"},
 }
 
 

@@ -4,10 +4,6 @@ name: Composite backtest (COMPOSITE-1 stage A)
 # A pass does not activate anything: showing the Composite in the app is a separate, reviewed change.
 on:
   workflow_dispatch:
-  # TEMPORARY: lets the branch run the backtest before merge; remove before merging.
-  push:
-    branches: [claude/universe2-analysis]
-    paths: ['.github/workflows/composite-backtest.yml', 'analysis/composite*.py']
 
 permissions:
   contents: read
