@@ -4,8 +4,8 @@ test.use({viewport:{width:1440,height:900}})
 const row=(ticker:string)=>({id:ticker,ticker,market:'US',name:'스냅샷 '+ticker,asset_class:'Equity',sector:'Technology',industry:'Semiconductors',exchange:'NASDAQ',index_memberships:[],price:100,rs_rank:99,ibd_rs_estimate:95,high_52w_distance:-.05,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파 매수권',rs_3m:.1,rs_6m:.1,ma50:90,ma200:80,action_guide:'테스트'})
 async function setup(page:Page,snapshot:{status:number;age_h?:number}){
   const calls={live:0,snapshot:0}
-  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
-  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{series:{}}}))
+  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/functions/v1/leaderboard?*',route=>{calls.live++;return route.fulfill({json:{rows:[row('LIVE')]}})})
   await page.route('**/data/leaderboard.json',route=>{calls.snapshot++
     if(snapshot.status!==200)return route.fulfill({status:snapshot.status,body:'not found'})
