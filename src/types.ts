@@ -53,6 +53,10 @@ export type LeaderRow = {
   ma50: number | null
   ma200: number | null
   leader_tt: boolean
+  // GROUP-RANK-1 (display, from loaded rows)
+  group_rank?: number | null
+  group_total?: number | null
+  group_name?: string | null
 }
 
 export type EditableRow = Record<string, string | number | boolean | null>
