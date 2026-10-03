@@ -2,12 +2,12 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } fr
 
 const pages=[
   ['dashboard','◫','Dashboard'],
-  ['leaderboard','↗','Leaderboard'],
   ['analysis','▦','종목 분석'],
   ['research','⌕','Research'],
   ['watchlist','◎','Watchlist'],
   ['portfolio','◆','Portfolio'],
   ['journal','✎','Journal'],
+  ['leaderboard','↗','Leaderboard'],
   ['universe','⊙','Universe'],
   ['settings','⚙','Settings']
 ]
