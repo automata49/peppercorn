@@ -23,21 +23,21 @@ Trading value: a stock already in the universe uses its own `traded_value_20d`; 
 one-session value (screener `lastsale × volume`, KRX `Amount`). A single session favours stocks that are busy that
 day, which tilts new entrants toward current momentum; after the first sync their own 20-session value applies.
 
-### Simulation (run 37097388399, Universe report, 2026-10-03, read-only)
+### Simulation (run 37097896804 attempt 2, Universe report, 2026-10-03, read-only)
 
 | | US | KR |
 |---|---|---|
 | Listing candidates | 7,072 | 2,725 |
-| UNIVERSE-2 included | 2,632 | 595 |
+| UNIVERSE-2 included | 2,633 | 595 |
 | Current (v1) priced | 1,149 | 351 |
-| Added / removed | 1,503 / 20 | 283 / 39 |
+| Added / removed | 1,502 / 18 | 283 / 39 |
 | RS rank change of kept stocks p10/p50/p90 | +1 / +2 / +3 | −17 / −13 / −2 |
 | 핵심 주도 v1 → v2 | 29 → 67 | 4 → 10 |
 | 주도 후보 v1 → v2 | 84 → 214 | 10 → 21 |
 | 강세 전환 v1 → v2 | 7 → 23 | 12 → 23 |
 
 Reported names: OKLO, 대덕전자 (353200) and 지엔씨에너지 (119850) all pass the screen (지엔씨에너지 classifies as 주도 후보
-in the simulation). Totals: 3,227 equities (my earlier estimate was US 1,800–2,200 and KR 700–900; US is larger and KR
+in the simulation). Totals: 3,228 equities (run 37097388399 before the BRKB/BFB ticker fix: 2,632 US, 20 removed) (my earlier estimate was US 1,800–2,200 and KR 700–900; US is larger and KR
 smaller). KR ranks of existing stocks drop by a median 13 points because the added KOSPI/KOSDAQ names are, on this
 date, stronger than the index constituents; this is the population effect the CONTRACT asks to disclose.
 The simulation mirrors the SQL formulas in Python on Yahoo prices; production values can differ slightly.
@@ -46,6 +46,8 @@ Found during the run: the KRX-DESC listing cache has no file for the last 15 day
 source (KRX direct and pykrx now need a KRX login, TradingView and ETF-holdings proxies matched 0), so the current v1
 weekly sync is expected to fail validation on its next run (it does not import, so production data stays as is).
 UNIVERSE-2 does not depend on those sources; it skips index labels and the listing-date rule when they are missing.
+WiseIndex WICS coverage varied between runs (592/595; then 555/595, which the existing 95% guard refused; the retry passed),
+so a weekly v2 sync can fail on a bad WICS day without importing; rerun it.
 
 Switch: Actions → `Sync investment universe` with `universe_version` 2 (or set the repository variable
 `UNIVERSE_VERSION=2` for the weekly schedule), after deploying `universe-import` (bounds raised to 5,000).
