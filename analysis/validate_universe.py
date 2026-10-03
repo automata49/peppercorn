@@ -32,7 +32,8 @@ def main():
         if not 1000<=us2<=3500:fail(f"UNIVERSE-2 US count out of range: {us2}")
         if not 400<=kr2<=1500:fail(f"UNIVERSE-2 KR count out of range: {kr2}")
         if sp<450:fail(f"too few S&P500 constituents passed the screen: {sp}")
-        if k200<170:fail(f"too few KOSPI200 constituents passed the screen: {k200}")
+        if k200 and k200<170:fail(f"too few KOSPI200 constituents passed the screen: {k200}")
+        if not k200:print("VALIDATION WARNING: KOSPI200 labels unavailable in this run")
     else:
         if not 490<=sp<=520:fail(f"S&P500 count out of range: {sp}")
         if not 190<=k200<=210:fail(f"KOSPI200 count out of range: {k200}")

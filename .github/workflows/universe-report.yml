@@ -7,7 +7,7 @@ on:
   # TEMPORARY: lets the branch run the simulation before merge; remove before merging.
   push:
     branches: [claude/universe2-analysis]
-    paths: ['.github/workflows/universe-report.yml']
+    paths: ['.github/workflows/universe-report.yml', 'analysis/sync_universe.py', 'analysis/universe_*.py']
 
 permissions:
   contents: read

@@ -382,7 +382,7 @@ def build_v2(sp500,krx_desc,kospi200,kosdaq150):
             candidates.append(uv2.Candidate("US",t,str(r.get("name") or t).strip(),exchange.upper(),price,uv2.to_float(r.get("marketCap")),tv,src,
                 None,uv2.us_flags(t,str(r.get("name") or ""),r.get("industry")),str(r.get("sector") or "").strip() or None,str(r.get("industry") or "").strip() or None))
     kr_rows,kr_source=fetch_krx_market()
-    listing={norm_kr(pick(r,"Code","Symbol")):r for r in records(krx_desc)}
+    listing={norm_kr(pick(r,"Code","Symbol")):r for r in records(krx_desc)} if len(krx_desc) else {}
     today=pd.Timestamp(TODAY)
     for r in kr_rows:
         code=r["code"]
@@ -459,8 +459,16 @@ def fetch_kr_indexes(krx):
     return kospi200,kosdaq150
 
 def main_v2():
-    sp500=fetch_sp500();krx=fetch_krx_listing()
-    kospi200,kosdaq150=fetch_kr_indexes(krx)
+    sp500=fetch_sp500()
+    # The KRX-DESC cache (listing dates) and the KR index constituents are display/secondary inputs in UNIVERSE-2:
+    # without them the one-month listing rule and the KOSPI200/KOSDAQ150 labels are skipped, not the screen.
+    try:krx=fetch_krx_listing()
+    except Exception as exc:
+        print("::warning::KRX-DESC listing unavailable; listing-date rule skipped:",exc);krx=pd.DataFrame({"Code":[],"ListingDate":[]})
+    try:kospi200,kosdaq150=fetch_kr_indexes(krx)
+    except Exception as exc:
+        print("::warning::KR index constituents unavailable; KOSPI200/KOSDAQ150 labels skipped:",exc)
+        kospi200,kosdaq150=pd.DataFrame({"Code":[]}),pd.DataFrame({"Code":[]})
     instruments,memberships=build_v2(sp500,krx,kospi200,kosdaq150)
     payload={"generated_at":NOW,"universe_version":uv2.VERSION,"instruments":instruments,"memberships":memberships}
     OUTPUT.write_text(json.dumps(payload,ensure_ascii=False,separators=(",",":")),encoding="utf-8")
