@@ -1,5 +1,5 @@
 import {test,expect} from '@playwright/test'
-import {applyLensFilter,bigCapLeaders,byGroupThenRs,leaderGroups,topGroup} from '../src/lib/leaderLens'
+import {DEFAULT_LENS_FILTER,applyLensFilter,bigCapLeaders,byGroupThenRs,growthPasses,leaderGroups,topGroup} from '../src/lib/leaderLens'
 import {withGroupRanks} from '../src/lib/groupRank'
 import {flagBadges} from '../src/lib/stockFlags'
 import type {LeaderRow} from '../src/types'
@@ -34,9 +34,17 @@ test('top-down groups order by group rank, then RS; filters use the flags file o
   expect(topGroup(groups[1])).toBe(false)
   expect(byGroupThenRs(core).map(r=>r.ticker)).toEqual(['SEMI0','SEMI1','SEMI2','SEMI3','SEMI4','KOD'])
   const flags={'US:KOD':{loss:true,no_revenue:true},'US:SEMI0':{sepa:true,growth:{rev:.35,eps:.6}}}
-  expect(applyLensFilter(core,flags,{hideWeak:true,sepaOnly:false}).map(r=>r.ticker)).not.toContain('KOD')
-  expect(applyLensFilter(core,flags,{hideWeak:false,sepaOnly:true}).map(r=>r.ticker)).toEqual(['SEMI0'])
-  expect(applyLensFilter(core,null,{hideWeak:true,sepaOnly:true})).toHaveLength(6)   // no file: nothing judged
+  const off={hideWeak:false,sepaOnly:false,growthOnly:false}
+  expect(applyLensFilter(core,flags,{...off,hideWeak:true}).map(r=>r.ticker)).not.toContain('KOD')
+  expect(applyLensFilter(core,flags,{...off,sepaOnly:true}).map(r=>r.ticker)).toEqual(['SEMI0'])
+  expect(applyLensFilter(core,null,{hideWeak:true,sepaOnly:true,growthOnly:true})).toHaveLength(6)   // no file: nothing judged
+  // GROWTH-FILTER-1 is on by default: revenue >= +20 % AND earnings >= +25 %; unknown growth is hidden.
+  expect(DEFAULT_LENS_FILTER).toEqual({hideWeak:false,sepaOnly:false,growthOnly:true})
+  expect(applyLensFilter(core,flags,DEFAULT_LENS_FILTER).map(r=>r.ticker)).toEqual(['SEMI0'])
+  expect(growthPasses({growth:{rev:.20,eps:.25}})).toBe(true)
+  expect(growthPasses({growth:{rev:.199,eps:.9}})).toBe(false)
+  expect(growthPasses({growth:{rev:.5}})).toBe(false)
+  expect(growthPasses(undefined)).toBe(false)
 })
 
 test('growth and SEPA badges come first and name the period',()=>{
@@ -61,8 +69,14 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.locator('.leadership-card-grid button').filter({hasText:'핵심 주도'}).click()
   const sheet=page.locator('.drill-sheet')
   const names=()=>sheet.locator('.stock-row .stock-id b').allTextContents()
-  // 업종별 (default): the top-ranked group and its stocks come first; the group chip shows its rank.
+  // GROWTH-FILTER-1 is on by default: only the stock with quarterly growth shows; the classification count stays.
   await expect(sheet.locator('.summary-tabs button')).toHaveCount(5)
+  await expect(sheet.locator('.lens-chip',{hasText:'실적 성장만'})).toHaveAttribute('aria-pressed','true')
+  expect(await names()).toEqual(['반도체 0'])
+  await expect(sheet.locator('.drill-note')).toContainText('필터로 5종목 제외')
+  await expect(page.locator('.leadership-card-grid button').filter({hasText:'핵심 주도'})).toContainText('6')
+  await sheet.locator('.lens-chip',{hasText:'실적 성장만'}).click()
+  // 업종별 (default view): the top-ranked group and its stocks come first; the group chip shows its rank.
   await expect(sheet.locator('.lens-group').nth(1)).toContainText('Semiconductors')
   await expect(sheet.locator('.lens-group').nth(1)).toContainText('1위')
   await expect(sheet.locator('.lens-group').nth(1)).toHaveClass(/top/)

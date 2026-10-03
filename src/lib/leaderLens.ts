@@ -51,13 +51,19 @@ export function byGroupThenRs(rows:LeaderRow[]){
 export const topGroup=(g:{rank:number|null;total:number|null})=>g.rank!=null&&!!g.total&&g.rank<=Math.ceil(g.total*.2)
 
 // GROWTH-1 filters on STOCK-FLAGS-1 data. Without the flags file nothing can be judged, so the filters are off.
-export type LensFilter={hideWeak:boolean;sepaOnly:boolean}
+// growthOnly (GROWTH-FILTER-1, by user decision 2026-10-03 after SEPA-DEFAULT, on by default): latest quarter revenue
+// >= +20 % and earnings >= +25 % vs a year earlier; unknown growth is hidden while it is on. Display only.
+export const GROWTH_FILTER={revMin:.20,epsMin:.25}
+export type LensFilter={hideWeak:boolean;sepaOnly:boolean;growthOnly:boolean}
+export const DEFAULT_LENS_FILTER:LensFilter={hideWeak:false,sepaOnly:false,growthOnly:true}
+export const growthPasses=(x:StockFlag|undefined)=>!!x?.growth&&(x.growth.rev??-1)>=GROWTH_FILTER.revMin&&(x.growth.eps??-1)>=GROWTH_FILTER.epsMin
 export function applyLensFilter(rows:LeaderRow[],flags:Record<string,StockFlag>|null|undefined,f:LensFilter){
   if(!flags)return rows
   return rows.filter(r=>{
     const x=flags[r.market+':'+r.ticker]
     if(f.hideWeak&&(x?.loss||x?.no_revenue))return false
     if(f.sepaOnly&&!x?.sepa)return false
+    if(f.growthOnly&&!growthPasses(x))return false
     return true
   })
 }

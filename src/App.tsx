@@ -17,7 +17,7 @@ import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { GROUP_MIN_MEMBERS, normalizeUsSectors, withGroupRanks } from './lib/groupRank'
 import { flagBadges, flagKey, useStockFlags } from './lib/stockFlags'
-import { BIGCAP, applyLensFilter, bigCapLeaders, byGroupThenRs, leaderGroups, topGroup, type LensFilter } from './lib/leaderLens'
+import { BIGCAP, DEFAULT_LENS_FILTER, applyLensFilter, bigCapLeaders, byGroupThenRs, leaderGroups, topGroup, type LensFilter } from './lib/leaderLens'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
 import { invalidatePriceHistory, usePriceHistory, rebased } from './lib/priceHistory'
@@ -422,6 +422,7 @@ function LensBar({view,setView,filter,setFilter,flagsReady,showView=true}:{view:
   const off=flagsReady?undefined:'공시 배지 파일이 없어 필터를 적용할 수 없습니다'
   return <div className="lens-bar">
     {showView&&<div className="mini-segment" role="group" aria-label="정렬 기준">{([['group','업종별'],['rs','RS순']] as const).map(([k,t])=><button key={k} type="button" aria-pressed={view===k} className={view===k?'on':''} onClick={()=>setView(k)}>{t}</button>)}</div>}
+    <button type="button" className={'lens-chip'+(filter.growthOnly?' on':'')} aria-pressed={filter.growthOnly} disabled={!flagsReady} title={off??'최근 분기 매출 +20% 이상·이익 +25% 이상(전년 동기 대비, 미국 희석 EPS·한국 순이익)인 종목만 보여줍니다. 기본으로 켜져 있으며, 분류는 바꾸지 않습니다. 성장률을 알 수 없는 종목도 숨겨집니다.'} onClick={()=>setFilter({...filter,growthOnly:!filter.growthOnly})}>실적 성장만</button>
     <button type="button" className={'lens-chip'+(filter.hideWeak?' on':'')} aria-pressed={filter.hideWeak} disabled={!flagsReady} title={off??'연간 공시 기준 적자 또는 매출 없음 종목을 목록에서 숨깁니다 (분류는 그대로)'} onClick={()=>setFilter({...filter,hideWeak:!filter.hideWeak})}>적자·매출 없음 제외</button>
     <button type="button" className={'lens-chip'+(filter.sepaOnly?' on':'')} aria-pressed={filter.sepaOnly} disabled={!flagsReady} title={off??'Minervini SEPA: Trend Template 8개 조건 + 분기 EPS +25%·매출 +20% 이상인 종목만'} onClick={()=>setFilter({...filter,sepaOnly:!filter.sepaOnly})}>SEPA 충족만</button>
   </div>
@@ -770,7 +771,7 @@ export default function App(){
   const [summaryTab,setSummaryTab]=useState<SummaryTab|null>(null)
   // LEADER-LENS-1: how the 주도 종목 lists are read (per-device convenience; classification unchanged).
   const [leaderView,setLeaderView]=useState<'group'|'rs'>(()=>{try{return localStorage.getItem(LEADER_VIEW_KEY)==='rs'?'rs':'group'}catch{return 'group'}})
-  const [lensFilter,setLensFilter]=useState<LensFilter>(()=>{try{const v=JSON.parse(localStorage.getItem(LEADER_FILTER_KEY)||'{}');return {hideWeak:v.hideWeak===true,sepaOnly:v.sepaOnly===true}}catch{return {hideWeak:false,sepaOnly:false}}})
+  const [lensFilter,setLensFilter]=useState<LensFilter>(()=>{try{const v=JSON.parse(localStorage.getItem(LEADER_FILTER_KEY)||'{}');return {hideWeak:v.hideWeak===true,sepaOnly:v.sepaOnly===true,growthOnly:v.growthOnly!==false}}catch{return DEFAULT_LENS_FILTER}})
   useEffect(()=>{try{localStorage.setItem(LEADER_VIEW_KEY,leaderView);localStorage.setItem(LEADER_FILTER_KEY,JSON.stringify(lensFilter))}catch{/* storage unavailable */}},[leaderView,lensFilter])
   const [leaderGroupKey,setLeaderGroupKey]=useState<string|null>(null)
   const [allGroupsShown,setAllGroupsShown]=useState(false)
