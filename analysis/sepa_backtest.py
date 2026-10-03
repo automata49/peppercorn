@@ -200,21 +200,29 @@ def markdown(ev: dict, comp: dict) -> str:
 
 # ---- network (not unit tested) -------------------------------------------------------------------------------
 def load_us_growth(ua: str, tickers: list[str], years: range) -> dict:  # pragma: no cover - network
+    import time
+    from concurrent.futures import ThreadPoolExecutor
     import leadership_report as lr
     import stock_flags as sf
     sys.path.insert(0, str(Path(__file__).parent / "fundamentals"))
     import targets
     ciks = targets.sec_ciks(ua)
+    jobs = [(y, q, tag, unit) for y in years for q in (1, 2, 3, 4)
+            for tag, unit in [(t, "USD") for t in lr.REVENUE_TAGS] + [("EarningsPerShareBasic", "USD-per-shares"), ("EarningsPerShareDiluted", "USD-per-shares")]]
+    t0 = time.time()
+    with ThreadPoolExecutor(4) as pool:  # SEC allows 10 requests/s
+        got = list(pool.map(lambda j: (j, lr.sec_frames(ua, j[2], f"CY{j[0]}Q{j[1]}", j[3])), jobs))
+    print(f"SEC frames: {len(jobs)} downloads in {time.time() - t0:.0f}s", file=sys.stderr, flush=True)
     rev, eps = {}, {}
-    for y in years:
-        for q in (1, 2, 3, 4):
-            p = f"CY{y}Q{q}"
-            r = {}
-            for tag in lr.REVENUE_TAGS:
-                for cik, v in lr.sec_frames(ua, tag, p).items():
-                    r[cik] = max(r.get(cik, v), v)
-            rev[(y, q)] = r
-            eps[(y, q)] = {**lr.sec_frames(ua, "EarningsPerShareBasic", p, "USD-per-shares"), **lr.sec_frames(ua, "EarningsPerShareDiluted", p, "USD-per-shares")}
+    for (y, q, tag, unit), data in got:
+        if unit == "USD":
+            r = rev.setdefault((y, q), {})
+            for cik, v in data.items():
+                r[cik] = max(r.get(cik, v), v)
+        elif tag == "EarningsPerShareBasic":
+            eps.setdefault((y, q), {}).update({c: v for c, v in data.items() if c not in eps.get((y, q), {})})
+        else:
+            eps.setdefault((y, q), {}).update(data)  # diluted wins over basic
     out = {}
     for t in tickers:
         cik = ciks.get(t.upper().replace(".", "-")) or ciks.get(t.upper())
@@ -224,13 +232,14 @@ def load_us_growth(ua: str, tickers: list[str], years: range) -> dict:  # pragma
         for (y, q) in rev:
             if (y - 1, q) in rev and cik in rev[(y, q)]:
                 h.append((us_available(y, q), sf.growth(rev[(y, q)].get(cik), rev[(y - 1, q)].get(cik)),
-                          sf.growth(eps[(y, q)].get(cik), eps[(y - 1, q)].get(cik))))
+                          sf.growth(eps.get((y, q), {}).get(cik), eps.get((y - 1, q), {}).get(cik))))
         out[t] = h
     return out
 
 
 def load_kr_growth(key: str, tickers: list[str], years: range) -> dict:  # pragma: no cover - network
     import time
+    from concurrent.futures import ThreadPoolExecutor
     import requests
     import stock_flags as sf
     sys.path.insert(0, str(Path(__file__).parent / "fundamentals"))
@@ -238,21 +247,31 @@ def load_kr_growth(key: str, tickers: list[str], years: range) -> dict:  # pragm
     codes = targets.dart_codes(key)
     by_code = {codes[t]: t for t in tickers if t in codes}
     items, out = list(by_code), {}
-    for y in years:
-        for code in ("11013", "11012", "11014", "11011"):
-            for i in range(0, len(items), 100):
-                body = requests.get("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
-                                    params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": str(y), "reprt_code": code}, timeout=120).json()
-                rows = body.get("list") or []
-                for corp in {r["corp_code"] for r in rows}:
-                    mine = [r for r in rows if r["corp_code"] == corp]
-                    fs = "CFS" if any(r.get("fs_div") == "CFS" for r in mine) else "OFS"
-                    mine = [r for r in mine if r.get("fs_div") == fs]
-                    rv = next((r for r in mine if r.get("account_nm") in ("매출액", "영업수익", "수익(매출액)")), None)
-                    ni = next((r for r in mine if (r.get("account_nm") or "").startswith("당기순이익")), None)
-                    out.setdefault(by_code[corp], []).append((kr_available(y, code), sf.growth(*sf.dart_pair(rv, code == "11011")),
-                                                             sf.growth(*sf.dart_pair(ni, code == "11011"))))
-                time.sleep(.2)
+    jobs = [(y, code, i) for y in years for code in ("11013", "11012", "11014", "11011") for i in range(0, len(items), 100)]
+
+    def fetch(job):
+        y, code, i = job
+        for attempt in range(3):
+            try:
+                return job, requests.get("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json", timeout=60,
+                                         params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": str(y), "reprt_code": code}).json()
+            except Exception:
+                time.sleep(2 ** (attempt + 1))
+        return job, {}
+    t0 = time.time()
+    with ThreadPoolExecutor(3) as pool:
+        got = list(pool.map(fetch, jobs))
+    print(f"DART: {len(jobs)} requests in {time.time() - t0:.0f}s", file=sys.stderr, flush=True)
+    for (y, code, _), body in got:
+        rows = body.get("list") or []
+        for corp in {r["corp_code"] for r in rows}:
+            mine = [r for r in rows if r["corp_code"] == corp]
+            fs = "CFS" if any(r.get("fs_div") == "CFS" for r in mine) else "OFS"
+            mine = [r for r in mine if r.get("fs_div") == fs]
+            rv = next((r for r in mine if r.get("account_nm") in ("매출액", "영업수익", "수익(매출액)")), None)
+            ni = next((r for r in mine if (r.get("account_nm") or "").startswith("당기순이익")), None)
+            out.setdefault(by_code[corp], []).append((kr_available(y, code), sf.growth(*sf.dart_pair(rv, code == "11011")),
+                                                     sf.growth(*sf.dart_pair(ni, code == "11011"))))
     return out
 
 
@@ -262,9 +281,9 @@ def main():  # pragma: no cover - network
     rows = requests.get(lr.LEADERBOARD_URL, params={"client": "peppercorn-public-read-v1"}, timeout=120).json()["rows"]
     eq = [r for r in rows if r.get("asset_class") == "Equity" and r.get("market") in ("US", "KR")]
     ua, key = os.environ.get("SEC_USER_AGENT"), os.environ.get("DART_API_KEY")
-    years = range(2021, 2027)
-    growth = {"US": load_us_growth(ua, [r["ticker"] for r in eq if r["market"] == "US"], years) if ua else {},
-              "KR": load_kr_growth(key, [r["ticker"] for r in eq if r["market"] == "KR"], years) if key else {}}
+    # Backtest dates start about 2022-10; SEC needs the prior-year quarters, DART reports carry the prior year themselves.
+    growth = {"US": load_us_growth(ua, [r["ticker"] for r in eq if r["market"] == "US"], range(2021, 2027)) if ua else {},
+              "KR": load_kr_growth(key, [r["ticker"] for r in eq if r["market"] == "KR"], range(2022, 2027)) if key else {}}
     print(f"growth histories: US {len(growth['US'])}, KR {len(growth['KR'])}", file=sys.stderr)
     results, comp = {}, {}
     for market in ("US", "KR"):
@@ -272,6 +291,7 @@ def main():  # pragma: no cover - network
         groups = {r["ticker"]: (r.get("sector") if market == "KR" else r.get("industry")) for r in mrows}
         sectors = {r["ticker"]: (r.get("industry") if market == "KR" else US_SECTOR_GICS.get(r.get("sector"), r.get("sector"))) for r in mrows}
         frames = lb.load_prices(mrows, market)
+        print(f"{market}: prices loaded", file=sys.stderr, flush=True)
         results[market] = run_market(frames, groups, growth[market], market)
         comp[market] = composition(frames, groups, sectors, growth[market])
         print(f"{market}: {len(results[market]['dates'])} dates", file=sys.stderr)
