@@ -1,0 +1,33 @@
+name: Leadership diagnosis (read-only)
+
+# LEADERSHIP-DIAG-1. 읽기 전용: 공개 leaderboard, SEC XBRL frames, OpenDART 다중회사 주요계정, Yahoo 일봉만 읽고
+# 현재 주도 종목 분류의 섹터 편중·산업 순위·반도체 위치·조건 퍼널·공시 실적·단일일 급등 의존을 보고한다. Supabase 에는 쓰지 않는다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: pip install -r analysis/requirements.txt
+      - name: Diagnose
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          DART_API_KEY: ${{ secrets.DART_API_KEY }}
+        run: python analysis/leadership_report.py && cat leadership_report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: leadership-report
+          path: |
+            leadership_report.md
+            leadership_report.json
+          if-no-files-found: ignore
