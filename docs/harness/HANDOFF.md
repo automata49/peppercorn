@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile Trading Journal hierarchy — 2026-10-04
+Trading Journal now follows the same phone decision hierarchy as Watchlist/Portfolio. Recent ticker-linked records render first as compact DecisionList rows with status, date, current/realized value and buy price; the existing editable grid is unchanged behind a ProgressiveDisclosure. Wider screens still open directly on the grid. Compact rows jump to 종목 분석 when the ticker exists in the loaded universe. No journal schema, calculation, cloud sync or review field changed.
+Validation required: harness, build and full UI suite including tests/journal-mobile.spec.ts.
+
 ## Mobile Leaderboard / Universe hierarchy — 2026-10-04
 The remaining table-heavy public catalog pages now follow the same decision-first phone pattern. Leaderboard and Universe keep their existing filters and canonical AG Grid, but phones first render up to 20 compact DecisionList rows and place the full grid behind a shared ProgressiveDisclosure. The long rule guides are hidden from the first phone view; desktop/iPad-Pro full-grid behavior and guide copy remain. Compact rows jump to 종목 분석. Research is not changed because it is no longer a primary page: prior Research records are already folded under 시장 온도계.
 No universe membership, sorting, rank, classification, persistence or scheduled-refresh behavior changed. Validation required: harness, build and full UI suite including tests/catalog-mobile.spec.ts.

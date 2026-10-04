@@ -1150,7 +1150,7 @@ export default function App(){
     const score=(Number(r.eps_growth_q)>=.25?1:0)+(Number(r.sales_growth_q)>=.20?1:0)+(Number(r.eps_growth_3y)>=.25?1:0)+(Number(r.roe)>=.17?1:0)+(Number(r.operating_margin)>=.10?1:0)+(Number(r.debt_ratio)<=1&&r.debt_ratio!==null&&r.debt_ratio!==''?1:0)+(r.operating_cashflow_positive===true?1:0)+(Number(r.peg)<=1&&r.peg!==null&&r.peg!==''?1:0)+(yes50&&yes200?1:0)+(Number(r.high_52w_distance)>=-.25?1:0)
     return {...r,...auto,no:i+1,above_ma50:r.ticker?(yes50?'Y':'N'):'',above_ma200:r.ticker?(yes200?'Y':'N'):'',pass_count:r.ticker?score+'/10':'',auto_grade:r.ticker?(score>=8?'매수후보':score>=5?'관찰':'제외'):'',research_note_no:r.research_note_no||researchNoByTicker.get(String(r.ticker||''))||''}
   })
-  const enrichedJournal=enrich(journal).map((r,i)=>{
+  const enrichedJournal:EditableRow[]=enrich(journal).map((r,i)=>{
     const buy=Number(r.buy_price),target=Number(r.target_price),stop=Number(r.stop_price),sell=Number(r.sell_price)
     const validBuy=Number.isFinite(buy)&&buy!==0
     return {...r,no:i+1,target_return:validBuy&&Number.isFinite(target)&&target!==0?target/buy-1:null,stop_return:validBuy&&Number.isFinite(stop)&&stop!==0?stop/buy-1:null,realized_return:validBuy&&Number.isFinite(sell)&&sell!==0?sell/buy-1:r.realized_return,analysis_no:analysisNoByTicker.get(String(r.ticker||''))||'',research_no:researchNoByTicker.get(String(r.ticker||''))||''}
@@ -1444,7 +1444,35 @@ export default function App(){
     content=<><MarketTemperature entries={tempEntries} onChange={updateTemperature} facts={tempFacts}/>
       <details className="panel legacy-research"><summary>이전 Research 기록 ({research.length})</summary><p className="note">시장 온도계 이전의 Research 기록입니다. 지우지 않고 그대로 보관합니다.</p><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={520}/></details></>
   }else if(page==='journal'){
-    content=<><div className="page-note"><b>Trading Journal</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·RS가 연결됩니다. 매수 가설과 결과 복기를 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
+    const journalSummary=enrichedJournal.filter(r=>r.ticker).slice(0,20)
+    const openJournalStock=(r:EditableRow)=>{const hit=leaders.find(x=>x.market===r.market&&x.ticker===r.ticker);if(hit){setSelected(hit);setRecentStocks(pushRecent({market:hit.market,ticker:hit.ticker,name:hit.name}));setPage('analysis')}}
+    content=<><div className="page-note workspace-note"><b>Trading Journal</b><span>최근 기록의 상태와 가격을 먼저 보고, 가설·목표·손절·복기는 필요할 때 전체 표에서 편집합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/>
+      <section className="workspace-mobile-summary" aria-label="Trading Journal 요약">
+        <DecisionList
+          items={journalSummary.map((r,i)=>{
+            const realized=r.realized_return==null?null:Number(r.realized_return)
+            return {
+              key:String(r.id??i),
+              data:r,
+              rank:Number(r.no||i+1),
+              eyebrow:String(r.date||r.market||''),
+              title:String(r.name||r.ticker||'—'),
+              meta:[r.ticker,r.account,r.tranche,r.stage].filter(Boolean).join(' · '),
+              badge:String(r.status||'기록'),
+              badgeTone:r.status==='보유중'?'green':r.status==='재검토중'?'amber':'gray',
+              value:realized==null?`현재 ${r.current_price==null?'—':num(r.current_price)}`:`실현 ${pct(realized)}`,
+              subvalue:r.buy_price?`매수 ${num(r.buy_price)}`:r.review_date?`재검토 ${r.review_date}`:'기록 확인',
+              valueTone:realized==null?undefined:realized>0?'positive':realized<0?'negative':undefined,
+              ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
+            }
+          })}
+          onSelect={openJournalStock}
+          emptyLabel="종목코드를 입력하면 최근 기록 요약이 표시됩니다."
+        />
+      </section>
+      <ProgressiveDisclosure key="journal-table" title="전체 표 · 기록 편집" meta={`${enrichedJournal.length}건`} className="workspace-table-disclosure">
+        <div className="panel workspace-grid-panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div>
+      </ProgressiveDisclosure></>
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     const uvEq=leaders.filter(r=>r.asset_class==='Equity'),uvUS=uvEq.filter(r=>r.market==='US').length,uvKR=uvEq.length-uvUS
