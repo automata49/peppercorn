@@ -37,7 +37,8 @@ for(const width of [390,430]){
 
     const sectorRow=page.locator('.mobile-sector-list .decision-row').first()
     await boxAtLeast(sectorRow,200,64)
-    expect(parseFloat(await sectorRow.locator('.decision-main small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    expect(parseFloat(await sectorRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
     await nav.getByRole('button',{name:'관심'}).click()
     const tickerInput=page.locator('.ticker-entry input').first()
