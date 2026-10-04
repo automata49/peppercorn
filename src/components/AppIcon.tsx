@@ -11,6 +11,7 @@ export type AppIconName =
   | 'sectors'
   | 'menu'
   | 'close'
+  | 'refresh'
 
 const common={
   fill:'none',
@@ -35,6 +36,7 @@ export function AppIcon({name,size=20,className=''}:{name:AppIconName;size?:numb
       case 'sectors': return <><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></>
       case 'menu': return <><path d="M4 7h16M4 12h16M4 17h16"/></>
       case 'close': return <><path d="m6 6 12 12M18 6 6 18"/></>
+      case 'refresh': return <><path d="M20 6v5h-5"/><path d="M18.2 9A7 7 0 1 0 19 15"/></>
     }
   })()
   return <svg className={('app-icon '+className).trim()} width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" focusable="false" {...common}>{body}</svg>
