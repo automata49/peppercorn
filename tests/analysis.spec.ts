@@ -9,7 +9,7 @@ const position=[
 async function openAnalysis(page:Page){
   const side=page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'})
   if(await side.isVisible()){await side.click();return}
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'종목'})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'})
   if(await bottom.isVisible()){await bottom.click();return}
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
   await page.locator('.menu-drawer').getByRole('button',{name:'종목 분석'}).click()
