@@ -45,10 +45,10 @@ export function Sidebar({page,setPage,open,setOpen}:{page:string;setPage:(p:stri
     </div>
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
-      <button className={page==='dashboard'?'active':''} onClick={()=>setPage('dashboard')}><span aria-hidden="true">⌂</span><b>Dashboard</b></button>
+      <button className={page==='dashboard'?'active':''} onClick={()=>setPage('dashboard')}><span aria-hidden="true">⌂</span><b>홈</b></button>
       <button onClick={()=>goDashboardSection('.dashboard-sector-panel')}><span aria-hidden="true">▥</span><b>섹터</b></button>
-      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><span aria-hidden="true">▤</span><b>종목</b></button>
-      <button className={page==='watchlist'?'active':''} onClick={()=>setPage('watchlist')}><span aria-hidden="true">★</span><b>관심목록</b></button>
+      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><span aria-hidden="true">▤</span><b>분석</b></button>
+      <button className={page==='watchlist'?'active':''} onClick={()=>setPage('watchlist')}><span aria-hidden="true">★</span><b>관심</b></button>
     </nav>
 
     <Dialog open={open} onOpenChange={setOpen}>
