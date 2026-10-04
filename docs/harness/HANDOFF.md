@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile workspace hierarchy + restrained motion tokens — 2026-10-04
+Following #88/#89, Watchlist and Portfolio now expose compact decision rows first on phones and keep the existing editable AG Grid behind a shared `ProgressiveDisclosure` (`전체 표 · 편집`). Desktop keeps the grid open. Compact rows reuse `DecisionList` and can jump to 종목 분석 for loaded-universe tickers. A new `ProgressiveDisclosure` component establishes the second reusable presentation primitive alongside `DecisionList`, while CSS motion durations/easing are centralized into fast/base/sheet tokens and reduced-motion overrides. No data, workspace persistence, classification or calculation contract changed.
+Validation required: harness, build and full Playwright UI suite, including `tests/workspace-mobile.spec.ts`.
+
 ## Mobile analysis hierarchy — 2026-10-04
 After the decision-first Dashboard pass, the remaining phone density was concentrated in 종목 분석 and the full navigation drawer. MOBILE-ANALYSIS-1 keeps the stock hero/price chart and two-axis checkup primary, while one responsive `상세 데이터` disclosure owns compare, key stats, peers and filed/technical detail. It starts closed only on phones and remains open by default on larger screens; requesting a comparison opens it. The two checkup cards are compressed side-by-side on phones without changing their checks. The drawer now groups the same nine destinations into 핵심 / 기록 / 전체 데이터; desktop order and bottom navigation are unchanged.
 No Swing/Position thresholds, data collection, Supabase schema, persistence or ranking logic changed. Validation required: harness, build and full Playwright UI suite.
