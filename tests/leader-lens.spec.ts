@@ -45,6 +45,10 @@ test('top-down groups order by group rank, then RS; filters use the flags file o
   expect(growthPasses({growth:{rev:.199,eps:.9}})).toBe(false)
   expect(growthPasses({growth:{rev:.5}})).toBe(false)
   expect(growthPasses(undefined)).toBe(false)
+  // A market whose growth source failed (absent from growth_period) is not filtered by growth; others still are.
+  const kr={...core[0],id:'kr1',market:'KR',ticker:'000001'} as LeaderRow
+  expect(applyLensFilter([...core,kr],flags,DEFAULT_LENS_FILTER,['US']).map(r=>r.ticker)).toEqual(['SEMI0','000001'])
+  expect(applyLensFilter([...core,kr],flags,DEFAULT_LENS_FILTER,['US','KR']).map(r=>r.ticker)).toEqual(['SEMI0'])
 })
 
 test('growth and SEPA badges come first and name the period',()=>{

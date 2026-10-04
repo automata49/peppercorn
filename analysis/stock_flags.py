@@ -167,27 +167,14 @@ def us_quarter_growth(ua: str, tickers: list[str], today: datetime.date) -> tupl
     return {}, "none"
 
 
-def kr_quarter_growth(key: str, tickers: list[str], today: datetime.date) -> tuple[dict, str]:  # pragma: no cover - network
-    import requests
-    import time
-    sys.path.insert(0, str(Path(__file__).parent / "fundamentals"))
-    import targets
+def kr_quarter_growth(key: str, tickers: list[str], today: datetime.date, codes: dict[str, str] | None = None) -> tuple[dict, str]:  # pragma: no cover - network
     year, code, label = kr_report(today)
-    codes = targets.dart_codes(key)
+    codes = codes or lr.dart_corp_codes(key)
     by_code = {codes[t]: t for t in tickers if t in codes}
-    items, out = list(by_code), {}
-    for i in range(0, len(items), 100):
-        body = lr.get_with_deadline("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
-                                    params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": str(year), "reprt_code": code}).json()
-        rows = body.get("list") or []
-        for corp in {r["corp_code"] for r in rows}:
-            mine = [r for r in rows if r["corp_code"] == corp]
-            fs = "CFS" if any(r.get("fs_div") == "CFS" for r in mine) else "OFS"
-            mine = [r for r in mine if r.get("fs_div") == fs]
-            rev = next((r for r in mine if r.get("account_nm") in ("매출액", "영업수익", "수익(매출액)")), None)
-            ni = next((r for r in mine if (r.get("account_nm") or "").startswith("당기순이익")), None)
+    out = {}
+    for rows in lr.dart_multi_accounts(key, list(by_code), year, code):
+        for corp, (rev, ni) in lr.dart_pick(rows).items():
             out[("KR", by_code[corp])] = {"rev": growth(*dart_pair(rev, code == "11011")), "eps": growth(*dart_pair(ni, code == "11011"))}
-        time.sleep(.3)
     return out, label
 
 
@@ -232,15 +219,18 @@ def main():  # pragma: no cover - network
     except Exception as e:  # a failed source leaves its flags out
         sources["sec"] = f"failed: {e}"
         log(f"sec annual failed: {e}")
+    codes, dart_down = None, False
     try:
         if not key:
             raise RuntimeError("DART_API_KEY not set")
-        kr = lr.kr_fundamentals(key, [r["ticker"] for r in eq if r["market"] == "KR"])
+        codes = lr.dart_corp_codes(key)
+        kr = lr.kr_fundamentals(key, [r["ticker"] for r in eq if r["market"] == "KR"], codes)
         funda |= kr
         sources["dart"] = f"{len(kr)} KR equities"
         log("dart annual done")
     except Exception as e:
         sources["dart"] = f"failed: {e}"
+        dart_down = True  # a slow or failing OpenDART is skipped for the quarter too; KR growth stays unknown
         log(f"dart annual failed: {e}")
     today = datetime.date.today()
     quarters, periods = {}, {}
@@ -256,7 +246,9 @@ def main():  # pragma: no cover - network
     try:
         if not key:
             raise RuntimeError("DART_API_KEY not set")
-        q, periods["KR"] = kr_quarter_growth(key, [r["ticker"] for r in eq if r["market"] == "KR"], today)
+        if dart_down:
+            raise RuntimeError("skipped: OpenDART failed for the annual accounts")
+        q, periods["KR"] = kr_quarter_growth(key, [r["ticker"] for r in eq if r["market"] == "KR"], today, codes)
         quarters |= q
         sources["dart_quarter"] = f"{periods['KR']}: {sum(1 for v in q.values() if v['rev'] is not None)} revenue, {sum(1 for v in q.values() if v['eps'] is not None)} net income"
     except Exception as e:
