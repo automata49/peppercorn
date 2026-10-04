@@ -165,6 +165,7 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   ok=true
   await banner.getByRole('button',{name:'다시 연결'}).click()
   await expect(banner).toHaveCount(0)
+  await page.locator('.leader-detail > summary').click()
   await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 0')
   await context.close()
 })
@@ -178,10 +179,12 @@ test('주도 종목 popup shows momentum lines for its group; data is fetched pe
   await mockHistory(page,asked)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.locator('.leader-detail > summary').click()
   const chart=page.locator('.leadership-overview .rs-chart')
-  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 7','검증 종목 6','검증 종목 5','검증 종목 4','검증 종목 3'])
+  // Focus contains TEST0,1,2,3,5,6 after the per-group cap/backfill; the chart then takes the top five by 20D return.
+  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 6','검증 종목 5','검증 종목 3','검증 종목 2','검증 종목 1'])
   expect(asked.some(ids=>ids.length===5)).toBeTruthy()
-  await page.locator('.leadership-card').filter({hasText:'핵심 주도'}).first().click()
+  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
   const drill=page.locator('.drill-sheet')
   await expect(drill.locator('.rs-chart .line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
   await drill.locator('.rs-chart .line-legend button').first().click()
@@ -207,6 +210,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   // Section toggles: the sector section switches to KR without touching 주도 종목; the global toggle resets all.
   const sectorPanel=page.locator('.dashboard-sector-panel')
+  await sectorPanel.locator('.sector-heat-disclosure > summary').click()
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR','US'])
   // VALUE-2: US tiles sized by summed trading value (Health Technology 15e9 vs Technology 5e9); KR has none yet → member count.
   await expect(sectorPanel.locator('.etf-heat-market-head span').nth(1)).toContainText('20일 평균 거래대금 합계')
@@ -221,8 +225,10 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(sectorPanel.locator('.section-market button.on')).toHaveText('US')
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['US'])
   // RS line: 50D default, last close 159 vs base 109 against flat SPY.
+  await page.locator('.dashboard-explore > summary').click()
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
+  await page.locator('.leader-detail > summary').click()
   await page.locator('.leadership-overview .line-legend button').first().click()
   const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
   await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
