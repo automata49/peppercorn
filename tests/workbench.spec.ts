@@ -51,7 +51,7 @@ async function open(page:Page){
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'})
   if(await side.isVisible())return side.click()
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'종목'})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'})
   if(await bottom.isVisible())return bottom.click()
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
   await page.locator('.menu-drawer').getByRole('button',{name:'종목 분석'}).click()
@@ -133,7 +133,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
     await expect(side.locator('.nav-label')).toHaveText(['Dashboard','종목 분석','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
   }
   if(await side.isVisible())await side.getByRole('button',{name:'종목 분석'}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'종목'}).click()
+  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
   await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
   const body=page.locator('.analysis-body')
   await expect(body.locator('.hero-meta')).toHaveText('KR · 353200 · KOSPI · Semiconductors')
