@@ -1710,7 +1710,7 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
   .mobile-brandbar{height:54px;padding:5px 12px}
   .mobile-brand-home{min-height:var(--mobile-touch)}
   .mobile-brand-home img{width:31px;height:31px}
-  .mobile-brand-menu,.topbar-refresh{width:var(--mobile-touch);height:var(--mobile-touch);min-width:var(--mobile-touch);min-height:var(--mobile-touch)}
+  .mobile-brand-menu,.topbar-menu,.topbar-refresh{width:var(--mobile-touch);height:var(--mobile-touch);min-width:var(--mobile-touch);min-height:var(--mobile-touch)}
   .topbar{top:54px;min-height:56px;padding:7px 12px}
   .topbar h1{font-size:22px!important;line-height:1.12}
   .content{padding:8px 12px calc(98px + env(safe-area-inset-bottom))}
