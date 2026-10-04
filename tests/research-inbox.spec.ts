@@ -1,4 +1,4 @@
-import {test,expect,type Page} from '@playwright/test'
+import {test,expect,type Page} from '@playwright/test'\nimport {draftFromCaptureMessage,saveToPepperBookmarklet} from '../src/lib/research'
 
 const token='x.'+btoa(JSON.stringify({sub:'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'})).replace(/=/g,'')+'.x'
 const session={access_token:token,refresh_token:'r',expires_at:4102444800,user:{id:'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',email:'owner@example.com'}}
@@ -41,7 +41,9 @@ test('External Research shows public discovery and saves only user supplied body
   await expect(inbox.locator('.research-capture-item')).toContainText('AI 미연결')
 })
 
-test('Save to Pepper handoff consumes window.name and auto-saves after login',async({page})=>{
+test('Save to Pepper handoff validates sender origin and auto-saves after login',async({page})=>{
+  expect(draftFromCaptureMessage({type:'pepper-capture',payload:{url:'https://contents.premium.naver.com/test',title:'x',text:'body'}},'https://evil.example')).toBeNull()
+  expect(saveToPepperBookmarklet('https://automata49.github.io/peppercorn/')).toContain('postMessage')
   await prepare(page)
   const body='브라우저에서 직접 캡처한 프리미엄 본문'
   let posted:any=null
@@ -50,13 +52,11 @@ test('Save to Pepper handoff consumes window.name and auto-saves after login',as
     if(route.request().method()==='POST'){posted=route.request().postDataJSON();return route.fulfill({json:{ok:true,capture:{id:'33333333-3333-3333-3333-333333333333',feed_item_id:null,source_url:posted.source_url,title:posted.title,source_type:'naver_premium',captured_text:posted.captured_text,content_hash:'b'.repeat(64),analysis_status:'provider_unavailable',analysis:null,captured_at:'2026-10-04T00:00:00Z',updated_at:'2026-10-04T00:00:00Z'}})}
     return route.fulfill({json:{ok:true}})
   })
-  await page.goto('/peppercorn/')
-  await page.evaluate(({body})=>{window.name='pepper-capture:'+encodeURIComponent(JSON.stringify({url:'https://contents.premium.naver.com/test',title:'캡처 제목',text:body}))},{body})
   await page.goto('/peppercorn/?capture=1')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await goTemperature(page)
+  await expect(page.locator('.research-inbox')).toBeVisible()
+  await page.evaluate(({body})=>window.dispatchEvent(new MessageEvent('message',{origin:'https://contents.premium.naver.com',data:{type:'pepper-capture',payload:{url:'https://contents.premium.naver.com/test',title:'캡처 제목',text:body}}})),{body})
   await expect(page.locator('.research-inbox')).toContainText('저장 완료',{timeout:10000})
   expect(posted.captured_text).toBe(body)
-  expect(await page.evaluate(()=>window.name)).toBe('')
   expect(page.url()).not.toContain('capture=1')
 })
