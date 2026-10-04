@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile visual polish — 2026-10-04
+After the decision-first hierarchy was locked by #95, the phone audit found several remaining 8–9 px metadata labels and sub-44 px controls that made the UI feel denser than its actual information count. MOBILE-POLISH-1 adds phone-only ergonomics: 44 px touch targets, 52 px bottom-nav items, 64 px decision rows, ~10 px+ secondary metadata, 16 px form controls to prevent iOS Safari focus zoom, slightly calmer top bars/spacing, and consistent disclosure/action hit areas. No information, ranking, calculation, persistence or responsive breakpoint changes.
+Validation required: full Pepper harness plus tests/mobile-visual-polish.spec.ts at 390 and 430 CSS px.
+
 ## Mobile analysis records disclosure — 2026-10-04
 The final table-heavy section inside 종목 분석 is now secondary on phones. `ProgressiveDisclosure` gained an optional controlled state so explicit navigation can open the records section; `종목분석 기록 · 목록` starts closed on phones and remains open/headerless on wider screens. The long records-table explanation is hidden on phones. The underlying AG Grid, record creation, SEC/DART auto fields and persistence are unchanged.
 Validation required: harness, build and full UI suite including tests/analysis-records-mobile.spec.ts.
