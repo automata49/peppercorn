@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile Leaderboard / Universe hierarchy — 2026-10-04
+The remaining table-heavy public catalog pages now follow the same decision-first phone pattern. Leaderboard and Universe keep their existing filters and canonical AG Grid, but phones first render up to 20 compact DecisionList rows and place the full grid behind a shared ProgressiveDisclosure. The long rule guides are hidden from the first phone view; desktop/iPad-Pro full-grid behavior and guide copy remain. Compact rows jump to 종목 분석. Research is not changed because it is no longer a primary page: prior Research records are already folded under 시장 온도계.
+No universe membership, sorting, rank, classification, persistence or scheduled-refresh behavior changed. Validation required: harness, build and full UI suite including tests/catalog-mobile.spec.ts.
+
 ## Mobile workspace hierarchy + restrained motion tokens — 2026-10-04
 Following #88/#89, Watchlist and Portfolio now expose compact decision rows first on phones and keep the existing editable AG Grid behind a shared `ProgressiveDisclosure` (`전체 표 · 편집`). Desktop keeps the grid open. Compact rows reuse `DecisionList` and can jump to 종목 분석 for loaded-universe tickers. A new `ProgressiveDisclosure` component establishes the second reusable presentation primitive alongside `DecisionList`, while CSS motion durations/easing are centralized into fast/base/sheet tokens and reduced-motion overrides. No data, workspace persistence, classification or calculation contract changed.
 Validation required: harness, build and full Playwright UI suite, including `tests/workspace-mobile.spec.ts`.
