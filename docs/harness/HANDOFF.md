@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile analysis records disclosure — 2026-10-04
+The final table-heavy section inside 종목 분석 is now secondary on phones. `ProgressiveDisclosure` gained an optional controlled state so explicit navigation can open the records section; `종목분석 기록 · 목록` starts closed on phones and remains open/headerless on wider screens. The long records-table explanation is hidden on phones. The underlying AG Grid, record creation, SEC/DART auto fields and persistence are unchanged.
+Validation required: harness, build and full UI suite including tests/analysis-records-mobile.spec.ts.
+
 ## Mobile Trading Journal hierarchy — 2026-10-04
 Trading Journal now follows the same phone decision hierarchy as Watchlist/Portfolio. Recent ticker-linked records render first as compact DecisionList rows with status, date, current/realized value and buy price; the existing editable grid is unchanged behind a ProgressiveDisclosure. Wider screens still open directly on the grid. Compact rows jump to 종목 분석 when the ticker exists in the loaded universe. No journal schema, calculation, cloud sync or review field changed.
 Validation required: harness, build and full UI suite including tests/journal-mobile.spec.ts.
