@@ -17,7 +17,7 @@ import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { GROUP_MIN_MEMBERS, normalizeUsSectors, withGroupRanks } from './lib/groupRank'
 import { flagBadges, flagKey, useStockFlags } from './lib/stockFlags'
-import { BIGCAP, DEFAULT_LENS_FILTER, applyLensFilter, bigCapLeaders, byGroupThenRs, leaderGroups, topGroup, type LensFilter } from './lib/leaderLens'
+import { BIGCAP, DEFAULT_LENS_FILTER, applyLensFilter, bigCapLeaders, byGroupThenRs, groupKey, leaderGroups, topGroup, type LensFilter } from './lib/leaderLens'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
 import { squarify } from './lib/treemap'
 import { invalidatePriceHistory, usePriceHistory, rebased } from './lib/priceHistory'
@@ -552,7 +552,7 @@ function MarketSegment({value,onChange,label}:{value:MarketFilter;onChange:(m:Ma
 
 const FOCUS_CONFIG={singleMarket:10,allPerMarket:6,maxPerGroup:2}
 const focusClassScore=(r:LeaderRow)=>leadership(r)==='핵심 주도'?3:leadership(r)==='주도 후보'?2:leadership(r)==='강세 전환'?1:0
-const focusGroupKey=(r:LeaderRow)=>r.market+'|'+String(r.industry||r.sector||'분류 없음')
+const focusGroupKey=(r:LeaderRow)=>groupKey(r)
 const isTopFocusGroup=(r:LeaderRow)=>r.group_rank!=null&&!!r.group_total&&r.group_rank<=Math.ceil(r.group_total*.2)
 function focusLeaderRows(rows:LeaderRow[],market:MarketFilter){
   const markets:Market[]=market==='ALL'?['KR','US']:[market]
