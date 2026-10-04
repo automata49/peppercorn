@@ -1083,6 +1083,7 @@ export default function App(){
     turns:focusRows.filter(r=>leadership(r)==='강세 전환').length
   }
   const broadLeaderCount=summaryGroups.core.length+summaryGroups.candidates.length+summaryGroups.turns.length
+  const focusFilterLabel=!flagFile?'실적 데이터 준비 중':lensFilter.growthOnly?'실적 성장 필터 적용':'실적 성장 필터 해제'
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),
@@ -1211,7 +1212,7 @@ export default function App(){
           <button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 후보 {broadLeaderCount} →</button>
         </div>
         <div className="focus-summary">
-          <div className="focus-summary-main"><span>Focus</span><strong>{focusRows.length}</strong><small>상위 업종 우선 · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목 · 기본 실적 성장 필터</small></div>
+          <div className="focus-summary-main"><span>Focus</span><strong>{focusRows.length}</strong><small>상위 업종 우선 · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목 · {focusFilterLabel}</small></div>
           <div className="focus-class-strip" aria-label="포커스 분류">
             <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{focusCounts.core}</b><small>전체 {leadCount}</small></button>
             <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{focusCounts.candidates}</b><small>전체 {candidateCount}</small></button>
