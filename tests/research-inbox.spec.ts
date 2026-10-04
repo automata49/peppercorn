@@ -1,4 +1,5 @@
-import {test,expect,type Page} from '@playwright/test'\nimport {draftFromCaptureMessage,saveToPepperBookmarklet} from '../src/lib/research'
+import {test,expect,type Page} from '@playwright/test'
+import {draftFromCaptureMessage,saveToPepperBookmarklet} from '../src/lib/research'
 
 const token='x.'+btoa(JSON.stringify({sub:'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'})).replace(/=/g,'')+'.x'
 const session={access_token:token,refresh_token:'r',expires_at:4102444800,user:{id:'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',email:'owner@example.com'}}
