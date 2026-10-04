@@ -23,7 +23,7 @@ function FolioBrand(){
   return <><img className="brand-icon" src="./folio-icon.webp" alt=""/><img className="brand-wordmark-img" src="./folio-wordmark.webp" alt="Folio"/></>
 }
 
-export function Sidebar({page,setPage,open,setOpen}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void}){
+export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean}){
   const pageButton=([id,icon,label]:[string,AppIconName,string])=><button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
     <span className="nav-icon"><AppIcon name={icon}/></span><span className="nav-label">{label}</span>
   </button>
@@ -68,6 +68,9 @@ export function Sidebar({page,setPage,open,setOpen}:{page:string;setPage:(p:stri
         </div>
         <DialogDescription className="sr-only">페이지를 선택하세요.</DialogDescription>
         {drawerNavigation}
+        <button className="drawer-refresh" type="button" onClick={()=>{onRefresh();setOpen(false)}} disabled={refreshing}>
+          <AppIcon name="refresh"/><span>{refreshing?'새로고침 중':'데이터 새로고침'}</span>
+        </button>
       </DialogContent>
     </Dialog>
   </>
