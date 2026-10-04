@@ -834,6 +834,7 @@ export default function App(){
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
+  const [analysisDetailsOpen,setAnalysisDetailsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
   // Compare tray (<=4 stocks), remembered per device as a convenience.
   const [compareKeys,setCompareKeys]=useState<string[]>(()=>{try{const v=JSON.parse(localStorage.getItem('peppercorn-compare-v1')||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string').slice(0,4):[]}catch{return []}})
@@ -1324,7 +1325,7 @@ export default function App(){
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
     const addWatch=()=>{if(selected&&!inWatch)addTickerRecord('watchlist',selected.market+':'+selected.ticker)}
-    const toggleCompare=()=>{if(selected)setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
+    const toggleCompare=()=>{if(!selected)return;if(!inCompare)setAnalysisDetailsOpen(true);setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);window.setTimeout(()=>document.getElementById('analysis-judgement')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     content=<><div className="analysis-page">
@@ -1339,16 +1340,21 @@ export default function App(){
         <div className="analysis-main analysis-card">
           <section className="analysis-block"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>
           <section className="analysis-block"><h3 className="block-title">한눈에 보기</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
-          {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
-            <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
-          <section className="analysis-block"><h3 className="block-title">주요 지표</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
-          <section className="analysis-block"><h3 className="block-title">같은 산업 종목</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
-          <details className="analysis-block analysis-more"><summary>상세 지표 · 공시 더 보기</summary>
-            <h3 className="analysis-part">Swing · 모멘텀</h3>
-            <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
-            <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
-            <h3 className="analysis-part">Position · 펀더멘털</h3>
-            <PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/>
+          <details className="analysis-secondary" open={analysisDetailsOpen} onToggle={e=>setAnalysisDetailsOpen(e.currentTarget.open)}>
+            <summary><span>상세 데이터</span><small>{compareRows.length?`비교 ${compareRows.length} · `:''}주요 지표 · 동종 · 공시</small></summary>
+            <div className="analysis-secondary-body">
+              {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
+                <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
+              <section className="analysis-block"><h3 className="block-title">주요 지표</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
+              <section className="analysis-block"><h3 className="block-title">같은 산업 종목</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
+              <details className="analysis-block analysis-more"><summary>상세 지표 · 공시 더 보기</summary>
+                <h3 className="analysis-part">Swing · 모멘텀</h3>
+                <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
+                <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
+                <h3 className="analysis-part">Position · 펀더멘털</h3>
+                <PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/>
+              </details>
+            </div>
           </details>
         </div>
         <aside className="analysis-judgement" id="analysis-judgement" aria-label="내 판단">

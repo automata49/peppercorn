@@ -11,6 +11,11 @@ const pages=[
   ['universe','⊙','Universe'],
   ['settings','⚙','Settings']
 ]
+const pageGroups=[
+  ['핵심',['dashboard','analysis','temperature','watchlist']],
+  ['기록',['portfolio','journal']],
+  ['전체 데이터',['leaderboard','universe','settings']]
+] as const
 
 // Folio brand lockup: the icon and wordmark share one height, as in the source artwork.
 function FolioBrand(){
@@ -18,11 +23,14 @@ function FolioBrand(){
 }
 
 export function Sidebar({page,setPage,open,setOpen}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void}){
-  const navigation=<nav aria-label="주 메뉴">{pages.map(([id,mark,label])=>
-      <button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
-        <span className="nav-icon" aria-hidden="true">{mark}</span><span className="nav-label">{label}</span>
-      </button>
-    )}</nav>
+  const pageButton=([id,mark,label]:string[])=><button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
+    <span className="nav-icon" aria-hidden="true">{mark}</span><span className="nav-label">{label}</span>
+  </button>
+  const navigation=<nav aria-label="주 메뉴">{pages.map(pageButton)}</nav>
+  const drawerNavigation=<nav className="menu-nav" aria-label="주 메뉴">{pageGroups.map(([title,ids])=><section className="menu-nav-group" key={title}>
+    <h3>{title}</h3>
+    {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
+  </section>)}</nav>
 
   const goDashboardSection=(selector:string)=>{
     setPage('dashboard')
@@ -58,7 +66,7 @@ export function Sidebar({page,setPage,open,setOpen}:{page:string;setPage:(p:stri
           <DialogClose asChild><button className="menu-drawer-close" aria-label="메뉴 닫기">×</button></DialogClose>
         </div>
         <DialogDescription className="sr-only">페이지를 선택하세요.</DialogDescription>
-        {navigation}
+        {drawerNavigation}
       </DialogContent>
     </Dialog>
   </>

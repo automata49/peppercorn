@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile analysis hierarchy — 2026-10-04
+After the decision-first Dashboard pass, the remaining phone density was concentrated in 종목 분석 and the full navigation drawer. MOBILE-ANALYSIS-1 keeps the stock hero/price chart and two-axis checkup primary, while one responsive `상세 데이터` disclosure owns compare, key stats, peers and filed/technical detail. It starts closed only on phones and remains open by default on larger screens; requesting a comparison opens it. The two checkup cards are compressed side-by-side on phones without changing their checks. The drawer now groups the same nine destinations into 핵심 / 기록 / 전체 데이터; desktop order and bottom navigation are unchanged.
+No Swing/Position thresholds, data collection, Supabase schema, persistence or ranking logic changed. Validation required: harness, build and full Playwright UI suite.
+
 Task: dual-client engineering harness + dashboard stock/sector parity.
 Base: main 1b03168 (2026-09-28).
 Changes: reuse StockRows in dashboard, shared table tokens, correct signed high-distance display, full period columns, wide-screen sector selection in place, shared standards/skills/reviewer definitions/hooks/CI/offline analyst contract.
