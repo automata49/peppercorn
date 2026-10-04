@@ -16,8 +16,7 @@ Included:
 - editable Watchlist
 - editable Portfolio
 - Stock Analysis
-- editable Research Notes
-- editable Trading Journal
+- legacy editable Research Notes (preserved)\n- External Research Inbox: public source discovery + private Save to Pepper captures\n- editable Trading Journal
 - Universe
 - Supabase Auth + RLS
 - persistent personal workspace
@@ -41,10 +40,14 @@ Public market data is exposed through the `leaderboard` Edge Function. Browser c
 Personal data is stored behind Supabase Auth and RLS:
 - Watchlist
 - Portfolio
-- Research Notes
-- Trading Journal
-
+- Research Notes\n- External Research captures\n- Trading Journal\n
 Only the authenticated user's rows are readable or writable.
+
+## External Research
+
+The `External research discovery` workflow checks the public HS Academy Telegram preview every four hours and stores only public discovery metadata. It does not fetch Naver Premium subscriber article bodies.
+
+When the owner wants a subscribed article in Pepper, the `Save to Pepper` bookmarklet transfers the text visible in that browser tab to the authenticated app. Captures are private RLS rows and start with `analysis_status=provider_unavailable` until a live Pepper AI Analyst provider is separately connected and validated.
 
 ## Automated refresh
 
