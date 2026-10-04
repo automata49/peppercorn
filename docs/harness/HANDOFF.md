@@ -1,5 +1,9 @@
 # Current handoff
 
+## Progressive compact drawer — 2026-10-05
+The compact drawer still exposed all nine destinations at once. DRAWER-HIERARCHY-1 keeps the four core destinations plus Portfolio/Journal immediately visible and moves Leaderboard/Universe/Settings under a single `전체 데이터` disclosure. Reopening the drawer while on one of those secondary pages expands that group automatically. Desktop navigation remains unchanged.
+Validation required: full Pepper harness plus tests/drawer-hierarchy.spec.ts and updated brand/catalog/mobile-hierarchy coverage.
+
 ## Compact header refresh hierarchy — 2026-10-05
 Phone/iPad headers had menu + refresh + title competing for the same row. COMPACT-HEADER-1 keeps refresh functionality but moves it to the grouped drawer as a secondary `데이터 새로고침` action; desktop retains the direct header refresh. The demo fallback banner still exposes `다시 연결` immediately when live data fails, so recovery does not become harder. Existing refresh invalidation/reload logic is reused.
 Validation required: full Pepper harness, tests/compact-header.spec.ts, and the updated iPad RS refresh regression.
