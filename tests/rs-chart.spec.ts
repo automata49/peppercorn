@@ -67,14 +67,14 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
   // DASHBOARD-FOCUS-1 keeps charts secondary: the ranked focus list and compact sector table are visible first.
-  await expect(page.locator('.focus-leader-row')).toHaveCount(6)
+  await expect(page.locator('.focus-leader-row')).toHaveCount(4)
   await expect(page.locator('.leader-detail')).not.toHaveAttribute('open','')
   await page.locator('.leader-detail > summary').click()
   const leaderChart=page.locator('.leadership-overview .rs-chart')
   await expect(leaderChart.locator('.rs-mode-toggle')).toHaveCount(0)
   await expect(leaderChart.locator('.rs-period-toggle button')).toHaveText(['5D','20D','50D','120D','200D','52W'])
   await expect(leaderChart.locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
-  await expect(leaderChart.locator('.line-legend li')).toHaveCount(5)
+  await expect(leaderChart.locator('.line-legend li')).toHaveCount(4)
   await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
   await leaderChart.getByRole('button',{name:'5D',exact:true}).click()
   await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/124-1)*100).toFixed(1)}%`)
@@ -181,9 +181,9 @@ test('주도 종목 popup shows momentum lines for its group; data is fetched pe
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await page.locator('.leader-detail > summary').click()
   const chart=page.locator('.leadership-overview .rs-chart')
-  // Focus contains TEST0,1,2,3,5,6 after the per-group cap/backfill; the chart then takes the top five by 20D return.
-  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 6','검증 종목 5','검증 종목 3','검증 종목 2','검증 종목 1'])
-  expect(asked.some(ids=>ids.length===5)).toBeTruthy()
+  // Focus contains TEST0,1 and TEST5,6: two representatives from each industry group.
+  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 6','검증 종목 5','검증 종목 1','검증 종목 0'])
+  expect(asked.some(ids=>ids.length===4)).toBeTruthy()
   await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
   const drill=page.locator('.drill-sheet')
   await expect(drill.locator('.rs-chart .line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
