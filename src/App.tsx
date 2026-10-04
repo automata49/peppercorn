@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
 import { DecisionList } from './components/DecisionList'
+import { ProgressiveDisclosure } from './components/ProgressiveDisclosure'
 import { AuthModal } from './components/AuthModal'
 import { PositionPanel, valuation } from './components/PositionPanel'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
@@ -1312,9 +1313,49 @@ export default function App(){
       <span>분류 기준: <b>핵심 주도</b>({lbCount('핵심 주도')}) 추세 템플릿 통과 · RS순위 ≥ 95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0 / <b>주도 후보</b>({lbCount('주도 후보')}) 추세 통과 · IBD식 RS ≥ 80 · 고점 -25% 이내 · RS 3M &gt; 0 / <b>강세 전환</b>({lbCount('강세 전환')}) 추세 미통과지만 50일선 위 · 고점 -30% 이내 · RS순위 ≥ 70 · RS 1W/1M &gt; 0. ETF는 ETF끼리만 순위를 매기고 주도 분류에서 제외합니다.</span>
       <span>읽는 순서: 섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드. 한 종목을 깊게 보려면 종목 분석에서 검색하세요.</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
-    content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><LiveGridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
+    const rows=enrich(watch)
+    const openStock=(r:EditableRow)=>{const hit=leaders.find(x=>x.market===r.market&&x.ticker===r.ticker);if(hit){setSelected(hit);setRecentStocks(pushRecent({market:hit.market,ticker:hit.ticker,name:hit.name}));setPage('analysis')}}
+    content=<><div className="page-note workspace-note"><b>Watchlist</b><span>관심 종목의 현재 위치를 먼저 보고, 가격·손절·우선순위 편집은 필요할 때만 엽니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/>
+      <section className="workspace-mobile-summary" aria-label="Watchlist 요약">
+        <DecisionList items={rows.map((r,i)=>({
+          key:String(r.id??r.market+':'+r.ticker),
+          data:r,
+          rank:i+1,
+          eyebrow:String(r.market||''),
+          title:String(r.name||r.ticker||'—'),
+          meta:[r.ticker,r.industry,stageLabel(r.stage)].filter(Boolean).join(' · '),
+          badge:String(r.priority||stageLabel(r.stage)||'관찰'),
+          badgeTone:r.priority==='A'?'green':r.priority==='B'?'blue':'gray',
+          value:`RS ${r.rs_rank==null?'—':Math.round(Number(r.rs_rank))}`,
+          subvalue:`현재 ${r.current_price==null?'—':num(r.current_price)}`,
+          ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
+        }))} onSelect={openStock}/>
+      </section>
+      <ProgressiveDisclosure key="watchlist-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
+        <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={watchCols} editable onChange={updateWatch} height={650}/></div>
+      </ProgressiveDisclosure></>
   }else if(page==='portfolio'){
-    content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><LiveGridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
+    const rows=enrich(portfolio)
+    const openStock=(r:EditableRow)=>{const hit=leaders.find(x=>x.market===r.market&&x.ticker===r.ticker);if(hit){setSelected(hit);setRecentStocks(pushRecent({market:hit.market,ticker:hit.ticker,name:hit.name}));setPage('analysis')}}
+    content=<><div className="page-note workspace-note"><b>Portfolio</b><span>보유 종목의 현재가와 평단을 먼저 보고, 수량·Stop·투자 가설 편집은 필요할 때만 엽니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/>
+      <section className="workspace-mobile-summary" aria-label="Portfolio 요약">
+        <DecisionList items={rows.map((r,i)=>({
+          key:String(r.id??r.market+':'+r.ticker),
+          data:r,
+          rank:i+1,
+          eyebrow:String(r.market||''),
+          title:String(r.name||r.ticker||'—'),
+          meta:[r.ticker,r.account,r.shares==null?'':r.shares+'주'].filter(Boolean).join(' · '),
+          badge:String(r.account||stageLabel(r.stage)||'보유'),
+          badgeTone:'gray',
+          value:`현재 ${r.current_price==null?'—':num(r.current_price)}`,
+          subvalue:`평단 ${r.avg_price==null?'—':num(r.avg_price)}`,
+          ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
+        }))} onSelect={openStock}/>
+      </section>
+      <ProgressiveDisclosure key="portfolio-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
+        <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div>
+      </ProgressiveDisclosure></>
   }else if(page==='analysis'){
     const scoped=visible.filter(r=>analysisScope==='all'||(analysisScope==='leaders'?LEADING_CLASSES.has(leadership(r)):position.rows.has(positionKey(r.market,r.ticker))))
     const pickStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
