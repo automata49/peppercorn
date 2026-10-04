@@ -22,7 +22,7 @@ for(const width of [390,430]){
     const page=await context.newPage()
     await boot(page)
 
-    await boxAtLeast(page.locator('.mobile-brand-menu'),44,44)
+    await boxAtLeast(page.locator('.topbar-menu'),44,44)
     const nav=page.locator('.mobile-bottom-nav')
     await boxAtLeast(nav.getByRole('button',{name:'홈'}),44,52)
     expect(parseFloat(await nav.locator('b').first().evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(11)
