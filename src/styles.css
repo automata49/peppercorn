@@ -1752,3 +1752,26 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
   .mobile-bottom-nav button span{font-size:19px}
   .mobile-bottom-nav button b{font-size:11px;line-height:1.15}
 }
+
+/* IPAD-TOUCH-1 — keep tablet layouts, raise touch ergonomics on touch devices. */
+@media(min-width:651px) and (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  :root{--tablet-touch:44px}
+  button,[role="button"],summary{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  input,select,textarea{font-size:16px!important}
+
+  .topbar-menu,.mobile-brand-menu,.topbar-refresh,.menu-drawer-close{width:var(--tablet-touch);height:var(--tablet-touch);min-width:var(--tablet-touch);min-height:var(--tablet-touch)}
+  .mobile-brand-home{min-height:var(--tablet-touch)}
+  .mobile-bottom-nav button{min-height:52px;gap:3px;border-radius:10px}
+  .mobile-bottom-nav button b{font-size:11.5px;line-height:1.15}
+
+  .toolbar .segment button,.mini-segment button{min-height:var(--tablet-touch);padding:8px 12px}
+  .toolbar input,.ticker-entry input,.stock-search input{min-height:var(--tablet-touch)}
+  .ticker-entry button,.compare-toggle,.secondary-action,.primary-action{min-height:var(--tablet-touch)}
+  .progressive-disclosure>summary,.dashboard-explore>summary{min-height:48px}
+  .dashboard-disclosure>summary{min-height:var(--tablet-touch)}
+  .recent-stocks button{min-height:38px;padding:7px 12px}
+
+  .menu-drawer nav button{min-height:52px;padding:12px 14px;font-size:14px}
+  .menu-nav-group h3{font-size:11px}
+  .drill-sheet button,.sector-summary-dialog button{touch-action:manipulation}
+}
