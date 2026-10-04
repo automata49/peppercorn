@@ -9,6 +9,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  // DASHBOARD-FOCUS-1: ALL shows at most six per market; the broad classification remains available behind the list.
+  await expect(page.locator('.focus-leader-row')).toHaveCount(12);
+  await expect(page.locator('.focus-summary-main strong')).toHaveText('12');
+  await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
   const etfPanel=page.locator('.dashboard-etf-panel');
   const etfRows=etfPanel.locator('.stock-row');
@@ -39,6 +43,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.keyboard.press('Escape');
   await expect(metrics).toHaveCount(0);
   await expect(page.locator('.ui-dialog-overlay')).toHaveCount(0);
+  const explore=page.locator('.dashboard-explore');
+  await expect(explore).not.toHaveAttribute('open','');
+  await explore.locator('> summary').click();
+  await expect(etfPanel).toBeVisible();
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
   const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
   const before=await sameWidth();
@@ -115,7 +123,8 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  // Dashboard ETF summary: ETF-only RS rank and IBD estimate.
+  // Dashboard ETF summary is secondary and collapsed until requested.
+  await page.locator('.dashboard-explore > summary').click();
   const top=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(top.locator('.stock-id b')).toHaveText('QQQ ETF');
   await expect(top.locator('strong').nth(0)).toHaveText('99');
@@ -161,11 +170,13 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     await page.goto('http://127.0.0.1:4173/peppercorn/');
     await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
     const panel=page.locator('.dashboard-etf-industry-panel');
-    // Placement: directly under 섹터 요약 (same column), above ETF 요약.
-    const sectorBox=(await page.locator('.dashboard-sector-panel').boundingBox())!,heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
-    expect(Math.abs(heatBox.x-sectorBox.x)).toBeLessThan(2);
-    expect(heatBox.y).toBeGreaterThan(sectorBox.y+sectorBox.height-1);
-    expect(heatBox.y-(sectorBox.y+sectorBox.height)).toBeLessThan(40);
+    // ETF exploration is deliberately secondary: hidden by default, then revealed in one disclosure.
+    const explore=page.locator('.dashboard-explore');
+    await expect(explore).not.toHaveAttribute('open','');
+    await expect(panel).not.toBeVisible();
+    await explore.locator('> summary').click();
+    await expect(panel).toBeVisible();
+    const heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
     expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
     // One map per market; broad-market and valueless industries have no tile; KR labels are Korean.
     await expect(panel.locator('.etf-heat-market-head b')).toHaveText(['KR','US']);
@@ -239,6 +250,7 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,kr]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.locator('.dashboard-explore > summary').click();
   const row=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(row.locator('.stock-id b')).toHaveText('KODEX 200');
   await row.click();
@@ -257,7 +269,10 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
   expect(await align(sector.locator('tbody tr').first().locator('td:first-child'))).toEqual(['left']);
   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   for(const panel of ['.drill-sheet','.dashboard-etf-panel']){
-    if(panel==='.dashboard-etf-panel'){await page.keyboard.press('Escape');await expect(page.locator('.drill-sheet')).toHaveCount(0)}
+    if(panel==='.dashboard-etf-panel'){
+      await page.keyboard.press('Escape');await expect(page.locator('.drill-sheet')).toHaveCount(0);
+      await page.locator('.dashboard-explore > summary').click();
+    }
     const rows=page.locator(panel+' .stock-rows');
     expect(await align(rows.locator('.stock-rows-head > span'))).toEqual(['left']);
     const first=rows.locator('.stock-row').first();
