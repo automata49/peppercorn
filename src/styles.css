@@ -410,7 +410,6 @@ body{font-size:14px;line-height:1.45}
   .topbar>.topbar-title{min-width:0}
   .topbar h1{font-size:23px!important;line-height:1.08;letter-spacing:-.035em}
   .topbar p{display:none!important}
-  .topbar .topbar-menu{display:none!important}
   .top-actions{display:none!important}
   .content{padding:8px 10px calc(92px + env(safe-area-inset-bottom))}
   .toolbar{display:flex;flex-direction:row;align-items:center;gap:8px;margin-bottom:12px}
