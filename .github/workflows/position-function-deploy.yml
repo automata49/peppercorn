@@ -1,6 +1,6 @@
 name: Edge function deploy
 
-# 수동 실행 전용. Position Edge Function(position-ingest, position-public) 또는 quotes 를 테스트 또는 운영 프로젝트에 배포한다.
+# 수동 실행 전용. Position Edge Function(position-ingest, position-public), quotes 또는 research-ingest 를 테스트 또는 운영 프로젝트에 배포한다.
 # Supabase 개인 액세스 토큰: 운영은 SUPABASE_ACCESS_TOKEN, 테스트는 SUPABASE_ACCESS_TOKEN_TEST (없으면 운영 토큰을 시도).
 # 토큰은 각 프로젝트 하나에 Edge Functions 권한만 주는 것을 권장한다. 운영은 confirm 에 deploy 를 입력해야 한다.
 on:
@@ -9,7 +9,7 @@ on:
       function:
         description: 배포할 함수
         type: choice
-        options: [position-ingest, position-public, quotes, price-history, universe-import, workspace, auth]
+        options: [position-ingest, position-public, quotes, price-history, universe-import, workspace, research-ingest, auth]
         default: position-ingest
       target:
         description: 배포 대상
@@ -57,10 +57,11 @@ jobs:
           # endpoints guarded by origin and client token like leaderboard. None uses a Supabase JWT.
           # universe-import authenticates with a GitHub OIDC token as well. workspace keeps the gateway's Supabase JWT check
           # (it reads the user id from the token and forwards it to PostgREST under RLS), so it deploys with verify_jwt on.
+          # research-ingest also requires a valid user JWT and stores only that user's owner-RLS research rows.
           # auth (login, refresh, Google PKCE exchange) is called before the user has a token, so the gateway check is off;
           # it validates its own inputs and uses the service key only server-side.
           case "$FUNCTION" in
             position-ingest|position-public|quotes|price-history|universe-import|auth) supabase functions deploy "$FUNCTION" --project-ref "$ref" --no-verify-jwt ;;
-            workspace) supabase functions deploy "$FUNCTION" --project-ref "$ref" ;;
+            workspace|research-ingest) supabase functions deploy "$FUNCTION" --project-ref "$ref" ;;
             *) echo "::error::unknown function $FUNCTION"; exit 1;;
           esac
