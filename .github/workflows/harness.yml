@@ -25,6 +25,7 @@ jobs:
       - run: npm run test:etf-rs
       - run: npm run test:universe-db
       - run: npm run test:temperature-db
+      - run: npm run test:research-db
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get install -y fonts-noto-cjk
