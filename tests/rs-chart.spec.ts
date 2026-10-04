@@ -66,7 +66,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
-  // 주도 종목 and ETF 요약: daily momentum lines only (no RS chart); 섹터 요약: heatmap.
+  // DASHBOARD-FOCUS-1 keeps charts secondary: the ranked focus list and compact sector table are visible first.
+  await expect(page.locator('.focus-leader-row')).toHaveCount(6)
+  await expect(page.locator('.leader-detail')).not.toHaveAttribute('open','')
+  await page.locator('.leader-detail > summary').click()
   const leaderChart=page.locator('.leadership-overview .rs-chart')
   await expect(leaderChart.locator('.rs-mode-toggle')).toHaveCount(0)
   await expect(leaderChart.locator('.rs-period-toggle button')).toHaveText(['5D','20D','50D','120D','200D','52W'])
@@ -75,12 +78,19 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
   await leaderChart.getByRole('button',{name:'5D',exact:true}).click()
   await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/124-1)*100).toFixed(1)}%`)
-  const etfChart=page.locator('.dashboard-etf-panel .rs-chart')
-  await expect(etfChart.locator('.line-legend b')).toHaveCount(3)
+
+  const sectorDisclosure=page.locator('.sector-heat-disclosure')
+  await expect(sectorDisclosure).not.toHaveAttribute('open','')
+  await sectorDisclosure.locator('> summary').click()
   const sectorChart=page.locator('.dashboard-sector-panel .sector-heat')
   await expect(sectorChart.locator('.etf-heat-tile')).toHaveCount(2)
-  await expect(page.locator('.dashboard-sector-panel svg')).toHaveCount(0)
-  expect((await sectorChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-sector-panel .dashboard-sector-table').boundingBox())!.y)
+  expect((await sectorChart.boundingBox())!.y).toBeGreaterThan((await page.locator('.dashboard-sector-panel .dashboard-sector-table').boundingBox())!.y)
+
+  const explore=page.locator('.dashboard-explore')
+  await expect(explore).not.toHaveAttribute('open','')
+  await explore.locator('> summary').click()
+  const etfChart=page.locator('.dashboard-etf-panel .rs-chart')
+  await expect(etfChart.locator('.line-legend b')).toHaveCount(3)
   expect((await etfChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-etf-panel .stock-rows').boundingBox())!.y)
   await noOverflow()
 
