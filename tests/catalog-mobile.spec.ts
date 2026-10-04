@@ -11,7 +11,10 @@ async function boot(page:any){
 
 async function openDrawerPage(page:any,name:string){
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name}).click()
+  const drawer=page.locator('.menu-drawer')
+  const more=drawer.locator('.menu-nav-more')
+  if(['Leaderboard','Universe','Settings'].includes(name)&&!(await more.getAttribute('open')))await more.locator(':scope > summary').click()
+  await drawer.getByRole('button',{name}).click()
 }
 
 test('phone Leaderboard and Universe are summary-first',async({browser})=>{
