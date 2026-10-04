@@ -621,7 +621,7 @@ const PriceRsChart=memo(function PriceRsChart({row,rows}:{row:LeaderRow;rows:Lea
     {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
       :!data?<p className="empty">{hist.status==='loading'||hist.status==='idle'?'일별 가격을 불러오는 중…':'일별 가격 이력이 없습니다.'}</p>
       :<>
-        <div ref={ref} className="line-chart-plot">{width>0&&<PriceRsSvg data={data} width={width} benchTicker={ticker}/>}</div>
+        <div ref={ref} className="line-chart-plot">{width>0&&<PriceRsSvg key={row.id+period} data={data} width={width} benchTicker={ticker}/>}</div>
         {!data.rs&&<p className="empty price-rs-missing">{isBench?`이 종목이 ${row.market} 벤치마크(${ticker})라 RS 라인이 없습니다.`:!bench?`벤치마크(${ticker}) 가격이 없어 RS 라인을 그릴 수 없습니다.`:'벤치마크와 겹치는 일별 가격이 없어 RS 라인을 그릴 수 없습니다.'}</p>}
         <ul className="line-legend">
           {[{label:row.name,sub:`${row.ticker} · ${SESSIONS[period]}거래일`,c:PRICE_C,dash:false,v:data.price},
@@ -638,6 +638,7 @@ const PRICE_C='#28486f',BENCH_C='#8a96a6',RS_C='#c33d36'
 
 function PriceRsSvg({data,width,benchTicker}:{data:PriceRsData;width:number;benchTicker:string}){
   const narrow=width<520,n=data.dates.length
+  const [scrub,setScrub]=useState<number|null>(null)
   const L=46,R=52,w=Math.max(0,width-L-R),T1=24,H1=narrow?170:190,G=40,T2=T1+H1+G,H2=data.rs?(narrow?64:76):0,B=24,H=(data.rs?T2+H2:T1+H1)+B
   const x=(i:number)=>L+(n>1?i*w/(n-1):0)
   const top=yScale([{key:'p',label:'',values:data.price},{key:'b',label:'',values:data.bench??[]}],100)
@@ -651,7 +652,18 @@ function PriceRsSvg({data,width,benchTicker}:{data:PriceRsData;width:number;benc
   const hiIdx=data.price.indexOf(data.priceHigh)
   const xTicks=[...new Set((narrow?[0,1,2,3].map(k=>Math.round(k*(n-1)/3)):[0,1,2,3,4,5].map(k=>Math.round(k*(n-1)/5))))]
   const last=n-1,rsLast=data.rs?.[last]
-  return <svg width={width} height={H} role="img" aria-label={`가격과 벤치마크${data.rs?', RS 라인':''} 꺾은선 차트`}>
+  const selected=Math.min(scrub??last,last)
+  const choose=(clientX:number,element:SVGSVGElement)=>{const rect=element.getBoundingClientRect();setScrub(Math.max(0,Math.min(last,Math.round(((clientX-rect.left)*width/rect.width-L)/Math.max(1,w)*last))))}
+  return <><div className="chart-readout" aria-live="off">
+    <time>{data.dates[selected]}</time>
+    <span>종목 <b key={data.price[selected]}>{data.price[selected].toFixed(1)}</b></span>
+    {data.bench&&<span>{benchTicker} <b>{data.bench[selected]?.toFixed(1)??'—'}</b></span>}
+    {data.rs&&<span>RS <b>{data.rs[selected]?.toFixed(1)??'—'}</b></span>}
+  </div><svg className="scrubbable-chart" width={width} height={H} role="img" aria-label={`가격과 벤치마크${data.rs?', RS 라인':''} 꺾은선 차트`}
+    onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId);choose(e.clientX,e.currentTarget)}}
+    onPointerMove={e=>{if(e.pointerType==='mouse'||e.currentTarget.hasPointerCapture(e.pointerId))choose(e.clientX,e.currentTarget)}}
+    onPointerUp={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)}}
+    onPointerCancel={()=>setScrub(null)}>
     <text className="line-axis-title" x={4} y={10}>지수 (시작=100)</text>
     {top.ticks.map(t=><g key={t}><line x1={L} x2={L+w} y1={y1(t)} y2={y1(t)} className={t===100?'line-zero':'line-grid'}/><text x={L-6} y={y1(t)+3.5} textAnchor="end" className="line-tick">{t.toFixed(0)}</text></g>)}
     {gap&&<path d={gap} className="price-rs-gap"/>}
@@ -670,8 +682,18 @@ function PriceRsSvg({data,width,benchTicker}:{data:PriceRsData;width:number;benc
       {rsLast!=null&&data.rsHigh[last]&&<circle cx={x(last)} cy={y2(rsLast)} r={2.6} fill={RS_C} className="price-rs-new-high"><title>{`RS 라인 신고가 · ${data.dates[last]}`}</title></circle>}
       {rsLast!=null&&data.rsHigh[last]&&data.belowPriceHigh&&<text x={x(last)-10} y={y2(rsLast)-8} textAnchor="end" className="price-rs-callout">RS 신고가 · 주가는 고점 아래</text>}
     </g>}
+    {scrub!=null&&<g className="chart-crosshair" aria-hidden="true">
+      <line x1={x(selected)} x2={x(selected)} y1={T1} y2={data.rs?T2+H2:T1+H1}/>
+      <circle cx={x(selected)} cy={y1(data.price[selected])} r={4} fill="white" stroke={PRICE_C} strokeWidth={2}/>
+      {data.rs?.[selected]!=null&&<circle cx={x(selected)} cy={y2(data.rs[selected]!)} r={3} fill="white" stroke={RS_C} strokeWidth={2}/>}
+    </g>}
     {xTicks.map(i=><text key={i} x={x(i)} y={H-6} textAnchor={i===0?'start':i===last?'end':'middle'} className="line-tick">{data.dates[i].slice(5)}</text>)}
   </svg>
+    <input className="chart-scrubber" type="range" min={0} max={last} value={selected}
+      aria-label="차트 날짜 탐색" aria-valuetext={`${data.dates[selected]} · 종목 지수 ${data.price[selected].toFixed(1)}`}
+      onChange={e=>setScrub(Number(e.target.value))}/>
+    <p className="chart-scrub-hint">차트를 좌우로 훑어 날짜별 값 확인 · 시작=100</p>
+  </>
 }
 
 const PeerLineChart=memo(function PeerLineChart({row,rows,kind}:{row:LeaderRow;rows:LeaderRow[];kind:ChartKind}){

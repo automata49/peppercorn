@@ -113,6 +113,23 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(section('가격 모멘텀').locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)'])
   await expect(section('가격 모멘텀').locator('.line-legend li')).toHaveCount(1)
   await expect(section('가격 모멘텀').locator('.rs-period-toggle button')).toHaveCount(6)
+  // Spark-inspired exploration: exact observed dates, keyboard/touch, no synthetic prices.
+  const scrubber=section('가격 모멘텀').getByRole('slider',{name:'차트 날짜 탐색'})
+  await scrubber.focus()
+  await page.keyboard.press('Home')
+  await expect(section('가격 모멘텀').locator('.chart-readout time')).toHaveText('2026-09-01')
+  await expect(section('가격 모멘텀').locator('.chart-readout b').first()).toHaveText('100.0')
+  await page.keyboard.press('End')
+  await expect(section('가격 모멘텀').locator('.chart-readout time')).toHaveText('2026-09-30')
+  const plot=section('가격 모멘텀').locator('.scrubbable-chart')
+  await plot.scrollIntoViewIfNeeded()
+  const box=(await plot.boundingBox())!
+  if(view.touch)await page.touchscreen.tap(box.x+46,box.y+65)
+  else {await page.mouse.move(box.x+46,box.y+65);await page.mouse.down();await page.mouse.up()}
+  await expect(section('가격 모멘텀').locator('.chart-crosshair')).toHaveCount(1)
+  await expect(section('가격 모멘텀').locator('.chart-readout time')).toHaveText('2026-09-01')
+  await page.emulateMedia({reducedMotion:'reduce'})
+  expect(await section('가격 모멘텀').locator('.chart-readout b').first().evaluate(el=>getComputedStyle(el).animationName)).toBe('none')
   await expect(drill.locator('.rs-chart')).toHaveCount(0)
   await noOverflow()
   await back.click()
