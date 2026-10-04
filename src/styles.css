@@ -1513,6 +1513,35 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .bigcap-link:hover{background:#f7f9fc}
 
 
+/* MOBILE-WATCHLIST-1 — decision-first phone view, canonical editable grid remains behind disclosure. */
+.watch-mobile-panel{display:none}
+.workspace-edit-disclosure>summary{display:none}
+.workspace-edit-disclosure>.panel{margin:0}
+@media(max-width:650px){
+  .watchlist-page-note{display:none}
+  .watch-mobile-panel{display:block;margin-bottom:10px;padding:13px;border-radius:13px;box-shadow:none}
+  .watch-mobile-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:5px}
+  .watch-mobile-head>div{display:flex;align-items:baseline;gap:7px}
+  .watch-mobile-head h2{margin:0;color:#21364f;font-size:18px}
+  .watch-mobile-head span,.watch-mobile-head small{color:#8a96a4;font-size:10.5px}
+  .watch-decision-list{border-top:1px solid #edf0f3}
+  .watch-decision-list .decision-row{grid-template-columns:24px minmax(0,1fr) 34px 68px;gap:4px 7px;min-height:60px;padding:8px 1px}
+  .watch-decision-list .decision-main>b{font-size:12.5px}
+  .watch-decision-list .decision-main>small{font-size:9px}
+  .watch-decision-list .decision-eyebrow{font-size:8px!important}
+  .watch-decision-list .decision-badge{justify-self:center;padding:3px 6px;font-size:8.5px}
+  .watch-decision-list .decision-value>b{font-size:11px}
+  .watch-decision-list .decision-value>small{font-size:9px}
+  .workspace-edit-disclosure{margin-top:8px}
+  .workspace-edit-disclosure>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 14px;border:1px solid #e4e9ee;border-radius:12px;background:#fff;color:#31465f;cursor:pointer;list-style:none}
+  .workspace-edit-disclosure>summary::-webkit-details-marker{display:none}
+  .workspace-edit-disclosure>summary span{font-size:12.5px;font-weight:800}
+  .workspace-edit-disclosure>summary small{color:#8a96a4;font-size:9.5px}
+  .workspace-edit-disclosure>summary::after{content:'＋';color:#84909f;font-size:15px}
+  .workspace-edit-disclosure[open]>summary::after{content:'−'}
+  .workspace-edit-disclosure[open]>.panel{margin-top:8px}
+}
+
 /* UI-PRIMITIVES-1 — one quiet renderer for ranked decision surfaces. The dashboard supplies view models;
    the same primitive can later be driven by a server-provided UI schema without duplicating page markup. */
 .decision-list{min-width:0}
