@@ -343,29 +343,58 @@ def company_annual(ua: str, cik: int) -> dict:  # pragma: no cover - network
     return {"net_income": ni, "files_without_revenue": ni is not None}
 
 
-def kr_fundamentals(key: str, tickers: list[str]) -> dict:  # pragma: no cover - network
-    import requests
-    sys.path.insert(0, str(Path(__file__).parent / "fundamentals"))
-    import targets
-    codes = targets.dart_codes(key)
+DART_BATCH_DEADLINE, DART_SOURCE_BUDGET = 45, 150  # seconds; OpenDART can turn slow (2026-10-04 deploy stalled on it)
+
+
+def dart_corp_codes(key: str) -> dict[str, str]:  # pragma: no cover - network
+    """stock_code -> OpenDART corp_code, downloaded once under a hard deadline."""
+    import io
+    import xml.etree.ElementTree as ET
+    import zipfile
+    r = get_with_deadline("https://opendart.fss.or.kr/api/corpCode.xml", deadline=60, attempts=2, params={"crtfc_key": key})
+    if r.status_code != 200:
+        raise RuntimeError(f"OpenDART corpCode HTTP {r.status_code}")
+    with zipfile.ZipFile(io.BytesIO(r.content)) as archive:
+        root = ET.fromstring(archive.read(archive.namelist()[0]))
+    return {(item.findtext("stock_code") or "").strip(): item.findtext("corp_code").strip()
+            for item in root.iter("list") if (item.findtext("stock_code") or "").strip()}
+
+
+def dart_multi_accounts(key: str, corp_codes: list[str], year: int, report: str, budget: float = DART_SOURCE_BUDGET):  # pragma: no cover - network
+    """Yields OpenDART multi-company account rows per batch of 100 companies. The whole source has a time budget and
+    any failed batch fails the source (raised), so a slow OpenDART costs at most `budget` seconds instead of the run."""
+    start = time.monotonic()
+    for i in range(0, len(corp_codes), 100):
+        if time.monotonic() - start > budget:
+            raise TimeoutError(f"OpenDART over its {budget:.0f}s budget after {i} of {len(corp_codes)} companies")
+        body = get_with_deadline("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json", deadline=DART_BATCH_DEADLINE, attempts=2,
+                                 params={"crtfc_key": key, "corp_code": ",".join(corp_codes[i:i + 100]), "bsns_year": str(year), "reprt_code": report}).json()
+        yield body.get("list") or []
+        time.sleep(.3)
+
+
+def dart_pick(rows: list[dict]) -> dict[str, tuple[dict | None, dict | None]]:
+    """corp_code -> (revenue row, net income row) from consolidated statements when present, else separate ones."""
+    out = {}
+    for corp in {r["corp_code"] for r in rows}:
+        mine = [r for r in rows if r["corp_code"] == corp]
+        fs = "CFS" if any(r.get("fs_div") == "CFS" for r in mine) else "OFS"
+        mine = [r for r in mine if r.get("fs_div") == fs]
+        out[corp] = (next((r for r in mine if r.get("account_nm") in ("매출액", "영업수익", "수익(매출액)")), None),
+                     next((r for r in mine if (r.get("account_nm") or "").startswith("당기순이익")), None))
+    return out
+
+
+def kr_fundamentals(key: str, tickers: list[str], codes: dict[str, str] | None = None) -> dict:  # pragma: no cover - network
+    codes = codes or dart_corp_codes(key)
     by_code = {codes[t]: t for t in tickers if t in codes}
     out = {}
-    items = list(by_code)
-    for i in range(0, len(items), 100):
-        body = get_with_deadline("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
-                                 params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": "2025", "reprt_code": "11011"}).json()
-        rows = body.get("list") or []
-        for corp in {r["corp_code"] for r in rows}:
-            mine = [r for r in rows if r["corp_code"] == corp]
-            fs = "CFS" if any(r.get("fs_div") == "CFS" for r in mine) else "OFS"
-            mine = [r for r in mine if r.get("fs_div") == fs]
-            amount = lambda r, k: num(str(r.get(k) or "").replace(",", ""))
-            rev = next((r for r in mine if r.get("account_nm") in ("매출액", "영업수익", "수익(매출액)")), None)
-            ni = next((r for r in mine if (r.get("account_nm") or "").startswith("당기순이익")), None)
+    amount = lambda r, k: num(str(r.get(k) or "").replace(",", ""))
+    for rows in dart_multi_accounts(key, list(by_code), 2025, "11011"):
+        for corp, (rev, ni) in dart_pick(rows).items():
             out[("KR", by_code[corp])] = {"revenue": amount(rev, "thstrm_amount") if rev else None,
                                           "revenue_prev": amount(rev, "frmtrm_amount") if rev else None,
                                           "net_income": amount(ni, "thstrm_amount") if ni else None}
-        time.sleep(.3)
     return out
 
 

@@ -1026,7 +1026,7 @@ export default function App(){
   const chosenSector=allSectorRows.find(g=>g.key===sectorKeySelected)||null
   const drillSector=allSectorRows.find(g=>g.key===drillSectorKey)||null
   const drillSectorStocks=visible.filter(r=>r.asset_class==='Equity'&&(!drillSector||sectorKey(r)===drillSector.key)).sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
-  const lens=(rows:LeaderRow[])=>applyLensFilter(rows,flagFile?.flags,lensFilter)
+  const lens=(rows:LeaderRow[])=>applyLensFilter(rows,flagFile?.flags,lensFilter,flagFile?Object.keys(flagFile.growth_period||{}):undefined)
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),

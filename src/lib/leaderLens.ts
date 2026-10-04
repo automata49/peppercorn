@@ -57,13 +57,15 @@ export const GROWTH_FILTER={revMin:.20,epsMin:.25}
 export type LensFilter={hideWeak:boolean;sepaOnly:boolean;growthOnly:boolean}
 export const DEFAULT_LENS_FILTER:LensFilter={hideWeak:false,sepaOnly:false,growthOnly:true}
 export const growthPasses=(x:StockFlag|undefined)=>!!x?.growth&&(x.growth.rev??-1)>=GROWTH_FILTER.revMin&&(x.growth.eps??-1)>=GROWTH_FILTER.epsMin
-export function applyLensFilter(rows:LeaderRow[],flags:Record<string,StockFlag>|null|undefined,f:LensFilter){
+// growthMarkets: markets whose quarterly growth source loaded (the flags file's growth_period). A market whose source
+// failed has no known growth at all, so the growth filter skips it instead of hiding all of its stocks.
+export function applyLensFilter(rows:LeaderRow[],flags:Record<string,StockFlag>|null|undefined,f:LensFilter,growthMarkets?:string[]){
   if(!flags)return rows
   return rows.filter(r=>{
     const x=flags[r.market+':'+r.ticker]
     if(f.hideWeak&&(x?.loss||x?.no_revenue))return false
     if(f.sepaOnly&&!x?.sepa)return false
-    if(f.growthOnly&&!growthPasses(x))return false
+    if(f.growthOnly&&(!growthMarkets||growthMarkets.includes(r.market))&&!growthPasses(x))return false
     return true
   })
 }

@@ -82,3 +82,13 @@ def test_quarter_and_report_selection():
     assert sf.dart_pair({"thstrm_add_amount": "1,200", "frmtrm_add_amount": "1,000", "thstrm_amount": "700", "frmtrm_q_amount": "650"}, False) == (1200, 1000)
     assert sf.dart_pair({"thstrm_amount": "700", "frmtrm_q_amount": "", "frmtrm_amount": "9"}, False) == (700, None)
     assert sf.dart_pair({"thstrm_amount": "700", "frmtrm_amount": "500"}, True) == (700, 500)
+
+
+def test_dart_pick_prefers_consolidated_statements():
+    rows = [{"corp_code": "A", "fs_div": "OFS", "account_nm": "매출액", "thstrm_amount": "1"},
+            {"corp_code": "A", "fs_div": "CFS", "account_nm": "매출액", "thstrm_amount": "2"},
+            {"corp_code": "A", "fs_div": "CFS", "account_nm": "당기순이익(손실)", "thstrm_amount": "3"},
+            {"corp_code": "B", "fs_div": "OFS", "account_nm": "영업수익", "thstrm_amount": "4"}]
+    picked = sf.lr.dart_pick(rows)
+    assert picked["A"][0]["thstrm_amount"] == "2" and picked["A"][1]["thstrm_amount"] == "3"
+    assert picked["B"][0]["thstrm_amount"] == "4" and picked["B"][1] is None
