@@ -1,5 +1,9 @@
 # Current handoff
 
+## Fast UI Pages deploy — 2026-10-04
+The Pages workflow previously recalculated STOCK-FLAGS-1 on every main push, so a pure UI merge could wait up to 12 minutes on external SEC/DART/yfinance work before the new interface appeared. App/code pushes now reuse the already-published stock-flags.json and proceed to Pages; only the successful `Refresh market analysis` workflow-run path recalculates stock flags. The refresh path still keeps the currently published file as fallback if recalculation fails. This changes deployment latency only; badge semantics and market-refresh ownership stay the same.
+Validation required: Pepper harness on the PR, then after merge confirm the branch Pages source versions to the merge SHA without executing the slow stock-flag refresh path.
+
 ## iPad touch polish — 2026-10-04
 After MOBILE-POLISH-1, the same touch ergonomics are extended to iPad without collapsing tablet information into the phone summary-first model. 834×1194, 1194×834 and 1366×1024 touch layouts keep their existing content/layout behavior while menu controls, bottom navigation, form inputs, drawer rows and common action/disclosure hit areas meet the 44/52 px touch targets; text inputs are 16 px to avoid Safari focus zoom behavior. No data or responsive information-hierarchy contract changes.
 Validation required: full Pepper harness plus tests/ipad-touch-polish.spec.ts.
