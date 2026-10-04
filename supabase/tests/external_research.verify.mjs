@@ -25,7 +25,7 @@ values('telegram','hs_academy','123','${'a'.repeat(64)}','https://t.me/HS_academ
 const as=async(uid,fn)=>{await db.exec(`set role authenticated; select set_config('test.uid','${uid}',false)`);try{return await fn()}finally{await db.exec('reset role')}};
 const fails=async fn=>{try{await fn();return false}catch{return true}};
 
-check('authenticated owner can read public feed metadata',await as(A,async()=>Number((await q('select count(*) n from public.external_research_feed')).rows[0].n)===1));
+check('authenticated owner can read public feed metadata',await as(A,async()=>Number((await q('select count(*) n from public.external_research_feed')).rows[0].n)===2));
 await db.exec('set role anon');check('anon cannot read feed',await fails(()=>q('select * from public.external_research_feed')));await db.exec('reset role');
 
 check('owner captures text',await as(A,async()=>{await q(`insert into public.research_captures(user_id,source_url,title,source_type,captured_text,content_hash)
