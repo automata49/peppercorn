@@ -81,14 +81,14 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
 
   const sectorDisclosure=page.locator('.sector-heat-disclosure')
   await expect(sectorDisclosure).not.toHaveAttribute('open','')
-  await sectorDisclosure.locator('> summary').click()
+  await sectorDisclosure.locator(':scope > summary').click()
   const sectorChart=page.locator('.dashboard-sector-panel .sector-heat')
   await expect(sectorChart.locator('.etf-heat-tile')).toHaveCount(2)
   expect((await sectorChart.boundingBox())!.y).toBeGreaterThan((await page.locator('.dashboard-sector-panel .dashboard-sector-table').boundingBox())!.y)
 
   const explore=page.locator('.dashboard-explore')
   await expect(explore).not.toHaveAttribute('open','')
-  await explore.locator('> summary').click()
+  await explore.locator(':scope > summary').click()
   const etfChart=page.locator('.dashboard-etf-panel .rs-chart')
   await expect(etfChart.locator('.line-legend b')).toHaveCount(3)
   expect((await etfChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-etf-panel .stock-rows').boundingBox())!.y)
