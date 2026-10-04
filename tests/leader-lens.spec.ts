@@ -111,6 +111,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // The choice is remembered on this device.
   await page.reload()
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.locator('.leader-detail > summary').click()
   await page.locator('.focus-actions button').filter({hasText:'대형 주도주'}).click()
   await expect(page.locator('.drill-sheet .summary-tabs button[aria-selected="true"]')).toContainText('대형 주도주')
   await expect(page.locator('.drill-sheet .lens-bar button[aria-pressed="true"]',{hasText:'RS순'})).toHaveCount(1)
