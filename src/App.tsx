@@ -572,24 +572,18 @@ function focusLeaderRows(rows:LeaderRow[],market:MarketFilter){
       selected.push(r);perGroup.set(key,n+1)
       if(selected.length>=limit)break
     }
-    if(selected.length<limit){
-      for(const r of ordered){
-        if(selected.includes(r))continue
-        selected.push(r)
-        if(selected.length>=limit)break
-      }
-    }
     return selected
   })
 }
 
 function FocusLeaderList({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const groups=leaderGroups(rows)
+  const displayRows=groups.flatMap(g=>g.rows)
   return <div className="focus-leader-list" role="list" aria-label="포커스 주도 종목">
     {groups.map(g=><section className="focus-group" key={g.key} aria-label={`${g.market} ${g.name}`}>
       <div className="focus-group-head"><span>{g.market} · {g.name}</span><small>{g.rank!=null&&g.total?`업종 ${g.rank}/${g.total}위`:'업종 순위 —'} · {g.rows.length}종목</small></div>
       {g.rows.map(r=><button key={r.id||r.market+':'+r.ticker} type="button" role="listitem" className="focus-leader-row" onClick={()=>onSelect(r)}>
-        <span className="focus-rank">{rows.indexOf(r)+1}</span>
+        <span className="focus-rank">{displayRows.indexOf(r)+1}</span>
         <span className="focus-stock"><b>{r.name||r.ticker}</b><small>{r.ticker} · {stageLabel(r.stage)}</small></span>
         <span className={'focus-class '+leadTone(leadership(r))}>{leadership(r)}</span>
         <span className="focus-score"><b>RS {r.rs_rank==null?'—':Math.round(r.rs_rank)}</b><small className={(r.return_20d??0)>0?'pos':(r.return_20d??0)<0?'neg':''}>{pct(r.return_20d)} · 20D</small></span>
