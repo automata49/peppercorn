@@ -1,6 +1,19 @@
 -- RESEARCH-INGEST-1: public discovery metadata + private user-authorized captures.
 -- Public collectors may discover only public channel metadata. Paid/subscriber bodies are never fetched server-side;
 -- a user explicitly captures text they are already viewing in their own browser.
+do $
+begin
+  if not exists (select 1 from pg_roles where rolname='research_feed_pipeline') then
+    create role research_feed_pipeline nologin noinherit;
+  end if;
+  if exists (select 1 from pg_roles where rolname='postgres') then
+    if current_setting('server_version_num')::int >= 160000 then
+      execute 'grant research_feed_pipeline to postgres with set true, inherit false';
+    else
+      execute 'grant research_feed_pipeline to postgres';
+    end if;
+  end if;
+end $;
 create table if not exists public.external_research_feed (
   id uuid primary key default gen_random_uuid(),
   source text not null check (source in ('telegram','youtube','naver_public')),
@@ -41,6 +54,17 @@ create index if not exists research_captures_user_date_idx on public.research_ca
 
 alter table public.external_research_feed enable row level security;
 alter table public.research_captures enable row level security;
+
+grant usage on schema public to research_feed_pipeline;
+revoke all on public.external_research_feed from research_feed_pipeline;
+grant select,insert,update on public.external_research_feed to research_feed_pipeline;
+revoke all on public.research_captures from research_feed_pipeline;
+drop policy if exists "research feed pipeline read" on public.external_research_feed;
+drop policy if exists "research feed pipeline insert" on public.external_research_feed;
+drop policy if exists "research feed pipeline update" on public.external_research_feed;
+create policy "research feed pipeline read" on public.external_research_feed for select to research_feed_pipeline using (true);
+create policy "research feed pipeline insert" on public.external_research_feed for insert to research_feed_pipeline with check (true);
+create policy "research feed pipeline update" on public.external_research_feed for update to research_feed_pipeline using (true) with check (true);
 
 -- Feed rows contain only publicly visible discovery metadata, but the app exposes them only to a signed-in owner session.
 revoke all on public.external_research_feed from anon;
