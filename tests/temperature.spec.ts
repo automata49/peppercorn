@@ -98,7 +98,7 @@ for(const view of views){
   // Dashboard card follows the latest entry.
   const side=page.locator('.sidebar nav')
   if(await side.isVisible())await side.getByRole('button',{name:'Dashboard'}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Dashboard'}).click()
+  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'홈'}).click()
   await expect(card.locator('.temp-value')).toHaveText('63°')
   await expect(card.locator('.temp-moved')).toHaveText('바뀐 항목: 금리 ▼ · 신용 스프레드 ▲')
   await card.getByRole('button',{name:'온도계 열기 →'}).click()
