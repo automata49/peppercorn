@@ -83,7 +83,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(cards.nth(1).locator('.checkup-count')).toHaveText('통과 6 · 중립 1 · 미달 0')
   await expect(card.locator('.checkup-quadrant b')).toHaveText('Swing 강함 × 펀더멘털 양호')
   const secondary=card.locator('.analysis-secondary')
-  if(!(await secondary.getAttribute('open')))await secondary.locator(':scope > summary').click()
+  if((await secondary.getAttribute('open'))===null)await secondary.locator(':scope > summary').click()
   await card.locator('.analysis-more > summary').click()
   await expect(card.locator('.analysis-part')).toContainText(['Swing · 모멘텀','Position · 펀더멘털','내 분석'])
   // Vertical sheet: create, enter a value as a percentage, see it stored and judged.
@@ -146,7 +146,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const secondary=body.locator('.analysis-secondary')
   if(view.width<=650)await expect(secondary).not.toHaveAttribute('open','')
   else await expect(secondary).toHaveAttribute('open','')
-  if(!(await secondary.getAttribute('open')))await secondary.locator(':scope > summary').click()
+  if((await secondary.getAttribute('open'))===null)await secondary.locator(':scope > summary').click()
   const stat=(label:string)=>body.locator('.key-stats > div').filter({hasText:label}).locator('b')
   await expect(body.locator('.key-stats > div')).toHaveCount(8)
   await expect(stat('20일 평균 거래대금')).toHaveText('1,600억원')
