@@ -744,7 +744,7 @@ export default function App(){
   const [showIntro,setShowIntro]=useState(()=>{
     try{return sessionStorage.getItem('peppercorn-intro-seen')!=='1'}catch{return true}
   })
-  const [page,setPage]=useState('dashboard')
+  const [page,setPage]=useState(()=>new URLSearchParams(location.search).get('capture')==='1'?'temperature':'dashboard')
   const [menuOpen,setMenuOpen]=useState(false)
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
   const [source,setSource]=useState<'demo'|'supabase'>('demo')
