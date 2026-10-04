@@ -1,5 +1,9 @@
 # Current handoff
 
+## Mobile Watchlist hierarchy — 2026-10-04
+The phone Watchlist now reuses the shared DecisionList boundary instead of opening with a dense editable AG Grid. Its primary list exposes only identity/stage, priority, live-or-daily current price and RS rank; selecting a row goes to 종목 분석. The original editable grid is unchanged and sits under 전체 편집 on phone, while desktop keeps it open as before. This continues the dashboard/analysis primary-vs-secondary information hierarchy and gives the SDUI-ready renderer a second real workspace consumer.
+No workspace schema, RLS, persistence, market calculations or ranking criteria changed. Validation required: build, full Playwright suite, and the new phone/desktop Watchlist cases.
+
 ## Mobile analysis hierarchy — 2026-10-04
 After the decision-first Dashboard pass, the remaining phone density was concentrated in 종목 분석 and the full navigation drawer. MOBILE-ANALYSIS-1 keeps the stock hero/price chart and two-axis checkup primary, while one responsive `상세 데이터` disclosure owns compare, key stats, peers and filed/technical detail. It starts closed only on phones and remains open by default on larger screens; requesting a comparison opens it. The two checkup cards are compressed side-by-side on phones without changing their checks. The drawer now groups the same nine destinations into 핵심 / 기록 / 전체 데이터; desktop order and bottom navigation are unchanged.
 No Swing/Position thresholds, data collection, Supabase schema, persistence or ranking logic changed. Validation required: harness, build and full Playwright UI suite.
