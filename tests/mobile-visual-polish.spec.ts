@@ -50,7 +50,7 @@ for(const width of [390,430]){
 
     const workspaceRow=page.locator('.workspace-mobile-summary .decision-row').first()
     await boxAtLeast(workspaceRow,200,64)
-    expect(parseFloat(await workspaceRow.locator('.decision-main small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    expect(parseFloat(await workspaceRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1)).toBeTruthy()
     await context.close()
