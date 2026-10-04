@@ -1,5 +1,9 @@
 # Current handoff
 
+## iPad touch polish — 2026-10-04
+After MOBILE-POLISH-1, the same touch ergonomics are extended to iPad without collapsing tablet information into the phone summary-first model. 834×1194, 1194×834 and 1366×1024 touch layouts keep their existing content/layout behavior while menu controls, bottom navigation, form inputs, drawer rows and common action/disclosure hit areas meet the 44/52 px touch targets; text inputs are 16 px to avoid Safari focus zoom behavior. No data or responsive information-hierarchy contract changes.
+Validation required: full Pepper harness plus tests/ipad-touch-polish.spec.ts.
+
 ## Mobile visual polish — 2026-10-04
 After the decision-first hierarchy was locked by #95, the phone audit found several remaining 8–9 px metadata labels and sub-44 px controls that made the UI feel denser than its actual information count. MOBILE-POLISH-1 adds phone-only ergonomics: 44 px touch targets, 52 px bottom-nav items, 64 px decision rows, ~10 px+ secondary metadata, 16 px form controls to prevent iOS Safari focus zoom, slightly calmer top bars/spacing, and consistent disclosure/action hit areas. No information, ranking, calculation, persistence or responsive breakpoint changes.
 Validation required: full Pepper harness plus tests/mobile-visual-polish.spec.ts at 390 and 430 CSS px.
