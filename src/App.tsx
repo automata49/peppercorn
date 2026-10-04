@@ -25,6 +25,7 @@ import { BENCHMARK, PRICE_RS_VERSION, priceRs, type PriceRsData } from './lib/be
 import { RS_CHART_PERIODS, RS_CHART_VERSION, medianOf, peerSeries, periodValue, yScale, type ChartKind, type LineSeries, type RsChartPeriod } from './lib/rsChart'
 import { completeGoogleLogin, loadStoredSession, loadWorkspace, saveWorkspace, storeSession, type Session, type WorkspaceResource } from './lib/session'
 import { MarketTemperature, TemperatureCard } from './components/MarketTemperature'
+import { ResearchInbox } from './components/ResearchInbox'
 import type { TempEntry } from './lib/temperature'
 import { LiveQuoteProvider, useLiveQuotes, type LiveQuote } from './lib/liveQuotes'
 import type { EditableRow, LeaderRow, Market, PositionRow } from './types'
@@ -1290,6 +1291,7 @@ export default function App(){
   }else if(page==='temperature'){
     const tempFacts=[{label:'MA200 위 비율'+(market==='ALL'?'':' · '+market),value:ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'},{label:'52W 고점 근접',value:high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'},{label:'상승/하락 (1W)',value:advanceCount+declineCount?(advanceDeclineRatio||0).toFixed(1)+' : 1':'—'}]
     content=<><MarketTemperature entries={tempEntries} onChange={updateTemperature} facts={tempFacts}/>
+      <ResearchInbox session={session} onSession={updateSession}/>
       <details className="panel legacy-research"><summary>이전 Research 기록 ({research.length})</summary><p className="note">시장 온도계 이전의 Research 기록입니다. 지우지 않고 그대로 보관합니다.</p><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={520}/></details></>
   }else if(page==='journal'){
     content=<><div className="page-note"><b>Trading Journal</b><span>종목코드를 입력하면 종목명·현재가·산업·섹터·RS가 연결됩니다. 매수 가설과 결과 복기를 기록하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('journal',ticker)}/><div className="panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div></>
