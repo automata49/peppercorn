@@ -8,6 +8,14 @@ Validation: see final implementation evidence below; run `npm run harness:check`
 Next: connect a server-side analyst adapter against sourced fundamentals, retaining missing-data behavior; do not add API secrets to the frontend.
 
 
+## Mobile decision UI + SDUI-ready primitive — 2026-10-04
+User direction: push the Robinhood benchmark further, especially restrained motion and progressive/server-driven-style UI, because Folio xx still exposes too much information at once on phones.
+
+Implementation: `src/components/DecisionList.tsx` adds a typed ranked-list renderer used by the Focus leaders and the phone sector surface. At <=650px the Dashboard hides its generic search field and page subtitle, removes the duplicate page-header menu, condenses the Focus summary, replaces the six-column sector table with a decision-essential list, and shortens bottom navigation labels to 홈 / 섹터 / 분석 / 관심. The canonical sector table remains for wider screens and `전체 보기`. 조정 중 / 대형 주도주 / momentum-live tools stay available inside the Focus disclosure; 시장 지표 and the sector heatmap now share one secondary disclosure. ETF · 시장 탐색 remains collapsed. Motion is limited to user-triggered disclosure and press feedback, with `prefers-reduced-motion` respected.
+Architecture: this is an SDUI-ready boundary, not a server-controlled investing engine. Dashboard code maps domain rows into small view models (rank/title/meta/badge/value) and `DecisionList` renders them; leadership classes, thresholds, sorting inputs, tables and Supabase data contracts are unchanged.
+Tests: `tests/dashboard.spec.ts` distinguishes the phone decision list from the wider sector table and verifies hidden dashboard search/subtitle and compact navigation; `tests/rs-chart.spec.ts` anchors the heatmap below the correct phone/wide primary surface.
+Validation: PR CI required. No database migration, production data write, or classification/ranking change.
+
 ## Dashboard focus funnel + Robinhood-style simplification — 2026-10-04
 User goal: the UNIVERSE-2 expansion made the broad leadership lists too large and the dashboard too dense; make leading industries and representative stocks obvious without silently changing the investment classification. Production context remains 3,215 recalculated equities with 77 핵심 주도 and 235 주도 후보 after UNIVERSE-2. LEADERSHIP-V2 and SEPA-DEFAULT did not pass their pre-registered cross-market gates, so this change deliberately leaves v1 classification untouched.
 
