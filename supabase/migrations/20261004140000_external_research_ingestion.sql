@@ -1,7 +1,7 @@
 -- RESEARCH-INGEST-1: public discovery metadata + private user-authorized captures.
 -- Public collectors may discover only public channel metadata. Paid/subscriber bodies are never fetched server-side;
 -- a user explicitly captures text they are already viewing in their own browser.
-do $
+do $$
 begin
   if not exists (select 1 from pg_roles where rolname='research_feed_pipeline') then
     create role research_feed_pipeline nologin noinherit;
@@ -13,7 +13,7 @@ begin
       execute 'grant research_feed_pipeline to postgres';
     end if;
   end if;
-end $;
+end $$;
 create table if not exists public.external_research_feed (
   id uuid primary key default gen_random_uuid(),
   source text not null check (source in ('telegram','youtube','naver_public')),
