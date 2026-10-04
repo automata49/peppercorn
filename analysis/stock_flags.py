@@ -177,8 +177,8 @@ def kr_quarter_growth(key: str, tickers: list[str], today: datetime.date) -> tup
     by_code = {codes[t]: t for t in tickers if t in codes}
     items, out = list(by_code), {}
     for i in range(0, len(items), 100):
-        body = requests.get("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
-                            params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": str(year), "reprt_code": code}, timeout=120).json()
+        body = lr.get_with_deadline("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
+                                    params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": str(year), "reprt_code": code}).json()
         rows = body.get("list") or []
         for corp in {r["corp_code"] for r in rows}:
             mine = [r for r in rows if r["corp_code"] == corp]
@@ -207,7 +207,10 @@ def build(rows: list[dict], funda: dict, closes: dict, quarters: dict | None = N
 
 
 def main():  # pragma: no cover - network
+    import time
     import requests
+    t0 = time.monotonic()
+    log = lambda msg: print(f"[{time.monotonic() - t0:5.0f}s] {msg}", file=sys.stderr, flush=True)  # shows where a slow run spends its time
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="stock-flags.json")
     args = ap.parse_args()
@@ -225,16 +228,20 @@ def main():  # pragma: no cover - network
                                 fallback={r["ticker"] for r in leading if r["market"] == "US"})
         funda |= us
         sources["sec"] = f"{len(us)} US equities"
+        log("sec annual done")
     except Exception as e:  # a failed source leaves its flags out
         sources["sec"] = f"failed: {e}"
+        log(f"sec annual failed: {e}")
     try:
         if not key:
             raise RuntimeError("DART_API_KEY not set")
         kr = lr.kr_fundamentals(key, [r["ticker"] for r in eq if r["market"] == "KR"])
         funda |= kr
         sources["dart"] = f"{len(kr)} KR equities"
+        log("dart annual done")
     except Exception as e:
         sources["dart"] = f"failed: {e}"
+        log(f"dart annual failed: {e}")
     today = datetime.date.today()
     quarters, periods = {}, {}
     try:
@@ -245,6 +252,7 @@ def main():  # pragma: no cover - network
         sources["sec_quarter"] = f"{periods['US']}: {sum(1 for v in q.values() if v['rev'] is not None)} revenue, {sum(1 for v in q.values() if v['eps'] is not None)} EPS"
     except Exception as e:
         sources["sec_quarter"] = f"failed: {e}"
+    log(f"sec quarter: {sources['sec_quarter']}")
     try:
         if not key:
             raise RuntimeError("DART_API_KEY not set")
@@ -253,6 +261,7 @@ def main():  # pragma: no cover - network
         sources["dart_quarter"] = f"{periods['KR']}: {sum(1 for v in q.values() if v['rev'] is not None)} revenue, {sum(1 for v in q.values() if v['eps'] is not None)} net income"
     except Exception as e:
         sources["dart_quarter"] = f"failed: {e}"
+    log(f"dart quarter: {sources['dart_quarter']}")
     # Daily closes for the leading stocks (jump check) and for SEPA candidates: the existing trend structure
     # (leader_tt: price > MA50 > MA200, within 25 % of the high, RS rank >= 70) with both growth thresholds met.
     grows = lambda r: sepa({"pass": 8}, quarters.get((r["market"], r["ticker"])))
@@ -262,6 +271,7 @@ def main():  # pragma: no cover - network
         sources["yahoo"] = f"{len(closes)} of {len(wanted)} leading stocks and SEPA candidates"
     except Exception as e:
         closes, sources["yahoo"] = {}, f"failed: {e}"
+    log(f"yahoo: {sources['yahoo']}")
     flags = build(eq, funda, closes, quarters)
     body = {"version": VERSION, "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"),
             "sources": sources, "growth_period": periods, "eps_basis": {"US": "diluted EPS", "KR": "net income"},
