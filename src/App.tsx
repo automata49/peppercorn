@@ -1243,7 +1243,6 @@ export default function App(){
           <div className="panel-head dashboard-sector-head">
             <div><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
             <div className="sector-actions">
-              <button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표</button>
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
@@ -1277,7 +1276,7 @@ export default function App(){
             onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
             emptyLabel="조건에 맞는 섹터가 없습니다."
           />
-          <details className="dashboard-disclosure sector-heat-disclosure"><summary>섹터 히트맵 보기</summary><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
+          <details className="dashboard-disclosure sector-heat-disclosure"><summary>시장 지표 · 섹터 히트맵</summary><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
         </div>
         </div>
       </section>
