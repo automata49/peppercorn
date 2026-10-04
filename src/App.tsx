@@ -1309,9 +1309,31 @@ export default function App(){
   }else if(page==='leaderboard'){
     const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
     const lbCount=(c:string)=>lbEquities.filter(r=>leadership(r)===c).length
-    content=<><div className="page-note page-guide"><b>Leaderboard</b><span>유니버스 전체(주식 {lbEquities.length.toLocaleString('ko-KR')}개 · ETF {lbEtfs.toLocaleString('ko-KR')}개)를 RS순위 순으로 보여주는 전체 표입니다. 매 거래일 장 마감 뒤 가격을 받아 RS·추세·분류를 다시 계산합니다.</span>
+    const openLeaderboardStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}));setPage('analysis')}
+    const compactRows=visible.slice(0,20)
+    content=<><div className="page-note page-guide catalog-guide"><b>Leaderboard</b><span>유니버스 전체(주식 {lbEquities.length.toLocaleString('ko-KR')}개 · ETF {lbEtfs.toLocaleString('ko-KR')}개)를 RS순위 순으로 보여주는 전체 표입니다. 매 거래일 장 마감 뒤 가격을 받아 RS·추세·분류를 다시 계산합니다.</span>
       <span>분류 기준: <b>핵심 주도</b>({lbCount('핵심 주도')}) 추세 템플릿 통과 · RS순위 ≥ 95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0 / <b>주도 후보</b>({lbCount('주도 후보')}) 추세 통과 · IBD식 RS ≥ 80 · 고점 -25% 이내 · RS 3M &gt; 0 / <b>강세 전환</b>({lbCount('강세 전환')}) 추세 미통과지만 50일선 위 · 고점 -30% 이내 · RS순위 ≥ 70 · RS 1W/1M &gt; 0. ETF는 ETF끼리만 순위를 매기고 주도 분류에서 제외합니다.</span>
-      <span>읽는 순서: 섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드. 한 종목을 깊게 보려면 종목 분석에서 검색하세요.</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
+      <span>읽는 순서: 섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드. 한 종목을 깊게 보려면 종목 분석에서 검색하세요.</span></div>{filters}
+      <section className="catalog-mobile-summary" aria-label="Leaderboard 상위 종목">
+        <div className="catalog-mobile-head"><b>상위 {compactRows.length}</b><small>필터 적용 결과 · 상세 지표는 전체 표</small></div>
+        <DecisionList items={compactRows.map((r,i)=>({
+          key:r.id||r.market+':'+r.ticker,
+          data:r,
+          rank:i+1,
+          eyebrow:r.market,
+          title:r.name||r.ticker,
+          meta:[r.ticker,r.industry,stageLabel(r.stage)].filter(Boolean).join(' · '),
+          badge:r.asset_class==='ETF'?'ETF':leadership(r),
+          badgeTone:r.asset_class==='ETF'?'gray':leadTone(leadership(r)) as 'green'|'blue'|'amber'|'gray',
+          value:`RS ${r.asset_class==='ETF'?(r.etf_rs_rank==null?'—':Math.round(r.etf_rs_rank)):(r.rs_rank==null?'—':Math.round(r.rs_rank))}`,
+          subvalue:`20D ${pct(r.return_20d)}`,
+          valueTone:(r.return_20d??0)>0?'positive':(r.return_20d??0)<0?'negative':undefined,
+          ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
+        }))} onSelect={openLeaderboardStock}/>
+      </section>
+      <ProgressiveDisclosure key="leaderboard-table" title="전체 표 · 모든 지표" meta={`${visible.length.toLocaleString('ko-KR')}종목`} className="catalog-table-disclosure">
+        <div className="panel catalog-grid-panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div>
+      </ProgressiveDisclosure></>
   }else if(page==='watchlist'){
     const rows=enrich(watch)
     const openStock=(r:EditableRow)=>{const hit=leaders.find(x=>x.market===r.market&&x.ticker===r.ticker);if(hit){setSelected(hit);setRecentStocks(pushRecent({market:hit.market,ticker:hit.ticker,name:hit.name}));setPage('analysis')}}
@@ -1426,9 +1448,29 @@ export default function App(){
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
     const uvEq=leaders.filter(r=>r.asset_class==='Equity'),uvUS=uvEq.filter(r=>r.market==='US').length,uvKR=uvEq.length-uvUS
-    content=<><div className="page-note page-guide"><b>Universe</b><span>리더보드에 들어가는 종목 범위입니다(UNIVERSE-2, 현재 미국 {uvUS.toLocaleString('ko-KR')}개 · 한국 {uvKR.toLocaleString('ko-KR')}개). 미국 NASDAQ·NYSE·NYSE American, 한국 KOSPI·KOSDAQ 상장 보통주 가운데 아래 기준을 넘는 종목을 매주 일요일 다시 고릅니다.</span>
+    const universeRows=visible.filter(r=>r.asset_class==='Equity')
+    const openUniverseStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}));setPage('analysis')}
+    content=<><div className="page-note page-guide catalog-guide"><b>Universe</b><span>리더보드에 들어가는 종목 범위입니다(UNIVERSE-2, 현재 미국 {uvUS.toLocaleString('ko-KR')}개 · 한국 {uvKR.toLocaleString('ko-KR')}개). 미국 NASDAQ·NYSE·NYSE American, 한국 KOSPI·KOSDAQ 상장 보통주 가운데 아래 기준을 넘는 종목을 매주 일요일 다시 고릅니다.</span>
       <span>기준: 미국 주가 $5 · 시가총액 $300M · 20일 평균 거래대금 $5M 이상 / 한국 1,000원 · 1,000억원 · 20억원 이상. 우선주·스팩·펀드·리츠·관리종목·투자주의 환기종목은 제외합니다. 이미 들어 있는 종목은 기준의 70% 아래로 내려갈 때만 빠지고, 내 Watchlist·Portfolio·종목 분석·Journal에 있는 종목은 항상 남습니다.</span>
-      <span>S&P500·KOSPI200·KOSDAQ150 같은 지수 편입은 참고 정보로만 표시합니다. 분류는 미국 GICS(S&P500)·Nasdaq SIC, 한국 WICS를 씁니다.</span></div>{filters}<div className="panel"><GridTable rows={visible.filter(r=>r.asset_class==='Equity')} columns={cols} height={650}/></div></>
+      <span>S&P500·KOSPI200·KOSDAQ150 같은 지수 편입은 참고 정보로만 표시합니다. 분류는 미국 GICS(S&P500)·Nasdaq SIC, 한국 WICS를 씁니다.</span></div>{filters}
+      <section className="catalog-mobile-summary" aria-label="Universe 종목">
+        <div className="catalog-mobile-head"><b>종목 {Math.min(20,universeRows.length)}</b><small>필터 결과 일부 · 구성 정보는 전체 표</small></div>
+        <DecisionList items={universeRows.slice(0,20).map(r=>({
+          key:r.id||r.market+':'+r.ticker,
+          data:r,
+          eyebrow:r.market,
+          title:r.name||r.ticker,
+          meta:[r.ticker,sectorName(r.market,r.sector),r.industry].filter(Boolean).join(' · '),
+          badge:r.exchange||r.market,
+          badgeTone:'gray',
+          value:r.index_memberships?.length?`${r.index_memberships.length} 지수`:'유니버스',
+          subvalue:r.data_status||'시장 데이터',
+          ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
+        }))} onSelect={openUniverseStock}/>
+      </section>
+      <ProgressiveDisclosure key="universe-table" title="전체 표 · 구성 정보" meta={`${universeRows.length.toLocaleString('ko-KR')}종목`} className="catalog-table-disclosure">
+        <div className="panel catalog-grid-panel"><GridTable rows={universeRows} columns={cols} height={650}/></div>
+      </ProgressiveDisclosure></>
   }else{
     content=<div className="settings-grid"><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="setting"><span>52W 계산</span><b>52W 고점: 최근 최대 252개 거래 세션의 최고가(이력 부족 시 확보된 기간) · RS/등락 52W: 252거래일 전 종가 대비</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 주식 가격 이력 253거래일 미만은 공란입니다. ETF는 주식 순위와 섞지 않고 같은 시장 ETF끼리 따로 RS순위·IBD식 RS를 산정하며, 같은 Trend Template·단계·최종 판단·액션 가이드 규칙을 적용합니다(주도 분류는 주식 전용). 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
