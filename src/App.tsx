@@ -1455,9 +1455,10 @@ export default function App(){
       <span>S&P500·KOSPI200·KOSDAQ150 같은 지수 편입은 참고 정보로만 표시합니다. 분류는 미국 GICS(S&P500)·Nasdaq SIC, 한국 WICS를 씁니다.</span></div>{filters}
       <section className="catalog-mobile-summary" aria-label="Universe 종목">
         <div className="catalog-mobile-head"><b>종목 {Math.min(20,universeRows.length)}</b><small>필터 결과 일부 · 구성 정보는 전체 표</small></div>
-        <DecisionList items={universeRows.slice(0,20).map(r=>({
+        <DecisionList items={universeRows.slice(0,20).map((r,i)=>({
           key:r.id||r.market+':'+r.ticker,
           data:r,
+          rank:i+1,
           eyebrow:r.market,
           title:r.name||r.ticker,
           meta:[r.ticker,sectorName(r.market,r.sector),r.industry].filter(Boolean).join(' · '),
