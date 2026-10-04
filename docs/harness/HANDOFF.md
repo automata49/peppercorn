@@ -1,5 +1,10 @@
 # Current handoff
 
+## Robinhood GitHub interaction adoption — 2026-10-05
+Official reference repositories: https://github.com/robinhood/spark (small charts, baseline, scrubbing) and https://github.com/robinhood/ticker (short numeric transitions). Both are Android components, not a public source for the full Robinhood app. React clone https://github.com/bazybones/robinhood was inspected as a secondary layout reference; no code or assets copied.
+Implementation: PriceRsSvg gains a persistent date/index readout, pointer crosshair, keyboard-accessible date range and short reduced-motion-aware numeric entry. Existing chart lines, period controls, sparse-data handling and investment rules stay unchanged. The first phone viewport retains the existing flat decision-first hierarchy.
+Validation completed: npm run harness:check, npm run build, git diff --check pass. Chart suite: 10/10 pass across five viewports, including exact keyboard/touch values and reduced motion. Full UI suite: 109/115 pass; isolated brand/catalog rerun: 9/9 pass. The remaining two mobile-visual-polish touch-width failures (36.4 px vs 44 px) also reproduce on unmodified main in /tmp/folio-before-robinhood. No physical Safari testing. Local branch feat/robinhood-chart-interaction is committed; GitHub push was blocked by automatic approval review because remote source-disclosure authorization was not verified. No PR/merge/deployment completed.
+
 ## Compact titlebar — 2026-10-05
 Phone already hid the generic workspace subtitle, but iPad still spent a 74 px header on it. COMPACT-TITLEBAR-1 makes all touch/compact layouts title-first: the generic subtitle is hidden and the header settles at ~60 px while retaining the 44 px menu target. Desktop keeps the contextual subtitle. No routes, content or data behavior changed.
 Validation required: full Pepper harness plus tests/compact-titlebar.spec.ts across phone/iPad/iPad Pro touch and desktop.
