@@ -157,7 +157,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
   const secondary=page.locator('.analysis-card .analysis-secondary');
-  if(!(await secondary.getAttribute('open')))await secondary.locator(':scope > summary').click();
+  if((await secondary.getAttribute('open'))===null)await secondary.locator(':scope > summary').click();
   await page.locator('.analysis-more > summary').click();
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
