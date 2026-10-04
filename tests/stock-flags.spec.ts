@@ -48,6 +48,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
+  // This spec checks badges; the default-on growth filter (GROWTH-FILTER-1) is covered in leader-lens.spec.ts.
+  await page.addInitScript(()=>localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({growthOnly:false})))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   // US sector shows under its GICS name only.

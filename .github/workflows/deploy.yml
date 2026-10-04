@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2'
+      - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2' 'pandas==2.3.2' 'numpy==2.3.3'
       - if: github.event_name != 'workflow_run'
         run: python -m pytest -q analysis/fundamentals
       - if: github.event_name != 'workflow_run'
@@ -113,11 +113,12 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         run: node scripts/publish-leaderboard.mjs
-      # STOCK-FLAGS-1: display-only warning badges (loss, no revenue, shrinking revenue, one-day jump). A failure only
+      # STOCK-FLAGS-1 + GROWTH-1/SEPA-1: display-only badges (loss, no revenue, shrinking revenue, one-day jump,
+      # quarterly growth, SEPA). A failure only
       # leaves the badges out; the app works without the file.
       - name: Publish stock flags
         continue-on-error: true
-        timeout-minutes: 12
+        timeout-minutes: 15
         env:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}

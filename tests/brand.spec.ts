@@ -55,6 +55,8 @@ for(const view of views){
    const brand=drawer.locator('.folio-brand')
    await expect(brand).toBeVisible()
    await expect(page.getByRole('dialog',{name:'Folio'})).toBeVisible()
+   // The drawer slides in; separate boundingBox calls during the slide can land on different frames, so measure after it settles.
+   await drawer.evaluate(e=>Promise.all(e.getAnimations({subtree:true}).map(a=>a.finished)))
    const [di,dw,dc,dd]=await Promise.all([brand.locator('.brand-icon').boundingBox(),brand.locator('.brand-wordmark-img').boundingBox(),drawer.locator('.menu-drawer-close').boundingBox(),drawer.boundingBox()])
    const dh=await brand.evaluate(e=>[...e.querySelectorAll('img')].map(i=>(i as HTMLElement).offsetHeight))
    expect(Math.abs(dh[0]-dh[1])).toBeLessThanOrEqual(1)
