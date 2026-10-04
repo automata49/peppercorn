@@ -113,10 +113,19 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         run: node scripts/publish-leaderboard.mjs
-      # STOCK-FLAGS-1 + GROWTH-1/SEPA-1: display-only badges (loss, no revenue, shrinking revenue, one-day jump,
-      # quarterly growth, SEPA). A failure only
-      # leaves the badges out; the app works without the file.
-      - name: Publish stock flags
+      # STOCK-FLAGS-1 + GROWTH-1/SEPA-1: display-only badges.
+      # UI/code pushes should not wait on the slow external refresh. They reuse the currently published
+      # snapshot; the market-refresh workflow is the single place that recalculates the file.
+      - name: Keep published stock flags on app deploy
+        if: github.event_name != 'workflow_run'
+        continue-on-error: true
+        run: |
+          mkdir -p dist/data
+          curl -fsS --max-time 30 https://automata49.github.io/peppercorn/data/stock-flags.json -o dist/data/stock-flags.json \
+            && echo "Kept the published stock-flags.json" || echo "No published stock-flags.json to keep"
+
+      - name: Refresh stock flags after market refresh
+        if: github.event_name == 'workflow_run'
         continue-on-error: true
         timeout-minutes: 15
         env:
@@ -124,8 +133,8 @@ jobs:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
         run: |
           python -m pip install --quiet 'yfinance==0.2.65' 'pandas==2.3.2' 'numpy==2.3.3'
-          # Keep the currently published file unless a new one is produced, so a slow or failed run never ships the app
-          # without badges (2026-10-04: a stalled download hit the step timeout and the deploy lost the file).
+          # Keep the currently published file unless a new one is produced, so a slow or failed refresh
+          # never ships the app without badges.
           mkdir -p dist/data
           curl -fsS --max-time 30 https://automata49.github.io/peppercorn/data/stock-flags.json -o dist/data/stock-flags.json \
             && echo "Fallback: kept the published stock-flags.json" || echo "No published stock-flags.json to keep"
