@@ -1,0 +1,34 @@
+name: External research discovery
+
+# RESEARCH-INGEST-1: discover only public HS Academy Telegram metadata.
+# Subscriber content is never fetched by this workflow; paid bodies enter Pepper only through the user's Save to Pepper action.
+on:
+  schedule:
+    - cron: '17 */4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: external-research-discovery
+  cancel-in-progress: false
+
+env:
+  RESEARCH_EDGE_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1/research-ingest
+  OIDC_AUDIENCE: peppercorn-supabase
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Parser tests
+        run: python -m pytest -q analysis/tests/test_research_discover.py
+      - name: Discover and ingest public metadata
+        run: python analysis/research_discover.py --push --edge-url "$RESEARCH_EDGE_URL" --audience "$OIDC_AUDIENCE"
