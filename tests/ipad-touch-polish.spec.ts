@@ -19,8 +19,9 @@ async function boxAtLeast(locator:any,width:number,height:number){
   await expect(locator).toBeVisible()
   const box=await locator.boundingBox()
   expect(box).not.toBeNull()
-  expect(box!.width).toBeGreaterThanOrEqual(width)
-  expect(box!.height).toBeGreaterThanOrEqual(height)
+  // Chromium can report a CSS 44px edge as 43.9999px on scaled touch viewports.
+  expect(box!.width).toBeGreaterThanOrEqual(width-.1)
+  expect(box!.height).toBeGreaterThanOrEqual(height-.1)
 }
 
 for(const view of views){
