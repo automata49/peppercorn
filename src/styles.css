@@ -1500,6 +1500,11 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .focus-class-strip b{grid-area:value;font-size:20px;line-height:1;font-variant-numeric:tabular-nums}
 .focus-class-strip small{grid-area:note;color:#99a2ad;font-size:9.5px}
 .focus-leader-list{margin-top:8px;border-top:1px solid #eceff2}
+.focus-group{margin:0}
+.focus-group+.focus-group{margin-top:5px}
+.focus-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:12px 6px 6px;background:#fff}
+.focus-group-head span{min-width:0;overflow:hidden;color:#475a70;font-size:10.5px;font-weight:800;text-overflow:ellipsis;white-space:nowrap}
+.focus-group-head small{flex:none;color:#929dab;font-size:9px;white-space:nowrap}
 .focus-leader-row{display:grid;grid-template-columns:34px minmax(170px,1fr) 92px 90px;align-items:center;gap:10px;width:100%;min-height:62px;padding:9px 6px;border:0;border-bottom:1px solid #eef1f4;background:transparent;color:#203248;text-align:left;cursor:pointer}
 .focus-leader-row:hover{background:#fafbfc}
 .focus-rank{color:#9aa4af;font-size:11px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
