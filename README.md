@@ -16,7 +16,9 @@ Included:
 - editable Watchlist
 - editable Portfolio
 - Stock Analysis
-- legacy editable Research Notes (preserved)\n- External Research Inbox: public source discovery + private Save to Pepper captures\n- editable Trading Journal
+- legacy editable Research Notes (preserved)
+- External Research Inbox: public source discovery + private Save to Pepper captures
+- editable Trading Journal
 - Universe
 - Supabase Auth + RLS
 - persistent personal workspace
@@ -40,7 +42,9 @@ Public market data is exposed through the `leaderboard` Edge Function. Browser c
 Personal data is stored behind Supabase Auth and RLS:
 - Watchlist
 - Portfolio
-- Research Notes\n- External Research captures\n- Trading Journal\n
+- Research Notes
+- External Research captures
+- Trading Journal\n
 Only the authenticated user's rows are readable or writable.
 
 ## External Research
