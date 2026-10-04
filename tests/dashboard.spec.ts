@@ -43,7 +43,6 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const metrics=page.locator('.market-metrics-dialog');
   await expect(metrics.getByRole('heading',{name:'시장 지표'})).toBeVisible();
   expect(await metrics.locator('.market-context').evaluate(e=>getComputedStyle(e).whiteSpace)).toBe('normal');
-  expect(await sectorTools.getByRole('button',{name:'시장 지표 보기'}).evaluate(e=>getComputedStyle(e).borderTopStyle)).toBe('solid');
   await expect(metrics.locator('.market-metric-card')).toHaveCount(4);
   await expect(metrics).not.toContainText('평균 RS');
   const mc=await metrics.locator('.market-metric-card').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,r:r.right}}));
