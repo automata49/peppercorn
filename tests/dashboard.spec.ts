@@ -14,6 +14,17 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.focus-summary-main strong')).toHaveText('4');
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
+  if(view.width<=650){
+    await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
+    await expect(page.locator('.mobile-sector-list')).toBeVisible();
+    await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
+    await expect(page.locator('.dashboard-toolbar input')).toBeHidden();
+    await expect(page.locator('.topbar p')).toBeHidden();
+    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','섹터','분석','관심']);
+  }else{
+    await expect(page.locator('.mobile-sector-list')).toBeHidden();
+    await expect(page.locator('.dashboard-sector-table-wrap')).toBeVisible();
+  }
   const etfPanel=page.locator('.dashboard-etf-panel');
   const etfRows=etfPanel.locator('.stock-row');
   await expect(etfRows).toHaveCount(5);
@@ -21,17 +32,18 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(etfRows.first().locator('strong').nth(0)).toHaveText('99');
   await expect(etfRows.first().locator('strong').nth(1)).toHaveText('—');
   await expect(etfRows.first().locator('span').last()).toHaveText('-10.0%');
-  // 시장 지표: a popup opened from the button left of 섹터 요약's 전체 보기; four cards, no 평균 RS.
+  // Secondary market tools are progressively disclosed; the primary header keeps only the full-list action.
   await expect(page.locator('.dashboard-section.market-internals')).toHaveCount(0);
   const sectorActions=page.locator('.dashboard-sector-panel .sector-actions button');
-  await expect(sectorActions).toHaveText(['시장 지표','전체 보기 →']);
-  const [mt,sa]=await Promise.all([sectorActions.nth(0).boundingBox(),sectorActions.nth(1).boundingBox()]);
-  expect(mt!.x+mt!.width).toBeLessThanOrEqual(sa!.x);
-  await sectorActions.nth(0).click();
+  await expect(sectorActions).toHaveText(['전체 보기 →']);
+  const sectorTools=page.locator('.sector-heat-disclosure');
+  await expect(sectorTools).not.toHaveAttribute('open','');
+  await sectorTools.locator(':scope > summary').click();
+  await sectorTools.getByRole('button',{name:'시장 지표 보기'}).click();
   const metrics=page.locator('.market-metrics-dialog');
   await expect(metrics.getByRole('heading',{name:'시장 지표'})).toBeVisible();
   expect(await metrics.locator('.market-context').evaluate(e=>getComputedStyle(e).whiteSpace)).toBe('normal');
-  expect(await sectorActions.nth(0).evaluate(e=>getComputedStyle(e).borderTopStyle)).toBe('solid');
+  expect(await sectorTools.getByRole('button',{name:'시장 지표 보기'}).evaluate(e=>getComputedStyle(e).borderTopStyle)).toBe('solid');
   await expect(metrics.locator('.market-metric-card')).toHaveCount(4);
   await expect(metrics).not.toContainText('평균 RS');
   const mc=await metrics.locator('.market-metric-card').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {x:r.x,y:r.y,r:r.right}}));
@@ -48,15 +60,16 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await explore.locator(':scope > summary').click();
   await expect(etfPanel).toBeVisible();
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
-  const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
-  const before=await sameWidth();
-  const sectorResizer=page.locator('.dashboard-sector-panel').getByRole('button',{name:'섹터 열 너비 조절'});
-  // Centre the handle so the fixed bottom navigation on phone/iPad cannot cover it.
-  await sectorResizer.evaluate(e=>e.scrollIntoView({block:'center'}));
-  const sectorResize=(await sectorResizer.boundingBox())!;
-  await page.mouse.move(sectorResize.x+sectorResize.width/2,sectorResize.y+sectorResize.height/2);
-  await page.mouse.down();await page.mouse.move(sectorResize.x+sectorResize.width/2+30,sectorResize.y+sectorResize.height/2);await page.mouse.up();
-  expect(await sameWidth()).toBeGreaterThan(before+20);
+  if(view.width>650){
+    const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
+    const before=await sameWidth();
+    const sectorResizer=page.locator('.dashboard-sector-panel').getByRole('button',{name:'섹터 열 너비 조절'});
+    await sectorResizer.evaluate(e=>e.scrollIntoView({block:'center'}));
+    const sectorResize=(await sectorResizer.boundingBox())!;
+    await page.mouse.move(sectorResize.x+sectorResize.width/2,sectorResize.y+sectorResize.height/2);
+    await page.mouse.down();await page.mouse.move(sectorResize.x+sectorResize.width/2+30,sectorResize.y+sectorResize.height/2);await page.mouse.up();
+    expect(await sameWidth()).toBeGreaterThan(before+20);
+  }
   const etfScroll=etfPanel.locator('.stock-rows');
   await etfScroll.evaluate(e=>{e.scrollLeft=200});
   expect(Math.abs((await etfHead.boundingBox())!.x-(await etfScroll.boundingBox())!.x)).toBeLessThan(6);
@@ -64,7 +77,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
   // Leading stocks are a popup on every screen: no right-hand panel, a sector row opens the drill sheet.
   await expect(page.locator('.dashboard-stock-panel')).toHaveCount(0);
-  await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
+  if(view.width<=650)await page.locator('.mobile-sector-list .decision-row').first().click();
+  else await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   const drill=page.locator('.drill-sheet');
   await expect(drill).toBeVisible();
   await expect(drill.locator('.drill-tabs button')).toHaveCount(4);
