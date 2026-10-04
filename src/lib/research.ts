@@ -39,21 +39,24 @@ export async function deleteResearchCapture(session:Session,id:string){
 export function saveToPepperBookmarklet(appUrl=location.origin+location.pathname){
   const target=new URL(appUrl)
   target.search='';target.hash='';target.searchParams.set('capture','1')
-  const destination=JSON.stringify(target.toString())
-  const prefix=JSON.stringify(CAPTURE_PREFIX)
-  return `javascript:(()=>{try{const p={url:location.href,title:document.title,text:(document.body?.innerText||'').slice(0,200000)};window.name=${prefix}+encodeURIComponent(JSON.stringify(p));location.href=${destination}}catch(e){alert('Save to Pepper failed')}})()`
+  const destination=JSON.stringify(target.toString()),targetOrigin=JSON.stringify(target.origin)
+  return `javascript:(()=>{try{const p={url:location.href,title:document.title,text:(document.body?.innerText||'').slice(0,200000)};const w=window.open(${destination},'pepper_capture');if(!w)throw new Error('popup');let n=0;let t;const ack=e=>{if(e.origin===${targetOrigin}&&e.data&&e.data.type==='pepper-capture-ack'){clearInterval(t);removeEventListener('message',ack)}};addEventListener('message',ack);const send=()=>{try{w.postMessage({type:'pepper-capture',payload:p},${targetOrigin})}catch(e){}if(++n>=15){clearInterval(t);removeEventListener('message',ack)}};t=setInterval(send,400);send()}catch(e){alert('Save to Pepper failed')}})()`
 }
-export function consumeCaptureDraft():CaptureDraft|null{
-  if(typeof window==='undefined')return null
-  const params=new URLSearchParams(location.search)
-  if(params.get('capture')!=='1'||!window.name.startsWith(CAPTURE_PREFIX))return null
-  const encoded=window.name.slice(CAPTURE_PREFIX.length);window.name=''
-  params.delete('capture');const query=params.toString()
-  history.replaceState(history.state,'',location.pathname+(query?'?'+query:'')+location.hash)
+
+export function draftFromCaptureMessage(data:unknown,origin:string):CaptureDraft|null{
   try{
-    const raw=JSON.parse(decodeURIComponent(encoded))
-    const source_url=String(raw?.url||'').trim(),title=String(raw?.title||'').trim().slice(0,500),captured_text=String(raw?.text||'').trim().slice(0,200000)
+    const envelope=data as {type?:unknown;payload?:any}
+    if(envelope?.type!=='pepper-capture')return null
+    const raw=envelope.payload||{},source_url=String(raw.url||'').trim(),title=String(raw.title||'').trim().slice(0,500),captured_text=String(raw.text||'').trim().slice(0,200000)
     if(!source_url.startsWith('https://')||!captured_text)return null
+    if(new URL(source_url).origin!==origin)return null
     return {source_url,title,captured_text}
   }catch{return null}
+}
+
+export function clearCaptureRequest(){
+  const params=new URLSearchParams(location.search)
+  if(params.get('capture')!=='1')return
+  params.delete('capture');const query=params.toString()
+  history.replaceState(history.state,'',location.pathname+(query?'?'+query:'')+location.hash)
 }
