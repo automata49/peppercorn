@@ -242,9 +242,10 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(chart.locator('.price-rs-callout')).toHaveCount(0)
   expect(asked.some(ids=>ids.includes('spy'))).toBeTruthy()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
-  // Refresh: reloads the leaderboard and refetches daily prices.
+  // Refresh: compact layouts keep the same action in the secondary drawer.
   const before=asked.length
-  await page.getByRole('button',{name:'새로고침',exact:true}).click()
+  await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'데이터 새로고침'}).click()
   await expect.poll(()=>calls).toBe(2)
   await expect.poll(()=>asked.length).toBeGreaterThan(before)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
