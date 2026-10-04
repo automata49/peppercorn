@@ -836,7 +836,6 @@ export default function App(){
   const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
   const [analysisDetailsOpen,setAnalysisDetailsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
-  useEffect(()=>{try{if(window.matchMedia('(max-width: 650px)').matches)setAnalysisDetailsOpen(false)}catch{/* no matchMedia */}},[selected?.id])
   // Compare tray (<=4 stocks), remembered per device as a convenience.
   const [compareKeys,setCompareKeys]=useState<string[]>(()=>{try{const v=JSON.parse(localStorage.getItem('peppercorn-compare-v1')||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string').slice(0,4):[]}catch{return []}})
   useEffect(()=>{try{localStorage.setItem('peppercorn-compare-v1',JSON.stringify(compareKeys))}catch{/* storage unavailable */}},[compareKeys])
