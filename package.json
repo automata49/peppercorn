@@ -13,8 +13,9 @@
     "test:etf-rs": "node supabase/tests/etf_rs.verify.mjs",
     "test:universe-db": "node supabase/tests/universe.verify.mjs",
     "test:temperature-db": "node supabase/tests/temperature.verify.mjs",
+    "test:research-db": "node supabase/tests/external_research.verify.mjs",
     "test:ui": "playwright test",
-    "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run test:universe-db && npm run test:temperature-db && npm run build && npm run test:ui"
+    "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run test:universe-db && npm run test:temperature-db && npm run test:research-db && npm run build && npm run test:ui"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.23",
