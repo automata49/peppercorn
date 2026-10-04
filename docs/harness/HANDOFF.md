@@ -1,5 +1,9 @@
 # Current handoff
 
+## Compact header refresh hierarchy — 2026-10-05
+Phone/iPad headers had menu + refresh + title competing for the same row. COMPACT-HEADER-1 keeps refresh functionality but moves it to the grouped drawer as a secondary `데이터 새로고침` action; desktop retains the direct header refresh. The demo fallback banner still exposes `다시 연결` immediately when live data fails, so recovery does not become harder. Existing refresh invalidation/reload logic is reused.
+Validation required: full Pepper harness, tests/compact-header.spec.ts, and the updated iPad RS refresh regression.
+
 ## Flat phone surfaces — 2026-10-05
 The hierarchy and typography passes reduced information density, but repeated rounded outer cards still visually fragmented the phone screen. MOBILE-FLAT-1 flattens only the primary phone sections into a continuous white surface separated by whitespace and a subtle divider, while keeping decision rows/badges/disclosures intact. Desktop keeps the existing card boundaries. No information or interaction is removed.
 Validation required: full Pepper harness plus tests/mobile-flat-surfaces.spec.ts.
