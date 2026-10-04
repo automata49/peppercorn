@@ -1,5 +1,9 @@
 # Current handoff
 
+## Lean Pages CD — 2026-10-04
+The full analysis/DB/Playwright suite remains the pull-request Pepper harness. The Pages deployment no longer repeats that 5+ minute suite after merge; app/code pushes run the fast harness structural check plus the production build, then publish. Market-refresh-triggered deploys build directly. This keeps CI as the quality gate and CD focused on publishing, while FAST-UI-DEPLOY-1 separately avoids recalculating stock flags on ordinary UI pushes. Direct main pushes still receive harness:check + TypeScript/Vite build before publishing.
+Validation required: Pepper harness on this PR, then after merge confirm index.html browser asset versions advance to the merge SHA through the lean deploy path.
+
 ## Fast UI Pages deploy — 2026-10-04
 The Pages workflow previously recalculated STOCK-FLAGS-1 on every main push, so a pure UI merge could wait up to 12 minutes on external SEC/DART/yfinance work before the new interface appeared. App/code pushes now reuse the already-published stock-flags.json and proceed to Pages; only the successful `Refresh market analysis` workflow-run path recalculates stock flags. The refresh path still keeps the currently published file as fallback if recalculation fails. This changes deployment latency only; badge semantics and market-refresh ownership stay the same.
 Validation required: Pepper harness on the PR, then after merge confirm the branch Pages source versions to the merge SHA without executing the slow stock-flag refresh path.

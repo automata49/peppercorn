@@ -35,28 +35,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2' 'pandas==2.3.2' 'numpy==2.3.3'
-      - if: github.event_name != 'workflow_run'
-        run: python -m pytest -q analysis/fundamentals
-      - if: github.event_name != 'workflow_run'
-        run: python -m pytest -q analysis/tests
+      # Full analysis/DB/Playwright verification belongs to the pull-request Pepper harness.
+      # CD keeps only the fast structural guard plus a production build so a merged UI fix appears promptly.
       - if: github.event_name != 'workflow_run'
         run: npm run harness:check
-      - if: github.event_name != 'workflow_run'
-        run: npm run test:position-db
-      - if: github.event_name != 'workflow_run'
-        run: npm run test:etf-rs
-      - if: github.event_name != 'workflow_run'
-        run: npm run test:universe-db
-      - if: github.event_name != 'workflow_run'
-        run: npm run test:temperature-db
       - run: npm run build
-      - if: github.event_name != 'workflow_run'
-        run: npx playwright install --with-deps chromium
-      - if: github.event_name != 'workflow_run'
-        run: sudo apt-get install -y fonts-noto-cjk
-      - if: github.event_name != 'workflow_run'
-        run: npm run test:ui
       - name: Version browser assets for immediate refresh
         run: |
           python - <<'PY'
