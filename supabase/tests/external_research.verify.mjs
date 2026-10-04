@@ -13,6 +13,10 @@ await db.exec(`create role anon nologin; create role authenticated nologin; crea
 await db.exec(readFileSync('supabase/schema.sql','utf8').replace(/create extension if not exists pgcrypto;/,''));
 const sql=readFileSync('supabase/migrations/20261004140000_external_research_ingestion.sql','utf8');
 await db.exec(sql);await db.exec(sql);check('migration re-applies',true);
+const asRole=async(role,fn)=>{await db.exec(`set role ${role}`);try{return await fn()}finally{await db.exec('reset role')}};
+const pipelineHash='e'.repeat(64);
+check('pipeline role inserts public feed only',await asRole('research_feed_pipeline',async()=>{await q(`insert into public.external_research_feed(source,source_key,external_id,fingerprint,source_url,title) values('telegram','hs_academy','pipeline',$1,'https://t.me/HS_academy/999','pipeline')`,[pipelineHash]);return true}));
+check('pipeline role cannot insert private captures',await (async()=>{try{await asRole('research_feed_pipeline',()=>q(`insert into public.research_captures(user_id,source_url,captured_text,content_hash) values('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa','https://example.com','x',$1)`,['f'.repeat(64)]));return false}catch{return true}})());
 
 const A='aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',B='bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb';
 await q('insert into auth.users(id) values($1),($2)',[A,B]);
