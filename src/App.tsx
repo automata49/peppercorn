@@ -4,6 +4,7 @@ import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
+import { DecisionList } from './components/DecisionList'
 import { AuthModal } from './components/AuthModal'
 import { PositionPanel, valuation } from './components/PositionPanel'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
@@ -579,15 +580,26 @@ function focusLeaderRows(rows:LeaderRow[],market:MarketFilter){
 function FocusLeaderList({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const groups=leaderGroups(rows)
   const displayRows=groups.flatMap(g=>g.rows)
-  return <div className="focus-leader-list" role="list" aria-label="포커스 주도 종목">
+  return <div className="focus-leader-list" aria-label="포커스 주도 종목">
     {groups.map(g=><section className="focus-group" key={g.key} aria-label={`${g.market} ${g.name}`}>
       <div className="focus-group-head"><span>{g.market} · {g.name}</span><small>{g.rank!=null&&g.total?`업종 ${g.rank}/${g.total}위`:'업종 순위 —'} · {g.rows.length}종목</small></div>
-      {g.rows.map(r=><button key={r.id||r.market+':'+r.ticker} type="button" role="listitem" className="focus-leader-row" onClick={()=>onSelect(r)}>
-        <span className="focus-rank">{displayRows.indexOf(r)+1}</span>
-        <span className="focus-stock"><b>{r.name||r.ticker}</b><small>{r.ticker} · {stageLabel(r.stage)}</small></span>
-        <span className={'focus-class '+leadTone(leadership(r))}>{leadership(r)}</span>
-        <span className="focus-score"><b>RS {r.rs_rank==null?'—':Math.round(r.rs_rank)}</b><small className={(r.return_20d??0)>0?'pos':(r.return_20d??0)<0?'neg':''}>{pct(r.return_20d)} · 20D</small></span>
-      </button>)}
+      <DecisionList
+        className="focus-decision-list"
+        rowClassName="focus-leader-row"
+        items={g.rows.map(r=>({
+          key:r.id||r.market+':'+r.ticker,
+          data:r,
+          rank:displayRows.indexOf(r)+1,
+          title:r.name||r.ticker,
+          meta:`${r.ticker} · ${stageLabel(r.stage)}`,
+          badge:leadership(r),
+          badgeTone:leadTone(leadership(r)) as 'green'|'blue'|'amber'|'gray',
+          value:`RS ${r.rs_rank==null?'—':Math.round(r.rs_rank)}`,
+          subvalue:`${pct(r.return_20d)} · 20D`,
+          valueTone:(r.return_20d??0)>0?'positive':(r.return_20d??0)<0?'negative':undefined
+        }))}
+        onSelect={onSelect}
+      />
     </section>)}
     {!rows.length&&<p className="empty">현재 포커스 조건을 통과한 종목이 없습니다.</p>}
   </div>
@@ -1146,7 +1158,7 @@ export default function App(){
     cellRenderer:(p:any)=><button className="grid-delete" onClick={(e)=>{e.stopPropagation();if(p.data)setAnalysisDeleteTarget(p.data)}}>삭제</button>
   }],[])
 
-  const filters=<div className="toolbar">
+  const filters=<div className={'toolbar'+(page==='dashboard'?' dashboard-toolbar':'')}>
     <div className="segment">{(['ALL','KR','US'] as const).map(m=><button key={m} className={market===m?'on':''} onClick={()=>setMarket(m)}>{m==='ALL'?'전체':m}</button>)}</div>
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ticker · 종목 · 산업 · 섹터 검색"/>
   </div>
@@ -1214,12 +1226,12 @@ export default function App(){
           </div>
         </div>
         <FocusLeaderList rows={focusRows} onSelect={chartOpenStock}/>
-        <div className="focus-actions">
-          <button type="button" onClick={()=>showStockGroup('corrections')}>조정 중 <b>{correctionCount}</b></button>
-          <button type="button" onClick={()=>showStockGroup('bigcap')}>대형 주도주 <b>{bigCaps.rows.length}</b></button>
-        </div>
         <details className="dashboard-disclosure leader-detail">
-          <summary>모멘텀 차트 · 현재가 강세 보기</summary>
+          <summary>추가 보기 · 모멘텀 / 현재가</summary>
+          <div className="focus-actions">
+            <button type="button" onClick={()=>showStockGroup('corrections')}>조정 중 <b>{correctionCount}</b></button>
+            <button type="button" onClick={()=>showStockGroup('bigcap')}>대형 주도주 <b>{bigCaps.rows.length}</b></button>
+          </div>
           <div className="mini-segment leader-basis" role="group" aria-label="주도 종목 기준">{([['close','종가 기준'],['live','현재가 기준']] as const).map(([key,text])=><button key={key} type="button" aria-pressed={leaderBasis===key} className={leaderBasis===key?'on':''} onClick={()=>setLeaderBasis(key)}>{text}</button>)}</div>
           {leaderBasis==='close'?<LeaderRsChart rows={focusRows} onSelect={chartOpenStock}/>:<div className="live-leaders"><LiveLeaders pool={focusRows} live={source==='supabase'} onSelect={row=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}}/></div>}
         </details>
@@ -1231,7 +1243,6 @@ export default function App(){
           <div className="panel-head dashboard-sector-head">
             <div><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
             <div className="sector-actions">
-              <button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표</button>
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
@@ -1246,7 +1257,26 @@ export default function App(){
             </tr>)}
             {!dashboardTopSectors.length&&<tr><td colSpan={6} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
           </tbody></table></div>
-          <details className="dashboard-disclosure sector-heat-disclosure"><summary>섹터 히트맵 보기</summary><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
+          <DecisionList
+            className="mobile-sector-list"
+            items={dashboardTopSectors.map((g,index)=>({
+              key:g.key,
+              data:g,
+              rank:index+1,
+              eyebrow:g.market,
+              title:sectorLabel(g),
+              meta:`RS ${g.medRank==null?'—':Math.round(g.medRank)} · 주도 ${g.core+g.candidate}`,
+              badge:g.core>0?`핵심 ${g.core}`:g.verdict,
+              badgeTone:g.core>0?'green':'gray',
+              value:pct(g.medRet20d),
+              subvalue:`50D ${pct(g.medRet50d)}`,
+              valueTone:(g.medRet20d??0)>0?'positive':(g.medRet20d??0)<0?'negative':undefined,
+              ariaLabel:`${sectorLabel(g)} 주도 종목 보기`
+            }))}
+            onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
+            emptyLabel="조건에 맞는 섹터가 없습니다."
+          />
+          <details className="dashboard-disclosure sector-heat-disclosure"><summary>시장 지표 · 섹터 히트맵</summary><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
         </div>
         </div>
       </section>
