@@ -160,8 +160,16 @@ check('VALUE-2 fills at least one equity', eqRows.some(r=>r.v!=null));
 const classAfter=(await q(`select instrument_id,rs_rank,ibd_rs_estimate,tt_pass_count,leader_tt,stage,verdict,action_guide from public.market_metrics m join public.instruments i on i.id=m.instrument_id order by instrument_id,as_of`)).rows;
 check('VALUE-2 leaves ranks and classification unchanged', JSON.stringify(classAfter)===JSON.stringify(classBefore.map(({traded_value_20d,...r})=>r)));
 check('VALUE-2 keeps ETF trading values', JSON.stringify(classBefore.filter(r=>r.traded_value_20d!=null).map(r=>[r.instrument_id,r.traded_value_20d]).filter(([id])=>Object.values(ids).includes(id)&&[ids.QQQ,ids.SPY,ids.KRETF].includes(id)))===JSON.stringify((await q(`select instrument_id,traded_value_20d from public.market_metrics where instrument_id in ($1,$2,$3) and traded_value_20d is not null order by instrument_id,as_of`,[ids.QQQ,ids.SPY,ids.KRETF])).rows.map(r=>[r.instrument_id,r.traded_value_20d])));
+// Re-applying over its own definition is accepted and changes nothing (production already held it on 2026-10-04).
+const tvBefore=JSON.stringify((await q(`select instrument_id,as_of,traded_value_20d from public.market_metrics order by instrument_id,as_of`)).rows);
+let value2Reapplied=true;try{await db.exec(readFileSync(`supabase/migrations/${value2}`,'utf8'))}catch{value2Reapplied=false}
+check('VALUE-2 re-applies over its own definition without changes', value2Reapplied&&tvBefore===JSON.stringify((await q(`select instrument_id,as_of,traded_value_20d from public.market_metrics order by instrument_id,as_of`)).rows));
+// Any other definition is refused.
+const ownSrc=(await q(`select prosrc from pg_proc where proname='recalculate_etf_relative_strength'`)).rows[0].prosrc;
+await db.exec(`create or replace function public.recalculate_etf_relative_strength() returns integer language plpgsql security invoker set search_path = '' as $fn$${ownSrc.replace('begin','begin\n  -- local edit')}$fn$`);
 let value2Refused=false;try{await db.exec(readFileSync(`supabase/migrations/${value2}`,'utf8'))}catch(e){value2Refused=/differs from the repo/.test(String(e.message))}
 check('VALUE-2 refuses to re-apply over a changed definition', value2Refused);
+await db.exec(`create or replace function public.recalculate_etf_relative_strength() returns integer language plpgsql security invoker set search_path = '' as $fn$${ownSrc}$fn$`);
 await db.exec('set role service_role');
 check('service role VALUE-2 rerun is idempotent', Number((await q('select public.recalculate_etf_relative_strength() n')).rows[0].n)===0);
 await db.exec('reset role');

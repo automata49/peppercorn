@@ -245,17 +245,39 @@ def summarize(rows: list[dict], funda: dict, closes: dict, as_of: str) -> dict:
 
 
 # ---- network (not unit tested) -------------------------------------------------------------------------------
-def sec_frames(ua: str, concept: str, period: str, unit: str = "USD") -> dict[int, float]:  # pragma: no cover - network
+class _Body:
+    def __init__(self, status_code: int, content: bytes):
+        self.status_code, self.content = status_code, content
+
+    def json(self):
+        return json.loads(self.content)
+
+
+def get_with_deadline(url: str, deadline: float = 60, attempts: int = 4, **kw) -> _Body:  # pragma: no cover - network
+    """GET with a hard limit on the whole download. requests' timeout only bounds the gap between bytes, so a server
+    that trickles a response could hold a run forever (the 2026-10-04 Pages deploy lost its flags file to that).
+    Retries on a cut-off, stalled or failed connection; raises after the last attempt."""
     import requests
-    url = f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/{unit}/{period}.json"
-    for attempt in range(4):  # SEC sometimes ends a large response early; retry before giving up
+    last = None
+    for attempt in range(attempts):
         try:
-            r = requests.get(url, headers={"User-Agent": ua}, timeout=120)
-            break
-        except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout):
-            if attempt == 3:
-                raise
-            time.sleep(2 ** (attempt + 1))
+            start = time.monotonic()
+            with requests.get(url, timeout=(15, 30), stream=True, **kw) as r:
+                chunks = []
+                for chunk in r.iter_content(1 << 16):
+                    chunks.append(chunk)
+                    if time.monotonic() - start > deadline:
+                        raise requests.exceptions.Timeout(f"download over {deadline:.0f}s: {url}")
+                return _Body(r.status_code, b"".join(chunks))
+        except (requests.exceptions.ChunkedEncodingError, requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+            last = e
+            if attempt < attempts - 1:
+                time.sleep(2 ** (attempt + 1))
+    raise last
+
+
+def sec_frames(ua: str, concept: str, period: str, unit: str = "USD") -> dict[int, float]:  # pragma: no cover - network
+    r = get_with_deadline(f"https://data.sec.gov/api/xbrl/frames/us-gaap/{concept}/{unit}/{period}.json", headers={"User-Agent": ua})
     time.sleep(.15)
     if r.status_code != 200:
         return {}
@@ -305,7 +327,10 @@ def latest_annual(facts: dict, concepts: tuple[str, ...]) -> tuple[float | None,
 def company_annual(ua: str, cik: int) -> dict:  # pragma: no cover - network
     """Fallback for a company missing from the CY2025 frames: its own filings, and whether it files without revenue."""
     import requests
-    r = requests.get(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json", headers={"User-Agent": ua}, timeout=120)
+    try:
+        r = get_with_deadline(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik:010d}.json", deadline=30, attempts=2, headers={"User-Agent": ua})
+    except requests.exceptions.RequestException:
+        return {}
     time.sleep(.15)
     if r.status_code != 200:
         return {}
@@ -327,8 +352,8 @@ def kr_fundamentals(key: str, tickers: list[str]) -> dict:  # pragma: no cover -
     out = {}
     items = list(by_code)
     for i in range(0, len(items), 100):
-        body = requests.get("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
-                            params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": "2025", "reprt_code": "11011"}, timeout=120).json()
+        body = get_with_deadline("https://opendart.fss.or.kr/api/fnlttMultiAcnt.json",
+                                 params={"crtfc_key": key, "corp_code": ",".join(items[i:i + 100]), "bsns_year": "2025", "reprt_code": "11011"}).json()
         rows = body.get("list") or []
         for corp in {r["corp_code"] for r in rows}:
             mine = [r for r in rows if r["corp_code"] == corp]
@@ -353,7 +378,7 @@ def yahoo_closes(rows: list[dict], period: str = "5mo") -> dict:  # pragma: no c
     out, keys = {}, list(sym)
     for i in range(0, len(keys), 200):
         batch = keys[i:i + 200]
-        frame = yf.download(batch, period=period, interval="1d", auto_adjust=False, progress=False, threads=True, group_by="ticker")
+        frame = yf.download(batch, period=period, interval="1d", auto_adjust=False, progress=False, threads=True, group_by="ticker", timeout=30)
         for s in batch:
             try:
                 f = frame[s] if len(batch) > 1 else frame

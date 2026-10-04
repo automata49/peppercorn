@@ -9,7 +9,11 @@ do $guard$
 declare etf_src text;
 begin
   select md5(prosrc) into etf_src from pg_proc where oid='public.recalculate_etf_relative_strength()'::regprocedure;
-  if etf_src is distinct from 'e9246c9854ff5184c20d33f7632a6786' then raise exception 'recalculate_etf_relative_strength() differs from the repo (md5 %)',etf_src; end if;
+  -- e9246c98…: the *_kr_benchmark_kospi.sql definition this replaces; 989f34fa…: this file's own definition (already
+  -- applied; re-applying is a no-op that re-runs the verification). Anything else is refused.
+  if etf_src is distinct from 'e9246c9854ff5184c20d33f7632a6786' and etf_src is distinct from '989f34fadbd09dafc4d569a3ab9acdc7' then
+    raise exception 'recalculate_etf_relative_strength() differs from the repo (md5 %)',etf_src;
+  end if;
 end
 $guard$;
 
