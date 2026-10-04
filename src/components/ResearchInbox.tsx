@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useRef,useState} from 'react'
 import type {Session} from '../lib/session'
-import {consumeCaptureDraft,deleteResearchCapture,loadResearchInbox,saveResearchCapture,saveToPepperBookmarklet,type CaptureDraft,type ResearchCapture,type ResearchFeedItem} from '../lib/research'
+import {clearCaptureRequest,deleteResearchCapture,draftFromCaptureMessage,loadResearchInbox,saveResearchCapture,saveToPepperBookmarklet,type CaptureDraft,type ResearchCapture,type ResearchFeedItem} from '../lib/research'
 
 const emptyDraft:CaptureDraft={source_url:'',title:'',captured_text:''}
 const date=(value:string|null)=>value?new Date(value).toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'—'
@@ -17,9 +17,14 @@ export function ResearchInbox({session,onSession}:{session:Session|null;onSessio
   const loadedFor=useRef<string>('')
 
   useEffect(()=>{
-    const incoming=consumeCaptureDraft()
-    if(incoming){pendingRef.current=incoming;setDraft(incoming);setMessage(session?'Save to Pepper 캡처를 저장합니다.':'캡처를 받았습니다. 로그인하면 저장합니다.')}
-  },[])
+    if(new URLSearchParams(location.search).get('capture')==='1')setMessage('Save to Pepper에서 본문을 받는 중입니다…')
+    const receive=(event:MessageEvent)=>{
+      const incoming=draftFromCaptureMessage(event.data,event.origin);if(!incoming)return
+      clearCaptureRequest();pendingRef.current=incoming;setDraft(incoming);setMessage(session?'Save to Pepper 캡처를 저장합니다.':'캡처를 받았습니다. 로그인하면 저장합니다.')
+      try{(event.source as WindowProxy|null)?.postMessage({type:'pepper-capture-ack'},event.origin)}catch{}
+    }
+    window.addEventListener('message',receive);return()=>window.removeEventListener('message',receive)
+  },[session?.user.id])
 
   useEffect(()=>{
     if(!session){setFeed([]);setCaptures([]);loadedFor.current='';return}
