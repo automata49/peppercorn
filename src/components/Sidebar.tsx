@@ -14,9 +14,9 @@ const pages:[string,AppIconName,string][]=[
 ]
 const pageGroups=[
   ['핵심',['dashboard','analysis','temperature','watchlist']],
-  ['기록',['portfolio','journal']],
-  ['전체 데이터',['leaderboard','universe','settings']]
+  ['기록',['portfolio','journal']]
 ] as const
+const secondaryPages=['leaderboard','universe','settings'] as const
 
 // Folio brand lockup: the icon and wordmark share one height, as in the source artwork.
 function FolioBrand(){
@@ -28,10 +28,16 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     <span className="nav-icon"><AppIcon name={icon}/></span><span className="nav-label">{label}</span>
   </button>
   const navigation=<nav aria-label="주 메뉴">{pages.map(pageButton)}</nav>
-  const drawerNavigation=<nav className="menu-nav" aria-label="주 메뉴">{pageGroups.map(([title,ids])=><section className="menu-nav-group" key={title}>
-    <h3>{title}</h3>
-    {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
-  </section>)}</nav>
+  const drawerNavigation=<nav className="menu-nav" aria-label="주 메뉴">
+    {pageGroups.map(([title,ids])=><section className="menu-nav-group" key={title}>
+      <h3>{title}</h3>
+      {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
+    </section>)}
+    <details key={(open?'open:':'closed:')+page} className="menu-nav-more" open={(secondaryPages as readonly string[]).includes(page)}>
+      <summary><span>전체 데이터</span><small>Leaderboard · Universe · Settings</small></summary>
+      <div>{pages.filter(([id])=>(secondaryPages as readonly string[]).includes(id)).map(pageButton)}</div>
+    </details>
+  </nav>
 
   const goDashboardSection=(selector:string)=>{
     setPage('dashboard')
