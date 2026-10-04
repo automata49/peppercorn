@@ -836,6 +836,7 @@ export default function App(){
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
   const [analysisDetailsOpen,setAnalysisDetailsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
+  const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
   // Compare tray (<=4 stocks), remembered per device as a convenience.
   const [compareKeys,setCompareKeys]=useState<string[]>(()=>{try{const v=JSON.parse(localStorage.getItem('peppercorn-compare-v1')||'[]');return Array.isArray(v)?v.filter(x=>typeof x==='string').slice(0,4):[]}catch{return []}})
@@ -982,7 +983,11 @@ export default function App(){
   },[])
 
   useEffect(()=>{
-    if(page==='analysis'&&scrollToAnalysis){analysisRecordsRef.current?.scrollIntoView({behavior:'smooth',block:'start'});setScrollToAnalysis(false)}
+    if(page==='analysis'&&scrollToAnalysis){
+      setAnalysisRecordsOpen(true)
+      window.setTimeout(()=>analysisRecordsRef.current?.scrollIntoView({behavior:'smooth',block:'start'}),0)
+      setScrollToAnalysis(false)
+    }
   },[page,scrollToAnalysis])
 
   useEffect(()=>{
@@ -1438,7 +1443,13 @@ export default function App(){
         </div>
       </div>:<p className="empty">종목을 검색하거나 목록에서 고르세요.</p>}
       </div>
-      <div ref={analysisRecordsRef} className="records-anchor"><div className="page-note"><b>종목분석 기록 · 목록 보기</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/><div className="panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div></div></>
+      <div ref={analysisRecordsRef} className="records-anchor">
+        <ProgressiveDisclosure title="종목분석 기록 · 목록" meta={`${enrichedAnalysis.length}건`} className="workspace-table-disclosure analysis-records-disclosure" open={analysisRecordsOpen} onOpenChange={setAnalysisRecordsOpen}>
+          <div className="page-note analysis-records-note"><b>기록 편집</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div>
+          <TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/>
+          <div className="panel workspace-grid-panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div>
+        </ProgressiveDisclosure>
+      </div></>
   }else if(page==='temperature'){
     const tempFacts=[{label:'MA200 위 비율'+(market==='ALL'?'':' · '+market),value:ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'},{label:'52W 고점 근접',value:high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'},{label:'상승/하락 (1W)',value:advanceCount+declineCount?(advanceDeclineRatio||0).toFixed(1)+' : 1':'—'}]
     content=<><MarketTemperature entries={tempEntries} onChange={updateTemperature} facts={tempFacts}/>
