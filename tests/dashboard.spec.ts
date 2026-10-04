@@ -45,7 +45,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.ui-dialog-overlay')).toHaveCount(0);
   const explore=page.locator('.dashboard-explore');
   await expect(explore).not.toHaveAttribute('open','');
-  await explore.locator('> summary').click();
+  await explore.locator(':scope > summary').click();
   await expect(etfPanel).toBeVisible();
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
   const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
@@ -174,7 +174,7 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     const explore=page.locator('.dashboard-explore');
     await expect(explore).not.toHaveAttribute('open','');
     await expect(panel).not.toBeVisible();
-    await explore.locator('> summary').click();
+    await explore.locator(':scope > summary').click();
     await expect(panel).toBeVisible();
     const heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
     expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
