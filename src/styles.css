@@ -1850,3 +1850,11 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
   .topbar-refresh{display:none!important}
   .drawer-refresh{min-height:52px;margin-top:10px}
 }
+
+/* COMPACT-TITLEBAR-1 — title-first headers on phone/iPad, full context on desktop. */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .topbar{min-height:60px!important;padding-top:8px!important;padding-bottom:8px!important}
+  .topbar p{display:none!important}
+  .topbar-title{display:flex;align-items:center;min-height:44px}
+  .topbar h1{margin:0;line-height:1.1}
+}
