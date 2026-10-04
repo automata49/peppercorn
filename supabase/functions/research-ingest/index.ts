@@ -52,7 +52,10 @@ Deno.serve(async(req:Request)=>{
   const dbUrl=Deno.env.get("SUPABASE_DB_URL");if(!dbUrl)return Response.json({error:"server_not_configured"},{status:500});
   const sql=postgres(dbUrl,{prepare:false,max:1,idle_timeout:5});
   try{
-    const rows=await sql.unsafe(UPSERT,[JSON.stringify(items)]);
+    const rows=await sql.begin(async(tx)=>{
+      await tx.unsafe("set local role research_feed_pipeline");
+      return tx.unsafe(UPSERT,[JSON.stringify(items)]);
+    });
     return Response.json({ok:true,received:items.length,upserted:rows.length});
   }catch(e){return Response.json({error:"write_refused",detail:String((e as Error).message).slice(0,300)},{status:422})}
   finally{await sql.end({timeout:5})}
