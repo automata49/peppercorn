@@ -400,6 +400,30 @@ function LiveGridTable(props:Parameters<typeof GridTable>[0]){
   return <GridTable {...props} rows={rows}/>
 }
 
+function WatchDecisionList({rows,onSelect}:{rows:EditableRow[];onSelect:(row:EditableRow)=>void}){
+  const quoteRows=rows.filter(r=>(r.market==='US'||r.market==='KR')&&r.ticker).map(r=>({market:r.market as Market,ticker:String(r.ticker),exchange:(r.exchange as string|null|undefined)??null}))
+  const live=useLiveQuotes(quoteRows,80)
+  const items=rows.map((r,index)=>{
+    const q=(r.market==='US'||r.market==='KR')&&r.ticker?live({market:r.market as Market,ticker:String(r.ticker),exchange:(r.exchange as string|null|undefined)??null}):null
+    const priority=String(r.priority||'B').toUpperCase()
+    const badgeTone=priority==='A'?'green':priority==='B'?'blue':'gray'
+    const rank=Number(r.rs_rank)
+    return {
+      key:String(r.id||r.market||'')+':'+String(r.ticker||index),
+      data:r,
+      rank:index+1,
+      eyebrow:String(r.market||''),
+      title:String(r.name||r.ticker||'종목'),
+      meta:[String(r.ticker||''),String(r.stage||'')].filter(Boolean).join(' · '),
+      badge:priority,
+      badgeTone:badgeTone as 'green'|'blue'|'gray',
+      value:num(q?.price??r.current_price),
+      subvalue:Number.isFinite(rank)?`RS ${Math.round(rank)}`:'RS —'
+    }
+  })
+  return <DecisionList className="watch-decision-list" items={items} onSelect={onSelect} emptyLabel="Watchlist가 비어 있습니다."/>
+}
+
 // STOCK-FLAGS-1 warning badges and GROUP-RANK-1 label (display only).
 function StockBadges({row}:{row:LeaderRow}){
   const file=useStockFlags()
@@ -800,6 +824,15 @@ export default function App(){
   })
   const [page,setPage]=useState('dashboard')
   const [menuOpen,setMenuOpen]=useState(false)
+  const [phoneView,setPhoneView]=useState(()=>{try{return window.matchMedia('(max-width: 650px)').matches}catch{return false}})
+  const [watchEditOpen,setWatchEditOpen]=useState(false)
+  useEffect(()=>{
+    let media:MediaQueryList
+    try{media=window.matchMedia('(max-width: 650px)')}catch{return}
+    const update=()=>setPhoneView(media.matches)
+    media.addEventListener('change',update)
+    return()=>media.removeEventListener('change',update)
+  },[])
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
   const [source,setSource]=useState<'demo'|'supabase'>('demo')
   const [refreshing,setRefreshing]=useState(false)
@@ -1312,7 +1345,20 @@ export default function App(){
       <span>분류 기준: <b>핵심 주도</b>({lbCount('핵심 주도')}) 추세 템플릿 통과 · RS순위 ≥ 95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0 / <b>주도 후보</b>({lbCount('주도 후보')}) 추세 통과 · IBD식 RS ≥ 80 · 고점 -25% 이내 · RS 3M &gt; 0 / <b>강세 전환</b>({lbCount('강세 전환')}) 추세 미통과지만 50일선 위 · 고점 -30% 이내 · RS순위 ≥ 70 · RS 1W/1M &gt; 0. ETF는 ETF끼리만 순위를 매기고 주도 분류에서 제외합니다.</span>
       <span>읽는 순서: 섹터 → 주도 분류 → 모멘텀 단계 → RS → 액션 가이드. 한 종목을 깊게 보려면 종목 분석에서 검색하세요.</span></div>{filters}<div className="panel"><GridTable rows={visible} columns={leaderCols} height={680}/></div></>
   }else if(page==='watchlist'){
-    content=<><div className="page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/><div className="panel"><LiveGridTable rows={enrich(watch)} columns={watchCols} editable onChange={updateWatch} height={650}/></div></>
+    const watchRows=enrich(watch)
+    const openWatchAnalysis=(row:EditableRow)=>{const live=matchLeader(row);if(live){setSelected(live);setPage('analysis')}}
+    content=<>
+      <div className="page-note watchlist-page-note"><b>Watchlist</b><span>종목코드를 입력하면 현재가·산업·섹터·단계·RS가 자동 연결됩니다. 관심가·손절·우선순위를 관리하세요.</span></div>
+      <TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/>
+      {phoneView&&<section className="panel watch-mobile-panel">
+        <div className="watch-mobile-head"><div><h2>관심 종목</h2><span>{watchRows.length}개</span></div><small>종목을 누르면 분석으로 이동</small></div>
+        <WatchDecisionList rows={watchRows} onSelect={openWatchAnalysis}/>
+      </section>}
+      <details className="workspace-edit-disclosure" open={!phoneView||watchEditOpen} onToggle={e=>{if(phoneView)setWatchEditOpen(e.currentTarget.open)}}>
+        <summary><span>전체 편집</span><small>관심가 · 손절 · 우선순위 · 메모</small></summary>
+        <div className="panel"><LiveGridTable rows={watchRows} columns={watchCols} editable onChange={updateWatch} height={650}/></div>
+      </details>
+    </>
   }else if(page==='portfolio'){
     content=<><div className="page-note"><b>Portfolio</b><span>종목코드를 입력하면 현재가·산업·섹터가 연결됩니다. 수량·평단·Stop·투자 가설을 관리하세요.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/><div className="panel"><LiveGridTable rows={enrich(portfolio)} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div></>
   }else if(page==='analysis'){
