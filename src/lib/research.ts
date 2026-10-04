@@ -40,9 +40,9 @@ export function saveToPepperBookmarklet(appUrl=location.origin+location.pathname
   const target=new URL(appUrl)
   target.search='';target.hash='';target.searchParams.set('capture','1')
   const destination=JSON.stringify(target.toString())
-  return 'javascript:(()=>{try{const p={url:location.href,title:document.title,text:(document.body?.innerText||\'\').slice(0,200000)};window.name=\''+CAPTURE_PREFIX+'\'+encodeURIComponent(JSON.stringify(p));location.href='+destination+'}catch(e){alert(\'Save to Pepper failed\')}})()'
+  const prefix=JSON.stringify(CAPTURE_PREFIX)
+  return `javascript:(()=>{try{const p={url:location.href,title:document.title,text:(document.body?.innerText||'').slice(0,200000)};window.name=${prefix}+encodeURIComponent(JSON.stringify(p));location.href=${destination}}catch(e){alert('Save to Pepper failed')}})()`
 }
-
 export function consumeCaptureDraft():CaptureDraft|null{
   if(typeof window==='undefined')return null
   const params=new URLSearchParams(location.search)
