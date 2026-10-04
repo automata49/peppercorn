@@ -1,5 +1,9 @@
 # Current handoff
 
+## Flat phone surfaces — 2026-10-05
+The hierarchy and typography passes reduced information density, but repeated rounded outer cards still visually fragmented the phone screen. MOBILE-FLAT-1 flattens only the primary phone sections into a continuous white surface separated by whitespace and a subtle divider, while keeping decision rows/badges/disclosures intact. Desktop keeps the existing card boundaries. No information or interaction is removed.
+Validation required: full Pepper harness plus tests/mobile-flat-surfaces.spec.ts.
+
 ## Unified navigation icon system — 2026-10-05
 The remaining obvious visual inconsistency was navigation: desktop, drawer and quick-nav used unrelated Unicode glyphs with different weight/alignment. NAV-ICON-1 adds a dependency-free AppIcon SVG set and uses it for all nine destinations plus the four quick-nav actions and menu/close/refresh controls. Stroke, size and active feedback are centralized in CSS; motion stays short and respects reduced-motion. No route labels/order or navigation behavior changed.
 Validation required: full Pepper harness plus tests/nav-icons.spec.ts on phone and desktop.
