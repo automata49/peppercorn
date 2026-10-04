@@ -1331,7 +1331,7 @@ export default function App(){
           ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
         }))} onSelect={openStock}/>
       </section>
-      <ProgressiveDisclosure title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
+      <ProgressiveDisclosure key="watchlist-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
         <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={watchCols} editable onChange={updateWatch} height={650}/></div>
       </ProgressiveDisclosure></>
   }else if(page==='portfolio'){
@@ -1353,7 +1353,7 @@ export default function App(){
           ariaLabel:`${r.name||r.ticker} 종목 분석 열기`
         }))} onSelect={openStock}/>
       </section>
-      <ProgressiveDisclosure title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
+      <ProgressiveDisclosure key="portfolio-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
         <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div>
       </ProgressiveDisclosure></>
   }else if(page==='analysis'){
