@@ -55,7 +55,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // US sector shows under its GICS name only.
   await expect(page.locator('.dashboard-sector-table')).toContainText('Information Technology')
   await expect(page.locator('.dashboard-sector-table')).not.toContainText(/(^|[^ ])Technology ·/)
-  await page.locator('.leadership-card-grid button').filter({hasText:'핵심 주도'}).click()
+  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
   const kod=page.locator('.drill-sheet .stock-row').filter({hasText:'Kodiak'}).first()
   await expect(kod.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
   await expect(kod.locator('.stock-flag.jump')).toHaveAttribute('title',/하루 \+178%/)
@@ -76,7 +76,7 @@ test('without the flags file the app shows no badges and still works',async({pag
   await page.route('**/data/stock-flags.json',route=>route.fulfill({status:404,body:'not found'}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.leadership-card-grid button').filter({hasText:'핵심 주도'}).click()
+  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
   await expect(page.locator('.drill-sheet .stock-row').filter({hasText:'Kodiak'}).first()).toBeVisible()
   await expect(page.locator('.stock-flag')).toHaveCount(0)
   // Leaderboard grid shows the group rank column.
