@@ -1,5 +1,9 @@
 # Current handoff
 
+## Compact titlebar — 2026-10-05
+Phone already hid the generic workspace subtitle, but iPad still spent a 74 px header on it. COMPACT-TITLEBAR-1 makes all touch/compact layouts title-first: the generic subtitle is hidden and the header settles at ~60 px while retaining the 44 px menu target. Desktop keeps the contextual subtitle. No routes, content or data behavior changed.
+Validation required: full Pepper harness plus tests/compact-titlebar.spec.ts across phone/iPad/iPad Pro touch and desktop.
+
 ## Compact header refresh hierarchy — 2026-10-05
 Phone/iPad headers had menu + refresh + title competing for the same row. COMPACT-HEADER-1 keeps refresh functionality but moves it to the grouped drawer as a secondary `데이터 새로고침` action; desktop retains the direct header refresh. The demo fallback banner still exposes `다시 연결` immediately when live data fails, so recovery does not become harder. Existing refresh invalidation/reload logic is reused.
 Validation required: full Pepper harness, tests/compact-header.spec.ts, and the updated iPad RS refresh regression.
