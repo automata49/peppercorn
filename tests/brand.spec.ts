@@ -54,6 +54,7 @@ for(const view of views){
    const drawer=page.locator('.menu-drawer')
    const brand=drawer.locator('.folio-brand')
    await expect(brand).toBeVisible()
+   await expect(drawer.locator('.menu-nav-group h3')).toHaveText(['핵심','기록','전체 데이터'])
    await expect(page.getByRole('dialog',{name:'Folio'})).toBeVisible()
    // The drawer slides in; separate boundingBox calls during the slide can land on different frames, so measure after it settles.
    await drawer.evaluate(e=>Promise.all(e.getAnimations({subtree:true}).map(a=>a.finished)))
