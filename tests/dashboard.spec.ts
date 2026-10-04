@@ -9,9 +9,9 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  // DASHBOARD-FOCUS-1: ALL shows at most six per market; the broad classification remains available behind the list.
-  await expect(page.locator('.focus-leader-row')).toHaveCount(12);
-  await expect(page.locator('.focus-summary-main strong')).toHaveText('12');
+  // DASHBOARD-FOCUS-1: the fixture has one industry group per market, so the strict two-per-group cap shows four names.
+  await expect(page.locator('.focus-leader-row')).toHaveCount(4);
+  await expect(page.locator('.focus-summary-main strong')).toHaveText('4');
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
   const etfPanel=page.locator('.dashboard-etf-panel');
