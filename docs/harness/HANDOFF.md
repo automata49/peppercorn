@@ -1,5 +1,9 @@
 # Current handoff
 
+## Unified navigation icon system — 2026-10-05
+The remaining obvious visual inconsistency was navigation: desktop, drawer and quick-nav used unrelated Unicode glyphs with different weight/alignment. NAV-ICON-1 adds a dependency-free AppIcon SVG set and uses it for all nine destinations plus the four quick-nav actions and menu/close/refresh controls. Stroke, size and active feedback are centralized in CSS; motion stays short and respects reduced-motion. No route labels/order or navigation behavior changed.
+Validation required: full Pepper harness plus tests/nav-icons.spec.ts on phone and desktop.
+
 ## Fast UI Pages deploy — 2026-10-04
 The Pages workflow previously recalculated STOCK-FLAGS-1 on every main push, so a pure UI merge could wait up to 12 minutes on external SEC/DART/yfinance work before the new interface appeared. App/code pushes now reuse the already-published stock-flags.json and proceed to Pages; only the successful `Refresh market analysis` workflow-run path recalculates stock flags. The refresh path still keeps the currently published file as fallback if recalculation fails. This changes deployment latency only; badge semantics and market-refresh ownership stay the same.
 Validation required: Pepper harness on the PR, then after merge confirm the branch Pages source versions to the merge SHA without executing the slow stock-flag refresh path.
