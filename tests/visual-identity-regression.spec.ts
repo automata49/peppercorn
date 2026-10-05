@@ -13,7 +13,12 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
+  await page.route('**/functions/v1/price-history?*',route=>{
+    const ids=new URL(route.request().url()).searchParams.get('ids')?.split(',')||[]
+    return route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[
+      ['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]
+    ]]))}})
+  })
   await page.goto('http://127.0.0.1:4173/peppercorn/')
 }
 
