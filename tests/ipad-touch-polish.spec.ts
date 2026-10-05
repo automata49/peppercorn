@@ -2,8 +2,8 @@ import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
 const views=[
-  {name:'ipad-portrait',width:834,height:1194,menu:'.topbar-menu'},
-  {name:'ipad-landscape',width:1194,height:834,menu:'.topbar-menu'},
+  {name:'ipad-portrait',width:834,height:1194,menu:'.mobile-brand-menu'},
+  {name:'ipad-landscape',width:1194,height:834,menu:'.mobile-brand-menu'},
   {name:'ipad-pro',width:1366,height:1024,menu:'.mobile-brand-menu'}
 ]
 

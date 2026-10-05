@@ -1,3 +1,33 @@
+## Harness aligned to Folio Identity v2 — 2026-10-05
+
+User requested the Harness itself be updated, not only the app CSS. The active branch now treats the visual identity as an engineering contract across Claude Code, Codex, CI, skills, reviewers and PWA checks.
+
+- `AGENTS.md` and `CLAUDE.md` explicitly route Folio brand/Home/theme/loading/PWA work through `docs/design/FOLIO_IDENTITY_V2.md`.
+- New canonical `harness/skills/folio-identity/SKILL.md` is mirrored to `.agents/skills`, `.claude/skills` and `plugins/pepper-harness/skills`. `pepper-ui` and `pepper-review` now encode the B-across-devices rule.
+- Claude and Codex now have read-only `identity-reviewer` agents; the existing UI reviewers also check identity parity.
+- `scripts/harness/identity.mjs` is imported by `npm run harness:check` and enforces the authoritative design doc, B on compact layouts, active stylesheet, theme modes, removal of the old Robinhood override and current PWA asset references.
+- `npm run test:identity` is the focused Playwright gate for brand/launch/PWA metadata, System/Light/Dark, compact Sunset Editorial B and compact header behavior. The CI harness runs it before the full UI suite.
+- Plugin bundle version is 1.1.0. `docs/harness/README.md` documents the new workflow and physical-Safari limitation.
+- `HARNESS-IDENTITY-1` in CONTRACT makes these gates authoritative. Touch iPad now follows the same B / Sunset Editorial Dashboard system as phone, with tablet density retained elsewhere.
+
+Do not merge PR #110 until the latest commit's complete harness run passes. Stale workflow runs are intentionally cancelled by PR concurrency.
+
+## Mobile / iPad visual direction superseded — 2026-10-05
+
+User explicitly changed the compact visual direction: **mobile and iPad also use concept B (Sunset Editorial)**. This supersedes the earlier instruction that concept C/Fluid Market should be the mobile app UI treatment. Current rule: B is the UI system at every viewport; C remains only for photography/launch atmosphere and restrained sunset accents such as the gradient `xx` and selected chart point. Compact Home therefore uses warm-paper/near-black surfaces, monochrome chart line, text-led period tabs, flat evidence columns, square/flat actions, editorial sector rows and monochrome bottom navigation. System / Light / Dark remain unchanged, and no screening/ranking/data logic changes.
+
+## Folio Home / New Visual Identity v2 — 2026-10-05
+
+User requested a full Home rebuild under the selected New Visual Identity and a Robinhood structure/philosophy benchmark. Implementation is on PR #110 (`fix/folio-identity-assets-ui`).
+
+Design: Robinhood is used as a structural benchmark only: simple/mobile-familiar navigation, content-first typography, less-is-more chrome, one primary decision journey, essential bottom navigation and first-class appearance settings. Folio keeps its own Sunset Editorial + Fluid Market language. Compact Home is now Folio xx brand → Total/KR/US → one representative Focus leader → large price + period performance → sunset daily-close chart → 1D/1W/1M/3M/1Y/ALL → alternate leaders → RS/group/high evidence → compact class cards → secondary Focus/sector/temperature/exploration. No ranking/classification/Position rules were changed.
+
+Brand/PWA: in-app identity is now a text-native `Folio xx` lockup (theme foreground + sunset xx); launch uses the same identity. New installed-app icons are generated deterministically by `scripts/generate-folio-icons.mjs` before dev/build and referenced as `folio-identity-180/192/512/512-maskable.png` by manifest, metadata, install UI, service worker and deploy sync. This avoids the stale punch-card filenames. An already installed iOS PWA may still need remove/re-add because the OS owns the stored Home Screen icon.
+
+Responsive: compact/touch Dashboard uses the brand bar instead of a duplicate Dashboard titlebar; touch iPad Pro through 1500 CSS px follows that shell. Other page data and edit flows remain unchanged.
+
+Validation note: first PR run exposed a real runtime regression because the old GSAP launch animation still targeted removed `.launch-emblem` / `.launch-wordmark` nodes. The animation now targets the new wordmark and guards all optional nodes. Continue with the latest harness run; do not merge until the full Playwright suite passes.
+
 ## Folio New Visual Identity — 2026-10-05
 
 User selected concept B (Sunset Editorial) as the base visual system, concept C (Fluid Market) for the mobile app treatment and photography language, and requested System / Light / Dark appearance support. The previous Robinhood-specific override layer is removed and replaced by `src/design/folio-identity.css`.

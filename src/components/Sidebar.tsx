@@ -62,9 +62,15 @@ function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode
   </div>
 }
 
-// Folio brand lockup: the icon and wordmark share one height, as in the source artwork.
+export function FolioWordmark({className=''}:{className?:string}){
+  return <span className={('folio-wordmark-system '+className).trim()} role="img" aria-label="Folio xx">
+    <span className="folio-word">Folio</span>
+    <span className="folio-xx" aria-hidden="true"><span>x</span><span>x</span></span>
+  </span>
+}
+
 function FolioBrand(){
-  return <><img className="brand-icon" src="./folio-icon.webp" alt=""/><img className="brand-wordmark-img" src="./folio-wordmark.webp" alt="Folio"/></>
+  return <FolioWordmark/>
 }
 
 export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean}){
@@ -109,7 +115,10 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
       <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Dashboard로 이동">
         <span className="folio-brand"><FolioBrand/></span>
       </button>
-      <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/></button>
+      <div className="mobile-brand-actions">
+        <button className="mobile-brand-search" onClick={()=>setPage('analysis')} aria-label="종목 검색"><AppIcon name="search"/></button>
+        <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/></button>
+      </div>
     </div>
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">

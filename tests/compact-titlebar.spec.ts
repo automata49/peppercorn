@@ -15,17 +15,23 @@ for(const view of [
   {name:'ipad-landscape',width:1194,height:834},
   {name:'ipad-pro-touch',width:1366,height:1024}
 ]){
-  test(view.name+' uses a title-first compact header',async({browser})=>{
+  test(view.name+' uses the Folio brand-first compact header',async({browser})=>{
     const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:true,isMobile:true})
     const page=await context.newPage()
     await boot(page)
     const top=page.locator('.topbar')
-    await expect(top.locator('h1')).toBeVisible()
-    await expect(top.locator('p')).toBeHidden()
-    const box=await top.boundingBox()
-    expect(box).not.toBeNull()
-    expect(box!.height).toBeLessThanOrEqual(62)
-    expect(box!.height).toBeGreaterThanOrEqual(58)
+    if(view.width<=1500){
+      await expect(top).toBeHidden()
+      const brandbar=page.locator('.mobile-brandbar')
+      await expect(brandbar).toBeVisible()
+      const box=await brandbar.boundingBox()
+      expect(box).not.toBeNull()
+      expect(box!.height).toBeGreaterThanOrEqual(67.5)
+      expect(box!.height).toBeLessThanOrEqual(68.5)
+    }else{
+      await expect(top.locator('h1')).toBeVisible()
+      await expect(top.locator('p')).toBeHidden()
+    }
     await context.close()
   })
 }

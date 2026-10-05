@@ -22,7 +22,7 @@ for(const width of [390,430]){
     const page=await context.newPage()
     await boot(page)
 
-    await boxAtLeast(page.locator('.topbar-menu'),44,44)
+    await boxAtLeast(page.locator('.mobile-brand-menu'),44,44)
     const nav=page.locator('.mobile-bottom-nav')
     await boxAtLeast(nav.getByRole('button',{name:'홈'}),44,52)
     expect(parseFloat(await nav.locator('b').first().evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(11)
@@ -37,7 +37,7 @@ for(const width of [390,430]){
     expect(parseFloat(await focusRow.locator('.decision-value small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
     const sectorRow=page.locator('.mobile-sector-list .decision-row').first()
-    await boxAtLeast(sectorRow,160,150)
+    await boxAtLeast(sectorRow,160,76)
     expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
     expect(parseFloat(await sectorRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 

@@ -4,7 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-folio-icons.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/generate-folio-icons.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",
@@ -13,8 +15,9 @@
     "test:etf-rs": "node supabase/tests/etf_rs.verify.mjs",
     "test:universe-db": "node supabase/tests/universe.verify.mjs",
     "test:temperature-db": "node supabase/tests/temperature.verify.mjs",
+    "test:identity": "playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts",
     "test:ui": "playwright test",
-    "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run test:universe-db && npm run test:temperature-db && npm run build && npm run test:ui"
+    "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run test:universe-db && npm run test:temperature-db && npm run build && npm run test:identity && npm run test:ui"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.23",

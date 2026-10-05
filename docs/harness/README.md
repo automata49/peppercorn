@@ -2,17 +2,42 @@
 
 ## Daily use
 
-Run `npm ci`, then `npm run harness:check`. For UI work, run `npm run build` and `npx playwright install chromium`, then `npm run test:ui`.
+Run `npm ci`, then `npm run harness:check`. For UI work, run `npm run build` and the relevant browser tests. For Folio brand, Home, theme, loading, responsive or PWA changes, the minimum gate is:
 
-Claude Code reads CLAUDE.md; Codex reads AGENTS.md. Both lead to CONTRACT.md. Canonical skills are in harness/skills; `npm run harness:sync` generates .claude/skills, .agents/skills and plugin copies. CI rejects drift.
+```bash
+npm run harness:check
+npm run build
+npm run test:identity
+npm run test:ui
+```
+
+Claude Code reads `CLAUDE.md`; Codex reads `AGENTS.md`. Both lead to `docs/harness/CONTRACT.md` and `docs/harness/HANDOFF.md`. Folio identity work must also read `docs/design/FOLIO_IDENTITY_V2.md`.
+
+Canonical skills are in `harness/skills`; `npm run harness:sync` generates `.claude/skills`, `.agents/skills` and plugin copies. CI rejects drift. For Folio visual work use both `folio-identity` and `pepper-ui`. Reviewers use `identity-reviewer` plus `ui-reviewer` for cross-device identity changes.
+
+## Folio identity gate
+
+The authoritative visual rule is **Sunset Editorial (B) on desktop, mobile and iPad**. Fluid Market/C is not a compact UI theme; it is restricted to the launch/photography atmosphere, the gradient `xx` mark and small focus accents. Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure, not for copied branding or trade-entry UI.
+
+`scripts/harness/identity.mjs` is part of `npm run harness:check`. It verifies the design/contract files exist, the B rule is authoritative, the active Folio stylesheet is loaded, the superseded Robinhood override remains removed, theme modes stay present and PWA references use only the current `folio-identity-*` filenames. These source checks do not replace browser tests.
+
+`npm run test:identity` runs the focused identity suite: launch/brand/PWA metadata, System/Light/Dark, compact B styling and compact titlebar behavior. The full `npm run test:ui` remains required before merge because identity changes can regress navigation, dialogs, sector exploration, charts and workspaces outside the focused suite.
+
+Physical iPhone/iPad Safari is not implied by Chromium emulation. If it was not tested on-device, state that explicitly. An already installed iOS Home Screen icon may also require remove/re-add because the OS can retain the old icon independently of the web app theme.
+
+## Position Growth
 
 For Position Growth, read `POSITION_GROWTH.md` before changing collection, valuation, labels, UI, or thesis. It maps the supplied requirements to the current app and lists phase-by-phase acceptance checks. `npm run harness:check` also validates Position AI evidence fixtures and allowed database write targets; these offline checks do not activate a Position pipeline.
 
-Default division: Claude plans/refactors, Codex implements/tests, then the other reviews only the diff and acceptance criteria. Reverse when useful. Avoid two simultaneous writers on the same branch/files. Reviewer definitions are in .claude/agents (Markdown) and .codex/agents (TOML); model selection inherits the user's client configuration, with no hard-coded paid model.
+## Agent division and review
+
+Default division: Claude plans/refactors, Codex implements/tests, then the other reviews only the diff and acceptance criteria. Reverse when useful. Avoid two simultaneous writers on the same branch/files. Reviewer definitions are in `.claude/agents` (Markdown) and `.codex/agents` (TOML); model selection inherits the user's client configuration, with no hard-coded paid model.
+
+For identity/UI changes, the read-only reviewers must check B consistency across desktop/mobile/iPad, System/Light/Dark, PWA asset references, semantic gain/loss colours, touch/overflow behavior and unchanged investment/ranking rules.
 
 ## Hooks and permissions
 
-Both clients have PostToolUse hooks for edits, backed by scripts/harness/hook.cjs. They run the fast contract gate, not the full browser suite on every keystroke. Shell-mediated edits may not match these tool filters: always run the final gates and rely on CI. Codex must trust the project and review the exact hooks through `/hooks`; the repository cannot grant that trust. Older clients without hook support still use the same npm commands and CI. These settings do not alter a managed ChatGPT session's permissions.
+Both clients have PostToolUse hooks for edits, backed by `scripts/harness/hook.cjs`. They run the fast contract gate, including deterministic identity invariants, not the browser suite on every keystroke. Shell-mediated edits may not match these tool filters: always run the final gates and rely on CI. Codex must trust the project and review the exact hooks through `/hooks`; the repository cannot grant that trust. Older clients without hook support still use the same npm commands and CI. These settings do not alter a managed ChatGPT session's permissions.
 
 Codex config uses workspace-write/on-request; Exec Policy rules are narrow defense-in-depth, not a complete shell security boundary. Claude excludes local secret files from Read. Never enable bypass-permissions, overwrite global settings, or assume a rule blocks every equivalent shell command.
 

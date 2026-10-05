@@ -14,13 +14,15 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.focus-summary-main strong')).toHaveText('4');
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
-  if(view.width<=650){
+  if(view.touch){
     await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
     await expect(page.locator('.mobile-sector-list')).toBeVisible();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
-    await expect(page.locator('.dashboard-toolbar input')).toBeHidden();
-    await expect(page.locator('.topbar p')).toBeHidden();
     await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','섹터','분석','관심']);
+    if(view.width<=650){
+      await expect(page.locator('.dashboard-toolbar input')).toBeHidden();
+      await expect(page.locator('.topbar p')).toBeHidden();
+    }
   }else{
     await expect(page.locator('.mobile-sector-list')).toBeHidden();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeVisible();
@@ -59,7 +61,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await explore.locator(':scope > summary').click();
   await expect(etfPanel).toBeVisible();
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
-  if(view.width>650){
+  if(!view.touch){
     const sameWidth=async()=>{const a=(await sectorHead.boundingBox())!.width,b=(await etfHead.boundingBox())!.width;expect(Math.abs(a-b)).toBeLessThan(1.5);return a};
     const before=await sameWidth();
     const sectorResizer=page.locator('.dashboard-sector-panel').getByRole('button',{name:'섹터 열 너비 조절'});
@@ -76,7 +78,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
   // Leading stocks are a popup on every screen: no right-hand panel, a sector row opens the drill sheet.
   await expect(page.locator('.dashboard-stock-panel')).toHaveCount(0);
-  if(view.width<=650)await page.locator('.mobile-sector-list .decision-row').first().click();
+  if(view.touch)await page.locator('.mobile-sector-list .decision-row').first().click();
   else await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   const drill=page.locator('.drill-sheet');
   await expect(drill).toBeVisible();
