@@ -17,7 +17,7 @@ Canonical skills are in `harness/skills`; `npm run harness:sync` generates `.cla
 
 ## Folio identity gate
 
-The authoritative visual rule is the **attached column 02 Sunset Editorial (B) on desktop, mobile and iPad**. The committed B artwork is authoritative: `folio-b-wordmark-light/dark.webp`, `folio-b-icon-*`, `folio-b-launch-hero.webp` and `folio-b-motif.webp`. C is limited to photography treatment through `folio-c-photography.webp`; it is not a UI theme. Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure, not for copied branding or trade-entry UI.
+The authoritative visual rule is the **attached column 02 Sunset Editorial (B) on desktop, mobile and iPad**. The clean B wordmark is rendered as editorial `Folio` + the interlocked `folio-b-xx-light/dark.png` mark; installed identity uses `folio-b-icon-*`; loading and motif use `folio-b-launch-hero.webp` and `folio-b-motif.webp`. C is limited to photography treatment through `folio-c-photography.webp`; it is not a UI theme. Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure, not for copied branding or trade-entry UI.
 
 `scripts/harness/identity.mjs` is part of `npm run harness:check`. It verifies the design/contract files exist, exact B artwork files are committed, the exact-B CSS lock and Inter/Neue-Grotesk stack are present, the superseded Robinhood override and generic icon generator remain removed, theme modes stay present, and PWA/deploy references use only `folio-b-icon-*`. It also requires the app to place the B launch hero, B motif and C photography treatment. These source checks do not replace browser tests.
 
