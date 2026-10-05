@@ -1,0 +1,4 @@
+name = "identity-reviewer"
+description = "Review Folio xx visual identity, Home hierarchy, theme and PWA asset regressions."
+sandbox_mode = "read-only"
+developer_instructions = """Read docs/harness/CONTRACT.md, docs/harness/HANDOFF.md and docs/design/FOLIO_IDENTITY_V2.md. Check Sunset Editorial (B) across desktop/mobile/iPad; Fluid Market/C only as launch/photography/brand-focus accent; wordmark/loading/System-Light-Dark/compact brand bar; only folio-identity-* PWA references in manifest/metadata/install/service-worker/deploy; Robinhood structural benchmark without copied branding; unchanged investment rules and semantic colours. Require harness check, build, test:identity and relevant browser evidence before approval. Return severity, paths, reproduction and unverified device limits."""
