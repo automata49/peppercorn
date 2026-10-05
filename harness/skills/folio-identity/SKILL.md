@@ -7,8 +7,8 @@ Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLI
 
 Hard rules:
 - The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
-- Wordmark must use the B artwork family: `public/folio-b-wordmark-light.webp` on light paper and `public/folio-b-wordmark-dark.webp` on dark/black surfaces. Plain text xx, the old punch-card mark, or a newly invented symbol is not a final substitute.
-- Primary installed-app icon must use B's near-black tile + small centered angular xx: `folio-b-icon-180/192/512/512-maskable.png`. Do not regenerate it from generic X geometry.
+- Wordmark must match B as a clean lockup: rendered `Folio` in the B editorial grotesk plus the exact interlocked B mark from `public/folio-b-xx-light.png` / `public/folio-b-xx-dark.png`. Do not use plain text xx, noisy screenshot crops, the old punch-card mark, or a newly invented symbol.
+- Primary installed-app icon must use B's near-black tile + small centered interlocked xx: `folio-b-icon-180/192/512/512-maskable.png`. The mark geometry must stay visually consistent with the wordmark's `folio-b-xx-*` assets.
 - Loading must use `public/folio-b-launch-hero.webp`, the B top composition, with restrained GSAP reveal/pan only. Motion may animate the artwork but must not redesign it.
 - Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - B motif = `public/folio-b-motif.webp`: monochrome landscape/rock + sparse technical line work + isolated warm sun/disc.
