@@ -843,8 +843,7 @@ export default function App(){
   useLayoutEffect(()=>{
     const root=launchRef.current
     if(!showIntro||!root)return
-    const icon=root.querySelector<HTMLElement>('.launch-emblem')
-    const wordmark=root.querySelector<HTMLElement>('.launch-wordmark')
+    const wordmark=root.querySelector<HTMLElement>('.launch-wordmark-system')
     const footer=root.querySelector<HTMLElement>('.launch-footer')
     const slogan=root.querySelector<HTMLElement>('.launch-slogan')
     const description=root.querySelector<HTMLElement>('.launch-description')
@@ -857,20 +856,18 @@ export default function App(){
     // A suspended animation must never leave the dashboard covered.
     const fallback=window.setTimeout(finish,5300)
     const context=gsap.context(()=>{
-      gsap.set(progress,{scaleX:0})
-      if(!reduceMotion){
-        gsap.set([icon,wordmark,slogan,description,footer],{autoAlpha:0})
-      }
+      if(progress)gsap.set(progress,{scaleX:0})
+      const entrance=[wordmark,slogan,description,footer].filter(Boolean) as HTMLElement[]
+      if(!reduceMotion&&entrance.length)gsap.set(entrance,{autoAlpha:0})
       const timeline=gsap.timeline({onComplete:finish})
       if(!reduceMotion){
-        timeline.fromTo(icon,{y:12,scale:.95,autoAlpha:0,rotationX:9,rotationY:-11,transformPerspective:420},{y:0,scale:1,autoAlpha:1,rotationX:9,rotationY:-11,transformPerspective:420,duration:.8,ease:'power2.out'},.15)
-          .fromTo(wordmark,{x:-8,autoAlpha:0},{x:0,autoAlpha:1,duration:.65,ease:'power2.out'},.45)
-          .fromTo(slogan,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.9)
-          .fromTo(description,{y:6,autoAlpha:0},{y:0,autoAlpha:1,duration:.7,ease:'power2.out'},1.1)
-          .fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},1.2)
+        if(wordmark)timeline.fromTo(wordmark,{y:12,scale:.97,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},.15)
+        if(slogan)timeline.fromTo(slogan,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.75)
+        if(description)timeline.fromTo(description,{y:6,autoAlpha:0},{y:0,autoAlpha:1,duration:.7,ease:'power2.out'},.95)
+        if(footer)timeline.fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},1.1)
       }
-      timeline.to(progress,{scaleX:1,duration:4.35,ease:'none'},0)
-        .to(root,{autoAlpha:0,duration:.65,ease:'power2.inOut'},4.35)
+      if(progress)timeline.to(progress,{scaleX:1,duration:4.35,ease:'none'},0)
+      timeline.to(root,{autoAlpha:0,duration:.65,ease:'power2.inOut'},4.35)
     },root)
     return()=>{window.clearTimeout(fallback);context.revert()}
   },[showIntro])
