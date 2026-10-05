@@ -8,7 +8,7 @@ Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLI
 
 Check that:
 - the attached column 02 “Sunset Editorial” (B) remains the visual source of truth on desktop, mobile and iPad;
-- in-app wordmarks use `folio-b-wordmark-light.webp` / `folio-b-wordmark-dark.webp`, preserving B's bold Folio + compact angular/interlocked gradient xx;
+- in-app wordmarks render B's bold editorial `Folio` plus `folio-b-xx-light.png` / `folio-b-xx-dark.png`; noisy screenshot-crop wordmarks are not accepted;
 - installed-app metadata uses only `folio-b-icon-180/192/512/512-maskable.png`;
 - loading uses `folio-b-launch-hero.webp` and GSAP only animates reveal/pan/opacity without redesigning the composition;
 - typography follows Inter / Neue-Grotesk editorial proportions;
