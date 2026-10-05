@@ -64,8 +64,11 @@ function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode
 
 export function FolioWordmark({className=''}:{className?:string}){
   return <span className={('folio-wordmark-system '+className).trim()} role="img" aria-label="Folio xx">
-    <img className="folio-wordmark-art folio-wordmark-art-light" src="./folio-b-wordmark-light.webp" alt="" draggable={false}/>
-    <img className="folio-wordmark-art folio-wordmark-art-dark" src="./folio-b-wordmark-dark.webp" alt="" draggable={false}/>
+    <span className="folio-wordmark-text" aria-hidden="true">Folio</span>
+    <span className="folio-wordmark-mark" aria-hidden="true">
+      <img className="folio-xx-art folio-xx-art-light" src="./folio-b-xx-light.png" alt="" draggable={false}/>
+      <img className="folio-xx-art folio-xx-art-dark" src="./folio-b-xx-dark.png" alt="" draggable={false}/>
+    </span>
   </span>
 }
 
