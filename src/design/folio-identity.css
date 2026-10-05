@@ -991,13 +991,12 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
     letter-spacing:-.075em;
   }
   .page-shell-dashboard .spotlight-performance{margin-top:12px}
-  .page-shell-dashboard .spotlight-performance b{color:var(--folio-ink)}
-  .page-shell-dashboard .spotlight-performance b.falling{color:var(--folio-ink)}
+  /* B keeps semantic gain/loss text functional; decorative UI stays monochrome. */
 
   /* B = editorial black/white chart. Sunset is only the selected point. */
   .page-shell-dashboard .spotlight-chart{margin:18px -8px 0;color:var(--folio-ink)}
   .page-shell-dashboard .spotlight-line{stroke:var(--folio-ink)!important;stroke-width:2!important}
-  .page-shell-dashboard .spotlight-area{fill:var(--folio-sunset-soft)!important;opacity:.28!important}
+  .page-shell-dashboard .spotlight-area{fill:var(--folio-ink)!important;opacity:.035!important}
   .page-shell-dashboard .spotlight-chart circle{fill:var(--folio-coral)}
   .page-shell-dashboard .spotlight-cursor{stroke:var(--folio-line-strong)}
 
