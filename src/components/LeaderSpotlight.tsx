@@ -67,7 +67,7 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
       </div>
 
       <div className="spotlight-tabs" role="tablist" aria-label="대표 리더 선택">
-        {rows.map((r,i)=><button key={r.id} type="button" role="tab" aria-selected={r.id===row.id} tabIndex={r.id===row.id?0:-1} onKeyDown={e=>{const next=e.key==='ArrowRight'?(i+1)%rows.length:e.key==='ArrowLeft'?(i-1+rows.length)%rows.length:e.key==='Home'?0:e.key==='End'?rows.length-1:null;if(next!=null){e.preventDefault();const target=e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('button')[next];target?.focus();setSelectedId(rows[next].id);setExploration(null)}}} onClick={()=>{setSelectedId(r.id);setExploration(null)}}>{r.ticker}<small>{r.market}</small></button>)}
+        {rows.map((r,i)=><button key={r.id} type="button" role="tab" aria-selected={r.id===row.id} tabIndex={r.id===row.id?0:-1} onKeyDown={e=>{const next=e.key==='ArrowRight'?(i+1)%rows.length:e.key==='ArrowLeft'?(i-1+rows.length)%rows.length:e.key==='Home'?0:e.key==='End'?rows.length-1:null;if(next!=null){e.preventDefault();const target=e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('button')[next];setSelectedId(rows[next].id);setExploration(null);window.requestAnimationFrame(()=>target?.focus())}}} onClick={()=>{setSelectedId(r.id);setExploration(null)}}>{r.ticker}<small>{r.market}</small></button>)}
       </div>
 
       <div className="spotlight-evidence">
