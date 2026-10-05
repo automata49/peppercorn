@@ -1,3 +1,13 @@
+## Folio New Visual Identity — 2026-10-05
+
+User selected concept B (Sunset Editorial) as the base visual system, concept C (Fluid Market) for the mobile app treatment and photography language, and requested System / Light / Dark appearance support. The previous Robinhood-specific override layer is removed and replaced by `src/design/folio-identity.css`.
+
+Implementation: black/white editorial structure and spacing on desktop, a black desktop rail, warm paper/light surfaces, near-black dark surfaces, and a restrained plum → magenta → coral → amber sunset gradient used for focal accents rather than semantic gain/loss meaning. Mobile keeps the existing decision-first information hierarchy but uses the Fluid Market treatment: subtle sunset ambient fields, monochrome controls and a chromatic focus line. The launch screen uses the C-direction sunset photography treatment as a soft abstract light field; no supplied personal photo or third-party artwork is uploaded. Existing Folio icon/wordmark assets remain.
+
+Appearance: `System` follows `prefers-color-scheme`; `Light` and `Dark` are explicit overrides. The choice persists in `localStorage` as `folio-theme`, the resolved browser theme color is updated, and the Vite HTML boot script applies the stored mode before React mounts to avoid a theme flash. Desktop exposes the selector in the rail; compact layouts expose it in the menu drawer. Added `tests/theme-system.spec.ts` for desktop persistence and compact-drawer access.
+
+Validation required before merge: `npm run harness:check`, `npm run build`, `npm run test:ui -- --workers=4`, and visual inspection of phone/light, phone/dark, desktop/light and desktop/dark. Physical iPhone/iPad Safari remains unverified.
+
 ## Folio discovery redesign (DISCOVERY-1) — 2026-10-05
 
 User asked to apply Metalab/Robinhood product design, official design content and SDUI, and judged the prior UI insufficiently different. Started from main `9e3b12f` (chart exploration PR #104 already merged and published).
