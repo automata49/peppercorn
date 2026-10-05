@@ -1417,7 +1417,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{height:27px}
   .folio-identity-interlude{
     grid-template-columns:1fr;
-    margin:30px -18px 24px;
+    margin:30px -16px 24px;
     border-left:0;
     border-right:0;
   }
@@ -1431,6 +1431,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 }
 
 @media(max-width:650px){
+  .folio-identity-interlude{margin-left:-18px;margin-right:-18px}
   .launch-center{width:100%;padding:0 0 22px;align-content:center}
   .launch-editorial-frame{
     width:100vw;
