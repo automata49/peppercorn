@@ -1,3 +1,9 @@
+## Pages identity asset publish regression — 2026-10-06
+
+User reported that the current deployed build showed neither the new visual images nor the B mark assets. Root cause: the Actions artifact contained the new files from `public/`, but the deploy workflow's later "Keep branch Pages source deployable" sync copied only the four app-icon PNGs to the branch root. GitHub Pages then published that root sync, whose `index.html` still referenced `./folio-b-xx-light.png`, `./folio-b-xx-dark.png`, `./folio-b-launch-hero.webp`, `./folio-b-motif.webp` and `./folio-c-photography.webp`; those files were absent at the root, producing broken live assets.
+
+Fix: branch-root sync now copies and stages every active Folio B/C identity asset used by the live app, and `scripts/harness/identity.mjs` asserts that the deploy workflow contains those assets so this artifact-vs-root mismatch cannot silently recur. No UI, ranking, market-data or identity artwork itself changed.
+
 ## Exact B wordmark cleanup + identity placement — 2026-10-06
 
 This entry supersedes earlier Folio identity notes where they conflict.
