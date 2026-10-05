@@ -375,7 +375,11 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 }
 .mobile-bottom-nav button{position:relative}
 .mobile-brandbar{background:var(--folio-paper)}
-@media (max-width:1279px), (hover:none) and (max-width:1500px){\n  .topbar{height:60px}\n  .topbar p{display:none}\n}\n@media(max-width:1279px),(hover:none){
+@media (max-width:1279px), (hover:none) and (max-width:1500px){
+  .topbar{height:60px}
+  .topbar p{display:none}
+}
+@media(max-width:1279px),(hover:none){
   .segment button,.mini-segment button{min-height:44px}
 }
 @media(max-width:650px){
@@ -428,7 +432,8 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   background:linear-gradient(180deg,transparent 0 58%,color-mix(in srgb,var(--folio-paper) 56%,transparent) 100%);
   pointer-events:none;
 }
-.launch-center{position:relative;z-index:1}\n.launch-footer{z-index:1}
+.launch-center{position:relative;z-index:1}
+.launch-footer{z-index:1}
 .launch-wordmark{filter:none}
 .launch-slogan{color:var(--folio-ink)!important;font-size:15px!important;letter-spacing:.08em!important;font-weight:600}
 .launch-description{color:var(--folio-muted)!important;max-width:560px;line-height:1.7}
