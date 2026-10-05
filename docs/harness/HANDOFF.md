@@ -1,3 +1,7 @@
+## Mobile / iPad visual direction superseded — 2026-10-05
+
+User explicitly changed the compact visual direction: **mobile and iPad also use concept B (Sunset Editorial)**. This supersedes the earlier instruction that concept C/Fluid Market should be the mobile app UI treatment. Current rule: B is the UI system at every viewport; C remains only for photography/launch atmosphere and restrained sunset accents such as the gradient `xx` and selected chart point. Compact Home therefore uses warm-paper/near-black surfaces, monochrome chart line, text-led period tabs, flat evidence columns, square/flat actions, editorial sector rows and monochrome bottom navigation. System / Light / Dark remain unchanged, and no screening/ranking/data logic changes.
+
 ## Folio Home / New Visual Identity v2 — 2026-10-05
 
 User requested a full Home rebuild under the selected New Visual Identity and a Robinhood structure/philosophy benchmark. Implementation is on PR #110 (`fix/folio-identity-assets-ui`).
