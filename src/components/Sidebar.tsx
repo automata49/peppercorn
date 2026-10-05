@@ -115,7 +115,10 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
       <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Dashboard로 이동">
         <span className="folio-brand"><FolioBrand/></span>
       </button>
-      <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/></button>
+      <div className="mobile-brand-actions">
+        <button className="mobile-brand-search" onClick={()=>setPage('analysis')} aria-label="종목 검색"><AppIcon name="search"/></button>
+        <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/></button>
+      </div>
     </div>
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
