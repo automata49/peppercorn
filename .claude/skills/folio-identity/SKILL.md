@@ -6,8 +6,12 @@ description: Use for Folio xx brand, Home visual identity, System/Light/Dark the
 Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLIO_IDENTITY_V2.md` before editing.
 
 Hard rules:
-- Sunset Editorial (B) is the UI system on desktop, mobile and iPad: monochrome/warm-paper or near-black surfaces, editorial typography, flat rules, restrained spacing and minimal card chrome.
-- Fluid Market/C is not a mobile UI theme. Keep it to photography/launch atmosphere, the gradient `xx` mark and small focus accents.
+- The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
+- Wordmark must match B's bold Folio + compact angular/interlocked gradient xx; plain text xx is not a final substitute.
+- Primary app icon must match B's near-black tile + small centered angular xx. Warm-sand is the only secondary icon treatment.
+- Typography follows Inter / Neue-Grotesk editorial proportions.
+- B motif = monochrome landscape/rock + sparse line work + isolated warm sun/disc. C's flowing wave is not a primary motif.
+- Fluid Market/C is not a UI theme. C is limited to photography treatment: warm sunset light, shallow depth/bokeh and human-scale imagery.
 - Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure only. Do not copy its branding, colours or trade-entry UI.
 - Preserve System / Light / Dark and persisted theme behavior.
 - Preserve semantic finance colours and all investment logic. Brand colour never changes gain/loss meaning, leadership class, RS, stage, sector rank or Position Growth rules.
