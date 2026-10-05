@@ -4,7 +4,7 @@ const views=[
   {name:'phone',width:390,height:844,touch:true,compact:true},
   {name:'ipad-portrait',width:834,height:1194,touch:true,compact:true},
   {name:'ipad-landscape',width:1194,height:834,touch:true,compact:true},
-  {name:'ipad-pro',width:1366,height:1024,touch:true,compact:false},
+  {name:'ipad-pro',width:1366,height:1024,touch:true,compact:true},
   {name:'desktop',width:1440,height:900,touch:false,compact:false}
 ]
 const shots=process.env.BRAND_SHOTS
