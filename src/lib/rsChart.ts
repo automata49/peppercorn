@@ -6,6 +6,7 @@ import { ETF_HEAT_PERIODS, type EtfHeatPeriod } from './etfIndustries'
 export const RS_CHART_VERSION='RS-CHART-2'
 export const RS_CHART_PERIODS=ETF_HEAT_PERIODS
 export type RsChartPeriod=EtfHeatPeriod
+export const CHART_SESSIONS:Record<RsChartPeriod,number>={'5D':5,'20D':20,'50D':50,'120D':120,'200D':200,'52W':252}
 export type ChartKind='rs'|'return'
 export type LineSeries={key:string;label:string;sub?:string;values:(number|null)[];n?:number;highlight?:boolean}
 

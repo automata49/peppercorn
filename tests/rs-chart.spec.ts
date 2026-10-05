@@ -268,3 +268,23 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
   await context.close()
 })
+
+test('cold history mounts and sizes the stock chart after data arrives',async({page})=>{
+  await page.addInitScript(()=>sessionStorage.setItem('peppercorn-intro-seen','1'))
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  let release!:()=>void
+  const gate=new Promise<void>(resolve=>{release=resolve})
+  await page.route('**/functions/v1/price-history?*',async route=>{
+    await gate
+    const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',')
+    await route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:60},(_,i)=>[`2026-08-${String(i+1).padStart(2,'0')}`,100+i])]))}})
+  })
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.getByRole('button',{name:/이 종목 깊이 보기/}).click()
+  const chart=page.locator('.drill-sheet .price-rs')
+  await expect(chart).toContainText('일별 가격을 불러오는 중')
+  release()
+  await expect(chart.locator('svg [data-key="price"]')).toBeVisible()
+  await expect(chart.getByRole('slider',{name:'차트 날짜 탐색'})).toBeVisible()
+})
