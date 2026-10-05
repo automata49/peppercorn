@@ -37,12 +37,12 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   await context.close()
 })
 
-test('desktop keeps card boundaries for scanability',async({page})=>{
+test('desktop focal leader is flat while analysis keeps card boundaries',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const focus=page.locator('.focus-overview')
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
   const block=page.locator('.analysis-main > .analysis-block').first()
