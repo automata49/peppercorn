@@ -944,6 +944,14 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
     color:var(--folio-paper);
     box-shadow:none;
   }
+  .mobile-bottom-nav{
+    background:var(--folio-paper);
+    border-top:1px solid var(--folio-line);
+    box-shadow:none;
+    backdrop-filter:none;
+  }
+  .mobile-bottom-nav button.active{color:var(--folio-ink);background:transparent}
+  .mobile-bottom-nav button.active::before{background:var(--folio-ink)}
 
   .page-shell-dashboard .mobile-brandbar{
     height:68px;
