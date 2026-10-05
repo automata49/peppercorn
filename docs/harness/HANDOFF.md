@@ -1,3 +1,7 @@
+## B app-icon proportion correction — 2026-10-06
+
+User reported that the deployed icon's xx size and proportion did not match concept B. The earlier 512 asset effectively used the mark too large/wide. The authoritative app-icon geometry is now: near-black B tile, exact interlocked B mark, mark width ≈31.25% of the tile, mark bounding aspect ≈1.72:1, centered. `scripts/generate-b-app-icons.mjs` derives the 180/192/512/maskable family from `folio-b-xx-dark.png` before build; Playwright checks the rendered 512 mark bbox and the harness locks the constants. Deploy sync persists both public and root icon copies after generation.
+
 ## Pages identity asset publish regression — 2026-10-06
 
 User reported that the current deployed build showed neither the new visual images nor the B mark assets. Root cause: the Actions artifact contained the new files from `public/`, but the deploy workflow's later "Keep branch Pages source deployable" sync copied only the four app-icon PNGs to the branch root. GitHub Pages then published that root sync, whose `index.html` still referenced `./folio-b-xx-light.png`, `./folio-b-xx-dark.png`, `./folio-b-launch-hero.webp`, `./folio-b-motif.webp` and `./folio-c-photography.webp`; those files were absent at the root, producing broken live assets.
