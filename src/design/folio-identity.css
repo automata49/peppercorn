@@ -655,7 +655,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 .spotlight-price strong{
   color:var(--folio-ink);
   font-size:clamp(46px,7vw,78px);
-  font-weight:430;
+  font-weight:400;
   line-height:.94;
   letter-spacing:-.07em;
   font-variant-numeric:tabular-nums;
