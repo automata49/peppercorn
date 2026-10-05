@@ -1,5 +1,5 @@
 /* Folio xx — New Visual Identity
-   Direction: Sunset Editorial (B) + Fluid Market mobile/theme system (C).
+   Direction: Sunset Editorial (B) across desktop, mobile and iPad; Fluid Market only for restrained brand/photography accents.
    Black/white structure, sunset accents, restrained motion, system/light/dark. */
 
 :root{
@@ -211,7 +211,7 @@ button:active{transform:scale(.985)}
 .chip.on{background:var(--folio-ink);color:var(--folio-paper);border-color:var(--folio-ink)}
 .rs-period-toggle{border-bottom-color:var(--folio-line)}
 
-/* Fluid Market focal surface: the only strong chromatic gesture in the daily UI. */
+/* Restrained sunset focal accent inside the Sunset Editorial system. */
 .discovery-home{--discovery-ink:var(--folio-ink);--discovery-accent:var(--folio-plum)}
 .discovery-home .focus-overview{border:0;border-radius:0;padding:20px 0;box-shadow:none;background:transparent}
 .leader-spotlight{
@@ -358,7 +358,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 .ag-row-hover .ag-cell{background-color:var(--folio-surface-2)!important}
 .ag-input-field-input{background:var(--folio-surface)!important;color:var(--folio-ink)!important}
 
-/* Mobile = Fluid Market: light editorial canvas + a restrained sunset current. */
+/* Compact base; final mobile/iPad treatment is Sunset Editorial B below. */
 .mobile-bottom-nav{
   background:color-mix(in srgb,var(--folio-surface) 92%,transparent);
   border-top:1px solid var(--folio-line);
@@ -488,7 +488,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 
 /* =========================================================
    Folio xx Visual Identity v2 — Robinhood-inspired hierarchy
-   User decision 2026-10-05: B editorial base + C Fluid Market.
+   User decision 2026-10-05: B editorial UI across devices + C only for photography/launch accents.
    The benchmark is structural (focus, hierarchy, restraint), never a clone.
    ========================================================= */
 
