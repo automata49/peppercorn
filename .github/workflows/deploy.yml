@@ -171,6 +171,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html assets manifest.webmanifest sw.js discovery-layout.json logo.webp \
             folio-b-icon-180.png folio-b-icon-192.png folio-b-icon-512.png folio-b-icon-512-maskable.png \
+            public/folio-b-icon-180.png public/folio-b-icon-192.png public/folio-b-icon-512.png public/folio-b-icon-512-maskable.png \
             folio-b-xx-light.png folio-b-xx-dark.png folio-b-launch-hero.webp folio-b-motif.webp folio-c-photography.webp \
             .nojekyll
           if ! git diff --cached --quiet; then
