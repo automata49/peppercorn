@@ -16,15 +16,17 @@ async function boot(page:any){
 }
 
 for(const view of views){
- test(view.name+' uses the Folio xx identity from launch through home',async({browser})=>{
-  const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
+ test(view.name+' keeps exact Sunset Editorial B identity from launch through Home',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch,colorScheme:'light'})
   const page=await context.newPage()
   await boot(page)
 
   const launch=page.locator('.launch-overlay')
-  await expect(launch.getByRole('img',{name:'Folio xx'})).toBeVisible()
-  await expect(launch.locator('.launch-slogan')).toHaveText('Fewer decisions. Greater conviction')
-  await expect(launch.locator('.launch-description')).toContainText('데이터 기반 투자 분석 플랫폼')
+  const hero=launch.getByRole('img',{name:'Folio xx Sunset Editorial'})
+  await expect(hero).toBeVisible()
+  await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp')
+  await expect(launch.locator('.launch-editorial-caption')).toContainText('SUNSET EDITORIAL')
+  await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
   await expect(launch.locator('.launch-footer')).toContainText('Peppercorn Capital')
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000})
@@ -33,21 +35,27 @@ for(const view of views){
     const homeBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
     await expect(homeBrand).toBeVisible()
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
+    await expect(homeBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
+    await expect(homeBrand.locator('.folio-xx-art-light')).toHaveAttribute('src','./folio-b-xx-light.png')
+    await expect(homeBrand.locator('.folio-xx-art-light')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
   }else{
-    await expect(page.locator('.sidebar .folio-wordmark-system')).toBeVisible()
+    const sideBrand=page.locator('.sidebar .folio-wordmark-system')
+    await expect(sideBrand).toBeVisible()
+    await expect(sideBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
+    await expect(sideBrand.locator('.folio-xx-art-dark')).toHaveAttribute('src','./folio-b-xx-dark.png')
+    await expect(sideBrand.locator('.folio-xx-art-dark')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  const xx=page.locator('.folio-wordmark-system:visible .folio-xx').first()
-  expect(await xx.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.webp')
+  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
-  const menu=view.compact?page.locator('.mobile-brand-menu'):page.locator('.mobile-brand-menu')
   if(view.compact){
-    await menu.click()
+    await page.locator('.mobile-brand-menu').click()
     const drawer=page.locator('.menu-drawer')
     await expect(drawer.getByRole('img',{name:'Folio xx'})).toBeVisible()
     await expect(drawer.locator('.theme-control')).toBeVisible()
@@ -57,15 +65,15 @@ for(const view of views){
  })
 }
 
-test('home-screen icons and manifest use versioned Folio identity assets',async({page,request})=>{
+test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-identity-180.png')
+ expect(touch).toBe('./folio-b-icon-180.png')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
- expect(manifest.background_color).toBe('#f8f5f1')
+ expect(manifest.background_color).toBe('#f4f1ec')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
- expect(srcs.every(s=>s.includes('folio-identity-'))).toBe(true)
+ expect(srcs.every(s=>s.includes('folio-b-icon-'))).toBe(true)
  for(const src of srcs){
   const res=await request.get(src.replace('./',''))
   expect(res.status(),src).toBe(200)
@@ -73,7 +81,21 @@ test('home-screen icons and manifest use versioned Folio identity assets',async(
  }
 })
 
-test('share metadata carries Folio xx and the new identity icon',async({page,request})=>{
+test('B wordmark, hero, motif and C photography assets are deployable',async({request})=>{
+ for(const asset of [
+  'folio-b-xx-light.png',
+  'folio-b-xx-dark.png',
+  'folio-b-launch-hero.webp',
+  'folio-b-motif.webp',
+  'folio-c-photography.webp'
+ ]){
+  const res=await request.get(asset)
+  expect(res.status(),asset).toBe(200)
+  expect(res.headers()['content-type'],asset).toContain('image/')
+ }
+})
+
+test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  const description='모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼'
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const meta=(sel:string)=>page.locator(sel).getAttribute('content')
@@ -81,7 +103,7 @@ test('share metadata carries Folio xx and the new identity icon',async({page,req
  expect(await meta('meta[property="og:description"]')).toBe(description)
  expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
  const image=await meta('meta[property="og:image"]')
- expect(image).toContain('folio-identity-512.png')
+ expect(image).toContain('folio-b-icon-512.png')
  const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
  expect(res.status()).toBe(200)
 })

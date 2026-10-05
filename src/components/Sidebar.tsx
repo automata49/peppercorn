@@ -46,7 +46,7 @@ function applyTheme(mode:ThemeMode){
   const resolved=resolvedTheme(mode)
   root.style.colorScheme=resolved
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    ?.setAttribute('content',resolved==='dark'?'#0a0a0c':'#f8f5f1')
+    ?.setAttribute('content',resolved==='dark'?'#0a0a0c':'#f4f1ec')
 }
 
 function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode)=>void}){
@@ -64,8 +64,11 @@ function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode
 
 export function FolioWordmark({className=''}:{className?:string}){
   return <span className={('folio-wordmark-system '+className).trim()} role="img" aria-label="Folio xx">
-    <span className="folio-word">Folio</span>
-    <span className="folio-xx" aria-hidden="true"><span>x</span><span>x</span></span>
+    <span className="folio-wordmark-text" aria-hidden="true">Folio</span>
+    <span className="folio-wordmark-mark" aria-hidden="true">
+      <img className="folio-xx-art folio-xx-art-light" src="./folio-b-xx-light.png" alt="" draggable={false}/>
+      <img className="folio-xx-art folio-xx-art-dark" src="./folio-b-xx-dark.png" alt="" draggable={false}/>
+    </span>
   </span>
 }
 

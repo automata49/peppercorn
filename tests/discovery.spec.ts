@@ -35,7 +35,19 @@ for(const width of [390,834,1194,1366,1440])test(`discovery at ${width}: real da
   await expect(page.locator('.spotlight-price')).toContainText('2026-09-28')
   await expect(page.locator('.spotlight-price strong')).toHaveText('100')
   expect((await slider.boundingBox())!.height).toBeGreaterThanOrEqual(44)
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
+  const overflow=await page.evaluate(()=>{
+    const viewport=innerWidth
+    return {
+      scrollWidth:document.documentElement.scrollWidth,
+      viewport,
+      offenders:[...document.querySelectorAll<HTMLElement>('body *')]
+        .map(el=>{const r=el.getBoundingClientRect();return {tag:el.tagName,cls:el.className?.toString?.()||'',left:r.left,right:r.right,width:r.width}})
+        .filter(x=>x.right>viewport+1||x.left<-1)
+        .sort((a,b)=>Math.max(b.right-viewport,-b.left)-Math.max(a.right-viewport,-a.left))
+        .slice(0,8)
+    }
+  })
+  expect(overflow.scrollWidth,`overflow diagnostics: ${JSON.stringify(overflow.offenders)}`).toBeLessThanOrEqual(overflow.viewport+1)
   await page.screenshot({path:`test-results/discovery-${width}.png`,fullPage:true})
   await page.getByRole('button',{name:'이 종목 깊이 보기'}).click()
   await expect(page.locator('.drill-sheet')).toBeVisible()

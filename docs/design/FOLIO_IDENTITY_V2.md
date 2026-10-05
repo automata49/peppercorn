@@ -21,15 +21,20 @@ Official references:
 - https://robinhood.com/us/en/support/articles/accessibility-options/
 - https://robinhood.com/us/en/careers/blog/customer-journey-the-first-principles-approach-to-sdlc/
 
-## Folio interpretation
+## Authoritative visual reference
 
-Robinhood's neon green is not copied. Folio keeps its own identity:
+The **attached concept board's column 02 — “Sunset Editorial” (B)** is the source of truth for Folio UI identity. Do not reinterpret B into a new style. Generated moodboards, Robinhood screenshots and later exploratory visuals are references only and must never override the B column.
 
-- **Base on every device:** Sunset Editorial — black/white, warm paper, typographic hierarchy, flat rules, sparse dividers and minimal card chrome. Desktop, mobile and iPad use the same visual system.
-- **Accent only:** Fluid Market — plum → magenta → coral → amber is not a mobile theme. It is limited to the xx brand mark, a selected chart point/focus cue and the C-style photography/launch atmosphere. Core charts and navigation stay editorial/monochrome.
-- **Brand mark:** text-native `Folio xx`; `Folio` follows theme foreground, `xx` carries the sunset spectrum.
-- **App icon:** black field + large sunset xx. It must read at small iOS home-screen sizes and does not change with the in-app theme.
-- **Semantic finance colours:** positive/negative remain independent functional colours. Sunset colour never means gain/loss.
+Exact B rules:
+- **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Implementation is deliberately clean rather than a screenshot crop: the `Folio` text uses the B grotesk proportions and the mark comes from `folio-b-xx-light.png` / `folio-b-xx-dark.png`, extracted from the exact B icon geometry. The xx is plum → magenta → coral/amber. Plain text “x x”, rounded letterforms, noisy raster crops, a punch-card emblem or a newly invented mark are not acceptable substitutes.
+- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. A warm-sand alternate may be used only where a light preview is appropriate. Do not use a full-gradient tile as the primary icon.
+- **Typography:** Inter / Neue-Grotesk style grotesk. Large headings are clean, confident and tightly set; captions use restrained uppercase tracking. Avoid decorative type or overly rounded fintech styling.
+- **Motif:** B's editorial motif language = monochrome landscape/rock silhouette, sparse technical line work, isolated warm sun/disc, and disciplined words such as DISCIPLINE / INSIGHT / PERSPECTIVE / FREEDOM. The flowing multicolour wave belongs to C and is not Folio's primary motif.
+- **Photography:** C's photography *treatment* may be borrowed: warm sunset light, shallow depth of field, human-scale optimism, restrained blur/bokeh. It is photography treatment only, not a C UI system.
+- **Palette:** Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`. Warm off-white reading surfaces are allowed as B's paper field.
+- **Semantic finance colours:** gain/loss colours remain functional and independent from the brand palette.
+
+Robinhood is benchmarked only for product hierarchy, simplicity, familiar navigation and progressive disclosure. Its green, trade-entry visual language and branding are not Folio identity.
 
 ## Home information architecture
 
@@ -53,7 +58,7 @@ This is deliberately **not** a dense dashboard. The first screen answers: *where
 
 ## Mobile / iPad visual rule
 
-Compact layouts do not use a separate C/Fluid-Market UI. They use B/Sunset Editorial: plain warm-paper or near-black surfaces, monochrome chart line, text-led tabs, square/flat dividers, editorial evidence columns and list-like sector rows. Rounded cards, glowing gradient backgrounds and chromatic navigation are avoided. Sunset colour remains a small brand/focus accent so the product stays recognisably Folio without weakening financial legibility.
+Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper or near-black surfaces, monochrome chart line, text-led tabs, flat dividers, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Non-negotiable implementation rules
 
@@ -64,3 +69,5 @@ Compact layouts do not use a separate C/Fluid-Market UI. They use B/Sunset Edito
 - Compact Dashboard uses the brand bar instead of a second `Dashboard` titlebar.
 - Dense tables are secondary on phone; desktop can expose more without changing the information model.
 - Motion is short, user-triggered and reduced under `prefers-reduced-motion`.
+- Loading may animate the B top-image composition with GSAP, but the composition itself must remain B: black editorial field + monochrome portrait/landscape + sunset edge + exact Folio xx lockup. Motion must not transform it into a Fluid Market wave scene.
+- Identity implementation reviews compare against the B concept first: wordmark geometry, icon proportion, typography, motif and image treatment are acceptance criteria, not optional decoration.

@@ -2,7 +2,7 @@ import { CHART_SESSIONS } from './lib/rsChart'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
 import type { ColDef } from 'ag-grid-community'
-import { FolioWordmark, Sidebar } from './components/Sidebar'
+import { Sidebar } from './components/Sidebar'
 import { AppIcon } from './components/AppIcon'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
@@ -843,31 +843,28 @@ export default function App(){
   useLayoutEffect(()=>{
     const root=launchRef.current
     if(!showIntro||!root)return
-    const wordmark=root.querySelector<HTMLElement>('.launch-wordmark-system')
+    const frame=root.querySelector<HTMLElement>('.launch-editorial-frame')
+    const hero=root.querySelector<HTMLElement>('.launch-b-hero')
+    const caption=root.querySelector<HTMLElement>('.launch-editorial-caption')
     const footer=root.querySelector<HTMLElement>('.launch-footer')
-    const slogan=root.querySelector<HTMLElement>('.launch-slogan')
-    const description=root.querySelector<HTMLElement>('.launch-description')
     const progress=root.querySelector<HTMLElement>('.launch-progress span')
     const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const finish=()=>{
       try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
       setShowIntro(false)
     }
-    // A suspended animation must never leave the dashboard covered.
-    const fallback=window.setTimeout(finish,5300)
+    const fallback=window.setTimeout(finish,5600)
     const context=gsap.context(()=>{
-      if(progress)gsap.set(progress,{scaleX:0})
-      const entrance=[wordmark,slogan,description,footer].filter(Boolean) as HTMLElement[]
-      if(!reduceMotion&&entrance.length)gsap.set(entrance,{autoAlpha:0})
+      if(progress)gsap.set(progress,{scaleX:0,transformOrigin:'0% 50%'})
       const timeline=gsap.timeline({onComplete:finish})
       if(!reduceMotion){
-        if(wordmark)timeline.fromTo(wordmark,{y:12,scale:.97,autoAlpha:0},{y:0,scale:1,autoAlpha:1,duration:.8,ease:'power2.out'},.15)
-        if(slogan)timeline.fromTo(slogan,{y:8,autoAlpha:0},{y:0,autoAlpha:1,duration:.65,ease:'power2.out'},.75)
-        if(description)timeline.fromTo(description,{y:6,autoAlpha:0},{y:0,autoAlpha:1,duration:.7,ease:'power2.out'},.95)
-        if(footer)timeline.fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.65,ease:'power2.out'},1.1)
+        if(frame)timeline.fromTo(frame,{autoAlpha:0,clipPath:'inset(0 18% 0 18%)'},{autoAlpha:1,clipPath:'inset(0 0% 0 0%)',duration:1.05,ease:'power3.out'},.08)
+        if(hero)timeline.fromTo(hero,{scale:1.045,xPercent:1.2},{scale:1,xPercent:0,duration:4.35,ease:'sine.out'},.08)
+        if(caption)timeline.fromTo(caption,{y:10,autoAlpha:0},{y:0,autoAlpha:1,duration:.72,ease:'power2.out'},.82)
+        if(footer)timeline.fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.6,ease:'power2.out'},1.05)
       }
-      if(progress)timeline.to(progress,{scaleX:1,duration:4.35,ease:'none'},0)
-      timeline.to(root,{autoAlpha:0,duration:.65,ease:'power2.inOut'},4.35)
+      if(progress)timeline.to(progress,{scaleX:1,duration:4.45,ease:'none'},0)
+      timeline.to(root,{autoAlpha:0,duration:.62,ease:'power2.inOut'},4.48)
     },root)
     return()=>{window.clearTimeout(fallback);context.revert()}
   },[showIntro])
@@ -1207,6 +1204,17 @@ export default function App(){
 
       <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
 
+      <section className="folio-identity-interlude" aria-label="Folio 투자 원칙">
+        <figure className="folio-motif-panel">
+          <img src="./folio-b-motif.webp" alt="" loading="lazy"/>
+          <figcaption><span>DISCIPLINE · INSIGHT · PERSPECTIVE · FREEDOM</span><strong>Know the Market. Know Yourself.</strong></figcaption>
+        </figure>
+        <figure className="folio-photo-panel">
+          <img src="./folio-c-photography.webp" alt="" loading="lazy"/>
+          <figcaption><span>PHOTOGRAPHY TREATMENT</span><strong>Structured freedom, seen through warmer light.</strong></figcaption>
+        </figure>
+      </section>
+
       <details className="dashboard-explore">
         <summary><span>ETF · 시장 탐색</span><small>필요할 때 펼쳐서 확인</small></summary>
         <div className="dashboard-explore-body">
@@ -1537,5 +1545,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-brand"><FolioWordmark className="launch-wordmark-system"/></div><p className="launch-slogan">Fewer decisions. Greater conviction</p><p className="launch-description">모멘텀·성장주·가치투자 전략을 통합해 시장 주도주 발굴, 기업 펀더멘털 및 내재가치 분석, 투자 기회 평가부터 포트폴리오 관리까지 체계적으로 지원하는 데이터 기반 투자 분석 플랫폼</p><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-b-launch-hero.webp" alt="Folio xx Sunset Editorial"/></div><div className="launch-editorial-caption"><span>SUNSET EDITORIAL · STRUCTURED FREEDOM</span><p>더 멀리 보고, 더 깊이 생각하는 투자.</p></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><img src="./logo.webp" alt=""/><span>Peppercorn Capital</span><small>© {new Date().getFullYear()} All rights reserved.</small></footer></div></div>}</LiveQuoteProvider>
 }

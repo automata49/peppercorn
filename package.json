@@ -4,9 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/generate-folio-icons.mjs",
     "dev": "vite",
-    "prebuild": "node scripts/generate-folio-icons.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",

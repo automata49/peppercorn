@@ -4,13 +4,13 @@
 
 :root{
   color-scheme:light;
-  --folio-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
-  --folio-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
+  --folio-display:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
+  --folio-text:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
   --folio-black:#0b0b0d;
   --folio-white:#fff;
-  --folio-paper:#f8f5f1;
+  --folio-paper:#f4f1ec;
   --folio-surface:#ffffff;
-  --folio-surface-2:#f1ece7;
+  --folio-surface-2:#e8ded4;
   --folio-ink:#111113;
   --folio-muted:#77716f;
   --folio-line:rgba(17,17,19,.12);
@@ -1165,4 +1165,302 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   .page-shell-dashboard .spotlight-price strong{font-size:54px}
   .page-shell-dashboard .spotlight-evidence>div{padding:14px 9px}
   .page-shell-dashboard .focus-class-strip button{padding:14px 10px}
+}
+
+
+/* =========================================================
+   B EXACT LOCK — attached 02 Sunset Editorial is authoritative
+   Wordmark/icon/hero/motif are artwork derived from that board.
+   C is photography treatment only.
+   ========================================================= */
+
+:root{
+  --folio-warm-sand:#e8ded4;
+  --folio-editorial-paper:#f4f1ec;
+  --folio-display:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
+  --folio-text:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
+}
+body{
+  font-family:var(--folio-text);
+  font-kerning:normal;
+  text-rendering:optimizeLegibility;
+}
+h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
+  font-family:var(--folio-display);
+  font-weight:620;
+  letter-spacing:-.045em;
+}
+.panel-head p,.dashboard-section-head p,.drill-note,.focus-roster-note{
+  letter-spacing:-.01em;
+  line-height:1.55;
+}
+
+/* Exact B wordmark: bold Folio + compact interlocked xx from the B icon artwork. */
+.folio-wordmark-system{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  color:var(--folio-ink);
+  line-height:1;
+  white-space:nowrap;
+}
+.folio-wordmark-text{
+  display:block;
+  font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue",Arial,sans-serif;
+  font-size:28px;
+  font-weight:720;
+  line-height:.9;
+  letter-spacing:-.075em;
+}
+.folio-wordmark-mark{
+  position:relative;
+  display:block;
+  width:43px;
+  height:24px;
+  margin-left:5px;
+  flex:0 0 auto;
+}
+.folio-xx-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  user-select:none;
+  pointer-events:none;
+}
+.folio-xx-art-dark{display:none}
+.sidebar .folio-wordmark-system{color:#fff}
+.sidebar .folio-wordmark-text{font-size:25px;font-weight:680}
+.sidebar .folio-wordmark-mark{width:39px;height:21px;margin-left:4px}
+.sidebar .folio-xx-art-light{display:none}
+.sidebar .folio-xx-art-dark{display:block}
+.mobile-brand-home .folio-wordmark-text{font-size:30px}
+.mobile-brand-home .folio-wordmark-mark{width:46px;height:25px}
+.menu-drawer .folio-wordmark-text{font-size:30px}
+.menu-drawer .folio-wordmark-mark{width:46px;height:25px}
+:root[data-theme="dark"] .folio-wordmark-system{color:#f7f4f1}
+:root[data-theme="dark"] .folio-xx-art-light{display:none}
+:root[data-theme="dark"] .folio-xx-art-dark{display:block}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .folio-wordmark-system{color:#f7f4f1}
+  :root:not([data-theme]) .folio-xx-art-light{display:none}
+  :root:not([data-theme]) .folio-xx-art-dark{display:block}
+}
+.sidebar .folio-xx-art-dark{display:block!important}
+
+/* B typography: large type stays regular and editorial, metadata is tracked. */
+.spotlight-kicker,.launch-editorial-caption span,.folio-identity-interlude figcaption span,
+.drawer-theme>span,.side-foot-meta{
+  font-family:var(--folio-text);
+  font-weight:650;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.spotlight-price strong,.kpi strong,.focus-class-strip b{
+  font-family:var(--folio-display);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Loading: use the exact B top composition, animated with GSAP in App.tsx. */
+.launch-overlay{background:var(--folio-editorial-paper)}
+.launch-screen{
+  display:grid;
+  grid-template-rows:1fr auto;
+  min-height:100dvh;
+  background:var(--folio-editorial-paper)!important;
+  color:var(--folio-black);
+  overflow:hidden;
+}
+.launch-screen::before,.launch-screen::after{display:none!important}
+.launch-center{
+  width:min(1040px,94vw);
+  margin:auto;
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  padding:clamp(32px,6vh,72px) 0 24px;
+}
+.launch-editorial-frame{
+  position:relative;
+  width:min(980px,94vw);
+  aspect-ratio:508/235;
+  overflow:hidden;
+  background:#0b0b0d;
+  box-shadow:0 24px 70px rgba(11,11,13,.12);
+  will-change:clip-path,opacity;
+}
+.launch-b-hero{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transform-origin:52% 50%;
+  will-change:transform;
+}
+.launch-editorial-caption{
+  width:min(980px,94vw);
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:24px;
+  padding:18px 2px 0;
+  color:var(--folio-black);
+}
+.launch-editorial-caption span{font-size:9px}
+.launch-editorial-caption p{
+  margin:0;
+  font-family:var(--folio-display);
+  font-size:clamp(14px,1.6vw,19px);
+  font-weight:560;
+  letter-spacing:-.035em;
+}
+.launch-progress{
+  width:min(980px,94vw)!important;
+  height:1px!important;
+  margin:22px 0 0!important;
+  background:rgba(11,11,13,.14)!important;
+  border-radius:0!important;
+}
+.launch-progress span{
+  display:block;
+  width:100%;
+  height:100%;
+  background:var(--folio-black)!important;
+  border-radius:0!important;
+}
+.launch-footer{
+  position:relative!important;
+  inset:auto!important;
+  width:min(980px,94vw);
+  margin:0 auto;
+  padding:0 0 max(18px,env(safe-area-inset-bottom));
+  color:#6f6965!important;
+  border:0!important;
+  background:transparent!important;
+}
+.launch-footer img{filter:grayscale(1);opacity:.7}
+
+/* B motif + C photography treatment: identity interlude, secondary to market data. */
+.folio-identity-interlude{
+  display:grid;
+  grid-template-columns:minmax(0,1.08fr) minmax(280px,.92fr);
+  gap:1px;
+  margin:36px 0 30px;
+  border-top:1px solid var(--folio-line-strong);
+  border-bottom:1px solid var(--folio-line);
+  background:var(--folio-line);
+}
+.folio-identity-interlude figure{
+  position:relative;
+  min-width:0;
+  margin:0;
+  overflow:hidden;
+  background:var(--folio-paper);
+}
+.folio-identity-interlude img{
+  display:block;
+  width:100%;
+  height:clamp(190px,20vw,290px);
+  object-fit:cover;
+}
+.folio-motif-panel img{object-position:center center;filter:contrast(1.02)}
+.folio-photo-panel img{
+  object-position:center 54%;
+  filter:saturate(.88) contrast(.98);
+}
+.folio-identity-interlude figcaption{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+  min-height:72px;
+  padding:15px 16px 17px;
+  background:var(--folio-paper);
+  color:var(--folio-ink);
+}
+.folio-identity-interlude figcaption span{font-size:8px;color:var(--folio-muted)}
+.folio-identity-interlude figcaption strong{
+  max-width:320px;
+  font-family:var(--folio-display);
+  font-size:clamp(15px,1.5vw,20px);
+  font-weight:570;
+  line-height:1.15;
+  letter-spacing:-.04em;
+  text-align:right;
+}
+
+/* B keeps data surfaces disciplined: neutral rules, minimal rounded chrome. */
+.page-dashboard .panel,
+.page-dashboard .dashboard-section,
+.page-dashboard .temp-card,
+.page-dashboard .dashboard-explore{
+  box-shadow:none!important;
+}
+.page-dashboard .focus-sector-panel,
+.page-dashboard .temp-card,
+.page-dashboard .dashboard-explore{
+  border-radius:0!important;
+}
+.page-dashboard .dashboard-section-action,
+.page-dashboard .spotlight-open{
+  font-family:var(--folio-text);
+  letter-spacing:.01em;
+}
+
+/* Compact B: same identity, not a separate Fluid Market mobile theme. */
+@media (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .page-shell-dashboard .mobile-brandbar{
+    background:var(--folio-paper)!important;
+    border-bottom:1px solid var(--folio-line)!important;
+  }
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{height:27px}
+  .folio-identity-interlude{
+    grid-template-columns:1fr;
+    margin:30px -16px 24px;
+    border-left:0;
+    border-right:0;
+  }
+  .folio-identity-interlude img{height:190px}
+  .folio-photo-panel{display:none}
+  .folio-identity-interlude figcaption{
+    min-height:64px;
+    padding:13px 18px 15px;
+  }
+  .folio-identity-interlude figcaption strong{font-size:16px}
+}
+
+@media(max-width:650px){
+  .folio-identity-interlude{margin-left:-18px;margin-right:-18px}
+  .launch-center{width:100%;padding:0 0 22px;align-content:center}
+  .launch-editorial-frame{
+    width:100vw;
+    box-shadow:none;
+  }
+  .launch-editorial-caption{
+    width:calc(100vw - 36px);
+    display:grid;
+    gap:8px;
+    padding-top:16px;
+  }
+  .launch-editorial-caption p{font-size:15px}
+  .launch-progress{width:calc(100vw - 36px)!important;margin-top:18px!important}
+  .launch-footer{width:calc(100vw - 36px)}
+}
+
+/* Dark mode preserves the B composition: black field, white wordmark, warm-photo accent. */
+:root[data-theme="dark"] .launch-overlay,
+:root[data-theme="dark"] .launch-screen{background:#0b0b0d!important;color:#f7f4f1}
+:root[data-theme="dark"] .launch-editorial-caption{color:#f7f4f1}
+:root[data-theme="dark"] .launch-progress{background:rgba(255,255,255,.18)!important}
+:root[data-theme="dark"] .launch-progress span{background:#f7f4f1!important}
+:root[data-theme="dark"] .folio-identity-interlude,
+:root[data-theme="dark"] .folio-identity-interlude figure,
+:root[data-theme="dark"] .folio-identity-interlude figcaption{background:var(--folio-paper)}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .launch-overlay,
+  :root:not([data-theme]) .launch-screen{background:#0b0b0d!important;color:#f7f4f1}
+  :root:not([data-theme]) .launch-editorial-caption{color:#f7f4f1}
+  :root:not([data-theme]) .launch-progress{background:rgba(255,255,255,.18)!important}
+  :root:not([data-theme]) .launch-progress span{background:#f7f4f1!important}
 }

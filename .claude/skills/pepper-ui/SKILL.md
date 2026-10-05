@@ -7,11 +7,13 @@ Read the UI/formatting sections in `docs/harness/CONTRACT.md`. For Folio brand/H
 
 Locate the existing shared component and CSS tokens before editing. Reuse shared primitives such as `StockRows`, `DecisionList`, disclosures, navigation icons and table tokens. Preserve data/calculation contracts while changing presentation.
 
-Responsive contract:
-- Desktop, mobile and iPad share Sunset Editorial (B); compact layouts may change density and navigation placement but not switch to a different visual system.
+Responsive / identity contract:
+- The attached column 02 Sunset Editorial (B) is the exact visual source of truth on desktop, mobile and iPad; compact layouts may change density and navigation placement but not identity.
+- Use the committed B wordmark/icon/launch/motif artwork instead of recreating them with text, CSS X geometry or generic gradients.
 - Dashboard compact hierarchy is brand → Total/KR/US → one leader hero/chart/periods → evidence → class summary → secondary sector/temperature/exploration.
 - Touch targets, no-horizontal-overflow, progressive disclosure and System/Light/Dark behavior are acceptance criteria.
-- C/Fluid Market colour is a restrained brand/photography accent, not chrome for cards/navigation.
+- C is photography treatment only through the committed C photography asset; it is not chrome for cards/navigation and its flowing-wave motif is not a Folio UI motif.
+- Robinhood can inform hierarchy and interaction economy, never Folio branding or colour.
 
 Run `npm run build` and `npm run test:identity` for identity/responsive changes, then relevant/full `npm run test:ui`. Report measured layout and behavior, not a visual guess.
 
