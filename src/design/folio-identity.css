@@ -1018,7 +1018,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   .page-shell-dashboard .spotlight-price{margin-top:18px}
   .page-shell-dashboard .spotlight-price strong{
     font-size:clamp(50px,10vw,76px);
-    font-weight:390;
+    font-weight:400;
     letter-spacing:-.075em;
   }
   .page-shell-dashboard .spotlight-performance{margin-top:12px}
