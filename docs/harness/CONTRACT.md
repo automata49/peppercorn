@@ -89,3 +89,5 @@ This is the single source of project rules for Claude Code and Codex. User instr
 5. Commit source only. Deployment workflow builds assets; never hand-edit generated `assets/` or root `index.html`. Preserve user changes, secrets, RLS and credentials.
 
 Use Claude Code for planning/refactoring and Codex for implementation/regression checks as a default workflow, with roles reversible. Reviewer agents are read-only. Small edits stay single-agent. Hooks are fast feedback; CI is the shared gate even if a client does not load hooks.
+
+- VISUAL-ROBINHOOD-1 (2026-10-05, user request): the default workspace and focal leader stay bright. Native sans typography, regular large price digits, a restrained green spotlight chart, white surfaces and black pill actions interpret the supplied Metalab Robinhood app images. The focal leader is flat on desktop too; analysis blocks retain existing desktop boundaries. Animated price digits inherit their parent price size. Existing market-specific gain/loss colors and all ranking/data rules remain unchanged.
