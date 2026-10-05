@@ -95,6 +95,36 @@ test('B wordmark, hero, motif and C photography assets are deployable',async({re
  }
 })
 
+test('B app icon keeps the compact xx scale and proportion from concept B',async({page})=>{
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ const box=await page.evaluate(async()=>{
+   const img=new Image()
+   img.src='./folio-b-icon-512.png'
+   await img.decode()
+   const canvas=document.createElement('canvas')
+   canvas.width=512;canvas.height=512
+   const ctx=canvas.getContext('2d',{willReadFrequently:true})!
+   ctx.drawImage(img,0,0)
+   const data=ctx.getImageData(0,0,512,512).data
+   let x0=512,y0=512,x1=-1,y1=-1
+   for(let y=0;y<512;y++)for(let x=0;x<512;x++){
+     const i=(y*512+x)*4,r=data[i],g=data[i+1],b=data[i+2],a=data[i+3]
+     if(a>180&&Math.max(r,g,b)>45){
+       if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y
+     }
+   }
+   return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2}
+ })
+ expect(box.w/512).toBeGreaterThanOrEqual(.29)
+ expect(box.w/512).toBeLessThanOrEqual(.33)
+ expect(box.h/512).toBeGreaterThanOrEqual(.16)
+ expect(box.h/512).toBeLessThanOrEqual(.20)
+ expect(box.w/box.h).toBeGreaterThanOrEqual(1.65)
+ expect(box.w/box.h).toBeLessThanOrEqual(1.80)
+ expect(Math.abs(box.cx-255.5)).toBeLessThanOrEqual(5)
+ expect(Math.abs(box.cy-255.5)).toBeLessThanOrEqual(5)
+})
+
 test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  const description='모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼'
  await page.goto('http://127.0.0.1:4173/peppercorn/')
