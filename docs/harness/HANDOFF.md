@@ -1,3 +1,18 @@
+## Exact B wordmark cleanup + identity placement — 2026-10-06
+
+This entry supersedes earlier Folio identity notes where they conflict.
+
+- **Source of truth:** attached column 02 `Sunset Editorial` (B) on desktop, mobile and iPad.
+- **Wordmark:** the visible lockup is now clean B geometry, not the noisy screenshot crop. `Folio` is rendered in the editorial grotesk and paired with `public/folio-b-xx-light.png` / `public/folio-b-xx-dark.png`, extracted from the B app-icon mark. The rejected `folio-b-wordmark-light/dark.webp` crops were removed.
+- **App icon:** exact B near-black rounded tile + centered xx via `folio-b-icon-180/192/512/512-maskable.png`.
+- **Loading:** `folio-b-launch-hero.webp` preserves the B top composition; GSAP is limited to clip reveal, subtle pan/scale, progress and fade.
+- **Typography:** Inter / Neue-Grotesk proportions are authoritative; large numerals stay regular, display tracking is tight, metadata is restrained uppercase.
+- **Motif:** `folio-b-motif.webp` is placed after the market-temperature section as the B editorial identity interlude.
+- **Photography:** `folio-c-photography.webp` is used only as C-style photography treatment on wider layouts. C remains prohibited as a UI theme or primary motif.
+- **Harness:** exact assets, clean wordmark DOM/CSS, icon references, loading/motif/photo placement, theme behavior and removal of generic/generated identity sources are guarded by `scripts/harness/identity.mjs` + `npm run test:identity`.
+
+Do not merge until the latest branch head passes `npm run harness:check`, build, the focused identity suite and the full Playwright suite.
+
 ## Exact Sunset Editorial B artwork implementation — 2026-10-05
 
 User clarified that the attached **02 Sunset Editorial (B)** concept must be reproduced as the identity source of truth, not merely interpreted.
