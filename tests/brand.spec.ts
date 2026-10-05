@@ -35,15 +35,17 @@ for(const view of views){
     const homeBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
     await expect(homeBrand).toBeVisible()
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
-    await expect(homeBrand.locator('.folio-wordmark-art-light')).toHaveAttribute('src','./folio-b-wordmark-light.webp')
-    await expect(homeBrand.locator('.folio-wordmark-art-light')).toBeVisible()
+    await expect(homeBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
+    await expect(homeBrand.locator('.folio-xx-art-light')).toHaveAttribute('src','./folio-b-xx-light.png')
+    await expect(homeBrand.locator('.folio-xx-art-light')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
   }else{
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-art-dark')).toHaveAttribute('src','./folio-b-wordmark-dark.webp')
-    await expect(sideBrand.locator('.folio-wordmark-art-dark')).toBeVisible()
+    await expect(sideBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
+    await expect(sideBrand.locator('.folio-xx-art-dark')).toHaveAttribute('src','./folio-b-xx-dark.png')
+    await expect(sideBrand.locator('.folio-xx-art-dark')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
@@ -81,8 +83,8 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
 
 test('B wordmark, hero, motif and C photography assets are deployable',async({request})=>{
  for(const asset of [
-  'folio-b-wordmark-light.webp',
-  'folio-b-wordmark-dark.webp',
+  'folio-b-xx-light.png',
+  'folio-b-xx-dark.png',
   'folio-b-launch-hero.webp',
   'folio-b-motif.webp',
   'folio-c-photography.webp'
