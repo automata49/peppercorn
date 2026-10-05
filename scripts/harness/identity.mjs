@@ -38,7 +38,7 @@ assert(main.includes("import './design/folio-identity.css'"), 'Folio identity st
 assert(!existsSync('src/design/robinhood.css'), 'Superseded robinhood.css must stay removed.');
 assert(sidebar.includes('FolioWordmark'), 'Theme-native Folio wordmark is missing.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
-assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts','test:identity script drifted.');
+assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts','test:identity script drifted.');
 assert(agentsEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&agentsEntry.includes('folio-identity'),'AGENTS.md must route identity work through the design doc and skill.');
 assert(claudeEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&claudeEntry.includes('folio-identity'),'CLAUDE.md must route identity work through the design doc and skill.');
 assert.equal(claudePlugin.version,'1.1.0','Claude harness plugin version must match identity-v2 bundle.');
