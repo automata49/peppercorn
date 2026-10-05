@@ -1,5 +1,5 @@
 import { AnimatedNumber } from './motion/AnimatedNumber'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { LeaderRow } from '../types'
 import { usePriceHistory } from '../lib/priceHistory'
 
@@ -17,7 +17,7 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
   if(!row)return <div className="spotlight-empty">조건을 통과한 리더가 없습니다. 전체 후보에서 시장을 살펴보세요.</div>
 
   const h=history.get(row.id)
-  const allPoints=useMemo(()=>h?h.closes.map((close,i)=>({close,date:h.dates[i]})).filter(p=>Number.isFinite(p.close)&&p.close>0&&p.date).slice(-253):[],[h])
+  const allPoints=h?h.closes.map((close,i)=>({close,date:h.dates[i]})).filter(p=>Number.isFinite(p.close)&&p.close>0&&p.date).slice(-253):[]
   const wanted=sessions[period]+1
   const points=allPoints.slice(-Math.min(allPoints.length,wanted))
   const cursor=exploration?.id===row.id?Math.min(exploration.index,Math.max(0,points.length-1)):Math.max(0,points.length-1)
