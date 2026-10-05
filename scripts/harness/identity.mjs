@@ -75,6 +75,17 @@ for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.ts
   assert(!content.includes('folio-identity-'),`Superseded generated identity reference in ${file}`);
   assert(content.includes('folio-b-icon-'),`Exact B icon reference missing in ${file}`);
 }
+
+const deployWorkflow=read('.github/workflows/deploy.yml');
+for(const asset of [
+  'folio-b-xx-light.png',
+  'folio-b-xx-dark.png',
+  'folio-b-launch-hero.webp',
+  'folio-b-motif.webp',
+  'folio-c-photography.webp'
+]){
+  assert(deployWorkflow.includes(asset),`Pages root sync missing active identity asset: ${asset}`);
+}
 for(const file of ['app/index.html','src/components/Sidebar.tsx']){
   const content=read(file);
   assert(!content.includes('folio-wordmark.webp'),`Legacy wordmark reference in active UI: ${file}`);
