@@ -150,11 +150,11 @@ jobs:
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
           cp dist/logo.webp logo.webp
-          for f in folio-identity-180.png folio-identity-192.png folio-identity-512.png folio-identity-512-maskable.png; do cp "dist/$f" "$f"; done
+          for f in folio-b-icon-180.png folio-b-icon-192.png folio-b-icon-512.png folio-b-icon-512-maskable.png; do cp "dist/$f" "$f"; done
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets manifest.webmanifest sw.js discovery-layout.json logo.webp folio-identity-180.png folio-identity-192.png folio-identity-512.png folio-identity-512-maskable.png .nojekyll
+          git add index.html assets manifest.webmanifest sw.js discovery-layout.json logo.webp folio-b-icon-180.png folio-b-icon-192.png folio-b-icon-512.png folio-b-icon-512-maskable.png .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "chore: sync built Pages output [skip ci]"
             git push
