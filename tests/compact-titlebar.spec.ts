@@ -20,7 +20,7 @@ for(const view of [
     const page=await context.newPage()
     await boot(page)
     const top=page.locator('.topbar')
-    if(view.width<1280){
+    if(view.width<=1500){
       await expect(top).toBeHidden()
       const brandbar=page.locator('.mobile-brandbar')
       await expect(brandbar).toBeVisible()
