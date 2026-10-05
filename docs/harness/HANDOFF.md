@@ -454,3 +454,5 @@ Validation: `python -m pytest -q analysis/tests` (54), `npm run harness:check`, 
 
 ## Motion structure — 2026-10-05
 Separated price/RS SVG rendering and the period control from App.tsx. Interaction motion now lives in src/motion/system.ts; detail sheets/panels use cancellable Web Animations rather than GSAP selectors and staggered section entrances. GSAP still owns the launch brand timeline. AnimatedNumber is an exact-value digit primitive shared by chart indices and spotlight daily closes; changes animate 260ms and reduced-motion disables them. This is digit entry feedback, not a full odometer or chart morph; period reset remains unchanged. No new runtime library, calculation, data source or backend SDUI was introduced.
+
+Callback-ref sizing also fixes charts mounted after asynchronous history arrives. Added the cold-history regression. Validation: npm run harness:check, npm run build, git diff --check, and npm run test:ui -- --workers=4 (123 passed). Initial browser run overlapped rebuild and failed three cases; the stable final build passed the entire suite.
