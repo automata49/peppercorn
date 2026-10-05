@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './ui/dialog'
 import { AppIcon, type AppIconName } from './AppIcon'
 
@@ -18,12 +19,67 @@ const pageGroups=[
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 
+type ThemeMode='system'|'light'|'dark'
+const THEME_KEY='folio-theme'
+const themeLabels:Record<ThemeMode,string>={system:'System',light:'Light',dark:'Dark'}
+
+function readTheme():ThemeMode{
+  try{
+    const saved=window.localStorage.getItem(THEME_KEY)
+    return saved==='light'||saved==='dark'||saved==='system'?saved:'system'
+  }catch{
+    return 'system'
+  }
+}
+
+function resolvedTheme(mode:ThemeMode){
+  return mode==='system'
+    ?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')
+    :mode
+}
+
+function applyTheme(mode:ThemeMode){
+  const root=document.documentElement
+  if(mode==='system')root.removeAttribute('data-theme')
+  else root.dataset.theme=mode
+  root.dataset.themeMode=mode
+  const resolved=resolvedTheme(mode)
+  root.style.colorScheme=resolved
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+    ?.setAttribute('content',resolved==='dark'?'#0a0a0c':'#f8f5f1')
+}
+
+function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode)=>void}){
+  return <div className="theme-control" role="group" aria-label="화면 테마">
+    {(Object.keys(themeLabels) as ThemeMode[]).map(mode=>
+      <button
+        key={mode}
+        type="button"
+        aria-pressed={value===mode}
+        onClick={()=>onChange(mode)}
+      >{themeLabels[mode]}</button>
+    )}
+  </div>
+}
+
 // Folio brand lockup: the icon and wordmark share one height, as in the source artwork.
 function FolioBrand(){
   return <><img className="brand-icon" src="./folio-icon.webp" alt=""/><img className="brand-wordmark-img" src="./folio-wordmark.webp" alt="Folio"/></>
 }
 
 export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean}){
+  const [theme,setTheme]=useState<ThemeMode>(readTheme)
+
+  useEffect(()=>{
+    applyTheme(theme)
+    try{window.localStorage.setItem(THEME_KEY,theme)}catch{}
+    if(theme!=='system')return
+    const media=window.matchMedia('(prefers-color-scheme: dark)')
+    const handle=()=>applyTheme('system')
+    media.addEventListener?.('change',handle)
+    return ()=>media.removeEventListener?.('change',handle)
+  },[theme])
+
   const pageButton=([id,icon,label]:[string,AppIconName,string])=><button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
     <span className="nav-icon"><AppIcon name={icon}/></span><span className="nav-label">{label}</span>
   </button>
@@ -43,7 +99,10 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     <aside className="sidebar">
       <div className="brand folio-brand"><FolioBrand/></div>
       {navigation}
-      <div className="side-foot">Investment Workspace <b>v0.1</b></div>
+      <div className="side-foot">
+        <ThemeControl value={theme} onChange={setTheme}/>
+        <div className="side-foot-meta">Investment Workspace <b>v0.1</b></div>
+      </div>
     </aside>
 
     <div className="mobile-brandbar">
@@ -66,8 +125,9 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
           <DialogTitle className="brand folio-brand"><FolioBrand/></DialogTitle>
           <DialogClose asChild><button className="menu-drawer-close" aria-label="메뉴 닫기"><AppIcon name="close"/></button></DialogClose>
         </div>
-        <DialogDescription className="sr-only">페이지를 선택하세요.</DialogDescription>
+        <DialogDescription className="sr-only">페이지와 화면 테마를 선택하세요.</DialogDescription>
         {drawerNavigation}
+        <div className="drawer-theme"><span>Appearance</span><ThemeControl value={theme} onChange={setTheme}/></div>
         <button className="drawer-refresh" type="button" onClick={()=>{onRefresh();setOpen(false)}} disabled={refreshing}>
           <AppIcon name="refresh"/><span>{refreshing?'새로고침 중':'데이터 새로고침'}</span>
         </button>
