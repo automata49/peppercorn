@@ -1316,6 +1316,33 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   text-align:right;
 }
 
+/* B chart language is identical on desktop, phone and iPad.
+   Sunset colour is reserved for the selected point, never the chart chrome. */
+.page-shell-dashboard .spotlight-chart{color:var(--folio-ink)}
+.page-shell-dashboard .spotlight-line{stroke:var(--folio-ink)!important;stroke-width:2!important}
+.page-shell-dashboard .spotlight-area{fill:var(--folio-ink)!important;opacity:.035!important}
+.page-shell-dashboard .spotlight-chart circle{fill:var(--folio-coral)}
+.page-shell-dashboard .spotlight-periods{
+  border-bottom:1px solid var(--folio-line);
+}
+.page-shell-dashboard .spotlight-periods button{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--folio-muted);
+}
+.page-shell-dashboard .spotlight-periods button.on{
+  position:relative;
+  background:transparent;
+  color:var(--folio-ink);
+}
+.page-shell-dashboard .spotlight-periods button.on::after{
+  content:"";
+  position:absolute;
+  left:28%;right:28%;bottom:5px;height:1.5px;
+  background:var(--folio-ink);
+}
+
 /* B keeps data surfaces disciplined: neutral rules, minimal rounded chrome. */
 .page-dashboard .panel,
 .page-dashboard .dashboard-section,
