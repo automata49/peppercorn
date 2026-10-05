@@ -1,5 +1,5 @@
 import { AnimatedNumber } from './motion/AnimatedNumber'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { LeaderRow } from '../types'
 import { usePriceHistory } from '../lib/priceHistory'
 
@@ -11,6 +11,8 @@ const sessions:Record<HeroPeriod,number>={'1D':1,'1W':5,'1M':20,'3M':60,'1Y':252
 export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];labelFor:(row:LeaderRow)=>string;onSelect:(row:LeaderRow)=>void}){
   const [selectedId,setSelectedId]=useState('')
   const [period,setPeriod]=useState<HeroPeriod>('1M')
+  const tabRefs=useRef<Array<HTMLButtonElement|null>>([])
+  const pendingFocus=useRef<number|null>(null)
   const row=rows.find(r=>r.id===selectedId)||rows[0]
   const history=usePriceHistory(row?[row.id]:[],!!row)
   const [exploration,setExploration]=useState<{id:string;index:number}|null>(null)
@@ -31,6 +33,13 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
   const chartChange=points.length>1?points[points.length-1].close/points[0].close-1:null
   const tone=(chartChange??row.return_50d??0)<0?'falling':'rising'
   const setHeroPeriod=(next:HeroPeriod)=>{setPeriod(next);setExploration(null)}
+
+  useEffect(()=>{
+    const index=pendingFocus.current
+    if(index==null)return
+    pendingFocus.current=null
+    window.requestAnimationFrame(()=>tabRefs.current[index]?.focus())
+  },[selectedId])
 
   return <div className="leader-spotlight" aria-label="리더 집중 탐색">
     <div key={row.id} className="spotlight-body" id="spotlight-panel" role="tabpanel">
@@ -67,7 +76,7 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
       </div>
 
       <div className="spotlight-tabs" role="tablist" aria-label="대표 리더 선택">
-        {rows.map((r,i)=><button key={r.id} type="button" role="tab" aria-selected={r.id===row.id} tabIndex={r.id===row.id?0:-1} onKeyDown={e=>{const next=e.key==='ArrowRight'?(i+1)%rows.length:e.key==='ArrowLeft'?(i-1+rows.length)%rows.length:e.key==='Home'?0:e.key==='End'?rows.length-1:null;if(next!=null){e.preventDefault();const parent=e.currentTarget.parentElement;setSelectedId(rows[next].id);setExploration(null);window.requestAnimationFrame(()=>parent?.querySelectorAll<HTMLButtonElement>('button')[next]?.focus())}}} onClick={()=>{setSelectedId(r.id);setExploration(null)}}>{r.ticker}<small>{r.market}</small></button>)}
+        {rows.map((r,i)=><button ref={el=>{tabRefs.current[i]=el}} key={r.id} type="button" role="tab" aria-selected={r.id===row.id} tabIndex={r.id===row.id?0:-1} onKeyDown={e=>{const next=e.key==='ArrowRight'?(i+1)%rows.length:e.key==='ArrowLeft'?(i-1+rows.length)%rows.length:e.key==='Home'?0:e.key==='End'?rows.length-1:null;if(next!=null){e.preventDefault();pendingFocus.current=next;setSelectedId(rows[next].id);setExploration(null)}}} onClick={()=>{setSelectedId(r.id);setExploration(null)}}>{r.ticker}<small>{r.market}</small></button>)}
       </div>
 
       <div className="spotlight-evidence">
