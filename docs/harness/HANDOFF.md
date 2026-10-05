@@ -1,3 +1,9 @@
+## Folio B visual identity cleanup — 2026-10-06
+
+User requested a cleanup pass rather than another redesign. Sunset Editorial B remains the only UI identity across desktop, phone and iPad. The launch footer is Folio-only; the legacy Peppercorn logo/text co-brand is removed. Superseded root/public identity assets are deleted instead of merely left unused, and the deploy workflow no longer republishes `logo.webp`.
+
+The identity stylesheet removes earlier text-native wordmark and alternate launch treatments that were still sitting underneath the B Exact Lock, and literal escaped-newline CSS is prohibited by the Harness. A dedicated Playwright visual-signature gate now locks the canonical widths 390 / 834 / 1366 / 1440 CSS px. Identity work must pass `harness:check`, build, `test:visual-identity`, focused identity tests and the full UI suite.
+
 ## B app-icon proportion correction — 2026-10-06
 
 User reported that the deployed icon's xx size and proportion did not match concept B. The earlier 512 asset effectively used the mark too large/wide. The authoritative app-icon geometry is now: near-black B tile, exact interlocked B mark, mark width ≈31.25% of the tile, mark bounding aspect ≈1.72:1, centered. `scripts/generate-b-app-icons.mjs` derives the 180/192/512/maskable family from `folio-b-xx-dark.png` before build; Playwright checks the rendered 512 mark bbox and the harness locks the constants. Deploy sync persists both public and root icon copies after generation.
