@@ -6,6 +6,8 @@ import { AppIcon } from './components/AppIcon'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
 import { DecisionList } from './components/DecisionList'
+import { LeaderSpotlight } from './components/LeaderSpotlight'
+import { useDiscoveryLayout } from './lib/discoveryLayout'
 import { ProgressiveDisclosure } from './components/ProgressiveDisclosure'
 import { AuthModal } from './components/AuthModal'
 import { PositionPanel, valuation } from './components/PositionPanel'
@@ -819,6 +821,7 @@ function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
 }
 
 export default function App(){
+  const discoveryLayout=useDiscoveryLayout()
   const [showIntro,setShowIntro]=useState(()=>{
     try{return sessionStorage.getItem('peppercorn-intro-seen')!=='1'}catch{return true}
   })
@@ -1241,12 +1244,13 @@ export default function App(){
 
   let content
   if(page==='dashboard'){
-    content=<>{filters}
+    content=<div className="discovery-home">{filters}
       <section className="dashboard-section leadership-overview focus-overview">
         <div className="dashboard-section-head">
-          <div><h2>오늘의 리더</h2><p>강한 업종 안에서 대표 종목만 추렸습니다.</p><MarketSegment label="주도 종목" value={leaderMkt} onChange={setLeaderMkt}/></div>
+          <div><h2>{discoveryLayout.title}</h2><p>{discoveryLayout.subtitle}</p><MarketSegment label="주도 종목" value={leaderMkt} onChange={setLeaderMkt}/></div>
           <button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 후보 {broadLeaderCount} →</button>
         </div>
+        <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
         <div className="focus-summary">
           <div className="focus-summary-main"><span>Focus</span><strong>{focusRows.length}</strong><small>상위 업종 우선 · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목 · {focusFilterLabel}</small></div>
           <div className="focus-class-strip" aria-label="포커스 분류">
@@ -1255,7 +1259,7 @@ export default function App(){
             <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{focusCounts.turns}</b><small>전체 {turnCount}</small></button>
           </div>
         </div>
-        <FocusLeaderList rows={focusRows} onSelect={chartOpenStock}/>
+        <details className="dashboard-disclosure focus-roster"><summary>포커스 목록 {focusRows.length} · 업종별로 보기</summary><p className="focus-roster-note">{focusFilterLabel} · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목. 표시 순서는 기존 포커스 기준입니다.</p><FocusLeaderList rows={focusRows} onSelect={chartOpenStock}/></details>
         <details className="dashboard-disclosure leader-detail">
           <summary>추가 보기 · 모멘텀 / 현재가</summary>
           <div className="focus-actions">
@@ -1333,7 +1337,7 @@ export default function App(){
           </section>
         </div>
       </details>
-    </>
+    </div>
   }else if(page==='leaderboard'){
     const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
     const lbCount=(c:string)=>lbEquities.filter(r=>leadership(r)===c).length
