@@ -1,5 +1,5 @@
 import { AnimatedNumber } from './motion/AnimatedNumber'
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import type { LeaderRow } from '../types'
 import { usePriceHistory } from '../lib/priceHistory'
 
@@ -16,6 +16,13 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
   const row=rows.find(r=>r.id===selectedId)||rows[0]
   const history=usePriceHistory(row?[row.id]:[],!!row)
   const [exploration,setExploration]=useState<{id:string;index:number}|null>(null)
+
+  useLayoutEffect(()=>{
+    const index=pendingFocus.current
+    if(index==null)return
+    pendingFocus.current=null
+    tabRefs.current[index]?.focus()
+  },[selectedId])
   if(!row)return <div className="spotlight-empty">조건을 통과한 리더가 없습니다. 전체 후보에서 시장을 살펴보세요.</div>
 
   const h=history.get(row.id)
@@ -33,13 +40,6 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
   const chartChange=points.length>1?points[points.length-1].close/points[0].close-1:null
   const tone=(chartChange??row.return_50d??0)<0?'falling':'rising'
   const setHeroPeriod=(next:HeroPeriod)=>{setPeriod(next);setExploration(null)}
-
-  useEffect(()=>{
-    const index=pendingFocus.current
-    if(index==null)return
-    pendingFocus.current=null
-    window.requestAnimationFrame(()=>tabRefs.current[index]?.focus())
-  },[selectedId])
 
   return <div className="leader-spotlight" aria-label="리더 집중 탐색">
     <div key={row.id} className="spotlight-body" id="spotlight-panel" role="tabpanel">
