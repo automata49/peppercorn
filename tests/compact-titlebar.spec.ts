@@ -15,7 +15,7 @@ for(const view of [
   {name:'ipad-landscape',width:1194,height:834},
   {name:'ipad-pro-touch',width:1366,height:1024}
 ]){
-  test(view.name+' uses a title-first compact header',async({browser})=>{
+  test(view.name+' uses the Folio brand-first compact header',async({browser})=>{
     const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:true,isMobile:true})
     const page=await context.newPage()
     await boot(page)
