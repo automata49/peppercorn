@@ -1195,39 +1195,59 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   line-height:1.55;
 }
 
-/* Exact B wordmark artwork. */
+/* Exact B wordmark: bold Folio + compact interlocked xx from the B icon artwork. */
 .folio-wordmark-system{
-  display:inline-grid;
+  display:inline-flex;
   align-items:center;
-  width:auto;
-  height:26px;
-  line-height:0;
-  color:transparent;
-  letter-spacing:0;
+  width:max-content;
+  color:var(--folio-ink);
+  line-height:1;
+  white-space:nowrap;
 }
-.folio-wordmark-art{
-  grid-area:1/1;
+.folio-wordmark-text{
   display:block;
-  width:auto;
+  font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue",Arial,sans-serif;
+  font-size:28px;
+  font-weight:720;
+  line-height:.9;
+  letter-spacing:-.075em;
+}
+.folio-wordmark-mark{
+  position:relative;
+  display:block;
+  width:43px;
+  height:24px;
+  margin-left:5px;
+  flex:0 0 auto;
+}
+.folio-xx-art{
+  position:absolute;
+  inset:0;
+  width:100%;
   height:100%;
-  max-width:none;
   object-fit:contain;
   user-select:none;
   pointer-events:none;
 }
-.folio-wordmark-art-dark{display:none}
-.sidebar .folio-wordmark-system{height:27px}
-.sidebar .folio-wordmark-art-light{display:none}
-.sidebar .folio-wordmark-art-dark{display:block}
-.mobile-brand-home .folio-wordmark-system{height:29px}
-.menu-drawer .folio-wordmark-system{height:30px}
-:root[data-theme="dark"] .folio-wordmark-art-light{display:none}
-:root[data-theme="dark"] .folio-wordmark-art-dark{display:block}
+.folio-xx-art-dark{display:none}
+.sidebar .folio-wordmark-system{color:#fff}
+.sidebar .folio-wordmark-text{font-size:25px;font-weight:680}
+.sidebar .folio-wordmark-mark{width:39px;height:21px;margin-left:4px}
+.sidebar .folio-xx-art-light{display:none}
+.sidebar .folio-xx-art-dark{display:block}
+.mobile-brand-home .folio-wordmark-text{font-size:30px}
+.mobile-brand-home .folio-wordmark-mark{width:46px;height:25px}
+.menu-drawer .folio-wordmark-text{font-size:30px}
+.menu-drawer .folio-wordmark-mark{width:46px;height:25px}
+:root[data-theme="dark"] .folio-wordmark-system{color:#f7f4f1}
+:root[data-theme="dark"] .folio-xx-art-light{display:none}
+:root[data-theme="dark"] .folio-xx-art-dark{display:block}
 @media(prefers-color-scheme:dark){
-  :root:not([data-theme]) .folio-wordmark-art-light{display:none}
-  :root:not([data-theme]) .folio-wordmark-art-dark{display:block}
+  :root:not([data-theme]) .folio-wordmark-system{color:#f7f4f1}
+  :root:not([data-theme]) .folio-xx-art-light{display:none}
+  :root:not([data-theme]) .folio-xx-art-dark{display:block}
 }
-.sidebar .folio-wordmark-art-dark{display:block!important}
+.sidebar .folio-xx-art-dark{display:block!important}
 
 /* B typography: large type stays regular and editorial, metadata is tracked. */
 .spotlight-kicker,.launch-editorial-caption span,.folio-identity-interlude figcaption span,
