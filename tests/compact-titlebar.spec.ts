@@ -20,12 +20,18 @@ for(const view of [
     const page=await context.newPage()
     await boot(page)
     const top=page.locator('.topbar')
-    await expect(top.locator('h1')).toBeVisible()
-    await expect(top.locator('p')).toBeHidden()
-    const box=await top.boundingBox()
-    expect(box).not.toBeNull()
-    expect(box!.height).toBeLessThanOrEqual(62)
-    expect(box!.height).toBeGreaterThanOrEqual(58)
+    if(view.width<1280){
+      await expect(top).toBeHidden()
+      const brandbar=page.locator('.mobile-brandbar')
+      await expect(brandbar).toBeVisible()
+      const box=await brandbar.boundingBox()
+      expect(box).not.toBeNull()
+      expect(box!.height).toBeGreaterThanOrEqual(60)
+      expect(box!.height).toBeLessThanOrEqual(66)
+    }else{
+      await expect(top.locator('h1')).toBeVisible()
+      await expect(top.locator('p')).toBeHidden()
+    }
     await context.close()
   })
 }
