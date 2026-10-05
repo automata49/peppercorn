@@ -27,7 +27,8 @@ for(const view of views){
   await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
-  await expect(launch.locator('.launch-footer')).toContainText('Peppercorn Capital')
+  await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
+  await expect(launch.locator('.launch-footer')).not.toContainText('Peppercorn Capital')
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000})
 
