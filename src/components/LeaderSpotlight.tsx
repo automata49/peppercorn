@@ -1,3 +1,4 @@
+import { AnimatedNumber } from './motion/AnimatedNumber'
 import { useState } from 'react'
 import type { LeaderRow } from '../types'
 import { usePriceHistory } from '../lib/priceHistory'
@@ -26,7 +27,7 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
     <div key={row.id} className="spotlight-body" id="spotlight-panel" role="tabpanel" aria-labelledby={'spotlight-tab-'+rows.indexOf(row)}>
       <div className="spotlight-identity"><span>{row.market} · {row.group_name||row.industry||row.sector}</span><span>{labelFor(row)}</span></div>
       <h3>{row.name||row.ticker}</h3>
-      <div className="spotlight-price"><strong>{(point?.close??row.price)?.toLocaleString('ko-KR',{maximumFractionDigits:2})??'—'}</strong><span>{row.market==='KR'?'KRW':'USD'} · {point?.date||'일간 종가 · 날짜 미제공'}</span></div>
+      <div className="spotlight-price"><strong><AnimatedNumber value={(point?.close??row.price)?.toLocaleString('ko-KR',{maximumFractionDigits:2})??'—'}/></strong><span>{row.market==='KR'?'KRW':'USD'} · {point?.date||'일간 종가 · 날짜 미제공'}</span></div>
       <div className={'spotlight-chart '+tone}>
         {points.length>1?<>
           <svg viewBox="0 0 640 180" role="img" aria-label={`${row.name} 일간 종가, ${points[0].date}부터 ${points[points.length-1].date}까지`} onPointerMove={e=>{if(e.pointerType==='touch'&&e.buttons===0)return;const rect=e.currentTarget.getBoundingClientRect();setExploration({id:row.id,index:Math.round(Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width))*(points.length-1))})}} onPointerLeave={()=>setExploration(null)}>

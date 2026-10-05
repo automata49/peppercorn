@@ -1957,3 +1957,8 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .spotlight-slider::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#166d4b}
 .spotlight-slider:focus-visible{outline:2px solid #166d4b;outline-offset:1px;border-radius:4px}
 @media(max-width:650px){main:has(.discovery-home){background:#fff}.discovery-home .dashboard-section-head h2,.discovery-home .dashboard-sector-head h2{color:#17241e;font-size:22px}}
+
+/* Exact-value digit primitive: clip only visual motion, preserve text and semantics. */
+.animated-number{display:inline-flex;overflow:hidden;vertical-align:bottom;font-variant-numeric:tabular-nums}
+.animated-number>span{display:inline-block}
+.chart-readout b{animation:none}
