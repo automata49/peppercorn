@@ -46,7 +46,7 @@ for(const view of views){
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
   const menu=view.compact?page.locator('.mobile-brand-menu'):page.locator('.mobile-brand-menu')
-  if(view.touch){
+  if(view.compact){
     await menu.click()
     const drawer=page.locator('.menu-drawer')
     await expect(drawer.getByRole('img',{name:'Folio xx'})).toBeVisible()
