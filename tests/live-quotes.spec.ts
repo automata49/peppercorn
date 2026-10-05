@@ -68,6 +68,7 @@ test('주도 종목 현재가 기준 orders leaders by live change',async({page}
   NVDA:{price:123,time:null,previous_close:120,currency:'USD'},'247540.KQ':{price:210000,time:null,previous_close:200000,currency:'KRW'}}}}))
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+ await page.locator('.focus-roster > summary').click()
  const detail=page.locator('.leader-detail')
  await expect(detail).not.toHaveAttribute('open','')
  await detail.locator(':scope > summary').click()

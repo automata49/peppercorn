@@ -1,3 +1,17 @@
+## Folio discovery redesign (DISCOVERY-1) — 2026-10-05
+
+User asked to apply Metalab/Robinhood product design, official design content and SDUI, and judged the prior UI insufficiently different. Started from main `9e3b12f` (chart exploration PR #104 already merged and published).
+
+Home now gives one Focus leader a dominant identity/daily-close chart, three evidence values and one stock-detail action. Up to four tabs preview existing Focus results; the unchanged full grouped list starts collapsed. Phone sectors use a horizontal tile strip; the visible global market toggle replaces duplicate section toggles on phones. Wider screens retain independent market toggles and the canonical sector table. Daily history comes through the existing public price-history hook; missing data produces no synthetic chart, and undated fallback daily prices explicitly say dates are unavailable. Tabs support arrow/Home/End navigation, the accessible date slider has a 44px target, and motion respects reduced-motion.
+
+`public/discovery-layout.json` + `src/lib/discoveryLayout.ts` provide a bounded version-1 hosted presentation config (copy, allowlisted component and preview count), with a three-second timeout and whole-unit default fallback. This is a limited presentation boundary, not a full backend-generated SDUI platform. No leadership rule, ranking, filter, DB schema, Edge function or stored record changed. Sources, interpretation and limits: `docs/design/ROBINHOOD_DISCOVERY.md`.
+
+Validation actually executed: `npm run harness:check`; `npm run build`; `npm run test:ui -- --workers=4` (**122 passed**, including 7 new config/date/keyboard/detail/viewport checks); `npm run test:position-db` (93), `npm run test:etf-rs` (47), `npm run test:universe-db` (22), `npm run test:temperature-db` (16); `git diff --check`. Visually inspected phone and desktop screenshots. Repository-required read-only ui-reviewer found tab navigation/touch-size issues; both fixed and re-reviewed with no material remaining source issue.
+
+The initial suite exposed one old assumption that the full list is always visible; its test now opens the explicit roster. Two initial test processes briefly overlapped their shared trace directory and produced ENOENT artifacts; the final complete single-process 122-case run passed. Physical iPhone/iPad Safari remains unverified. Existing Vite bundle-size warning remains (AG Grid in the main bundle).
+
+Publishing: code is ready for the user's previously approved GitHub upload/deploy; production success must be verified separately after merge.
+
 # Current handoff
 
 ## Robinhood GitHub interaction adoption — 2026-10-05

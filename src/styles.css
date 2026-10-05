@@ -1868,3 +1868,92 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 @media(prefers-reduced-motion:reduce){.chart-readout b{animation:none}}
 @media(max-width:650px){.chart-scrubber{height:44px}.price-rs .chart-readout{gap:6px 14px}}
 @media(max-width:650px){.dashboard-toolbar .segment button{min-width:44px}}
+
+/* DISCOVERY-1: one focal point, evidence, then deliberate exploration. */
+.discovery-home{--discovery-ink:#17241e;--discovery-accent:#166d4b;max-width:1120px;margin:0 auto}
+.discovery-home .focus-overview{padding:26px;background:#fff;border-color:#dfe6df;box-shadow:none}
+.discovery-home .dashboard-section-head h2{font-size:24px;letter-spacing:-.8px;color:var(--discovery-ink)}
+.discovery-home .dashboard-section-head p{font-size:13px;line-height:1.6}
+.leader-spotlight{margin:22px 0 14px;min-width:0}
+.spotlight-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px}
+.spotlight-tabs button{flex-shrink:0;min-height:44px;padding:9px 16px;border:1px solid #e0e6e1;border-radius:999px;background:#fff;cursor:pointer;font-weight:650;color:#58645e;transition:background var(--motion-base),color var(--motion-base)}
+.spotlight-tabs button small{margin-left:7px;font-size:10px;opacity:.7}
+.spotlight-tabs button[aria-selected=true]{background:#17241e;color:#fff;border-color:#17241e}
+.spotlight-body{padding:18px 0 0;animation:spotlight-enter var(--motion-base) var(--motion-ease)}
+.spotlight-identity{display:flex;justify-content:space-between;gap:12px;color:#69766e;font-size:12px}
+.spotlight-identity span:last-child{color:var(--discovery-accent);white-space:nowrap}
+.spotlight-body h3{font-size:clamp(24px,3vw,34px);letter-spacing:-1px;line-height:1.3;color:var(--discovery-ink);margin:10px 0 6px;word-break:keep-all;overflow-wrap:anywhere}
+.spotlight-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:12px}
+.spotlight-price strong{font-size:clamp(32px,4vw,46px);font-weight:500;letter-spacing:-1.7px;font-variant-numeric:tabular-nums;color:var(--discovery-ink)}
+.spotlight-price span{font-size:11px;color:#727e76}
+.spotlight-chart{color:#16815a;margin-top:8px}
+.spotlight-chart.falling{color:#2467b2}
+.spotlight-chart svg{display:block;width:100%;height:180px;overflow:visible;touch-action:pan-y}
+.spotlight-line{fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.spotlight-area{fill:currentColor;opacity:.055}
+.spotlight-cursor{stroke:currentColor;stroke-width:1;opacity:.3;stroke-dasharray:3 5}
+.spotlight-chart circle{fill:currentColor;stroke:white;stroke-width:2}
+.spotlight-slider{display:block;width:100%;height:44px;accent-color:var(--discovery-accent);cursor:ew-resize;margin:0}
+.spotlight-chart-caption{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#727e76;margin:5px 0 18px}
+.spotlight-chart-caption b{color:inherit;font-size:12px;font-variant-numeric:tabular-nums}
+.spotlight-chart-caption small{font-weight:400;color:#727e76}
+.spotlight-chart-empty{min-height:90px;display:flex;align-items:center;justify-content:center;color:#727e76;font-size:12px;background:#fafcf9;margin:16px 0}
+.spotlight-evidence{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:17px 0;border-top:1px solid #e9ede7}
+.spotlight-evidence>div{display:flex;flex-direction:column;gap:7px}
+.spotlight-evidence span{font-size:11px;color:#727e76}
+.spotlight-evidence b{font-size:20px;font-weight:550;letter-spacing:-.5px;font-variant-numeric:tabular-nums;color:var(--discovery-ink)}
+.spotlight-open{width:100%;display:flex;justify-content:space-between;align-items:center;min-height:48px;border:0;border-radius:12px;background:#17241e;color:white;padding:12px 18px;font-size:14px;font-weight:600;cursor:pointer;transition:transform var(--motion-fast),background var(--motion-base)}
+.spotlight-open:hover{background:#28543e}.spotlight-open:active{transform:scale(.985)}
+.discovery-home .focus-summary{display:flex;align-items:center;gap:18px;margin:20px 0 6px;background:none}
+.discovery-home .focus-summary-main{display:flex;flex-direction:row;align-items:baseline;gap:8px;background:none;border:0;padding:0;box-shadow:none}
+.discovery-home .focus-summary-main>span{font-size:11px;color:#727e76}
+.discovery-home .focus-summary-main>strong{font-size:16px;color:var(--discovery-ink)}
+.discovery-home .focus-summary-main>small{display:none}
+.discovery-home .focus-class-strip{flex:1;display:flex;justify-content:flex-end;gap:8px;background:none;border:0;padding:0}
+.discovery-home .focus-class-strip button{display:flex;align-items:center;gap:5px;min-height:44px;border:0;border-radius:6px;background:none;padding:8px;color:#65716a;font-size:11px}
+.discovery-home .focus-class-strip b{font-size:13px;color:#263e30}
+.discovery-home .focus-class-strip small{display:none}
+.focus-roster-note{font-size:11px;color:#727e76;padding:12px 0;line-height:1.6}
+.spotlight-empty{padding:28px 0;color:#727e76;font-size:14px}
+@keyframes spotlight-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:900px){
+  .spotlight-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.55fr);column-gap:36px}
+  .spotlight-identity,.spotlight-body h3,.spotlight-price,.spotlight-chart{grid-column:1}
+  .spotlight-evidence{grid-column:2;grid-row:1/5;display:flex;flex-direction:column;justify-content:center;gap:22px;border-top:0;border-left:1px solid #e9ede7;padding-left:32px}
+  .spotlight-open{grid-column:2;grid-row:5;align-self:end}
+  .spotlight-chart{grid-row:4/6}
+}
+@media(max-width:650px){
+  .discovery-home .focus-overview{padding:10px 0 20px!important}
+  .discovery-home .dashboard-section-head h2{font-size:23px}
+  .leader-spotlight{margin-top:14px}
+  .spotlight-tabs{margin-right:-8px;padding-right:8px}
+  .spotlight-body{padding-top:12px}
+  .spotlight-identity{font-size:11px}
+  .spotlight-price{gap:8px}
+  .spotlight-chart svg{height:150px}
+  .spotlight-evidence{padding:15px 0}
+  .spotlight-evidence b{font-size:18px}
+  .discovery-home .focus-summary{gap:8px;margin-top:14px}
+  .discovery-home .focus-class-strip{gap:2px}
+  .discovery-home .mobile-sector-list{display:flex;overflow-x:auto;gap:10px;scroll-snap-type:x proximity;padding:4px 0 14px;border:0}
+  .discovery-home .mobile-sector-list .decision-row{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;flex:0 0 170px;min-height:172px;padding:16px;background:#f5f7f2;border:1px solid #e7ece2;border-radius:14px;scroll-snap-align:start;gap:6px;position:relative}
+  .discovery-home .mobile-sector-list .decision-rank{position:absolute;right:12px;top:12px;font-size:11px;background:none;color:#899487}
+  .discovery-home .mobile-sector-list .decision-main{display:flex;flex-direction:column;gap:4px;padding-right:14px}
+  .discovery-home .mobile-sector-list .decision-main>b{font-size:15px;line-height:1.3;white-space:normal;word-break:keep-all}
+  .discovery-home .mobile-sector-list .decision-main>small{font-size:10px}
+  .discovery-home .mobile-sector-list .decision-badge{font-size:10px;padding:0;background:none;color:#65716a}
+  .discovery-home .mobile-sector-list .decision-value{margin-top:auto;text-align:left}
+  .discovery-home .mobile-sector-list .decision-value>b{font-size:22px;letter-spacing:-.7px}
+  .discovery-home .mobile-sector-list .decision-value>small{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){.spotlight-body{animation:none}.spotlight-open,.spotlight-tabs button{transition:none}.spotlight-open:active{transform:none}}
+
+@media(max-width:650px){.discovery-home .focus-overview .section-market,.discovery-home .dashboard-sector-head .section-market{display:none}}
+.spotlight-slider{appearance:none;-webkit-appearance:none;background:transparent;outline:none;border:0}
+.spotlight-slider::-webkit-slider-runnable-track{height:2px;background:#dce7df;border-radius:2px}
+.spotlight-slider::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#166d4b;margin-top:-5px}
+.spotlight-slider::-moz-range-track{height:2px;background:#dce7df;border:0}
+.spotlight-slider::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#166d4b}
+.spotlight-slider:focus-visible{outline:2px solid #166d4b;outline-offset:1px;border-radius:4px}
+@media(max-width:650px){main:has(.discovery-home){background:#fff}.discovery-home .dashboard-section-head h2,.discovery-home .dashboard-sector-head h2{color:#17241e;font-size:22px}}
