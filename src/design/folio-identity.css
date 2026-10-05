@@ -1,0 +1,481 @@
+/* Folio xx — New Visual Identity
+   Direction: Sunset Editorial (B) + Fluid Market mobile/theme system (C).
+   Black/white structure, sunset accents, restrained motion, system/light/dark. */
+
+:root{
+  color-scheme:light;
+  --folio-display:-apple-system,BlinkMacSystemFont,"SF Pro Display","Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
+  --folio-text:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR","Segoe UI",sans-serif;
+  --folio-black:#0b0b0d;
+  --folio-white:#fff;
+  --folio-paper:#f8f5f1;
+  --folio-surface:#ffffff;
+  --folio-surface-2:#f1ece7;
+  --folio-ink:#111113;
+  --folio-muted:#77716f;
+  --folio-line:rgba(17,17,19,.12);
+  --folio-line-strong:rgba(17,17,19,.22);
+  --folio-plum:#54265f;
+  --folio-magenta:#a34f78;
+  --folio-coral:#f06a45;
+  --folio-amber:#f5a24a;
+  --folio-sunset:linear-gradient(108deg,#54265f 0%,#a34f78 35%,#f06a45 68%,#f5a24a 100%);
+  --folio-sunset-soft:linear-gradient(108deg,rgba(84,38,95,.12),rgba(163,79,120,.10),rgba(240,106,69,.10),rgba(245,162,74,.12));
+  --folio-chart:#7a3f79;
+  --folio-chart-fall:#2166b1;
+  --bg:var(--folio-paper);
+  --card:var(--folio-surface);
+  --ink:var(--folio-ink);
+  --muted:var(--folio-muted);
+  --line:var(--folio-line);
+  --navy:var(--folio-black);
+  --navy-soft:#eee8e5;
+}
+
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --folio-paper:#0a0a0c;
+  --folio-surface:#111114;
+  --folio-surface-2:#18171b;
+  --folio-ink:#f7f4f1;
+  --folio-muted:#aaa3a0;
+  --folio-line:rgba(255,255,255,.12);
+  --folio-line-strong:rgba(255,255,255,.22);
+  --folio-sunset-soft:linear-gradient(108deg,rgba(110,62,122,.20),rgba(181,88,132,.16),rgba(240,106,69,.14),rgba(245,162,74,.12));
+  --folio-chart:#d875a4;
+  --bg:var(--folio-paper);
+  --card:var(--folio-surface);
+  --ink:var(--folio-ink);
+  --muted:var(--folio-muted);
+  --line:var(--folio-line);
+  --navy:#f7f4f1;
+  --navy-soft:#211d23;
+}
+
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]){
+    color-scheme:dark;
+    --folio-paper:#0a0a0c;
+    --folio-surface:#111114;
+    --folio-surface-2:#18171b;
+    --folio-ink:#f7f4f1;
+    --folio-muted:#aaa3a0;
+    --folio-line:rgba(255,255,255,.12);
+    --folio-line-strong:rgba(255,255,255,.22);
+    --folio-sunset-soft:linear-gradient(108deg,rgba(110,62,122,.20),rgba(181,88,132,.16),rgba(240,106,69,.14),rgba(245,162,74,.12));
+    --folio-chart:#d875a4;
+    --bg:var(--folio-paper);
+    --card:var(--folio-surface);
+    --ink:var(--folio-ink);
+    --muted:var(--folio-muted);
+    --line:var(--folio-line);
+    --navy:#f7f4f1;
+    --navy-soft:#211d23;
+  }
+}
+
+html,body,#root,.shell,.shell>main,.content{background:var(--folio-paper);color:var(--folio-ink)}
+body{font-family:var(--folio-text);letter-spacing:-.018em}
+button,input,select,textarea{font-family:inherit}
+button{transition:transform var(--motion-fast) var(--motion-ease),background-color var(--motion-fast) var(--motion-ease),border-color var(--motion-fast) var(--motion-ease),color var(--motion-fast) var(--motion-ease)}
+button:active{transform:scale(.985)}
+::selection{background:rgba(240,106,69,.24)}
+
+/* Editorial desktop rail: black/white discipline. */
+.sidebar{
+  background:var(--folio-black);
+  border-right:0;
+  box-shadow:none;
+  padding:24px 14px 18px;
+}
+.sidebar .folio-brand{padding:2px 8px 28px}
+.sidebar .folio-brand .brand-wordmark-img{filter:brightness(0) invert(1);opacity:.96}
+.sidebar .folio-brand .brand-icon{filter:saturate(.82) contrast(1.05)}
+.sidebar nav{gap:2px}
+.sidebar nav button{
+  color:rgba(255,255,255,.60);
+  border-radius:0;
+  padding:11px 12px;
+  font-weight:520;
+}
+.sidebar nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.sidebar nav button.active{
+  position:relative;
+  background:rgba(255,255,255,.09);
+  color:#fff;
+  box-shadow:none;
+}
+.sidebar nav button.active::before{
+  content:"";
+  position:absolute;
+  left:0;top:9px;bottom:9px;width:2px;
+  background:var(--folio-sunset);
+  border-radius:99px;
+}
+.sidebar nav button .nav-icon{color:inherit}
+.side-foot{display:grid;gap:10px;color:rgba(255,255,255,.48);padding:12px 6px 4px}
+.side-foot-meta{font-size:10px;letter-spacing:.02em}
+.side-foot b{color:#fff}
+
+/* Theme control: one explicit control, available in desktop rail and compact drawer. */
+.theme-control{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:3px;border:1px solid var(--folio-line);border-radius:999px;background:var(--folio-surface-2)}
+.sidebar .theme-control{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.07)}
+.theme-control button{
+  min-width:0;
+  min-height:32px;
+  border:0;
+  border-radius:999px;
+  background:transparent;
+  color:var(--folio-muted);
+  padding:6px 8px;
+  font-size:10px;
+  font-weight:650;
+  cursor:pointer;
+}
+.sidebar .theme-control button{color:rgba(255,255,255,.55)}
+.theme-control button[aria-pressed="true"]{
+  background:var(--folio-sunset);
+  color:#fff;
+  box-shadow:0 6px 18px rgba(84,38,95,.18);
+}
+.drawer-theme{display:grid;gap:8px;margin-top:auto;padding:16px 10px 8px;border-top:1px solid var(--folio-line)}
+.drawer-theme>span{font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--folio-muted)}
+
+/* Title bar and workspace: editorial, quiet, high contrast. */
+.topbar{
+  height:78px;
+  background:color-mix(in srgb,var(--folio-paper) 88%,transparent);
+  border-bottom:1px solid var(--folio-line);
+  box-shadow:none;
+  backdrop-filter:blur(24px) saturate(1.15);
+}
+.topbar h1{
+  color:var(--folio-ink);
+  font-family:var(--folio-display);
+  font-size:clamp(22px,2vw,28px);
+  font-weight:650;
+  letter-spacing:-.055em;
+}
+.topbar p{color:var(--folio-muted);letter-spacing:.02em}
+.topbar-menu,.topbar-refresh,.top-actions button,.panel-head button,.text-button{
+  background:transparent;
+  border:1px solid var(--folio-line);
+  color:var(--folio-ink);
+  box-shadow:none;
+}
+.top-actions button:hover,.panel-head button:hover,.text-button:hover{background:var(--folio-surface-2)}
+.source{background:transparent;border-color:var(--folio-line);color:var(--folio-muted)}
+.source.supabase{color:#2f8054}
+.source.demo{color:#a46b17}
+.sync-state{color:var(--folio-muted);border-left-color:var(--folio-line)}
+
+/* Core surfaces: B-style editorial cards. */
+.panel,.kpi,.dashboard-section,.temp-card,.analysis-block,.snapshot-section,.auth-card,.ui-alert-content,.install-dialog.ui-popover-content{
+  background:var(--folio-surface);
+  border-color:var(--folio-line);
+  box-shadow:none;
+}
+.panel,.dashboard-section,.analysis-block{border-radius:12px}
+.kpi{border-radius:10px}
+.panel h2,.temp-card h2,.snapshot-section h3,.analysis-hero .hero-name{color:var(--folio-ink)}
+.panel-head p,.note,.page-note span,.kpi span,.kpi small,.stock-id small,.drill-note,.analysis-hero .hero-meta{color:var(--folio-muted)}
+.kpi strong,.decision-main>b,.stock-id b{color:var(--folio-ink)}
+.page-note,.criteria-sources{background:var(--folio-surface-2);border-color:var(--folio-line)}
+.content{
+  position:relative;
+  isolation:isolate;
+  background:
+    radial-gradient(circle at 82% -8%,rgba(245,162,74,.075),transparent 27rem),
+    radial-gradient(circle at 68% 0%,rgba(163,79,120,.060),transparent 24rem),
+    var(--folio-paper);
+}
+
+/* Navigation/filters: monochrome structure with a sunset signal. */
+.segment,.mini-segment{background:transparent;border:0;gap:4px;padding:0}
+.segment button,.mini-segment button,.tabs button,.spotlight-tabs button{
+  border:1px solid transparent;
+  border-radius:999px;
+  background:transparent;
+  color:var(--folio-muted);
+  min-height:40px;
+  font-weight:560;
+}
+.segment button.on,.mini-segment button.on,.tabs button.on,.spotlight-tabs button[aria-selected=true]{
+  background:var(--folio-ink);
+  color:var(--folio-paper);
+  border-color:var(--folio-ink);
+  box-shadow:none;
+  font-weight:650;
+}
+.chip{background:transparent;border-color:var(--folio-line);color:var(--folio-muted)}
+.chip.on{background:var(--folio-ink);color:var(--folio-paper);border-color:var(--folio-ink)}
+.rs-period-toggle{border-bottom-color:var(--folio-line)}
+
+/* Fluid Market focal surface: the only strong chromatic gesture in the daily UI. */
+.discovery-home{--discovery-ink:var(--folio-ink);--discovery-accent:var(--folio-plum)}
+.discovery-home .focus-overview{border:0;border-radius:0;padding:20px 0;box-shadow:none;background:transparent}
+.leader-spotlight{
+  position:relative;
+  overflow:hidden;
+  background:var(--folio-surface);
+  color:var(--folio-ink);
+  border:1px solid var(--folio-line);
+  border-radius:18px;
+  padding:26px 26px 28px;
+  margin-top:14px;
+  box-shadow:none;
+  --discovery-ink:var(--folio-ink);
+  --discovery-accent:var(--folio-plum);
+}
+.leader-spotlight::before{
+  content:"";
+  position:absolute;left:0;right:0;top:0;height:3px;
+  background:var(--folio-sunset);
+}
+.leader-spotlight::after{
+  content:"";
+  position:absolute;right:-120px;top:-170px;width:360px;height:360px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,106,69,.13) 0%,rgba(163,79,120,.08) 38%,transparent 70%);
+  filter:blur(8px);
+  pointer-events:none;
+}
+.spotlight-tabs{position:relative;z-index:1;gap:4px;padding-bottom:15px;border-bottom:1px solid var(--folio-line)}
+.spotlight-tabs button{padding:9px 14px}
+.spotlight-tabs button[aria-selected=true]{background:var(--folio-ink);color:var(--folio-paper)}
+.spotlight-body{position:relative;z-index:1}
+.spotlight-body h3{
+  color:var(--folio-ink);
+  font-size:clamp(29px,3.4vw,42px);
+  font-weight:590;
+  letter-spacing:-.055em;
+  line-height:1.18;
+  margin:18px 0 7px;
+}
+.spotlight-identity,.spotlight-price>span,.spotlight-chart-caption,.spotlight-chart-caption small{color:var(--folio-muted)}
+.spotlight-price strong{
+  color:var(--folio-ink);
+  font-size:clamp(42px,5vw,60px);
+  font-weight:430;
+  letter-spacing:-.055em;
+}
+.spotlight-price strong span{font:inherit;color:inherit}
+.spotlight-chart{color:var(--folio-chart);margin-top:24px}
+.spotlight-chart.falling{color:var(--folio-chart-fall)}
+.spotlight-line{stroke-width:1.8}
+.spotlight-area{opacity:.055}
+.spotlight-chart circle{stroke:var(--folio-surface);stroke-width:2}
+.spotlight-slider::-webkit-slider-runnable-track{background:var(--folio-line)}
+.spotlight-slider::-webkit-slider-thumb{background:var(--folio-magenta)}
+.spotlight-slider::-moz-range-track{background:var(--folio-line)}
+.spotlight-slider::-moz-range-thumb{background:var(--folio-magenta)}
+.spotlight-chart-caption b{color:var(--folio-magenta);font-weight:650}
+.spotlight-chart.falling .spotlight-chart-caption b{color:var(--folio-chart-fall)}
+.spotlight-chart-empty{background:var(--folio-surface-2);color:var(--folio-muted)}
+.spotlight-evidence{border-color:var(--folio-line)}
+.spotlight-evidence span{color:var(--folio-muted)}
+.spotlight-evidence b{color:var(--folio-ink);font-weight:480}
+.spotlight-open,.primary-action,.ticker-entry button,.auth-submit{
+  background:var(--folio-black);
+  color:#fff;
+  border:0;
+  border-radius:999px;
+  box-shadow:none;
+}
+:root[data-theme="dark"] .spotlight-open,
+:root[data-theme="dark"] .primary-action,
+:root[data-theme="dark"] .ticker-entry button,
+:root[data-theme="dark"] .auth-submit{background:#f7f4f1;color:#111113}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .spotlight-open,
+  :root:not([data-theme]) .primary-action,
+  :root:not([data-theme]) .ticker-entry button,
+  :root:not([data-theme]) .auth-submit{background:#f7f4f1;color:#111113}
+}
+.spotlight-open:hover,.primary-action:hover{opacity:.88}
+
+/* Tables and decision rows: keep data readable, remove dashboard-blue chrome. */
+.industry-table th,.compact-industry-table thead th,.stock-rows-head{
+  background:var(--folio-surface-2);
+  color:var(--folio-muted);
+  border-bottom-color:var(--folio-line);
+}
+.industry-table td,.stock-row,.drill-stock-list>button,.stock-rows,.decision-row{
+  background:var(--folio-surface);
+  border-color:var(--folio-line);
+  color:var(--folio-ink);
+}
+.industry-table tbody tr:hover td,.stock-row:hover,.drill-stock-list>button:hover{background:var(--folio-surface-2)}
+.compact-industry-table th:first-child,.compact-industry-table td:first-child,.stock-row .stock-id{background:inherit}
+.compact-industry-table tbody tr.selected td,.compact-industry-table tbody tr.selected td:first-child{background:color-mix(in srgb,var(--folio-magenta) 9%,var(--folio-surface))}
+.discovery-home .mobile-sector-list .decision-row{background:var(--folio-surface);border-color:var(--folio-line);border-radius:12px}
+.rank{background:var(--folio-surface-2);color:var(--folio-muted)}
+
+/* Forms and dialogs inherit the current theme. */
+.toolbar input,.ticker-entry,.ticker-entry input,.auth-card label input,
+select,textarea,input[type="text"],input[type="number"],input[type="date"]{
+  background:var(--folio-surface);
+  color:var(--folio-ink);
+  border-color:var(--folio-line);
+}
+.toolbar input:focus,.ticker-entry input:focus,.auth-card label input:focus{
+  border-color:var(--folio-magenta);
+  box-shadow:0 0 0 3px rgba(163,79,120,.12);
+}
+.ui-dialog-overlay{background:rgba(8,8,10,.48);backdrop-filter:blur(8px)}
+.drill-sheet,.menu-drawer,.ui-dialog-content,.ui-alert-content,.auth-card,.install-dialog.ui-popover-content{
+  background:var(--folio-surface);
+  color:var(--folio-ink);
+  border-color:var(--folio-line);
+}
+.drill-head{background:var(--folio-surface);border-bottom-color:var(--folio-line)}
+.drill-head h2{color:var(--folio-ink)}
+.drill-head small{color:var(--folio-muted)}
+.drill-close,.drill-back,.menu-drawer-close{
+  background:transparent;
+  color:var(--folio-ink);
+  border-color:var(--folio-line);
+}
+.drill-guide,.action-box{background:var(--folio-surface-2);border-color:var(--folio-line)}
+.drill-checks{border-color:var(--folio-line)}
+.drill-checks span{background:var(--folio-surface-2);color:var(--folio-muted)}
+.drill-checks b{color:var(--folio-ink)}
+.menu-nav-group{border-color:var(--folio-line)}
+.menu-nav-group h3{color:var(--folio-muted)}
+.menu-drawer nav button{color:var(--folio-muted);border-radius:10px}
+.menu-drawer nav button:hover,.menu-drawer nav button:focus-visible{background:var(--folio-surface-2);color:var(--folio-ink)}
+.menu-drawer nav button.active{background:var(--folio-sunset-soft);color:var(--folio-ink)}
+.menu-drawer nav button.active .nav-icon{color:var(--folio-coral)}
+.drawer-refresh{background:transparent!important;color:var(--folio-ink)!important;border-color:var(--folio-line)!important}
+
+/* AG Grid follows the identity instead of forcing a light island in dark mode. */
+.ag-root-wrapper,.ag-root,.ag-body,.ag-body-viewport,.ag-center-cols-viewport,.ag-center-cols-container,
+.ag-header,.ag-row,.ag-cell,.ag-paging-panel{
+  background-color:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+  border-color:var(--folio-line)!important;
+}
+.ag-header,.ag-header-row,.ag-header-cell{background-color:var(--folio-surface-2)!important;color:var(--folio-muted)!important}
+.ag-row-hover .ag-cell{background-color:var(--folio-surface-2)!important}
+.ag-input-field-input{background:var(--folio-surface)!important;color:var(--folio-ink)!important}
+
+/* Mobile = Fluid Market: light editorial canvas + a restrained sunset current. */
+.mobile-bottom-nav{
+  background:color-mix(in srgb,var(--folio-surface) 92%,transparent);
+  border-top:1px solid var(--folio-line);
+  box-shadow:none;
+  backdrop-filter:blur(24px) saturate(1.15);
+}
+.mobile-bottom-nav button{color:var(--folio-muted);font-weight:580}
+.mobile-bottom-nav button.active{color:var(--folio-ink);background:none}
+.mobile-bottom-nav button.active::before{
+  content:"";
+  position:absolute;
+  top:4px;left:50%;width:22px;height:2px;transform:translateX(-50%);
+  border-radius:99px;background:var(--folio-sunset);
+}
+.mobile-bottom-nav button{position:relative}
+.mobile-brandbar{background:var(--folio-paper)}
+@media(max-width:1279px),(hover:none){
+  .segment button,.mini-segment button{min-height:44px}
+}
+@media(max-width:650px){
+  .content{
+    background:
+      radial-gradient(circle at 104% 0%,rgba(245,162,74,.12),transparent 19rem),
+      radial-gradient(circle at 78% -2%,rgba(163,79,120,.10),transparent 17rem),
+      var(--folio-paper);
+  }
+  .topbar{height:60px;padding:0 14px;background:color-mix(in srgb,var(--folio-paper) 91%,transparent)}
+  .topbar h1{font-size:22px;font-weight:640;letter-spacing:-.045em}
+  .leader-spotlight{margin:12px -2px 14px;padding:20px 16px 22px;border-radius:16px}
+  .spotlight-tabs{overflow-x:auto;scrollbar-width:none}
+  .spotlight-tabs::-webkit-scrollbar{display:none}
+  .spotlight-tabs button{padding:9px 12px;white-space:nowrap}
+  .spotlight-body h3{font-size:30px}
+  .spotlight-price{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+  .spotlight-price strong{font-size:44px}
+  .spotlight-chart svg{height:178px}
+  .discovery-home .dashboard-sector-panel,.dashboard-section,.temp-card,.analysis-block{
+    background:transparent;
+    border-left:0;border-right:0;border-radius:0;box-shadow:none;
+  }
+}
+
+/* Launch / photography treatment C: sunset light, soft depth, black/white typography. */
+.launch-overlay{background:var(--folio-paper)}
+.launch-screen{
+  position:relative;
+  overflow:hidden;
+  background:var(--folio-paper);
+  color:var(--folio-ink);
+}
+.launch-screen::before{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  background:
+    radial-gradient(ellipse at 22% 72%,rgba(84,38,95,.42) 0%,rgba(163,79,120,.26) 24%,transparent 48%),
+    radial-gradient(ellipse at 72% 68%,rgba(240,106,69,.38) 0%,rgba(245,162,74,.22) 28%,transparent 52%),
+    linear-gradient(180deg,transparent 32%,rgba(245,162,74,.08) 74%,transparent 100%);
+  filter:blur(42px) saturate(1.05);
+  transform:scale(1.08);
+  opacity:.72;
+  pointer-events:none;
+}
+.launch-screen::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 0 58%,color-mix(in srgb,var(--folio-paper) 56%,transparent) 100%);
+  pointer-events:none;
+}
+.launch-center,.launch-footer{position:relative;z-index:1}
+.launch-wordmark{filter:none}
+.launch-slogan{color:var(--folio-ink)!important;font-size:15px!important;letter-spacing:.08em!important;font-weight:600}
+.launch-description{color:var(--folio-muted)!important;max-width:560px;line-height:1.7}
+.launch-progress{background:var(--folio-line)!important}
+.launch-progress span{background:var(--folio-sunset)!important}
+.launch-footer{color:var(--folio-muted)}
+.fatal-error,.boot-fallback{background:var(--folio-paper);color:var(--folio-ink)}
+.fatal-error>div{background:var(--folio-surface);border-color:var(--folio-line);box-shadow:none}
+
+/* Photography utility for future editorial imagery: C treatment is consistent everywhere. */
+.folio-photo{
+  position:relative;
+  overflow:hidden;
+  background:var(--folio-black);
+}
+.folio-photo>img{
+  display:block;width:100%;height:100%;object-fit:cover;
+  filter:saturate(.92) contrast(1.03) brightness(.96);
+}
+.folio-photo::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(135deg,rgba(84,38,95,.10),transparent 42%,rgba(240,106,69,.10) 72%,rgba(245,162,74,.08));
+  mix-blend-mode:screen;
+}
+
+/* Explicit dark-mode cleanup for hard-coded legacy islands. */
+:root[data-theme="dark"] .stock-title,
+:root[data-theme="dark"] .checklist,
+:root[data-theme="dark"] .stock-rows,
+:root[data-theme="dark"] .drill-stock-list,
+:root[data-theme="dark"] .spotlight-evidence{border-color:var(--folio-line)}
+:root[data-theme="dark"] .metric-grid .kpi,
+:root[data-theme="dark"] .drill-summary .kpi,
+:root[data-theme="dark"] .snapshot-item,
+:root[data-theme="dark"] .signal-strip>div{background:var(--folio-surface-2);border-color:var(--folio-line)}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .stock-title,
+  :root:not([data-theme]) .checklist,
+  :root:not([data-theme]) .stock-rows,
+  :root:not([data-theme]) .drill-stock-list,
+  :root:not([data-theme]) .spotlight-evidence{border-color:var(--folio-line)}
+  :root:not([data-theme]) .metric-grid .kpi,
+  :root:not([data-theme]) .drill-summary .kpi,
+  :root:not([data-theme]) .snapshot-item,
+  :root:not([data-theme]) .signal-strip>div{background:var(--folio-surface-2);border-color:var(--folio-line)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:1ms!important;animation-duration:1ms!important;animation-iteration-count:1!important}
+}
