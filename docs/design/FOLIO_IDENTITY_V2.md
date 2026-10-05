@@ -25,8 +25,8 @@ Official references:
 
 Robinhood's neon green is not copied. Folio keeps its own identity:
 
-- **Base:** Sunset Editorial — black/white, warm paper, typographic hierarchy, sparse dividers.
-- **Accent:** Fluid Market — plum → magenta → coral → amber, used only for the xx brand mark, chart focus, selection/motion and launch atmosphere.
+- **Base on every device:** Sunset Editorial — black/white, warm paper, typographic hierarchy, flat rules, sparse dividers and minimal card chrome. Desktop, mobile and iPad use the same visual system.
+- **Accent only:** Fluid Market — plum → magenta → coral → amber is not a mobile theme. It is limited to the xx brand mark, a selected chart point/focus cue and the C-style photography/launch atmosphere. Core charts and navigation stay editorial/monochrome.
 - **Brand mark:** text-native `Folio xx`; `Folio` follows theme foreground, `xx` carries the sunset spectrum.
 - **App icon:** black field + large sunset xx. It must read at small iOS home-screen sizes and does not change with the in-app theme.
 - **Semantic finance colours:** positive/negative remain independent functional colours. Sunset colour never means gain/loss.
@@ -50,6 +50,10 @@ Compact Dashboard primary flow:
 13. ETF / market exploration.
 
 This is deliberately **not** a dense dashboard. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+
+## Mobile / iPad visual rule
+
+Compact layouts do not use a separate C/Fluid-Market UI. They use B/Sunset Editorial: plain warm-paper or near-black surfaces, monochrome chart line, text-led tabs, square/flat dividers, editorial evidence columns and list-like sector rows. Rounded cards, glowing gradient backgrounds and chromatic navigation are avoided. Sunset colour remains a small brand/focus accent so the product stays recognisably Folio without weakening financial legibility.
 
 ## Non-negotiable implementation rules
 
