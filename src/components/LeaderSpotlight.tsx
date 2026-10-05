@@ -75,7 +75,7 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
         <div><span>업종 순위</span><b>{row.group_rank!=null&&row.group_total?`${row.group_rank} / ${row.group_total}`:'—'}</b></div>
         <div><span>52W 고점 대비</span><b>{percent(row.high_52w_distance)}</b></div>
       </div>
-      <button type="button" className="spotlight-open" onClick={()=>onSelect(row)}>종목 분석 <span aria-hidden="true">↗</span></button>
+      <button type="button" className="spotlight-open" aria-label="이 종목 깊이 보기" onClick={()=>onSelect(row)}>종목 분석 <span aria-hidden="true">↗</span></button>
     </div>
   </div>
 }
