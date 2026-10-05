@@ -264,7 +264,7 @@ button:active{transform:scale(.985)}
 .spotlight-line{stroke-width:1.8}
 .spotlight-area{opacity:.055}
 .spotlight-chart circle{stroke:var(--folio-surface);stroke-width:2}
-.spotlight-slider{height:45px;min-height:45px}\n.spotlight-slider::-webkit-slider-runnable-track{background:var(--folio-line)}
+.spotlight-slider{height:45px;min-height:45px}\n.spotlight-slider{height:45px;min-height:45px}\n.spotlight-slider::-webkit-slider-runnable-track{background:var(--folio-line)}
 .spotlight-slider::-webkit-slider-thumb{background:var(--folio-magenta)}
 .spotlight-slider::-moz-range-track{background:var(--folio-line)}
 .spotlight-slider::-moz-range-thumb{background:var(--folio-magenta)}
