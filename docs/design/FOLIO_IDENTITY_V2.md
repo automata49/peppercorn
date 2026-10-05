@@ -60,6 +60,16 @@ This is deliberately **not** a dense dashboard. The first screen answers: *where
 
 Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper or near-black surfaces, monochrome chart line, text-led tabs, flat dividers, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
+## Visual Identity cleanup lock
+
+The active product identity is **Folio xx / Sunset Editorial B only**. Peppercorn may remain a repository or company/project name, but it is not a second visible brand in the app shell or launch screen.
+
+- Active visual assets are limited to the B wordmark marks, B app-icon family, B launch hero, B motif and the explicitly secondary C photography-treatment image.
+- Superseded punch-card, generic `folio-icon-*`, generated `folio-identity-*`, old `folio-app-icon-*`, legacy wordmark and generic `icon-*` assets must not remain in deployable source/root locations.
+- Launch footer uses the Folio xx lockup only; it must not show `logo.webp` or “Peppercorn Capital”.
+- Identity CSS must not keep an earlier text-native wordmark or alternate launch composition underneath the B Exact Lock.
+- Canonical visual-regression widths are **390 / 834 / 1366 / 1440 CSS px**. `npm run test:visual-identity` and `npm run test:identity` must pass before identity-related work is approved.
+
 ## Non-negotiable implementation rules
 
 - No change to leadership classification, RS, Trend Template, Position Growth, sector ranking or market data.

@@ -149,7 +149,6 @@ jobs:
           cp dist/manifest.webmanifest manifest.webmanifest
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
-          cp dist/logo.webp logo.webp
           # Keep every active Folio identity asset at the branch root too. GitHub Pages can
           # publish the root sync after the Actions artifact deploy, so omitting these files
           # leaves the live shell with broken wordmark / launch / motif image URLs.
@@ -169,7 +168,7 @@ jobs:
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets manifest.webmanifest sw.js discovery-layout.json logo.webp \
+          git add index.html assets manifest.webmanifest sw.js discovery-layout.json \
             folio-b-icon-180.png folio-b-icon-192.png folio-b-icon-512.png folio-b-icon-512-maskable.png \
             public/folio-b-icon-180.png public/folio-b-icon-192.png public/folio-b-icon-512.png public/folio-b-icon-512-maskable.png \
             folio-b-xx-light.png folio-b-xx-dark.png folio-b-launch-hero.webp folio-b-motif.webp folio-c-photography.webp \

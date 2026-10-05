@@ -17,12 +17,15 @@ Hard rules:
 - Preserve System / Light / Dark and persisted theme behavior.
 - Preserve semantic finance colours and all investment logic. Brand colour never changes gain/loss meaning, leadership class, RS, stage, sector rank or Position Growth rules.
 - Compact Dashboard uses the Folio brand bar rather than a duplicate Dashboard titlebar. Touch iPad follows the same B language.
+- The launch screen is Folio-only: no Peppercorn logo/text co-branding and no `logo.webp`.
+- Superseded `folio-app-icon-*`, `folio-icon-*`, `folio-identity-*`, generic `icon-*`, legacy wordmark and old Apple-touch assets must stay deleted.
+- The visual identity regression gate is fixed at 390 / 834 / 1366 / 1440 CSS px.
 
 Workflow:
 1. Inspect the authoritative B artwork and shared source components before editing.
 2. Keep one information hierarchy across breakpoints; change density, not identity or meaning.
 3. Verify phone 390px, iPad 834px, touch iPad Pro 1366px and desktop 1440px, including Light and Dark where affected.
-4. Run `npm run harness:check`, `npm run build`, `npm run test:identity`, then the relevant/full `npm run test:ui`.
+4. Run `npm run harness:check`, `npm run build`, `npm run test:visual-identity`, `npm run test:identity`, then the relevant/full `npm run test:ui`.
 5. Report measured behavior and exact test outcomes. Physical Safari remains unverified unless actually tested.
 
 Resolve paths from the Peppercorn repository root. If installed as a plugin outside Peppercorn, locate the repository first; do not apply these policies to another project.

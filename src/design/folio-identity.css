@@ -264,7 +264,8 @@ button:active{transform:scale(.985)}
 .spotlight-line{stroke-width:1.8}
 .spotlight-area{opacity:.055}
 .spotlight-chart circle{stroke:var(--folio-surface);stroke-width:2}
-.spotlight-slider{height:45px;min-height:45px}\n.spotlight-slider{height:45px;min-height:45px}\n.spotlight-slider::-webkit-slider-runnable-track{background:var(--folio-line)}
+.spotlight-slider{height:45px;min-height:45px}
+.spotlight-slider::-webkit-slider-runnable-track{background:var(--folio-line)}
 .spotlight-slider::-webkit-slider-thumb{background:var(--folio-magenta)}
 .spotlight-slider::-moz-range-track{background:var(--folio-line)}
 .spotlight-slider::-moz-range-thumb{background:var(--folio-magenta)}
@@ -405,41 +406,8 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   }
 }
 
-/* Launch / photography treatment C: sunset light, soft depth, black/white typography. */
-.launch-overlay{background:var(--folio-paper)}
-.launch-screen{
-  position:relative;
-  overflow:hidden;
-  background:var(--folio-paper);
-  color:var(--folio-ink);
-}
-.launch-screen::before{
-  content:"";
-  position:absolute;
-  inset:-18%;
-  background:
-    radial-gradient(ellipse at 22% 72%,rgba(84,38,95,.42) 0%,rgba(163,79,120,.26) 24%,transparent 48%),
-    radial-gradient(ellipse at 72% 68%,rgba(240,106,69,.38) 0%,rgba(245,162,74,.22) 28%,transparent 52%),
-    linear-gradient(180deg,transparent 32%,rgba(245,162,74,.08) 74%,transparent 100%);
-  filter:blur(42px) saturate(1.05);
-  transform:scale(1.08);
-  opacity:.72;
-  pointer-events:none;
-}
-.launch-screen::after{
-  content:"";
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 0 58%,color-mix(in srgb,var(--folio-paper) 56%,transparent) 100%);
-  pointer-events:none;
-}
-.launch-center{position:relative;z-index:1}
-.launch-footer{z-index:1}
-.launch-wordmark{filter:none}
-.launch-slogan{color:var(--folio-ink)!important;font-size:15px!important;letter-spacing:.08em!important;font-weight:600}
-.launch-description{color:var(--folio-muted)!important;max-width:560px;line-height:1.7}
-.launch-progress{background:var(--folio-line)!important}
-.launch-progress span{background:var(--folio-sunset)!important}
-.launch-footer{color:var(--folio-muted)}
+/* Launch identity is defined once in the B EXACT LOCK section below.
+   C remains photography treatment only. */
 .fatal-error,.boot-fallback{background:var(--folio-paper);color:var(--folio-ink)}
 .fatal-error>div{background:var(--folio-surface);border-color:var(--folio-line);box-shadow:none}
 
@@ -487,57 +455,9 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 
 
 /* =========================================================
-   Folio xx Visual Identity v2 — Robinhood-inspired hierarchy
-   User decision 2026-10-05: B editorial UI across devices + C only for photography/launch accents.
-   The benchmark is structural (focus, hierarchy, restraint), never a clone.
+   Sunset Editorial B product hierarchy
+   B EXACT LOCK below owns wordmark and loading identity.
    ========================================================= */
-
-.folio-wordmark-system{
-  display:inline-flex;
-  align-items:baseline;
-  gap:.08em;
-  font-family:var(--folio-display);
-  font-weight:760;
-  font-size:28px;
-  line-height:1;
-  letter-spacing:-.065em;
-  white-space:nowrap;
-  color:var(--folio-ink);
-}
-.folio-wordmark-system .folio-word{color:currentColor}
-.folio-wordmark-system .folio-xx{
-  display:inline-flex;
-  letter-spacing:-.16em;
-  padding-right:.08em;
-  background:var(--folio-sunset);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-  font-weight:800;
-}
-.sidebar .folio-wordmark-system{font-size:22px;color:#fff}
-.sidebar .folio-brand{padding:7px 10px 30px}
-.mobile-brand-home .folio-wordmark-system{font-size:30px}
-.menu-drawer .folio-wordmark-system{font-size:30px}
-.launch-wordmark-system{font-size:clamp(46px,9vw,72px);letter-spacing:-.075em}
-
-/* Loading = one restrained identity moment, not a second product UI. */
-.launch-screen{
-  background:
-    radial-gradient(circle at 24% 78%,rgba(84,38,95,.20),transparent 34%),
-    radial-gradient(circle at 78% 72%,rgba(240,106,69,.17),transparent 32%),
-    var(--folio-paper);
-}
-.launch-screen::before{
-  inset:-24%;
-  opacity:.86;
-  filter:blur(58px) saturate(1.06);
-}
-.launch-brand{display:flex;align-items:center;justify-content:center}
-.launch-slogan{margin-top:24px!important;color:var(--folio-ink)!important;font-weight:650!important;letter-spacing:.05em!important}
-.launch-description{margin:15px auto 0!important;max-width:560px!important;color:var(--folio-muted)!important;font-size:13px!important}
-.launch-progress{width:min(240px,56vw)!important;margin:26px auto 0!important;height:2px!important}
-.launch-footer{color:var(--folio-muted)!important}
 
 /* Dashboard shell: content first, chrome second. */
 .page-dashboard .content{max-width:1460px;margin:0 auto}
@@ -898,8 +818,6 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
 }
 
 @media(max-width:650px){
-  .launch-wordmark-system{font-size:48px}
-  .launch-description{max-width:86vw!important;font-size:11.5px!important}
   .page-shell-dashboard .spotlight-evidence span{font-size:9px}
   .page-shell-dashboard .focus-class-strip button span,
   .page-shell-dashboard .focus-class-strip button small{font-size:9px}
@@ -1339,7 +1257,15 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   border:0!important;
   background:transparent!important;
 }
-.launch-footer img{filter:grayscale(1);opacity:.7}
+.launch-footer{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
+}
+.launch-footer .folio-wordmark-text{font-size:20px}
+.launch-footer .folio-wordmark-mark{width:31px;height:17px;margin-left:4px}
+.launch-footer small{font-size:10px;letter-spacing:.04em;color:#8b8581}
 
 /* B motif + C photography treatment: identity interlude, secondary to market data. */
 .folio-identity-interlude{
@@ -1388,6 +1314,33 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   line-height:1.15;
   letter-spacing:-.04em;
   text-align:right;
+}
+
+/* B chart language is identical on desktop, phone and iPad.
+   Sunset colour is reserved for the selected point, never the chart chrome. */
+.page-shell-dashboard .spotlight-chart{color:var(--folio-ink)}
+.page-shell-dashboard .spotlight-line{stroke:var(--folio-ink)!important;stroke-width:2!important}
+.page-shell-dashboard .spotlight-area{fill:var(--folio-ink)!important;opacity:.035!important}
+.page-shell-dashboard .spotlight-chart circle{fill:var(--folio-coral)}
+.page-shell-dashboard .spotlight-periods{
+  border-bottom:1px solid var(--folio-line);
+}
+.page-shell-dashboard .spotlight-periods button{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--folio-muted);
+}
+.page-shell-dashboard .spotlight-periods button.on{
+  position:relative;
+  background:transparent;
+  color:var(--folio-ink);
+}
+.page-shell-dashboard .spotlight-periods button.on::after{
+  content:"";
+  position:absolute;
+  left:28%;right:28%;bottom:5px;height:1.5px;
+  background:var(--folio-ink);
 }
 
 /* B keeps data surfaces disciplined: neutral rules, minimal rounded chrome. */
