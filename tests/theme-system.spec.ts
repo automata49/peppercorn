@@ -22,7 +22,7 @@ test('desktop theme control persists Light Dark and System modes',async({page})=
   await control.getByRole('button',{name:'Light'}).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme','light')
   await expect.poll(()=>page.evaluate(()=>localStorage.getItem('folio-theme'))).toBe('light')
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#f8f5f1')
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#f4f1ec')
 
   await control.getByRole('button',{name:'System'}).click()
   await expect(page.locator('html')).not.toHaveAttribute('data-theme')
