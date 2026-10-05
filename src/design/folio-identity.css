@@ -885,6 +885,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   .page-shell-dashboard .dashboard-lower-grid{margin-top:22px}
   .page-shell-dashboard .focus-sector-panel{padding:22px 0 0!important}
   .page-shell-dashboard .dashboard-sector-head{padding:0!important}
+  .page-shell-dashboard .dashboard-sector-table-wrap{display:none!important}
   .page-shell-dashboard .mobile-sector-list{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(210px,78vw);overflow-x:auto;gap:10px;padding-bottom:4px;scroll-snap-type:x proximity}
   .page-shell-dashboard .mobile-sector-list .decision-row{scroll-snap-align:start}
   .page-shell-dashboard .mobile-bottom-nav{
