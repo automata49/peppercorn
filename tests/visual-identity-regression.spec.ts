@@ -58,7 +58,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       expect(box).not.toBeNull()
       expect(box!.height).toBeGreaterThanOrEqual(59.5)
       expect(box!.height).toBeLessThanOrEqual(60.5)
-      expect((await page.locator('.mobile-brandbar').evaluate(e=>getComputedStyle(e).backdropFilter)).includes('blur')).toBe(true)
+      expect(await page.locator('.mobile-brandbar').evaluate(e=>getComputedStyle(e).backgroundColor)).toContain('rgba')
+      expect(parseFloat(await page.locator('.mobile-brandbar').evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
       await expect(compactBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
       await expect(compactBrand.locator('.folio-xx-vector')).toBeVisible()
     }else{
