@@ -106,13 +106,14 @@ assert.equal(claudePlugin.version,'1.2.0','Claude harness plugin version must ma
 assert.equal(codexPlugin.version,'1.2.0','Codex harness plugin version must match exact-B bundle.');
 
 const expectedIcons=[
-  './folio-b-icon-192.png',
-  './folio-b-icon-512.png',
-  './folio-b-icon-512-maskable.png'
+  './folio-b-icon-192.png?v=b3',
+  './folio-b-icon-512.png?v=b3',
+  './folio-b-icon-512-maskable.png?v=b3'
 ];
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use only exact B app icons.');
 assert.equal(manifest.background_color,'#f4f1ec','Manifest paper color must match B editorial paper.');
 assert.equal(manifest.theme_color,'#f4f1ec','Manifest theme color must match B editorial paper.');
+assert(read('app/index.html').includes('folio-b-icon-180.png?v=b3'),'Apple touch icon must carry the B3 cache revision.');
 
 for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.tsx','.github/workflows/deploy.yml']){
   const content=read(file);
