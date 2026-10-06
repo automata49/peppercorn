@@ -153,14 +153,11 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
-  // The analysis list starts with dashboard leaders; SPY is neutral, so switch to the full list.
-  await page.locator('.analysis-browse > summary').click();
+  // SPY is neutral, so switch to the full analysis list.
   await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
-  const secondary=page.locator('.analysis-card .analysis-secondary');
-  if((await secondary.getAttribute('open'))===null)await secondary.locator(':scope > summary').click();
-  await page.locator('.analysis-more > summary').click();
+  await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Swing'}).click();
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위50');
