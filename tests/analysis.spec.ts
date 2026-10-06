@@ -15,7 +15,7 @@ async function openAnalysis(page:Page){
   await page.locator('.menu-drawer').getByRole('button',{name:'종목 분석'}).click()
 }
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
- test(view.name+' stock analysis shows Swing, Position and my analysis',async({browser})=>{
+ test(view.name+' stock analysis shows Analysis, Financials and Thesis',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
   const page=await context.newPage()
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
@@ -33,7 +33,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await browse.getByRole('tab',{name:'핵심'}).click()
   await list.locator('> button').filter({hasText:'TEST0'}).click()
   const card=page.locator('.analysis-body')
-  await card.getByRole('tab',{name:'Position'}).click()
+  await card.getByRole('tab',{name:'Financials'}).click()
   const panel=card.locator('.position-panel')
   await expect(panel.locator('.position-status')).toHaveText('라벨 검증 중')
   await expect(panel.locator('.position-label-card strong')).toHaveText(['검증 중','검증 중','검증 중','검증 중'])
@@ -62,9 +62,10 @@ test('stock analysis survives a failed Position load',async({page})=>{
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openAnalysis(page)
-  await page.locator('.analysis-card').getByRole('tab',{name:'Position'}).click()
-  await expect(page.locator('.analysis-card .position-empty')).toContainText('불러오지 못했습니다')
-  await expect(page.locator('.analysis-card .checklist')).toHaveCount(0)
-  await page.locator('.analysis-card').getByRole('tab',{name:'Swing'}).click()
-  await expect(page.locator('.analysis-card .checklist')).toBeVisible()
+  const card=page.locator('.analysis-card')
+  await card.getByRole('tab',{name:'Financials'}).click()
+  await expect(card.locator('.position-empty')).toContainText('불러오지 못했습니다')
+  await expect(card.locator('.checklist')).toHaveCount(0)
+  await card.getByRole('tab',{name:'Analysis'}).click()
+  await expect(card.locator('.checklist')).toBeVisible()
 })

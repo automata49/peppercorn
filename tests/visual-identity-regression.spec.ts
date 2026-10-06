@@ -73,16 +73,28 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg')
     if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
 
-    const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
+    const leader=page.locator('.leadership-overview')
+    await expect(leader).toBeVisible()
+    expect(await leader.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(11, 11, 13)')
     const line=page.locator('.spotlight-line')
     await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe(bodyColor)
+    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(247, 244, 241)')
     expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
 
     const period=page.locator('.spotlight-periods button.on')
     expect(parseFloat(await period.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
     expect(await period.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
 
+    if(view.compact){
+      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+    }else{
+      await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+    }
+    const analysis=page.locator('.analysis-page')
+    await expect(analysis).toBeVisible()
+    expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(11, 11, 13)')
+    await expect(analysis.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
+    await expect(analysis.locator('.folio-insight')).toBeVisible()
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
     await context.close()
   })

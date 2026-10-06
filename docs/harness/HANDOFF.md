@@ -1,3 +1,9 @@
+## Folio visual quality v2 — 2026-10-06
+
+Latest user review supersedes the miniature app-icon note below. The approved B boards are now treated as a product-quality contract, not merely a palette/mood reference. The master double-x uses a centered negative diamond; installed xx occupies about 58% of the near-black tile with ~1.77:1 bounding aspect. Wordmark and icon share the same vector geometry. Leadership Overview and Analysis are near-black B focal investing surfaces inside the warm editorial shell. The duplicated leadership count layer is removed.
+
+Analysis keeps the proven PriceRsChart composition, then uses four depth tabs: Overview (deterministic Folio Insight + essentials), Analysis (leadership/Swing), Financials (Position filing evidence), Thesis (user judgement/record). Folio Insight is rule-based signal synthesis and must not be described as a live LLM opinion until a provider passes the analyst contract/evals.
+
 ## Folio B vector identity + unified analysis experience — 2026-10-06
 
 User requested a second Visual Identity pass plus an information-architecture redesign. This change keeps the attached B / Sunset Editorial concept authoritative while prohibiting copied/cropped wordmark and illustration assets.

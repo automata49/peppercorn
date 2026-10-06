@@ -12,8 +12,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // Unified Home: one leadership decision surface replaces the duplicate Focus roster/additional view.
   await expect(page.locator('.leadership-decision')).toBeVisible();
   await expect(page.locator('.leadership-pulse')).toBeVisible();
-  await expect(page.locator('.focus-summary-main strong')).toHaveText('4');
+  await expect(page.locator('.focus-summary-main')).toHaveCount(0);
+  await expect(page.locator('.leadership-pulse-stats')).toHaveCount(0);
   await expect(page.locator('.focus-class-strip button')).toHaveCount(3);
+  await expect(page.locator('.focus-class-strip button').first()).toContainText('Core Leaders');
   await expect(page.locator('.focus-roster')).toHaveCount(0);
   await expect(page.locator('.leader-detail')).toHaveCount(0);
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
@@ -161,7 +163,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
-  await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Swing'}).click();
+  await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click();
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위50');

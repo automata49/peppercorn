@@ -27,7 +27,7 @@ The **attached concept board's column 02 — “Sunset Editorial” (B)** is the
 
 Exact B rules:
 - **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Product UI renders “Folio” as live Inter / Neue-Grotesk typography and renders the xx from the original vector geometry in `src/components/FolioMark.tsx`. No screenshot crop, raster wordmark, pasted lettering or plain-text xx is allowed. The vector uses the B proportions and plum → magenta → coral/amber transition and is the shared source-of-truth geometry for the visible mark.
-- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The mark occupies approximately **31.25% of tile width** with a **1.72:1 bounding-box aspect**, optically centered. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
+- **App icon:** B's near-black rounded-square tile with the assertive centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The approved-board mark occupies approximately **58% of tile width** with an approximately **1.77:1 bounding-box aspect**, optically centered. The central negative diamond is mandatory. The left X transitions from tile-contrast ink/white into Plum/Magenta; the right X transitions Magenta → Coral → Amber. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
 - **Typography:** Inter / Neue-Grotesk style grotesk. Large headings are clean, confident and tightly set; captions use restrained uppercase tracking. Avoid decorative type or overly rounded fintech styling.
 - **Motif:** `public/folio-b-motif.svg` is an original vector construction of B's editorial language: monochrome rock/coast silhouette, lone human figure, sparse technical line work and an isolated warm sun/disc. It is not a crop or pasted artwork from the concept board. The flowing multicolour wave belongs to C and is not Folio's primary motif.
 - **Photography:** C's photography *treatment* may be borrowed: warm sunset light, shallow depth of field, human-scale optimism, restrained blur/bokeh. It is photography treatment only, not a C UI system.
@@ -62,14 +62,15 @@ Folio uses one linear analysis journey inspired by Robinhood's content-first sim
 1. **Leadership scope:** 핵심 / 후보 / 전환 / 전체 / Position.
 2. **Stock selection:** one persistent, readable list under search; no second hidden “목록에서 고르기” layer.
 3. **Price momentum:** the existing `PriceRsChart` composition and interaction stay intact. Identity changes are limited to B typography, surfaces, rules and restrained accent use.
-4. **Depth tabs:** Overview / Swing / Position replace nested “상세 데이터” + “상세 지표 · 공시 더 보기” disclosures.
-5. **My analysis:** remains the user's judgement/record area and stays separate from automated Swing/Position evidence.
+4. **Depth tabs:** Overview / Analysis / Financials / Thesis replace nested disclosures. Overview owns the structured Folio Insight and essential stats; Analysis owns leadership/Swing evidence; Financials owns filed Position fundamentals; Thesis owns the user's own judgement and record.
+5. **Folio Insight:** is currently deterministic structured signal synthesis from loaded price/RS/filing data. It may look editorial and thesis-led, but must not be presented as a live generative-AI opinion until a provider passes the analyst contract/evals.
+6. **My Thesis:** remains the user's judgement/record area and stays separate from automated evidence.
 
-The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. It is presentation-only and never changes or implies an investment score.
+The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. The ring and the three Core / Watch / Turnaround navigation cards are one decision surface; do not duplicate the same counts in a second summary block. It is presentation-only and never changes or implies an investment score.
 
 ## Mobile / iPad visual rule
 
-Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper or near-black surfaces, monochrome chart line, text-led tabs, flat dividers, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
+Desktop, mobile and iPad all use B/Sunset Editorial. Warm editorial paper is the shell; the approved dark mobile/product boards permit near-black **focal investing surfaces** for Leadership Overview and Analysis so the analytical path feels concentrated and premium. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper shell, near-black focal analysis surfaces, restrained sunset accents, text-led tabs, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Visual Identity cleanup lock
 

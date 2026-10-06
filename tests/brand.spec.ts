@@ -93,7 +93,7 @@ test('B wordmark, hero, motif and C photography assets are deployable',async({re
  }
 })
 
-test('B app icon keeps the compact xx scale and proportion from concept B',async({page})=>{
+test('B app icon keeps the approved board-scale xx and negative diamond',async({page})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const box=await page.evaluate(async()=>{
    const img=new Image()
@@ -111,16 +111,18 @@ test('B app icon keeps the compact xx scale and proportion from concept B',async
        if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y
      }
    }
-   return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2}
+   const p=(x:number,y:number)=>{const i=(y*512+x)*4;return [data[i],data[i+1],data[i+2],data[i+3]]}
+   return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2,center:p(256,256)}
  })
- expect(box.w/512).toBeGreaterThanOrEqual(.29)
- expect(box.w/512).toBeLessThanOrEqual(.33)
- expect(box.h/512).toBeGreaterThanOrEqual(.16)
- expect(box.h/512).toBeLessThanOrEqual(.20)
- expect(box.w/box.h).toBeGreaterThanOrEqual(1.65)
- expect(box.w/box.h).toBeLessThanOrEqual(1.80)
+ expect(box.w/512).toBeGreaterThanOrEqual(.55)
+ expect(box.w/512).toBeLessThanOrEqual(.61)
+ expect(box.h/512).toBeGreaterThanOrEqual(.30)
+ expect(box.h/512).toBeLessThanOrEqual(.36)
+ expect(box.w/box.h).toBeGreaterThanOrEqual(1.70)
+ expect(box.w/box.h).toBeLessThanOrEqual(1.84)
  expect(Math.abs(box.cx-255.5)).toBeLessThanOrEqual(5)
  expect(Math.abs(box.cy-255.5)).toBeLessThanOrEqual(5)
+ expect(Math.max(...box.center.slice(0,3))).toBeLessThan(40)
 })
 
 test('share metadata carries Folio xx and the B icon',async({page,request})=>{

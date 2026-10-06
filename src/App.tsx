@@ -23,6 +23,7 @@ import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, ini
 import { loadLeaderboard } from './lib/rest'
 import { pushRecent, readRecent, type RecentStock } from './lib/search'
 import { AnalysisSheet, CheckupSummary, CompareView, StockSearch } from './components/AnalysisWorkbench'
+import { FolioInsight } from './components/FolioInsight'
 import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
@@ -718,7 +719,7 @@ export default function App(){
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'all'|'position'>('core')
-  const [analysisSection,setAnalysisSection]=useState<'overview'|'swing'|'position'>('overview')
+  const [analysisSection,setAnalysisSection]=useState<'overview'|'analysis'|'financials'|'thesis'>('overview')
   const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
   // Compare tray (<=4 stocks), remembered per device as a convenience.
@@ -964,7 +965,6 @@ export default function App(){
     turns:focusRows.filter(r=>leadership(r)==='강세 전환').length
   }
   const broadLeaderCount=summaryGroups.core.length+summaryGroups.candidates.length+summaryGroups.turns.length
-  const focusFilterLabel=!flagFile?'실적 데이터 준비 중':lensFilter.growthOnly?'실적 성장 필터 적용':'실적 성장 필터 해제'
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),
@@ -1094,14 +1094,11 @@ export default function App(){
         </div>
         <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
         <div className="leadership-decision">
-          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포"/>
-          <div className="focus-summary">
-            <div className="focus-summary-main"><span>FOCUS</span><strong>{focusRows.length}</strong><small>{focusFilterLabel} · 대표 리더만 먼저 보여줍니다.</small></div>
-            <div className="focus-class-strip" aria-label="분석 허브 분류">
-              <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{leadCount}</b><small>Core Leaders</small></button>
-              <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{candidateCount}</b><small>Watch Candidates</small></button>
-              <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{turnCount}</b><small>Turnaround</small></button>
-            </div>
+          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포" showStats={false}/>
+          <div className="leadership-class-nav focus-class-strip" aria-label="리더십 분류">
+            <button type="button" onClick={()=>showStockGroup('core')}><span>Core Leaders</span><b>{leadCount}</b><small>핵심 주도</small></button>
+            <button type="button" onClick={()=>showStockGroup('candidates')}><span>Watch Candidates</span><b>{candidateCount}</b><small>주도 후보</small></button>
+            <button type="button" onClick={()=>showStockGroup('turns')}><span>Turnaround</span><b>{turnCount}</b><small>강세 전환</small></button>
           </div>
         </div>
         <div className="leadership-next">
@@ -1281,62 +1278,64 @@ export default function App(){
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
     const addWatch=()=>{if(selected&&!inWatch)addTickerRecord('watchlist',selected.market+':'+selected.ticker)}
     const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
-    const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);window.setTimeout(()=>document.getElementById('analysis-judgement')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
+    const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');window.setTimeout(()=>document.querySelector('.analysis-detail-tabs')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     content=<><div className="analysis-page">
       <section className="analysis-hub-head">
-        <div className="analysis-hub-copy"><span>ANALYSIS HUB</span><h2>시장 리더십에서 한 종목의 판단까지</h2><p>분류 → 종목 선택 → 가격 모멘텀 → Swing / Position → 내 판단의 한 흐름으로 정리했습니다.</p></div>
-        <LeadershipPulse counts={analysisCounts} label="전체 리더십 분포"/>
+        <div className="analysis-hub-copy"><span>ANALYSIS HUB</span><h2>더 많은 정보가 아니라, 더 선명한 판단.</h2><p>리더십 → 가격 모멘텀 → 구조화된 Insight → 재무 → Thesis 순서로 한 종목을 깊게 봅니다.</p></div>
+        <LeadershipPulse counts={analysisCounts} label="전체 리더십 분포" showStats={false}/>
       </section>
       <div className="analysis-finder">
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
         <div className="analysis-browse">
           <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['core','핵심'],['candidates','후보'],['turns','전환'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
-          <div className="stock-list" aria-label="분석 종목 목록">{scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{leadership(r)} · {r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
+          <div className="stock-list analysis-idea-list" aria-label="분석 종목 목록">{scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}>
+            <span className="analysis-list-copy"><b>{r.name||r.ticker}</b><small>{r.market} · {r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</small><em>{leadership(r)} · {r.industry} · {stageLabel(r.stage)}</em></span>
+            <span className="analysis-list-signal"><b>RS {r.rs_rank==null?'—':Math.round(r.rs_rank)}</b><small>20D {pct(r.return_20d)}</small></span>
+          </button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
         </div>
       </div>
       {selected?<div className="analysis-body">
         <div className="analysis-main analysis-card">
           <section className="analysis-block analysis-price-momentum"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>
           <nav className="analysis-detail-tabs" role="tablist" aria-label="종목 분석 영역">
-            {([['overview','Overview'],['swing','Swing'],['position','Position']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
+            {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
           </nav>
           <div className="analysis-secondary">
             {analysisSection==='overview'&&<div className="analysis-secondary-body">
-              <section className="analysis-block"><h3 className="block-title">한눈에 보기</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
-              {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
-                <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
-              <section className="analysis-block"><h3 className="block-title">주요 지표</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
-              <section className="analysis-block"><h3 className="block-title">같은 산업 종목</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
+              <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)}/></section>
+              <section className="analysis-block"><h3 className="block-title">Essential Stats</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
+              <section className="analysis-block"><h3 className="block-title">Same Industry</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
+              {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">Compare <small>{compareRows.length}/4</small></h3><CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
             </div>}
-            {analysisSection==='swing'&&<div className="analysis-secondary-body">
+            {analysisSection==='analysis'&&<div className="analysis-secondary-body">
+              <section className="analysis-block"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
               <section className="analysis-block"><h3 className="analysis-part">Swing · 모멘텀</h3>
                 <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
                 <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
               </section>
             </div>}
-            {analysisSection==='position'&&<div className="analysis-secondary-body">
-              <section className="analysis-block"><h3 className="analysis-part">Position · 펀더멘털</h3>
-                <PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/>
+            {analysisSection==='financials'&&<div className="analysis-secondary-body">
+              <section className="analysis-block"><h3 className="analysis-part">Financial Snapshot · Position</h3><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
+            </div>}
+            {analysisSection==='thesis'&&<div className="analysis-secondary-body">
+              <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
+                <div className="thesis-head"><div><span>MY THESIS</span><h3>내 분석</h3></div><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
+                <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
+                <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
+                <div className="judgement-actions">
+                  <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
+                  <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
+                  {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
+                </div>
               </section>
             </div>}
           </div>
         </div>
-        <aside className="analysis-judgement" id="analysis-judgement" aria-label="내 판단">
-          <h3 className="analysis-part">내 분석</h3>
-          <div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div>
-          <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. Swing과 Position은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</p>
-          <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
-          <div className="judgement-actions">
-            <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
-            <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
-            {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
-          </div>
-        </aside>
         <div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
           <button type="button" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★':'☆'}</button>
           <button type="button" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</button>
-          <button type="button" className="primary" onClick={goJudgement}>{record?'내 분석 보기':'분석 기록 쓰기'}</button>
+          <button type="button" className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</button>
         </div>
       </div>:<p className="empty">종목을 검색하거나 목록에서 고르세요.</p>}
       </div>
