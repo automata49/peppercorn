@@ -12,6 +12,7 @@ import { PriceRsChart } from './components/PriceRsChart'
 import { useElementWidth } from './lib/useElementWidth'
 import { animateSurface } from './motion/system'
 import { LeaderSpotlight } from './components/LeaderSpotlight'
+import { LeadershipPulse } from './components/LeadershipPulse'
 import { useDiscoveryLayout } from './lib/discoveryLayout'
 import { ProgressiveDisclosure } from './components/ProgressiveDisclosure'
 import { AuthModal } from './components/AuthModal'
@@ -762,8 +763,8 @@ export default function App(){
   const flagFile=useStockFlags()
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
-  const [analysisScope,setAnalysisScope]=useState<'leaders'|'all'|'position'>('leaders')
-  const [analysisDetailsOpen,setAnalysisDetailsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
+  const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'all'|'position'>('core')
+  const [analysisSection,setAnalysisSection]=useState<'overview'|'swing'|'position'>('overview')
   const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
   // Compare tray (<=4 stocks), remembered per device as a convenience.
@@ -1138,24 +1139,21 @@ export default function App(){
           <button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 후보 {broadLeaderCount} →</button>
         </div>
         <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
-        <div className="focus-summary">
-          <div className="focus-summary-main"><span>Focus</span><strong>{focusRows.length}</strong><small>상위 업종 우선 · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목 · {focusFilterLabel}</small></div>
-          <div className="focus-class-strip" aria-label="포커스 분류">
-            <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{focusCounts.core}</b><small>전체 {leadCount}</small></button>
-            <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{focusCounts.candidates}</b><small>전체 {candidateCount}</small></button>
-            <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{focusCounts.turns}</b><small>전체 {turnCount}</small></button>
+        <div className="leadership-decision">
+          <LeadershipPulse counts={focusCounts} label="포커스 리더십 분포"/>
+          <div className="focus-summary">
+            <div className="focus-summary-main"><span>FOCUS</span><strong>{focusRows.length}</strong><small>{focusFilterLabel} · 대표 리더만 먼저 보여줍니다.</small></div>
+            <div className="focus-class-strip" aria-label="분석 허브 분류">
+              <button type="button" onClick={()=>{setAnalysisScope('core');setPage('analysis')}}><span>핵심</span><b>{focusCounts.core}</b><small>Core Leaders</small></button>
+              <button type="button" onClick={()=>{setAnalysisScope('candidates');setPage('analysis')}}><span>후보</span><b>{focusCounts.candidates}</b><small>Watch Candidates</small></button>
+              <button type="button" onClick={()=>{setAnalysisScope('turns');setPage('analysis')}}><span>전환</span><b>{focusCounts.turns}</b><small>Turnaround</small></button>
+            </div>
           </div>
         </div>
-        <details className="dashboard-disclosure focus-roster"><summary>포커스 목록 {focusRows.length} · 업종별로 보기</summary><p className="focus-roster-note">{focusFilterLabel} · 업종당 최대 {FOCUS_CONFIG.maxPerGroup}종목. 표시 순서는 기존 포커스 기준입니다.</p><FocusLeaderList rows={focusRows} onSelect={chartOpenStock}/></details>
-        <details className="dashboard-disclosure leader-detail">
-          <summary>추가 보기 · 모멘텀 / 현재가</summary>
-          <div className="focus-actions">
-            <button type="button" onClick={()=>showStockGroup('corrections')}>조정 중 <b>{correctionCount}</b></button>
-            <button type="button" onClick={()=>showStockGroup('bigcap')}>대형 주도주 <b>{bigCaps.rows.length}</b></button>
-          </div>
-          <div className="mini-segment leader-basis" role="group" aria-label="주도 종목 기준">{([['close','종가 기준'],['live','현재가 기준']] as const).map(([key,text])=><button key={key} type="button" aria-pressed={leaderBasis===key} className={leaderBasis===key?'on':''} onClick={()=>setLeaderBasis(key)}>{text}</button>)}</div>
-          {leaderBasis==='close'?<LeaderRsChart rows={focusRows} onSelect={chartOpenStock}/>:<div className="live-leaders"><LiveLeaders pool={focusRows} live={source==='supabase'} onSelect={row=>{setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}}/></div>}
-        </details>
+        <div className="leadership-next">
+          <span>목록·세부 지표·내 판단은 분석 허브에서 한 번에 이어집니다.</span>
+          <button type="button" className="dashboard-section-action" onClick={()=>setPage('analysis')}>분석 허브 열기 →</button>
+        </div>
       </section>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
@@ -1309,8 +1307,16 @@ export default function App(){
         <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div>
       </ProgressiveDisclosure></>
   }else if(page==='analysis'){
-    const scoped=visible.filter(r=>analysisScope==='all'||(analysisScope==='leaders'?LEADING_CLASSES.has(leadership(r)):position.rows.has(positionKey(r.market,r.ticker))))
-    const pickStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
+    const analysisClass={'core':'핵심 주도','candidates':'주도 후보','turns':'강세 전환'} as const
+    const scoped=visible.filter(r=>analysisScope==='all'
+      ||analysisScope==='position'&&position.rows.has(positionKey(r.market,r.ticker))
+      ||analysisScope!=='position'&&analysisScope!=='all'&&leadership(r)===analysisClass[analysisScope])
+    const analysisCounts={
+      core:visible.filter(r=>leadership(r)==='핵심 주도').length,
+      candidates:visible.filter(r=>leadership(r)==='주도 후보').length,
+      turns:visible.filter(r=>leadership(r)==='강세 전환').length,
+    }
+    const pickStock=(r:LeaderRow)=>{setSelected(r);setAnalysisSection('overview');setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
     const positionOf=(r:LeaderRow)=>position.rows.get(positionKey(r.market,r.ticker))
     const keyOf=(r:LeaderRow)=>r.market+'|'+r.ticker
     const record=selected?(enrichedAnalysis as EditableRow[]).find(r=>r.market===selected.market&&r.ticker===selected.ticker):undefined
@@ -1318,37 +1324,47 @@ export default function App(){
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
     const addWatch=()=>{if(selected&&!inWatch)addTickerRecord('watchlist',selected.market+':'+selected.ticker)}
-    const toggleCompare=()=>{if(!selected)return;if(!inCompare)setAnalysisDetailsOpen(true);setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
+    const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);window.setTimeout(()=>document.getElementById('analysis-judgement')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     content=<><div className="analysis-page">
+      <section className="analysis-hub-head">
+        <div className="analysis-hub-copy"><span>ANALYSIS HUB</span><h2>시장 리더십에서 한 종목의 판단까지</h2><p>분류 → 종목 선택 → 가격 모멘텀 → Swing / Position → 내 판단의 한 흐름으로 정리했습니다.</p></div>
+        <LeadershipPulse counts={analysisCounts} label="전체 리더십 분포"/>
+      </section>
       <div className="analysis-finder">
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
-        <details className="analysis-browse"><summary>목록에서 고르기</summary>
-          <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['leaders','주도 종목'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
-          <div className="stock-list">{scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
-        </details>
+        <div className="analysis-browse">
+          <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['core','핵심'],['candidates','후보'],['turns','전환'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
+          <div className="stock-list" aria-label="분석 종목 목록">{scoped.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}><b>{r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</b><span>{r.name}</span><em>{leadership(r)} · {r.industry} · {stageLabel(r.stage)}</em></button>)}{!scoped.length&&<p className="empty">선택한 범위에 종목이 없습니다.</p>}</div>
+        </div>
       </div>
       {selected?<div className="analysis-body">
         <div className="analysis-main analysis-card">
-          <section className="analysis-block"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>
-          <section className="analysis-block"><h3 className="block-title">한눈에 보기</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
-          <details className="analysis-secondary" open={analysisDetailsOpen} onToggle={e=>setAnalysisDetailsOpen(e.currentTarget.open)}>
-            <summary><span>상세 데이터</span><small>{compareRows.length?`비교 ${compareRows.length} · `:''}주요 지표 · 동종 · 공시</small></summary>
-            <div className="analysis-secondary-body">
+          <section className="analysis-block analysis-price-momentum"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>
+          <nav className="analysis-detail-tabs" role="tablist" aria-label="종목 분석 영역">
+            {([['overview','Overview'],['swing','Swing'],['position','Position']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
+          </nav>
+          <div className="analysis-secondary">
+            {analysisSection==='overview'&&<div className="analysis-secondary-body">
+              <section className="analysis-block"><h3 className="block-title">한눈에 보기</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
               {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">종목 비교 <small>{compareRows.length}/4</small></h3>
                 <CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
               <section className="analysis-block"><h3 className="block-title">주요 지표</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
               <section className="analysis-block"><h3 className="block-title">같은 산업 종목</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
-              <details className="analysis-block analysis-more"><summary>상세 지표 · 공시 더 보기</summary>
-                <h3 className="analysis-part">Swing · 모멘텀</h3>
+            </div>}
+            {analysisSection==='swing'&&<div className="analysis-secondary-body">
+              <section className="analysis-block"><h3 className="analysis-part">Swing · 모멘텀</h3>
                 <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
                 <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
-                <h3 className="analysis-part">Position · 펀더멘털</h3>
+              </section>
+            </div>}
+            {analysisSection==='position'&&<div className="analysis-secondary-body">
+              <section className="analysis-block"><h3 className="analysis-part">Position · 펀더멘털</h3>
                 <PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/>
-              </details>
-            </div>
-          </details>
+              </section>
+            </div>}
+          </div>
         </div>
         <aside className="analysis-judgement" id="analysis-judgement" aria-label="내 판단">
           <h3 className="analysis-part">내 분석</h3>
