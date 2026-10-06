@@ -1428,7 +1428,7 @@ export default function App(){
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
         <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>시장 지표</DialogTitle><DialogDescription className="market-context" title={metricContext}>{metricContext}</DialogDescription></div>
-        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <section className="market-internals">
         <div className="market-metric-grid">
@@ -1446,7 +1446,7 @@ export default function App(){
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
         <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>RS 순위 중앙값 기준 내림차순 · 주도 분류와 등락 5D~52W 전체 보기</DialogDescription></div>
-        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
         {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
@@ -1469,7 +1469,7 @@ export default function App(){
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
         <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>{chosenEtfIndustry?`ETF 주도 산업 · ${etfIndustryLabel(chosenEtfIndustry.market,chosenEtfIndustry.industry)}`:'ETF 요약 · 전체'}</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
-        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="drill-summary-list"><StockRows label="ETF" rows={dialogEtfRows} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/></div>
     </DialogContent>
@@ -1479,7 +1479,7 @@ export default function App(){
       <div className="drill-handle"/>
       <div className="drill-head">
         <div>{drillStock&&<button type="button" className="drill-back" onClick={backFromDetail} aria-label={`종목 상세에서 ${detailBackLabel==='뒤로'?'나가기':detailBackLabel}`}>‹ {detailBackLabel}</button>}<small>{summaryTab?lensMarket:drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${summaryTabNames[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
-        <DialogClose asChild><button className="drill-close" aria-label="닫기">×</button></DialogClose>
+        <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
         <div className="drill-meta drill-animate"><ValuePill tone={leadTone(leadership(drillStock))}>{leadership(drillStock)||'관찰'}</ValuePill><ValuePill tone={stageTone(drillStock.stage)}>{stageLabel(drillStock.stage)}</ValuePill><span>{drillStock.market} · {drillStock.ticker}</span></div>
