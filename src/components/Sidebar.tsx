@@ -5,18 +5,20 @@ import { FolioWordmark } from './FolioWordmark'
 
 const pages:[string,AppIconName,string][]=[
   ['dashboard','home','Home'],
-  ['analysis','analysis','종목 분석'],
-  ['temperature','temperature','시장 온도계'],
+  ['signal','sectors','Market Signal'],
+  ['leadership','leaderboard','Leadership'],
+  ['analysis','analysis','Stock'],
+  ['journal','journal','Decision'],
   ['watchlist','watchlist','Watchlist'],
   ['portfolio','portfolio','Portfolio'],
-  ['journal','journal','Journal'],
+  ['temperature','temperature','시장 온도계'],
   ['leaderboard','leaderboard','Leaderboard'],
   ['universe','universe','Universe'],
   ['settings','settings','Settings']
 ]
 const pageGroups=[
-  ['핵심',['dashboard','analysis','temperature','watchlist']],
-  ['기록',['portfolio','journal']],
+  ['투자 흐름',['dashboard','signal','leadership','analysis','journal']],
+  ['추적',['watchlist','portfolio','temperature']],
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 
@@ -112,8 +114,8 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
       <button className={page==='dashboard'?'active':''} onClick={()=>setPage('dashboard')}><AppIcon name="home"/><b>홈</b></button>
       <button className={page==='signal'?'active':''} onClick={()=>setPage('signal')}><AppIcon name="sectors"/><b>신호</b></button>
-      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="analysis"/><b>분석</b></button>
-      <button className={page==='watchlist'?'active':''} onClick={()=>setPage('watchlist')}><AppIcon name="watchlist"/><b>관심</b></button>
+      <button className={page==='leadership'?'active':''} onClick={()=>setPage('leadership')}><AppIcon name="leaderboard"/><b>리더십</b></button>
+      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="analysis"/><b>Stock</b></button>
     </nav>
 
     <Dialog open={open} onOpenChange={setOpen}>
