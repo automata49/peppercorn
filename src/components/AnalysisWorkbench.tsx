@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { AppIcon } from './AppIcon'
 import type { EditableRow, LeaderRow, PositionRow } from '../types'
 import { searchRows, type RecentStock } from '../lib/search'
 import { fundamentalChecks, markCounts, quadrant, swingChecks, type CheckItem, type Mark } from '../lib/checkup'
@@ -189,7 +190,7 @@ export function CompareView({ rows, positionOf, leadershipOf, onRemove, onSelect
     <div className="compare-scroll"><table>
       <thead><tr><th scope="col">항목</th>{rows.map(r => <th scope="col" key={r.id}>
         <button type="button" className="compare-name" onClick={() => onSelect(r)}>{r.name}</button><small>{r.market} · {r.ticker}</small>
-        <button type="button" className="compare-remove" aria-label={r.name + ' 비교에서 빼기'} onClick={() => onRemove(r)}>×</button>
+        <button type="button" className="compare-remove" aria-label={r.name + ' 비교에서 빼기'} onClick={() => onRemove(r)}><AppIcon name="close" size={14}/></button>
       </th>)}</tr></thead>
       <tbody>{lines.map(l => <tr key={l.label}><th scope="row">{l.label}</th>{rows.map(r => {
         const p = r.asset_class === 'Equity' ? positionOf(r) : undefined
