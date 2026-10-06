@@ -47,7 +47,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       paper:'#faf8f5',
       ink:'#111113',
       black:'#0b0b0d',
-      sand:'#f1ede8',
+      sand:'#e8ded4',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
