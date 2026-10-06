@@ -70,8 +70,10 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.getByRole('button',{name:'Market Signal →'}).click();
   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
-  await page.locator('.drill-sheet .stock-row').first().click();
+  await expect(page.locator('.leadership-page')).toBeVisible();
+  await page.locator('.leadership-page-list .decision-row').first().click();
   const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong').first()).toHaveText('—');
   await page.getByRole('button',{name:'RS 새로고침'}).click();
@@ -87,7 +89,8 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  // Dashboard ETF summary is secondary and collapsed until requested.
+  // ETF exploration is one level below Home on Market Signal.
+  await page.getByRole('button',{name:'Market Signal →'}).click();
   await page.locator('.dashboard-explore > summary').click();
   const top=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(top.locator('.stock-id b')).toHaveText('QQQ ETF');
@@ -132,6 +135,7 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:data}}));
     await page.goto('http://127.0.0.1:4173/peppercorn/');
     await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+    await page.getByRole('button',{name:'Market Signal →'}).click();
     const panel=page.locator('.dashboard-etf-industry-panel');
     // ETF exploration is deliberately secondary: hidden by default, then revealed in one disclosure.
     const explore=page.locator('.dashboard-explore');
@@ -213,6 +217,7 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,kr]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.getByRole('button',{name:'Market Signal →'}).click();
   await page.locator('.dashboard-explore > summary').click();
   const row=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(row.locator('.stock-id b')).toHaveText('KODEX 200');
@@ -225,12 +230,14 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await page.getByRole('button',{name:'Market Signal →'}).click();
   const align=(loc:any)=>loc.evaluateAll((es:Element[])=>[...new Set(es.map(e=>getComputedStyle(e).textAlign))]);
   const sector=page.locator('.dashboard-sector-panel .sector-metrics-table');
   expect(await align(sector.locator('th'))).toEqual(['left']);
   expect(await align(sector.locator('tbody tr').first().locator('td:not(:first-child)'))).toEqual(['right']);
   expect(await align(sector.locator('tbody tr').first().locator('td:first-child'))).toEqual(['left']);
-  await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
+  await page.locator('.sector-heat-disclosure > summary').click();
+  await page.locator('.dashboard-sector-panel .sector-heat .etf-heat-tile').first().click();
   for(const panel of ['.drill-sheet','.dashboard-etf-panel']){
     if(panel==='.dashboard-etf-panel'){
       await page.keyboard.press('Escape');await expect(page.locator('.drill-sheet')).toHaveCount(0);
