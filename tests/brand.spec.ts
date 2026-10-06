@@ -71,7 +71,7 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  expect(touch).toBe('./folio-b-icon-180.png')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
- expect(manifest.background_color).toBe('#f4f1ec')
+ expect(manifest.background_color).toBe('#0b0b0d')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-b-icon-'))).toBe(true)
  for(const src of srcs){
@@ -111,7 +111,9 @@ test('B app icon keeps the prominent xx scale and proportion from concept B',asy
        if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y
      }
    }
-   return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2}
+   const center=(255*512+255)*4
+   const centerRgb=[data[center],data[center+1],data[center+2]]
+   return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2,centerRgb}
  })
  expect(box.w/512).toBeGreaterThanOrEqual(.53)
  expect(box.w/512).toBeLessThanOrEqual(.58)
@@ -121,6 +123,7 @@ test('B app icon keeps the prominent xx scale and proportion from concept B',asy
  expect(box.w/box.h).toBeLessThanOrEqual(1.90)
  expect(Math.abs(box.cx-255.5)).toBeLessThanOrEqual(5)
  expect(Math.abs(box.cy-255.5)).toBeLessThanOrEqual(5)
+ expect(Math.max(...box.centerRgb)).toBeLessThan(30)
 })
 
 test('share metadata carries Folio xx and the B icon',async({page,request})=>{
