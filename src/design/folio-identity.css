@@ -8,9 +8,9 @@
   --folio-text:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
   --folio-black:#0b0b0d;
   --folio-white:#fff;
-  --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
-  --folio-surface-2:#e8ded4;
+  --folio-paper:var(--folio-ds-light-paper,#faf8f5);
+  --folio-surface:var(--folio-ds-light-surface,#ffffff);
+  --folio-surface-2:var(--folio-ds-light-surface-2,#f1ede8);
   --folio-ink:#111113;
   --folio-muted:#77716f;
   --folio-line:rgba(17,17,19,.12);
@@ -144,10 +144,11 @@ button:active{transform:scale(.985)}
 /* Title bar and workspace: editorial, quiet, high contrast. */
 .topbar{
   height:78px;
-  background:color-mix(in srgb,var(--folio-paper) 88%,transparent);
-  border-bottom:1px solid var(--folio-line);
-  box-shadow:none;
-  backdrop-filter:blur(24px) saturate(1.15);
+  background:var(--folio-ds-glass-bg,rgba(255,255,255,.68));
+  border-bottom:1px solid var(--folio-ds-glass-border,var(--folio-line));
+  box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08));
+  backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+  -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
 }
 .topbar h1{
   color:var(--folio-ink);
@@ -327,6 +328,13 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   background:var(--folio-surface);
   color:var(--folio-ink);
   border-color:var(--folio-line);
+}
+.menu-drawer{
+  background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82));
+  border-color:var(--folio-ds-glass-border,var(--folio-line));
+  box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08));
+  backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+  -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
 }
 .drill-head{background:var(--folio-surface);border-bottom-color:var(--folio-line)}
 .drill-head h2{color:var(--folio-ink)}
@@ -844,9 +852,11 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   /* B applies to all compact/touch pages, not only Dashboard. */
   .content{background:var(--folio-paper)}
   .topbar{
-    background:var(--folio-paper);
-    backdrop-filter:none;
-    box-shadow:none;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82));
+    border-bottom-color:var(--folio-ds-glass-border,var(--folio-line));
+    box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08));
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
   }
   .menu-drawer nav button.active{
     background:var(--folio-surface-2);
@@ -864,10 +874,11 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
     box-shadow:none;
   }
   .mobile-bottom-nav{
-    background:var(--folio-paper);
-    border-top:1px solid var(--folio-line);
-    box-shadow:none;
-    backdrop-filter:none;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82));
+    border-top:1px solid var(--folio-ds-glass-border,var(--folio-line));
+    box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08));
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
   }
   .mobile-bottom-nav button.active{color:var(--folio-ink);background:transparent}
   .mobile-bottom-nav button.active::before{background:var(--folio-ink)}
@@ -2411,19 +2422,23 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 /* Analysis mobile shell follows the approved black app screens while the rest of Folio may stay System/Light/Dark. */
 @media(max-width:1279px){
   .page-shell-analysis .mobile-brandbar{
-    background:rgba(10,10,12,.96)!important;
-    border-bottom-color:rgba(255,255,255,.09)!important;
-    backdrop-filter:blur(18px)!important;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82))!important;
+    border-bottom-color:var(--folio-ds-glass-border,var(--folio-line))!important;
+    box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08))!important;
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
   }
-  .page-shell-analysis .mobile-brandbar .folio-wordmark-system{color:#f7f4f1}
-  .page-shell-analysis .mobile-brand-actions button{color:#f7f4f1!important}
+  .page-shell-analysis .mobile-brandbar .folio-wordmark-system{color:var(--folio-ink)}
+  .page-shell-analysis .mobile-brand-actions button{color:var(--folio-ink)!important}
   .page-shell-analysis .mobile-bottom-nav{
-    border-top-color:rgba(255,255,255,.09)!important;
-    background:rgba(10,10,12,.96)!important;
-    box-shadow:0 -8px 24px rgba(0,0,0,.28)!important;
+    border-top-color:var(--folio-ds-glass-border,var(--folio-line))!important;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82))!important;
+    box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08))!important;
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
   }
-  .page-shell-analysis .mobile-bottom-nav button{color:#7f7978!important}
-  .page-shell-analysis .mobile-bottom-nav button.active{color:#f7f4f1!important}
+  .page-shell-analysis .mobile-bottom-nav button{color:var(--folio-muted)!important}
+  .page-shell-analysis .mobile-bottom-nav button.active{color:var(--folio-ink)!important}
 }
 @media(max-width:900px){
   .leadership-decision{grid-template-columns:1fr!important}
@@ -2557,10 +2572,11 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .page-shell-dashboard .mobile-brandbar{
     height:var(--folio-ds-header-compact)!important;
     padding:0 18px!important;
-    background:var(--folio-paper)!important;
-    border-bottom:1px solid var(--folio-line)!important;
-    backdrop-filter:none!important;
-    box-shadow:none!important;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82))!important;
+    border-bottom:1px solid var(--folio-ds-glass-border,var(--folio-line))!important;
+    box-shadow:var(--folio-ds-glass-shadow,0 10px 30px rgba(35,24,34,.08))!important;
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
   }
   .page-shell-dashboard .mobile-brand-home{
     min-height:44px!important;
@@ -2607,9 +2623,10 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .page-shell-dashboard .dashboard-toolbar{
     top:60px!important;
     padding:0 18px!important;
-    border-bottom:1px solid var(--folio-line)!important;
-    background:var(--folio-paper)!important;
-    backdrop-filter:none!important;
+    border-bottom:1px solid var(--folio-ds-glass-border,var(--folio-line))!important;
+    background:var(--folio-ds-glass-bg,rgba(255,255,255,.68))!important;
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
   }
   .page-shell-dashboard .dashboard-toolbar .segment button{
     min-height:44px!important;
@@ -2628,10 +2645,11 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
   .page-shell-dashboard .mobile-bottom-nav{
     padding:6px 12px calc(6px + env(safe-area-inset-bottom))!important;
-    border-top:1px solid var(--folio-line)!important;
-    background:var(--folio-paper)!important;
-    backdrop-filter:none!important;
-    box-shadow:none!important;
+    border-top:1px solid var(--folio-ds-glass-border,var(--folio-line))!important;
+    background:var(--folio-ds-glass-bg-strong,rgba(255,255,255,.82))!important;
+    box-shadow:0 -10px 30px rgba(35,24,34,.07)!important;
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18))!important;
   }
   .page-shell-dashboard .mobile-bottom-nav button{
     min-height:var(--folio-ds-nav-item)!important;
@@ -2681,6 +2699,22 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .page-shell-dashboard .folio-identity-interlude figcaption strong{
     font-size:13.5px!important;
     line-height:1.18!important;
+  }
+}
+
+/* Accessibility/browser fallback: functional glass becomes an opaque navigation layer when blur is unavailable or transparency is reduced. */
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar{
+    background:var(--folio-surface)!important;
+    box-shadow:none!important;
+  }
+}
+@media(prefers-reduced-transparency:reduce){
+  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar{
+    background:var(--folio-surface)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    box-shadow:none!important;
   }
 }
 
