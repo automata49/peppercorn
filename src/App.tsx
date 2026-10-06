@@ -802,8 +802,6 @@ export default function App(){
     if(!showIntro||!root)return
     const frame=root.querySelector<HTMLElement>('.launch-editorial-frame')
     const hero=root.querySelector<HTMLElement>('.launch-b-hero')
-    const caption=root.querySelector<HTMLElement>('.launch-editorial-caption')
-    const footer=root.querySelector<HTMLElement>('.launch-footer')
     const progress=root.querySelector<HTMLElement>('.launch-progress span')
     const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const finish=()=>{
@@ -817,8 +815,6 @@ export default function App(){
       if(!reduceMotion){
         if(frame)timeline.fromTo(frame,{autoAlpha:0,clipPath:'inset(0 18% 0 18%)'},{autoAlpha:1,clipPath:'inset(0 0% 0 0%)',duration:1.05,ease:'power3.out'},.08)
         if(hero)timeline.fromTo(hero,{scale:1.045,xPercent:1.2},{scale:1,xPercent:0,duration:4.35,ease:'sine.out'},.08)
-        if(caption)timeline.fromTo(caption,{y:10,autoAlpha:0},{y:0,autoAlpha:1,duration:.72,ease:'power2.out'},.82)
-        if(footer)timeline.fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.6,ease:'power2.out'},1.05)
       }
       if(progress)timeline.to(progress,{scaleX:1,duration:4.45,ease:'none'},0)
       timeline.to(root,{autoAlpha:0,duration:.62,ease:'power2.inOut'},4.48)
@@ -1154,14 +1150,12 @@ export default function App(){
 
       <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
 
-      <section className="folio-identity-interlude" aria-label="Folio 투자 원칙">
+      <section className="folio-identity-interlude" aria-label="Folio visual identity">
         <figure className="folio-motif-panel">
-          <img src="./folio-brand-typography.webp?v=u1" alt="" loading="lazy"/>
-          <figcaption><span>DISCIPLINE · INSIGHT · PERSPECTIVE · FREEDOM</span><strong>Know the Market. Know Yourself.</strong></figcaption>
+          <img src="./folio-brand-typography.webp?v=u1" alt="Know the Market. Know Yourself. A wider perspective for a brighter tomorrow." loading="lazy"/>
         </figure>
-        <figure className="folio-photo-panel">
+        <figure className="folio-photo-panel" aria-hidden="true">
           <img src="./folio-brand-photography.webp?v=u1" alt="" loading="lazy"/>
-          <figcaption><span>PHOTOGRAPHY TREATMENT</span><strong>Structured freedom, seen through warmer light.</strong></figcaption>
         </figure>
       </section>
 
