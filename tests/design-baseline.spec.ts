@@ -32,9 +32,14 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
       markRatio:get('--folio-ds-wordmark-mark-ratio'),
       plum:get('--folio-brand-plum'),
       coral:get('--folio-brand-coral'),
+      paper:get('--folio-ds-light-paper'),
+      glass:get('--folio-ds-glass-bg'),
+      glassStrong:get('--folio-ds-glass-bg-strong'),
+      glassBlur:get('--folio-ds-glass-blur'),
+      glassRadius:get('--folio-ds-glass-radius'),
     }
   })
-  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',markHeight:'1ex',markRatio:'184 / 104',plum:'#54265f',coral:'#f06a45'})
+  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',markHeight:'1ex',markRatio:'184 / 104',plum:'#54265f',coral:'#f06a45',paper:'#faf8f5',glass:'rgba(255,255,255,.68)',glassStrong:'rgba(255,255,255,.82)',glassBlur:'22px',glassRadius:'18px'})
 
   const header=await page.locator('.page-shell-dashboard .mobile-brandbar').boundingBox()
   expect(header).not.toBeNull()
@@ -71,6 +76,16 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
     expect(box).not.toBeNull()
     expect(box!.width).toBeGreaterThanOrEqual(43.9)
     expect(box!.height).toBeGreaterThanOrEqual(43.9)
+  }
+
+  const glassLayers=await page.evaluate(()=>['.page-shell-dashboard .mobile-brandbar','.page-shell-dashboard .dashboard-toolbar','.page-shell-dashboard .mobile-bottom-nav'].map(selector=>{
+    const el=document.querySelector<HTMLElement>(selector)
+    const s=el?getComputedStyle(el):null
+    return {selector,background:s?.backgroundColor||'',backdrop:(s?.backdropFilter||'')+(s?.webkitBackdropFilter||'')}
+  }))
+  for(const layer of glassLayers){
+    expect(layer.background).toContain('rgba')
+    expect(layer.backdrop).toContain('blur')
   }
 
   const navButton=page.locator('.mobile-bottom-nav').getByRole('button',{name:'홈'})
