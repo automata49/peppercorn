@@ -55,6 +55,8 @@ for(const view of views){
       expect(markBox).not.toBeNull()
       expect(markBox!.width).toBeGreaterThanOrEqual(30.5)
       expect(markBox!.width).toBeLessThanOrEqual(31.5)
+      expect(markBox!.width/markBox!.height).toBeGreaterThanOrEqual(1.74)
+      expect(markBox!.width/markBox!.height).toBeLessThanOrEqual(1.80)
       const navIcon=page.locator('.mobile-bottom-nav .app-icon').first()
       const navIconBox=await navIcon.boundingBox()
       expect(navIconBox).not.toBeNull()
