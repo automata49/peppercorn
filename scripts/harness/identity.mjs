@@ -63,6 +63,10 @@ const legacyIdentityAssets=[
 ];
 for(const file of legacyIdentityAssets)assert(!existsSync(file),`Legacy identity asset must stay removed: ${file}`);
 assert(!app.includes('Peppercorn Capital')&&!app.includes('logo.webp'),'Launch must remain Folio-only without Peppercorn co-branding.');
+const mainEntry=read('src/main.tsx');
+const authModal=read('src/components/AuthModal.tsx');
+assert(!mainEntry.includes('<strong>Peppercorn Capital</strong>'),'Fatal fallback must remain Folio-only.');
+assert(!authModal.includes('<span>Peppercorn Capital</span>')&&!authModal.includes("signup_closed:'Peppercorn"),'Auth UI must remain Folio-only.');
 assert(!app.includes('SUNSET EDITORIAL'),'Launch must not expose the internal Sunset Editorial concept label.');
 assert(!css.includes('\\n'),'Identity CSS contains a literal \\n escape.');
 assert(!css.includes('launch-wordmark-system')&&!css.includes('radial-gradient(circle at 24% 78%'),'Superseded launch/wordmark identity CSS returned.');
