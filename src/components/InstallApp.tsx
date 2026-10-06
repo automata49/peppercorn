@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from './ui/popover'
+import { FolioWordmark } from './FolioWordmark'
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -49,7 +50,7 @@ export function InstallApp() {
       <PopoverContent className="install-dialog" side="bottom" align="end" sideOffset={10} collisionPadding={12} aria-label="Folio xx 설치 안내">
         <PopoverClose asChild><button className="install-close" aria-label="닫기">×</button></PopoverClose>
         <img className="install-icon" src="./folio-b-icon-192.png?v=b5" alt="Folio 아이콘" />
-        <h2>Folio xx</h2>
+        <h2 className="sr-only">Folio xx</h2><FolioWordmark className="install-wordmark"/>
         <p className="install-description">홈 화면에 추가하면 앱처럼 바로 열 수 있습니다.</p>
         <ol>
           {isIOS ? <>
