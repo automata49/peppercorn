@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node scripts/generate-b-app-icons.mjs && vite",
     "build": "node scripts/generate-b-app-icons.mjs && tsc --noEmit && vite build",
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",
