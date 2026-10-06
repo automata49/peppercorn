@@ -2018,3 +2018,27 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .folio-insight-grid{grid-template-columns:1fr;margin-top:18px}
   .folio-insight-grid>div{padding:14px 0}
 }
+
+
+/* B PREMIUM LIGHT OVERRIDE — Dark is the default product expression, but explicit Light remains first-class. */
+@media(max-width:1279px){
+  :root[data-theme="light"] .mobile-brandbar{
+    background:rgba(244,241,236,.96)!important;
+    border-bottom-color:rgba(17,17,19,.12)!important;
+  }
+  :root[data-theme="light"] .mobile-brand-home,
+  :root[data-theme="light"] .mobile-brand-search,
+  :root[data-theme="light"] .mobile-brand-menu{color:#111113!important}
+  :root[data-theme="light"] .mobile-bottom-nav{
+    background:rgba(244,241,236,.97)!important;
+    border-top-color:rgba(17,17,19,.12)!important;
+  }
+  :root[data-theme="light"] .mobile-bottom-nav button{color:#77716f!important}
+  :root[data-theme="light"] .mobile-bottom-nav button.active{color:#f06a45!important}
+  :root[data-theme="light"] .analysis-detail-tabs{background:rgba(244,241,236,.94)!important}
+  :root[data-theme="light"] .folio-insight-card{
+    background:
+      radial-gradient(circle at 95% 0%,rgba(240,106,69,.16),transparent 42%),
+      linear-gradient(135deg,rgba(84,38,95,.09),#fff 64%)!important;
+  }
+}
