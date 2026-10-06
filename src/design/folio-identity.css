@@ -2476,3 +2476,49 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     scroll-margin-bottom:160px;
   }
 }
+
+
+/* QUALITY-V2 mobile containment + reachable compare actions. */
+.analysis-page,
+.analysis-page *{min-width:0}
+.compare-view thead th:not(:first-child){
+  position:relative;
+  min-width:142px;
+  padding-right:42px;
+}
+.compare-view thead small{pointer-events:none}
+.compare-remove{
+  position:absolute;
+  top:5px;
+  right:5px;
+  z-index:4;
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  padding:0!important;
+  border-radius:50%!important;
+  touch-action:manipulation;
+  scroll-margin-block:150px;
+}
+@media(max-width:650px){
+  /* Non-dashboard content has 12px side padding; cancel exactly that, not 18px. */
+  .page-shell-analysis .analysis-page{
+    margin-left:-12px;
+    margin-right:-12px;
+    padding-left:12px;
+    padding-right:12px;
+    padding-bottom:calc(170px + env(safe-area-inset-bottom));
+  }
+  .analysis-scope{
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    overflow:hidden;
+  }
+  .analysis-scope button{
+    min-width:0!important;
+    padding-left:5px!important;
+    padding-right:5px!important;
+    white-space:nowrap;
+  }
+  .compare-view{scroll-margin-block:150px}
+}
