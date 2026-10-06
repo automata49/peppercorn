@@ -1094,13 +1094,13 @@ export default function App(){
         </div>
         <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
         <div className="leadership-decision">
-          <LeadershipPulse counts={focusCounts} label="포커스 리더십 분포"/>
+          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포"/>
           <div className="focus-summary">
             <div className="focus-summary-main"><span>FOCUS</span><strong>{focusRows.length}</strong><small>{focusFilterLabel} · 대표 리더만 먼저 보여줍니다.</small></div>
             <div className="focus-class-strip" aria-label="분석 허브 분류">
-              <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{focusCounts.core}</b><small>Core Leaders</small></button>
-              <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{focusCounts.candidates}</b><small>Watch Candidates</small></button>
-              <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{focusCounts.turns}</b><small>Turnaround</small></button>
+              <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{leadCount}</b><small>Core Leaders</small></button>
+              <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{candidateCount}</b><small>Watch Candidates</small></button>
+              <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{turnCount}</b><small>Turnaround</small></button>
             </div>
           </div>
         </div>
@@ -1272,7 +1272,7 @@ export default function App(){
       candidates:visible.filter(r=>leadership(r)==='주도 후보').length,
       turns:visible.filter(r=>leadership(r)==='강세 전환').length,
     }
-    const pickStock=(r:LeaderRow)=>{setSelected(r);setAnalysisSection('overview');setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
+    const pickStock=(r:LeaderRow)=>{setSelected(r);setRecentStocks(pushRecent({market:r.market,ticker:r.ticker,name:r.name}))}
     const positionOf=(r:LeaderRow)=>position.rows.get(positionKey(r.market,r.ticker))
     const keyOf=(r:LeaderRow)=>r.market+'|'+r.ticker
     const record=selected?(enrichedAnalysis as EditableRow[]).find(r=>r.market===selected.market&&r.ticker===selected.ticker):undefined
