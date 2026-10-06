@@ -3028,6 +3028,29 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 .decision-action{margin-top:0!important}
 
 /* The journey pages use the same compact app chrome without promoting content to glass. */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .page-shell-dashboard .home-market-filter{
+    top:var(--folio-ds-header-compact);
+    z-index:35;
+    margin-left:calc(-1 * var(--folio-ds-gutter-tablet));
+    margin-right:calc(-1 * var(--folio-ds-gutter-tablet));
+    padding-left:var(--folio-ds-gutter-tablet);
+    padding-right:var(--folio-ds-gutter-tablet);
+    background:var(--folio-ds-glass-bg,rgba(255,255,255,.68));
+    border-bottom:1px solid var(--folio-ds-glass-border,var(--folio-line));
+    backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+    -webkit-backdrop-filter:blur(var(--folio-ds-glass-blur,22px)) saturate(var(--folio-ds-glass-saturation,1.18));
+  }
+}
+@media(max-width:650px){
+  .page-shell-dashboard .home-market-filter{
+    margin-left:calc(-1 * var(--folio-ds-gutter-phone));
+    margin-right:calc(-1 * var(--folio-ds-gutter-phone));
+    padding-left:var(--folio-ds-gutter-phone);
+    padding-right:var(--folio-ds-gutter-phone);
+  }
+}
+
 @media(max-width:900px){
   .home-regime{grid-template-columns:1fr;align-items:start}
   .home-regime>button{justify-self:start}
