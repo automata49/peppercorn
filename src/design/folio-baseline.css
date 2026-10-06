@@ -23,9 +23,23 @@
   --folio-ds-icon-stroke:1.55;
   --folio-ds-icon-stroke-active:1.75;
 
+  /* Brand master: B / Sunset Editorial. The xx is a lowercase-scale mark:
+     its visible height follows the font x-height (the height of the “o”), never cap height. */
+  --folio-brand-ink:#111113;
+  --folio-brand-plum:#54265f;
+  --folio-brand-magenta:#a34f78;
+  --folio-brand-coral:#f06a45;
+  --folio-brand-amber:#f5a24a;
+  --folio-brand-icon-bg:#0b0b0d;
+
   --folio-ds-wordmark-phone:25px;
-  --folio-ds-wordmark-mark-phone:31px;
+  --folio-ds-wordmark-sidebar:25px;
+  --folio-ds-wordmark-drawer:28px;
+  --folio-ds-wordmark-footer:20px;
+  --folio-ds-wordmark-mark-height:1ex;
   --folio-ds-wordmark-mark-ratio:184 / 104;
+  --folio-ds-wordmark-gap:.14em;
+  --folio-ds-wordmark-nudge:.015em;
 
   --folio-ds-type-display:28px;
   --folio-ds-type-section:18px;
@@ -58,7 +72,16 @@
   stroke-width:var(--folio-ds-icon-stroke);
 }
 
-.folio-wordmark-mark{aspect-ratio:var(--folio-ds-wordmark-mark-ratio)}
+.folio-wordmark-system{
+  --folio-wordmark-size:var(--folio-ds-wordmark-phone);
+  font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
+  font-size:var(--folio-wordmark-size);
+}
+.folio-wordmark-mark{
+  height:var(--folio-ds-wordmark-mark-height);
+  width:auto;
+  aspect-ratio:var(--folio-ds-wordmark-mark-ratio);
+}
 
 @media(max-width:650px){
   body{word-break:keep-all}
