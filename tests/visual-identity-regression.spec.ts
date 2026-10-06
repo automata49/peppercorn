@@ -44,7 +44,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       paper:'#faf8f5',
       ink:'#111113',
       black:'#0b0b0d',
-      glass:'rgba(255,255,255,.68)',
+      glass:'#ffffffad',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
