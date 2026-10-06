@@ -86,7 +86,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
 test('home-screen icons are full square before platform masking',async({page})=>{
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   const samples=await page.evaluate(async()=>{
-    const files=['folio-b-icon-180.png?v=u1','folio-b-icon-192.png?v=u1','folio-b-icon-512.png?v=u1','folio-b-icon-512-maskable.png?v=u1']
+    const files=['folio-b-icon-180.png?v=u2','folio-b-icon-192.png?v=u2','folio-b-icon-512.png?v=u2','folio-b-icon-512-maskable.png?v=u2']
     const out:any[]=[]
     for(const src of files){
       const img=new Image()
