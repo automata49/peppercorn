@@ -70,8 +70,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       await expect(desktopBrand.locator('.folio-xx-vector')).toBeVisible()
     }
 
-    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg')
-    if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
+    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b3')
+    if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b3')
 
     const leader=page.locator('.leadership-overview')
     await expect(leader).toBeVisible()
@@ -106,7 +106,7 @@ test('launch is Folio-only and keeps the exact B hero',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   const launch=page.locator('.launch-overlay')
-  await expect(launch.getByRole('img',{name:'Folio xx visual'})).toHaveAttribute('src','./folio-b-launch-hero.webp')
+  await expect(launch.getByRole('img',{name:'Folio xx visual'})).toHaveAttribute('src','./folio-b-launch-hero.webp?v=b3')
   await expect(launch).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
   await expect(launch).not.toContainText('Peppercorn Capital')
