@@ -3,7 +3,7 @@ name: folio-identity
 description: Use for Folio xx brand, Home visual identity, System/Light/Dark theme, loading screen, responsive mobile/iPad treatment, PWA icon/manifest and Robinhood-benchmark UI work.
 ---
 
-Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` before editing.
+Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` and `docs/design/FOLIO_UI_RESEARCH.md` before editing.
 
 Hard rules:
 - The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
@@ -12,11 +12,14 @@ Hard rules:
 - Loading uses `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
 - Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - Light is the first-run/default appearance. System and Dark remain explicit user selections; OS dark preference must not silently override a fresh Folio session.
+- Liquid Glass is a functional/navigation layer only. Use Level-0 glass tokens for top/bottom navigation, sticky filters/tool controls, drawers/popovers and transient controls; charts, tables, thesis cards and analytical content stay solid. Keep opaque/reduced-transparency fallbacks.
+- Robinhood research follows `FOLIO_UI_RESEARCH.md`: capture evidence, abstract a principle, map it to a Folio user intent, and add an acceptance check. Do not copy Robinhood branding, wording, proprietary assets or trade-entry UI.
 - Compact launch preserves the 508:235 `folio-b-launch-hero.webp` composition inside safe horizontal margins; never crop it into a tall portrait card. Keep the B motif secondary/compact on phones and use a quiet monoline navigation icon system.
 - B motif = original vector `public/folio-b-motif.svg`: monochrome rock/coast, lone figure, sparse technical line work and isolated warm sun/disc. Do not paste/crop the concept-board image.
 - Fluid Market/C is not a UI theme. C is limited to photography treatment through `public/folio-c-photography.webp`: warm sunset light, shallow depth/bokeh and human-scale optimism.
 - Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure only. Do not copy its branding, colours or trade-entry UI.
-- Analysis Hub owns the deep path: 핵심/후보/전환/전체/Position scope → one visible stock list → unchanged PriceRsChart composition → Overview / Analysis / Financials / Thesis. Overview owns deterministic Folio Insight, Analysis owns leadership/Swing evidence, Financials owns Position filing evidence, Thesis owns user judgement. Do not restore duplicate Focus/추가 보기 layers.
+- Product journey is **Home → Market Signal → Leadership → Stock → Thesis → Decision**. Desktop/drawer navigation exposes Home / Market Signal / Leadership / Stock / Decision; compact quick navigation is **홈 / 신호 / 리더십 / Stock**. Home is intentionally shallow: market regime, four leadership counts, 3–5 Focus names and one `AI INSIGHT · STRUCTURED` sentence only. Market breadth/sector/temperature/ETF move to Market Signal; RS comparison moves to Leadership; full price/RS/52W/Swing/Position evidence stays in Stock; Thesis stays user judgement and Decision routes to Journal tracking. Do not restore the old Home hero chart or dense dashboard modules.
+- Analysis Hub owns the Stock depth: one stock selection path → unchanged PriceRsChart composition → Overview / Analysis / Financials / Thesis. Overview owns deterministic Folio Insight, Analysis owns leadership/Swing evidence, Financials owns Position filing evidence, Thesis owns user judgement.
 - 3D is restricted to the shallow Leadership Pulse presentation. It must not change counts, ranking, classification or imply a new score.
 - Preserve System / Light / Dark and persisted theme behavior.
 - Preserve semantic finance colours and all investment logic. Brand colour never changes gain/loss meaning, leadership class, RS, stage, sector rank or Position Growth rules.

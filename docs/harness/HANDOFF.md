@@ -1,3 +1,25 @@
+## Progressive Folio decision journey — 2026-10-06
+
+User locked the product UX to **Home → Market Signal → Leadership → Stock → Thesis → Decision**, reflecting Folio's goal of 발견 → 판단 → Thesis → 추적 rather than Robinhood's investment → trade funnel.
+
+Implementation:
+- Home is intentionally shallow: Total/KR/US, deterministic display-only Market Regime, four leadership states (핵심 주도 / 주도 후보 / 강세 전환 / 조정 중), at most five existing Focus names, and one `AI INSIGHT · STRUCTURED` sentence. The wording is explicitly structured/rules-based because no live Analyst provider has passed the existing model/evidence gates.
+- Market Signal now owns MA50/MA200 breadth, 52W-high proximity, advance/decline, Sector Leadership, market temperature, sector heatmap and collapsed ETF exploration.
+- Leadership owns class/sector narrowing. The existing filing-based Leadership Lens filters remain here, and the former group/RS/full comparison sheet is preserved behind `업종·지표 상세 비교 →`.
+- Selecting a Leadership row now goes directly to the full **Stock** analysis at Overview. The old quick detail sheet is not part of the primary journey (it remains available to secondary ETF/drill flows). Thesis has `Decision 기록 →`, which creates a Journal row when one does not exist and navigates to tracking.
+- Desktop/drawer navigation is Home / Market Signal / Leadership / Stock / Decision before tracking/data utilities; compact quick navigation is **홈 / 신호 / 리더십 / Stock**. Home no longer renders the old hero chart, sector table, temperature card, ETF exploration or B motif/photo interlude.
+- No leadership classification, Focus algorithm, RS/stage/sector calculation, Position rule, database write rule or stored-data schema changed.
+
+Regression coverage was rewritten around the progressive path, while existing Leader Lens, stock flags and live-quote comparisons are retained one level deeper.
+
+## Bright-default + Liquid Glass research lock — 2026-10-06
+
+The user set three new visual requirements: **Light is the default**, use **Liquid Glass**, and study Robinhood's innovative UI structure in a way that serves Folio xx rather than cloning it. `docs/design/FOLIO_UI_RESEARCH.md` now defines the benchmark loop: evidence → reusable principle → Folio intent → acceptance test. It measures first-view clarity, hierarchy, progressive disclosure, navigation, state feedback, motion, density and recovery across 390 / 834 / 1366 / 1440 CSS px.
+
+Level-0 now owns bright paper `#FAF8F5` and the functional-glass tokens. Glass is restricted to navigation/control layers: desktop topbar, compact brand bar, sticky market tabs, bottom nav and menu drawer. Analytical content remains solid. The old Analysis-only black mobile navigation shell was removed so Light mode has one consistent app chrome; the deep analysis content may still use deliberate dark focal contrast. Opaque / reduced-transparency fallbacks are included.
+
+Harness and identity tests now check the research document, glass token contract, bright manifest/shell color and compact navigation blur. Canonical/generated `folio-identity` skills carry the same rule.
+
 ## Folio visual quality v2 — 2026-10-06
 
 ## Wordmark fidelity correction — 2026-10-06

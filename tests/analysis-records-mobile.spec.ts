@@ -13,7 +13,7 @@ test('phone analysis records are secondary and editable on demand',async({browse
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   await boot(page)
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   const records=page.locator('.analysis-records-disclosure')
   await expect(records).not.toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeVisible()
@@ -27,7 +27,7 @@ test('phone analysis records are secondary and editable on demand',async({browse
 test('desktop analysis records stay open without an extra disclosure header',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
   const records=page.locator('.analysis-records-disclosure')
   await expect(records).toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeHidden()

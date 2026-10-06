@@ -33,14 +33,25 @@ async function goTemperature(page:Page){
   else{await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click();await page.locator('.menu-drawer').getByRole('button',{name:'시장 온도계'}).click()}
   await expect(page.locator('.temp-page')).toBeVisible()
 }
+async function goSignal(page:Page){
+  const side=page.locator('.sidebar nav')
+  if(await side.isVisible()){
+    await side.getByRole('button',{name:'Home'}).click()
+    await page.getByRole('button',{name:'Market Signal →'}).click()
+  }else{
+    await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
+  }
+  await expect(page.locator('.market-signal-page')).toBeVisible()
+}
 const mark=(page:Page,key:string,n:number)=>page.locator(`.temp-row[data-item="${key}"] .temp-dot`).nth(n).click()
 
-test('dashboard temperature stays compact before the first record',async({page})=>{
+test('Market Signal temperature stays compact before the first record',async({page})=>{
   await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.removeItem('peppercorn-temperature')})
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[row]}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await goSignal(page)
   const card=page.locator('.temp-card')
   await expect(card).toHaveClass(/empty/)
   await expect(card.locator('.temp-empty')).toContainText('아직 기록이 없습니다')
@@ -60,6 +71,7 @@ for(const view of views){
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
+  await goSignal(page)
   const card=page.locator('.temp-card')
   await expect(card.locator('.temp-value')).toHaveText('58°')
   await expect(card.locator('.temp-moved')).toHaveText('첫 기록입니다.')
@@ -108,10 +120,8 @@ for(const view of views){
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
 
-  // Dashboard card follows the latest entry.
-  const side=page.locator('.sidebar nav')
-  if(await side.isVisible())await side.getByRole('button',{name:'Dashboard'}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'홈'}).click()
+  // Market Signal card follows the latest entry.
+  await goSignal(page)
   await expect(card.locator('.temp-value')).toHaveText('63°')
   await expect(card.locator('.temp-moved')).toHaveText('바뀐 항목: 금리 ▼ · 신용 스프레드 ▲')
   await card.getByRole('button',{name:'온도계 열기 →'}).click()

@@ -1,4 +1,4 @@
-# Folio xx — Design Baseline v1.0
+# Folio xx — Design Baseline v1.1
 
 Status: **Level 0 / authoritative**  
 Decision date: 2026-10-06
@@ -84,10 +84,13 @@ Do not paste Unicode icons, emoji, arbitrary SVGs, or a second icon library into
 
 B is editorial, not bubbly-fintech.
 
-- Light is first-run default.
-- Paper: `#F4F1EC`; Ink: `#111113`; deep black: `#0B0B0D`.
+- **Light is the first-run/default experience.** Base paper is now bright editorial `#FAF8F5`; Ink stays `#111113`; deep black stays `#0B0B0D` for deliberate focal contrast only.
+- Solid analytical content uses `#FFFFFF` and secondary `#F1EDE8`; it does not become translucent simply to look “glass.”
+- Liquid Glass is a **functional layer**, not a card style. Use the Level-0 glass tokens only for navigation, sticky filters/tool controls, drawers/popovers and transient controls.
+- Glass baseline: 68–82% white material, 22px blur, 1.18 saturation, 10% ink border and restrained elevation. Always provide an opaque fallback.
 - Card radius baseline: **14px**.
 - Control radius baseline: **10px**.
+- Glass/floating functional radius baseline: **18px** when a floating container actually needs a shape; do not turn ordinary content into pills.
 - Pills are only for tags, segmented toggles, and true status chips.
 - Primary hierarchy comes from spacing, type, rules, and contrast—not extra shadows.
 - Do not mix three different corner-radius families in one viewport.
@@ -107,7 +110,9 @@ Phone/tablet:
 - Search/menu icons: 20px inside 44px targets.
 - Market tabs: minimum 44px height.
 - Bottom nav: 20px icons, 11px labels, 52px minimum item height.
+- Header, sticky market tabs and bottom navigation share the same **bright functional-glass family** so content can move beneath them without turning analytical panels translucent.
 - Active state uses a short quiet rule; no oversized filled pill.
+- Search/menu/tab placement stays predictable; glass may change material depth, never navigation semantics.
 
 ## 9. Change policy
 
@@ -132,3 +137,6 @@ A visual-identity change is complete only when:
 - Home-screen icon is square/full-bleed before OS masking and the xx aspect is not distorted.
 - Wordmark, icon stroke, typography roles, and gutters match this baseline.
 - The built Pages output is checked, not only source CSS.
+- Light-first shell and manifest colors match `#FAF8F5`.
+- Glass appears only on functional layers; primary charts/tables/analysis content remain solid and readable.
+- Benchmark-driven changes follow `FOLIO_UI_RESEARCH.md` and state the Folio intent they improve.

@@ -75,9 +75,8 @@ for(const view of views){
       expect(navIconBox).not.toBeNull()
       expect(navIconBox!.width).toBeGreaterThanOrEqual(19.5)
       expect(navIconBox!.width).toBeLessThanOrEqual(20.5)
-      const motifBox=await page.locator('.folio-motif-panel img').boundingBox()
-      expect(motifBox).not.toBeNull()
-      expect(motifBox!.height).toBeLessThanOrEqual(122.5)
+      await expect(page.locator('.folio-motif-panel')).toHaveCount(0)
+      await expect(page.locator('.folio-photo-panel')).toHaveCount(0)
     }
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
@@ -89,8 +88,9 @@ for(const view of views){
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b5')
-  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b5')
+  // HOME-JOURNEY-1: brand imagery must not push the first decision path down the Home page.
+  await expect(page.locator('.folio-motif-panel')).toHaveCount(0)
+  await expect(page.locator('.folio-photo-panel')).toHaveCount(0)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
@@ -111,7 +111,7 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  expect(touch).toBe('./folio-b-icon-180.png?v=b5')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
- expect(manifest.background_color).toBe('#f4f1ec')
+ expect(manifest.background_color).toBe('#faf8f5')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-b-icon-'))).toBe(true)
  for(const src of srcs){

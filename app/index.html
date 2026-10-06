@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f1ec" />
+  <meta name="theme-color" content="#faf8f5" />
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼" />
   <meta property="og:type" content="website" />
@@ -41,13 +41,13 @@
           : mode;
         root.style.colorScheme = resolved;
         document.querySelector('meta[name="theme-color"]')
-          ?.setAttribute('content', resolved === 'dark' ? '#0a0a0c' : '#f4f1ec');
+          ?.setAttribute('content', resolved === 'dark' ? '#0a0a0c' : '#faf8f5');
       } catch {}
     })();
   </script>
 </head>
 <body>
-  <div id="root" style="min-height:100dvh;background:var(--folio-paper,#f4f1ec)"></div>
+  <div id="root" style="min-height:100dvh;background:var(--folio-paper,#faf8f5)"></div>
   <script type="module" src="../src/main.tsx"></script>
 </body>
 </html>

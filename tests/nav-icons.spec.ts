@@ -22,12 +22,12 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
 
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
   const drawer=page.locator('.menu-drawer')
-  await expect(drawer.locator('nav button')).toHaveCount(9)
-  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(9)
+  await expect(drawer.locator('nav button')).toHaveCount(11)
+  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(11)
   await expect(drawer.locator('.menu-drawer-close > svg.app-icon')).toHaveCount(1)
 
-  await drawer.getByRole('button',{name:'종목 분석'}).click()
-  await expect(bottom.getByRole('button',{name:'분석'})).toHaveClass(/active/)
+  await drawer.getByRole('button',{name:'Stock'}).click()
+  await expect(bottom.getByRole('button',{name:'Stock'})).toHaveClass(/active/)
   await context.close()
 })
 
@@ -35,8 +35,8 @@ test('desktop sidebar uses the same line icon system',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const side=page.locator('.sidebar nav')
-  await expect(side.locator('button')).toHaveCount(9)
-  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(9)
+  await expect(side.locator('button')).toHaveCount(11)
+  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(11)
 
   const active=side.locator('button.active .app-icon').first()
   const inactive=side.locator('button:not(.active) .app-icon').first()

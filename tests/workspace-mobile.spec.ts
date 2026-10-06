@@ -14,7 +14,8 @@ test('phone Watchlist and Portfolio use summary-first progressive disclosure',as
   const page=await context.newPage()
   await boot(page)
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'관심'}).click()
+  await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'Watchlist'}).click()
   const watchSummary=page.locator('.workspace-mobile-summary')
   await expect(watchSummary).toBeVisible()
   await expect(watchSummary.locator('.decision-row')).toHaveCount(4)
@@ -33,7 +34,8 @@ test('phone Watchlist and Portfolio use summary-first progressive disclosure',as
   const portfolioTable=page.locator('.workspace-table-disclosure')
   await expect(portfolioTable).not.toHaveAttribute('open','')
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'관심'}).click()
+  await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'Watchlist'}).click()
   await page.locator('.workspace-mobile-summary .decision-row').first().click()
   await expect(page.locator('.analysis-body .hero-name')).toHaveText('Apple')
   await context.close()

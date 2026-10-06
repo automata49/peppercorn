@@ -9,27 +9,26 @@ async function boot(page:any){
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
-test('phone primary sections use flat surfaces instead of nested cards',async({browser})=>{
+test('phone Home stays editorial-flat while deeper evidence remains solid',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   await boot(page)
 
-  const focus=page.locator('.focus-overview').first()
-  await expect(focus).toBeVisible()
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-  for(const selector of ['.dashboard-sector-panel','.temp-card']){
-    const node=page.locator(selector).first()
-    await expect(node).toBeVisible()
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
-  }
+  const regime=page.locator('.home-regime')
+  await expect(regime).toBeVisible()
+  expect(parseFloat(await regime.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  const classes=page.locator('.home-class-grid')
+  expect(parseFloat(await classes.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  await expect(page.locator('.dashboard-sector-panel')).toHaveCount(0)
 
-  const explore=page.locator('.dashboard-explore')
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
+  const signal=page.locator('.market-signal-page')
+  await expect(signal).toBeVisible()
+  const metric=signal.locator('.market-signal-metrics > div').first()
+  expect(await metric.evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none')
+  expect(await metric.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   const primary=page.locator('.analysis-main > .analysis-price-momentum')
   await expect(primary).toHaveCount(1)
   expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
@@ -45,13 +44,14 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   await context.close()
 })
 
-test('desktop focal leader and analysis keep the same flat editorial hierarchy',async({page})=>{
+test('desktop Home keeps the same progressive editorial hierarchy',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  const focus=page.locator('.focus-overview')
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThanOrEqual(20)
+  await expect(page.locator('.home-regime')).toBeVisible()
+  await expect(page.locator('.home-class-grid button')).toHaveCount(4)
+  await expect(page.locator('.spotlight-chart')).toHaveCount(0)
 
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)

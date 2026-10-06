@@ -27,21 +27,38 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
-  // Dashboard: decision list first, dense search/table second.
-  await expect(page.locator('.mobile-sector-list')).toBeVisible()
-  await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden()
-  await expect(page.locator('.dashboard-toolbar input')).toBeHidden()
+  // Home: only regime, four leadership states, 3–5 Focus names and one structured Insight.
+  await expect(page.locator('.home-regime')).toBeVisible()
+  await expect(page.locator('.home-class-grid button')).toHaveCount(4)
+  const homeRows=page.locator('.home-today-list .decision-row')
+  expect(await homeRows.count()).toBeGreaterThan(0)
+  expect(await homeRows.count()).toBeLessThanOrEqual(5)
+  await expect(page.locator('.home-insight')).toBeVisible()
+  await expect(page.locator('.dashboard-sector-panel')).toHaveCount(0)
   await noHorizontalOverflow(page)
 
-  // Analysis: one explicit decision path; Overview is primary and records stay secondary.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  // Market Signal: dense market/sector evidence is one level deeper.
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
+  await expect(page.locator('.market-signal-metrics > div')).toHaveCount(4)
+  await expect(page.locator('.mobile-sector-list')).toBeVisible()
+  await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden()
+  await noHorizontalOverflow(page)
+
+  // Leadership: candidate comparison is one level deeper than Market Signal.
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'리더십'}).click()
+  await expect(page.locator('.leadership-page')).toBeVisible()
+  await expect(page.locator('.leadership-tabs button')).toHaveCount(4)
+  await noHorizontalOverflow(page)
+
+  // Stock: one explicit decision path; Overview is primary and records stay secondary.
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   await expect(page.locator('.analysis-hub-head')).toBeVisible()
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   await expect(page.locator('.analysis-records-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  // Watchlist / Portfolio / Journal: compact decision rows first, editable grids closed.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'관심'}).click()
+  // Watchlist / Portfolio / Decision: compact decision rows first, editable grids closed.
+  await openDrawerPage(page,'Watchlist')
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
@@ -51,7 +68,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  await openDrawerPage(page,'Journal')
+  await openDrawerPage(page,'Decision')
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-mobile-summary .decision-row')).toHaveCount(1)
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')

@@ -23,7 +23,7 @@ test('phone Journal shows recent decisions before the full edit grid',async({bro
   await boot(page)
 
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'Journal'}).click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'Decision'}).click()
   const summary=page.locator('.workspace-mobile-summary')
   await expect(summary).toBeVisible()
   await expect(summary.locator('.decision-row')).toHaveCount(1)
@@ -43,7 +43,7 @@ test('phone Journal shows recent decisions before the full edit grid',async({bro
 test('desktop Journal keeps the full editable grid open',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await page.locator('.sidebar nav').getByRole('button',{name:'Journal'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'Decision'}).click()
   await expect(page.locator('.workspace-mobile-summary')).toBeHidden()
   const table=page.locator('.workspace-table-disclosure')
   await expect(table).toHaveAttribute('open','')

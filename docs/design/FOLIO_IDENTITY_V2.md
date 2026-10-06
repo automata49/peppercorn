@@ -6,6 +6,12 @@ Decision date: 2026-10-05. This document records product-design principles, not 
 
 Implementation now follows [FOLIO_DESIGN_BASELINE.md](./FOLIO_DESIGN_BASELINE.md) as **Level 0**. This document still defines visual direction and information hierarchy, but sizes, spacing, icon metrics, wordmark geometry, touch targets, and app-icon masking rules must come from the baseline. Do not solve visual drift by appending another page-specific quality-pass override.
 
+## Research method
+
+Use [FOLIO_UI_RESEARCH.md](./FOLIO_UI_RESEARCH.md) for any Robinhood/platform benchmark. A reference must be converted into **evidence → reusable principle → Folio user intent → acceptance test**. Never copy brand styling, proprietary assets, wording, or trade-entry interaction merely because it exists in the reference.
+
+Liquid Glass follows Apple’s functional-layer model: navigation, sticky controls, drawers/popovers and transient controls may use the glass tokens; analytical content remains on solid/standard surfaces. Light remains the fresh-install default.
+
 ## Benchmark: what Robinhood actually optimizes
 
 Official Robinhood material consistently points to a small set of principles:
@@ -44,22 +50,28 @@ Robinhood is benchmarked only for product hierarchy, simplicity, familiar naviga
 
 ## Home information architecture
 
-Compact Dashboard primary flow:
+Folio’s product journey is now explicit:
 
-1. Folio xx brand + menu.
-2. Total / KR / US.
-3. One representative leader.
-4. Large price + current selected-period return.
-5. One large daily-close chart.
-6. 1D / 1W / 1M / 3M / 1Y / ALL.
-7. Alternate Focus leaders as small chips.
-8. RS rank / industry rank / 52W-high distance.
-9. One restrained **Leadership Pulse** that summarizes 핵심 / 후보 / 전환 without duplicating the stock list.
-10. Three class buttons open their existing quick classified lists.
-11. One explicit **분석 허브** path owns deep stock selection and analysis.
-12. 주도 섹터 → 시장 온도계 → ETF / market exploration.
+**Home → Market Signal → Leadership → Stock → Thesis → Decision**
 
-The former separate Focus roster and “추가 보기 · 모멘텀 / 현재가” disclosure are removed from Home. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+Home is deliberately shallow. Its primary content is limited to:
+
+1. **Market regime** — a display-only synthesis of existing breadth/trend facts; never a new trading signal.
+2. **Four leadership states** — 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
+3. **Today 3–5 Focus stocks** — names first; detailed RS/return/fundamental evidence is deferred.
+4. **One Insight sentence** — currently labelled `AI INSIGHT · STRUCTURED` because it is deterministic synthesis, not a live generative model opinion.
+
+Home does **not** show the former hero price chart, sector table, market-temperature card, ETF exploration, full Focus roster or dense period metrics. Total/KR/US remains a functional filter.
+
+**Market Signal** owns market breadth, MA50/MA200 participation, 52W-high proximity, advance/decline, Sector Leadership, market temperature and optional ETF/heatmap exploration.
+
+**Leadership** owns class/sector narrowing and a ranked stock list. It may show comparison metrics such as RS and a compact return, but it does not expose the full stock evidence stack.
+
+**Stock** is the existing analysis surface. Detailed period returns, 52W position, Swing evidence, filed fundamentals and Position Growth appear only after a stock is chosen.
+
+**Thesis** remains the user’s judgement area. **Decision** routes that thesis into the Journal/tracking workflow.
+
+This is progressive disclosure: every deeper step adds evidence only after the user expresses intent.
 
 ## Analysis experience
 
@@ -75,6 +87,8 @@ Folio uses one linear analysis journey inspired by Robinhood's content-first sim
 The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. The ring and the three Core / Watch / Turnaround navigation cards are one decision surface; do not duplicate the same counts in a second summary block. It is presentation-only and never changes or implies an investment score.
 
 ## Mobile / iPad visual rule
+
+Primary compact quick navigation follows the decision journey: **홈 / 신호 / 리더십 / Stock**. Watchlist, Portfolio, temperature, Leaderboard, Universe and Settings remain available through the drawer rather than competing in the four-slot quick nav.
 
 Desktop, mobile and iPad all use B/Sunset Editorial. Warm editorial paper is the shell; the approved dark mobile/product boards permit near-black **focal investing surfaces** for Leadership Overview and Analysis so the analytical path feels concentrated and premium. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper shell, near-black focal analysis surfaces, restrained sunset accents, text-led tabs, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 

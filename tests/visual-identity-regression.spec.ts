@@ -9,25 +9,22 @@ const VISUAL_IDENTITY_VIEWPORTS=[
 ] as const
 
 async function boot(page:any){
-  await page.addInitScript(()=>sessionStorage.setItem('peppercorn-intro-seen','1'))
+  await page.addInitScript(()=>{
+    sessionStorage.setItem('peppercorn-intro-seen','1')
+    localStorage.setItem('folio-theme','light')
+  })
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.route('**/functions/v1/price-history?*',route=>{
-    const ids=new URL(route.request().url()).searchParams.get('ids')?.split(',')||[]
-    return route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[
-      ['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]
-    ]]))}})
-  })
   await page.goto('http://127.0.0.1:4173/peppercorn/')
 }
 
 for(const view of VISUAL_IDENTITY_VIEWPORTS){
-  test(view.name+' locks the Sunset Editorial B visual signature',async({browser})=>{
+  test(view.name+' locks the bright Sunset Editorial decision signature',async({browser})=>{
     const context=await browser.newContext({
       viewport:{width:view.width,height:view.height},
       hasTouch:view.touch,
-      isMobile:view.touch,
+      isMobile:view.width<900,
       colorScheme:'light',
       reducedMotion:'reduce',
     })
@@ -40,14 +37,14 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
         paper:s.getPropertyValue('--folio-paper').trim(),
         ink:s.getPropertyValue('--folio-ink').trim(),
         black:s.getPropertyValue('--folio-black').trim(),
-        sand:s.getPropertyValue('--folio-warm-sand').trim(),
+        glass:s.getPropertyValue('--folio-ds-glass-bg').trim(),
       }
     })
     expect(rootVars).toEqual({
-      paper:'#f4f1ec',
+      paper:'#faf8f5',
       ink:'#111113',
       black:'#0b0b0d',
-      sand:'#e8ded4',
+      glass:'#ffffffad',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
@@ -61,6 +58,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       expect(box).not.toBeNull()
       expect(box!.height).toBeGreaterThanOrEqual(59.5)
       expect(box!.height).toBeLessThanOrEqual(60.5)
+      expect(await page.locator('.mobile-brandbar').evaluate(e=>getComputedStyle(e).backgroundColor)).toContain('rgba')
+      expect(parseFloat(await page.locator('.mobile-brandbar').evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
       await expect(compactBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
       await expect(compactBrand.locator('.folio-xx-vector')).toBeVisible()
     }else{
@@ -70,25 +69,18 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       await expect(desktopBrand.locator('.folio-xx-vector')).toBeVisible()
     }
 
-    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b5')
-    if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b5')
-
-    const leader=page.locator('.leadership-overview')
-    await expect(leader).toBeVisible()
-    expect(await leader.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(11, 11, 13)')
-    const line=page.locator('.spotlight-line')
-    await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(247, 244, 241)')
-    expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
-
-    const period=page.locator('.spotlight-periods button.on')
-    expect(parseFloat(await period.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await period.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    await expect(page.locator('.home-regime')).toBeVisible()
+    await expect(page.locator('.home-class-grid button')).toHaveCount(4)
+    await expect(page.locator('.home-today-list')).toBeVisible()
+    await expect(page.locator('.home-insight')).toContainText('AI INSIGHT')
+    await expect(page.locator('.spotlight-chart')).toHaveCount(0)
+    await expect(page.locator('.folio-motif-panel')).toHaveCount(0)
+    await expect(page.locator('.folio-photo-panel')).toHaveCount(0)
 
     if(view.compact){
-      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
     }else{
-      await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+      await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
     }
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()

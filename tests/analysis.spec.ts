@@ -7,12 +7,12 @@ const position=[
   {market:'KR',ticker:'TEST1',as_of:'2026-06-30',status:'check_failed',rules_version:'uncalibrated',methods:{fcf:'KR-FCF-PPE-2',roic:'KR-ROIC-1'},failed_checks:[['분기 연속성 (최근 16분기)','공백 1곳']],metrics:metrics({eps_ttm:null,debt_ratio:null}),labels:noLabels,label_reasons:{},computed_at:'2026-09-30T02:00:00Z'},
 ]
 async function openAnalysis(page:Page){
-  const side=page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'})
+  const side=page.locator('.sidebar nav').getByRole('button',{name:'Stock'})
   if(await side.isVisible()){await side.click();return}
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'})
   if(await bottom.isVisible()){await bottom.click();return}
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'Stock'}).click()
 }
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' stock analysis shows Analysis, Financials and Thesis',async({browser})=>{
