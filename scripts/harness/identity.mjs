@@ -94,7 +94,7 @@ assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financial
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
 assert(css.includes('FOLIO B QUALITY PASS V2'),'B v2 product-surface visual lock is missing.');
 assert(css.includes('FOLIO DESIGN BASELINE — compact application'),'Compact UI must consume the Level-0 baseline.');
-assert(css.includes('aspect-ratio:184/104'),'Visible xx must keep the master 184:104 vector aspect.');
+assert(css.includes('aspect-ratio:var(--folio-ds-wordmark-mark-ratio)')&&baselineCss.includes('--folio-ds-wordmark-mark-ratio:184 / 104'),'Visible xx must keep the master 184:104 vector aspect through the Level-0 token.');
 assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio-ds-wordmark-mark-phone)'),'Phone wordmark must consume baseline tokens.');
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact icons must consume baseline tokens.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
@@ -102,7 +102,7 @@ const appIndex=read('app/index.html');
 assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
 assert(appIndex.includes("saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light'"),'Pre-React shell must start fresh installs in Light.');
 assert(css.includes('aspect-ratio:508/235')&&css.includes('width:calc(100vw - 36px)'),'Phone launch must preserve the B source aspect inside safe margins.');
-assert(css.includes('height:clamp(118px,34vw,136px)'),'Phone B motif must remain secondary and compact.');
+assert(css.includes('clamp(var(--folio-ds-motif-phone-min),29vw,var(--folio-ds-motif-phone-max))')&&baselineCss.includes('--folio-ds-motif-phone-min:108px')&&baselineCss.includes('--folio-ds-motif-phone-max:122px'),'Phone B motif must consume the compact baseline bounds.');
 const themeTest=read('tests/theme-system.spec.ts');
 const brandTest=read('tests/brand.spec.ts');
 assert(themeTest.includes('fresh install starts in Light even when the device prefers dark'),'Light-first regression test is missing.');
