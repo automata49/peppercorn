@@ -5,7 +5,7 @@
   <linearGradient id="sun" x1="0" x2="1" y1="0" y2="1">
     <stop offset="0" stop-color="#F7C7B2"/>
     <stop offset=".55" stop-color="#F6A67A"/>
-    <stop offset="1" stop-color="#F5A24A"/>
+    <stop offset="1" stop-color="#F7A24A"/>
   </linearGradient>
   <linearGradient id="mist" x1="0" x2="0" y1="0" y2="1">
     <stop offset="0" stop-color="#F4F1EC" stop-opacity=".1"/>
