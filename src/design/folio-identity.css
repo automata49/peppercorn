@@ -892,7 +892,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   }
   .page-shell-dashboard .mobile-brand-search:hover,
   .page-shell-dashboard .mobile-brand-menu:hover{background:var(--folio-surface-2)}
-  .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{font-size:30px}
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{--folio-wordmark-size:var(--folio-ds-wordmark-phone)}
 
   .page-shell-dashboard .dashboard-toolbar{
     top:60px;
