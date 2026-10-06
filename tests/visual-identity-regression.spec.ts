@@ -44,10 +44,10 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       }
     })
     expect(rootVars).toEqual({
-      paper:'#f4f1ec',
+      paper:'#faf8f5',
       ink:'#111113',
       black:'#0b0b0d',
-      sand:'#e8ded4',
+      sand:'#f1ede8',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
