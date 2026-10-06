@@ -49,7 +49,7 @@ test('stock detail links to Finviz for US tickers and no longer to the Google Sh
  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
- await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+ await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
  const list=page.locator('.stock-list')
  await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click()
  const finviz=page.locator('.external-links').first().getByRole('link',{name:'Finviz ↗'})
