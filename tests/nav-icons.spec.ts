@@ -26,8 +26,8 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
   await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(9)
   await expect(drawer.locator('.menu-drawer-close > svg.app-icon')).toHaveCount(1)
 
-  await drawer.getByRole('button',{name:'종목 분석'}).click()
-  await expect(bottom.getByRole('button',{name:'분석'})).toHaveClass(/active/)
+  await drawer.getByRole('button',{name:'Stock'}).click()
+  await expect(bottom.getByRole('button',{name:'Stock'})).toHaveClass(/active/)
   await context.close()
 })
 
