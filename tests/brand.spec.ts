@@ -24,7 +24,7 @@ for(const view of views){
   const launch=page.locator('.launch-overlay')
   const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
-  await expect(hero).toHaveAttribute('src','./folio-brand-launch.webp?v=u1')
+  await expect(hero).toHaveAttribute('src','./folio-brand-launch.webp?v=u2')
   await expect(launch.locator('.launch-editorial-caption')).toBeHidden()
   await expect(launch.locator('.launch-footer')).toBeHidden()
   if(view.name==='phone'){
@@ -43,7 +43,7 @@ for(const view of views){
     await expect(homeBrand).toBeVisible()
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
     await expect(homeBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-    await expect(homeBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u1')
+    await expect(homeBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
     if(view.name==='phone'){
       const brandBox=await homeBrand.boundingBox()
       expect(brandBox).not.toBeNull()
@@ -67,12 +67,12 @@ for(const view of views){
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
     await expect(sideBrand.locator('.folio-wordmark-image-dark')).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u1')
+    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u2')
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u1')
-  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u1')
+  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
+  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
@@ -90,7 +90,7 @@ for(const view of views){
 test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-b-icon-180.png?v=u1')
+ expect(touch).toBe('./folio-b-icon-180.png?v=u2')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
  expect(manifest.background_color).toBe('#f4f1ec')
@@ -160,8 +160,8 @@ test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  expect(await meta('meta[property="og:description"]')).toBe(description)
  expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
  const image=await meta('meta[property="og:image"]')
- expect(image).toContain('folio-b-icon-512.png?v=u1')
- expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=u1')
+ expect(image).toContain('folio-b-icon-512.png?v=u2')
+ expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=u2')
  const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
  expect(res.status()).toBe(200)
 })
