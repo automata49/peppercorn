@@ -1110,6 +1110,7 @@ export default function App(){
         onSignal={()=>setPage('signal')}
         onLeadership={openJourneyLeadership}
         onStock={openJourneyStock}
+        labelFor={leadership}
       />
     </div>
   }else if(page==='signal'){
