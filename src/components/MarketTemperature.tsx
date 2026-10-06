@@ -30,11 +30,9 @@ function Headline({entry,prev}:{entry:TempEntry|null;prev:TempEntry|null}){
 export function TemperatureCard({entries,onOpen}:{entries:TempEntry[];onOpen:()=>void}){
   const sorted=sortEntries(entries),latest=sorted[0]||null,prev=sorted[1]||null
   const moved=latest?changes(latest,prev):[]
-  return <section className="panel temp-card" aria-label="시장 온도계">
-    <div className="panel-head"><div><h2>시장 온도계</h2><p>Howard Marks 점검표로 직접 매긴 시장 온도</p></div><button className="dashboard-section-action" onClick={onOpen}>온도계 열기 →</button></div>
-    <Headline entry={latest} prev={prev}/>
-    <Gauge value={latest?temperature(latest.marks):null} prev={prev?temperature(prev.marks):null}/>
-    {latest&&<p className="temp-moved">{moved.length?'바뀐 항목: '+moved.map(m=>m.item.label+(m.dir==='hotter'?' ▲':' ▼')).join(' · '):prev?'지난 판단과 같은 표시입니다.':'첫 기록입니다.'}</p>}
+  return <section className={'panel temp-card'+(!latest?' empty':'')} aria-label="시장 온도계">
+    <div className="panel-head"><div><h2>시장 온도계</h2><p>Howard Marks 점검표로 직접 매긴 시장 온도</p></div><button className="dashboard-section-action" onClick={onOpen}>{latest?'온도계 열기 →':'첫 온도 기록 →'}</button></div>
+    {latest?<><Headline entry={latest} prev={prev}/><Gauge value={temperature(latest.marks)} prev={prev?temperature(prev.marks):null}/><p className="temp-moved">{moved.length?'바뀐 항목: '+moved.map(m=>m.item.label+(m.dir==='hotter'?' ▲':' ▼')).join(' · '):prev?'지난 판단과 같은 표시입니다.':'첫 기록입니다.'}</p></>:<div className="temp-empty"><span>아직 기록이 없습니다</span><small>필요할 때 직접 판단을 남기고 시장 온도의 변화를 비교합니다.</small></div>}
   </section>
 }
 
