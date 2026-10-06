@@ -19,6 +19,7 @@ const required=[
   'scripts/generate-b-app-icons.mjs',
   'src/components/FolioMark.tsx',
   'src/components/FolioWordmark.tsx',
+  'src/components/AppIcon.tsx',
   'src/components/FolioInsight.tsx',
   'public/folio-b-icon-180.png',
   'public/folio-b-icon-192.png',
@@ -40,6 +41,8 @@ const main=read('src/main.tsx');
 const app=read('src/App.tsx');
 const sidebar=read('src/components/Sidebar.tsx');
 const wordmark=read('src/components/FolioWordmark.tsx');
+const appIcon=read('src/components/AppIcon.tsx');
+const analysisWorkbench=read('src/components/AnalysisWorkbench.tsx');
 const pkg=JSON.parse(read('package.json'));
 const manifest=JSON.parse(read('public/manifest.webmanifest'));
 const claudePlugin=JSON.parse(read('plugins/pepper-harness/.claude-plugin/plugin.json'));
@@ -79,6 +82,7 @@ assert(authModal.includes("import { FolioWordmark } from './FolioWordmark'")&&au
 assert(mainEntry.includes("import { FolioWordmark } from './components/FolioWordmark'")&&mainEntry.includes('<FolioWordmark className="fatal-wordmark"/>'),'Fatal fallback must use the canonical Folio wordmark.');
 assert(installApp.includes("import { FolioWordmark } from './FolioWordmark'")&&installApp.includes('<FolioWordmark className="install-wordmark"/>'),'Install UI must use the canonical Folio wordmark.');
 for(const [name,content] of [['App',app],['Sidebar',sidebar],['Wordmark',wordmark],['Auth',authModal],['Install',installApp],['Main',mainEntry]])assert(!content.includes('Folio XX'),`${name} must never expose uppercase Folio XX; the brand is Folio xx.`);
+for(const [name,content] of [['App',app],['Auth',authModal],['Install',installApp],['AnalysisWorkbench',analysisWorkbench]])assert(!content.includes('>×</button>'),`${name} must use the shared AppIcon close symbol, not a text × glyph.`);
 assert(!app.includes('SUNSET EDITORIAL'),'Launch must not expose the internal Sunset Editorial concept label.');
 assert(!css.includes('\\n'),'Identity CSS contains a literal \\n escape.');
 assert(!css.includes('launch-wordmark-system')&&!css.includes('radial-gradient(circle at 24% 78%'),'Superseded launch/wordmark identity CSS returned.');
@@ -98,6 +102,7 @@ assert(wordmark.includes('folio-wordmark-text')&&wordmark.includes('>Folio</span
 const folioMark=read('src/components/FolioMark.tsx');
 assert(folioMark.includes('M92 33 111 52 92 71 73 52Z'),'Visible Folio mark must preserve the B negative diamond.');
 assert(!folioMark.includes('currentColor')&&folioMark.includes('var(--folio-brand-plum,#54265f)')&&folioMark.includes('var(--folio-brand-coral,#f06a45)'),'Visible Folio xx colours must be fixed to the B palette, not inherited from page text.');
+assert(appIcon.includes("stroke:'currentColor'")&&appIcon.includes('strokeWidth:1.55')&&appIcon.includes("strokeLinecap:'round'")&&appIcon.includes("strokeLinejoin:'round'"),'AppIcon master geometry/stroke contract drifted.');
 assert(css.includes('.folio-wordmark-text')&&css.includes('font-family:Inter'),'B wordmark typography contract is missing.');
 for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-photography.webp'])assert(app.includes(asset),`App identity placement missing ${asset}`);
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
