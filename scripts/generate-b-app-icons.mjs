@@ -2,42 +2,41 @@ import fs from 'node:fs'
 import zlib from 'node:zlib'
 
 const INK=[11,11,13,255]
-const WARM=[244,241,236]
-const PALE=[226,184,202]
 const PLUM=[84,38,95]
 const MAGENTA=[163,79,120]
 const CORAL=[240,106,69]
-const AMBER=[245,162,74]
-const MARK_WIDTH_RATIO=0.3125
-const MARK_ASPECT=1.72
-const ROUND_RADIUS_RATIO=0.18
-const VIEW_W=172
-const VIEW_H=100
+const AMBER=[247,162,74]
+const VIEW_W=184
+const VIEW_H=104
+const MARK_WIDTH_RATIO=0.58
+const MARK_ASPECT=VIEW_W/VIEW_H
+const ROUND_RADIUS_RATIO=0.205
 
 const polygons=[
-  [[0,0],[32,0],[94,100],[62,100]],
-  [[62,0],[94,0],[32,100],[0,100]],
-  [[78,0],[110,0],[172,100],[140,100]],
-  [[140,0],[172,0],[110,100],[78,100]],
+  [[0,0],[31,0],[99,104],[66,104]],
+  [[66,0],[99,0],[31,104],[0,104]],
+  [[85,0],[118,0],[184,104],[152,104]],
+  [[151,0],[184,0],[118,104],[85,104]],
 ]
+const diamond=[[92,33],[111,52],[92,71],[73,52]]
 
 function insidePolygon(x,y,points){
   let inside=false
   for(let i=0,j=points.length-1;i<points.length;j=i++){
-    const xi=points[i][0],yi=points[i][1],xj=points[j][0],yj=points[j][1]
+    const [xi,yi]=points[i],[xj,yj]=points[j]
     const hit=((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi||1e-9)+xi)
     if(hit)inside=!inside
   }
   return inside
 }
 function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t))}
-function markColor(x){
-  const t=Math.max(0,Math.min(1,x/VIEW_W))
-  if(t<.24)return mix(WARM,PALE,t/.24)
-  if(t<.44)return mix(PALE,PLUM,(t-.24)/.20)
-  if(t<.66)return mix(PLUM,MAGENTA,(t-.44)/.22)
-  if(t<.82)return mix(MAGENTA,CORAL,(t-.66)/.16)
-  return mix(CORAL,AMBER,(t-.82)/.18)
+function colorAt(x){
+  if(x<85){
+    const t=Math.max(0,Math.min(1,x/99))
+    return t<.54?mix([247,244,241],PLUM,t/.54):mix(PLUM,MAGENTA,(t-.54)/.46)
+  }
+  const t=Math.max(0,Math.min(1,(x-85)/(VIEW_W-85)))
+  return t<.58?mix(MAGENTA,CORAL,t/.58):mix(CORAL,AMBER,(t-.58)/.42)
 }
 function coverage(px,py,w,h){
   let hit=0
@@ -45,7 +44,7 @@ function coverage(px,py,w,h){
   for(let sy=0;sy<n;sy++)for(let sx=0;sx<n;sx++){
     const x=((px+(sx+.5)/n)/w)*VIEW_W
     const y=((py+(sy+.5)/n)/h)*VIEW_H
-    if(polygons.some(poly=>insidePolygon(x,y,poly)))hit++
+    if(polygons.some(poly=>insidePolygon(x,y,poly))&&!insidePolygon(x,y,diamond))hit++
   }
   return hit/(n*n)
 }
@@ -67,7 +66,7 @@ function compose(size,{transparentCorners=false}={}){
   for(let y=0;y<markH;y++)for(let x=0;x<markW;x++){
     const a=coverage(x,y,markW,markH)
     if(a<=0)continue
-    const [r,g,b]=markColor((x/Math.max(1,markW-1))*VIEW_W)
+    const [r,g,b]=colorAt((x/Math.max(1,markW-1))*VIEW_W)
     const d=((y+oy)*size+(x+ox))*4
     const da=pixels[d+3]/255,outA=a+da*(1-a)
     pixels[d]=Math.round((r*a+pixels[d]*da*(1-a))/Math.max(outA,1e-8))
@@ -77,33 +76,22 @@ function compose(size,{transparentCorners=false}={}){
   }
   return {w:size,h:size,pixels,markW,markH}
 }
-
-const crcTable=(()=>{
-  const table=new Uint32Array(256)
-  for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;table[n]=c>>>0}
-  return table
-})()
+const crcTable=(()=>{const table=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;table[n]=c>>>0}return table})()
 function crc32(buf){let c=0xffffffff;for(const b of buf)c=crcTable[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0}
-function chunk(type,data){
-  const t=Buffer.from(type),len=Buffer.alloc(4),crc=Buffer.alloc(4)
-  len.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([t,data])))
-  return Buffer.concat([len,t,data,crc])
-}
+function chunk(type,data){const t=Buffer.from(type),len=Buffer.alloc(4),crc=Buffer.alloc(4);len.writeUInt32BE(data.length);crc.writeUInt32BE(crc32(Buffer.concat([t,data])));return Buffer.concat([len,t,data,crc])}
 function encodePng(img){
   const stride=img.w*4,raw=Buffer.alloc((stride+1)*img.h)
   for(let y=0;y<img.h;y++){const o=y*(stride+1);raw[o]=0;img.pixels.copy(raw,o+1,y*stride,(y+1)*stride)}
   const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(img.w,0);ihdr.writeUInt32BE(img.h,4);ihdr[8]=8;ihdr[9]=6
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),chunk('IDAT',zlib.deflateSync(raw,{level:9})),chunk('IEND',Buffer.alloc(0))])
 }
-
-const outputs=[
+for(const [size,file,transparentCorners] of [
   [180,'public/folio-b-icon-180.png',false],
   [192,'public/folio-b-icon-192.png',true],
   [512,'public/folio-b-icon-512.png',true],
   [512,'public/folio-b-icon-512-maskable.png',false],
-]
-for(const [size,file,transparentCorners] of outputs){
+]){
   const img=compose(size,{transparentCorners})
   fs.writeFileSync(file,encodePng(img))
-  console.log(`${file}: procedural B xx ${img.markW}×${img.markH} (${(img.markW/size*100).toFixed(1)}% × ${(img.markH/size*100).toFixed(1)}%)`)
+  console.log(`${file}: B diamond xx ${img.markW}×${img.markH} (${(img.markW/size*100).toFixed(1)}% width)`)
 }
