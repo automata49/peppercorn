@@ -2,6 +2,10 @@
 
 Decision date: 2026-10-05. This document records product-design principles, not a request to clone Robinhood.
 
+## Design baseline authority
+
+Implementation now follows [FOLIO_DESIGN_BASELINE.md](./FOLIO_DESIGN_BASELINE.md) as **Level 0**. This document still defines visual direction and information hierarchy, but sizes, spacing, icon metrics, wordmark geometry, touch targets, and app-icon masking rules must come from the baseline. Do not solve visual drift by appending another page-specific quality-pass override.
+
 ## Benchmark: what Robinhood actually optimizes
 
 Official Robinhood material consistently points to a small set of principles:
