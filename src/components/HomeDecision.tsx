@@ -27,7 +27,8 @@ export function HomeDecision({
   insight,
   onSignal,
   onLeadership,
-  onStock
+  onStock,
+  labelFor
 }:{
   regime:HomeMarketRegime
   counts:Counts
@@ -36,6 +37,7 @@ export function HomeDecision({
   onSignal:()=>void
   onLeadership:(key:HomeLeadershipKey)=>void
   onStock:(row:LeaderRow)=>void
+  labelFor:(row:LeaderRow)=>string
 }){
   return <div className="home-decision-flow">
     <section className={'home-regime '+regime.tone} aria-label="Market regime">
@@ -76,8 +78,8 @@ export function HomeDecision({
           eyebrow:row.market,
           title:row.name||row.ticker,
           meta:row.ticker,
-          badge:row.leadership_class||'관찰',
-          badgeTone:row.leadership_class==='핵심 주도'?'green':row.leadership_class==='주도 후보'?'blue':row.leadership_class==='강세 전환'?'amber':'gray',
+          badge:labelFor(row),
+          badgeTone:labelFor(row)==='핵심 주도'?'green':labelFor(row)==='주도 후보'?'blue':labelFor(row)==='강세 전환'?'amber':'gray',
           ariaLabel:\`\${row.name||row.ticker} Stock 단계로 이동\`
         }))}
         onSelect={onStock}
