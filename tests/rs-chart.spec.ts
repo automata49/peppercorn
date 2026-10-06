@@ -77,7 +77,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await sectorDisclosure.locator(':scope > summary').click()
   const sectorChart=page.locator('.dashboard-sector-panel .sector-heat')
   await expect(sectorChart.locator('.etf-heat-tile')).toHaveCount(2)
-  const sectorAnchor=view.touch?page.locator('.mobile-sector-list'):page.locator('.dashboard-sector-panel .dashboard-sector-table')
+  const sectorAnchor=view.width<=650?page.locator('.mobile-sector-list'):page.locator('.dashboard-sector-panel .dashboard-sector-table')
   expect((await sectorChart.boundingBox())!.y).toBeGreaterThan((await sectorAnchor.boundingBox())!.y)
 
   const explore=page.locator('.dashboard-explore')
