@@ -1095,7 +1095,7 @@ export default function App(){
         </div>
         <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
         <div className="leadership-decision">
-          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포"/>
+          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포" showStats={false}/>
           <div className="leadership-class-nav focus-class-strip" aria-label="리더십 분류">
             <button type="button" onClick={()=>showStockGroup('core')}><span>Core Leaders</span><b>{leadCount}</b><small>핵심 주도</small></button>
             <button type="button" onClick={()=>showStockGroup('candidates')}><span>Watch Candidates</span><b>{candidateCount}</b><small>주도 후보</small></button>
@@ -1284,7 +1284,7 @@ export default function App(){
     content=<><div className="analysis-page">
       <section className="analysis-hub-head">
         <div className="analysis-hub-copy"><span>ANALYSIS HUB</span><h2>더 많은 정보가 아니라, 더 선명한 판단.</h2><p>리더십 → 가격 모멘텀 → 구조화된 Insight → 재무 → Thesis 순서로 한 종목을 깊게 봅니다.</p></div>
-        <LeadershipPulse counts={analysisCounts} label="전체 리더십 분포"/>
+        <LeadershipPulse counts={analysisCounts} label="전체 리더십 분포" showStats={false}/>
       </section>
       <div className="analysis-finder">
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
