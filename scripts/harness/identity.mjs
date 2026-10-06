@@ -18,6 +18,7 @@ const required=[
   'tests/visual-identity-regression.spec.ts',
   'scripts/generate-b-app-icons.mjs',
   'src/components/FolioMark.tsx',
+  'src/components/FolioWordmark.tsx',
   'src/components/FolioInsight.tsx',
   'public/folio-b-icon-180.png',
   'public/folio-b-icon-192.png',
@@ -38,6 +39,7 @@ const css=read('src/design/folio-identity.css');
 const main=read('src/main.tsx');
 const app=read('src/App.tsx');
 const sidebar=read('src/components/Sidebar.tsx');
+const wordmark=read('src/components/FolioWordmark.tsx');
 const pkg=JSON.parse(read('package.json'));
 const manifest=JSON.parse(read('public/manifest.webmanifest'));
 const claudePlugin=JSON.parse(read('plugins/pepper-harness/.claude-plugin/plugin.json'));
@@ -72,6 +74,7 @@ const mainEntry=read('src/main.tsx');
 const authModal=read('src/components/AuthModal.tsx');
 assert(!mainEntry.includes('<strong>Peppercorn Capital</strong>'),'Fatal fallback must remain Folio-only.');
 assert(!authModal.includes('<span>Peppercorn Capital</span>')&&!authModal.includes("signup_closed:'Peppercorn"),'Auth UI must remain Folio-only.');
+assert(authModal.includes("import { FolioWordmark } from './FolioWordmark'")&&authModal.includes('<FolioWordmark className="auth-wordmark"/>'),'Auth must use the same canonical Folio wordmark, not plain brand text.');
 assert(!app.includes('SUNSET EDITORIAL'),'Launch must not expose the internal Sunset Editorial concept label.');
 assert(!css.includes('\\n'),'Identity CSS contains a literal \\n escape.');
 assert(!css.includes('launch-wordmark-system')&&!css.includes('radial-gradient(circle at 24% 78%'),'Superseded launch/wordmark identity CSS returned.');
@@ -86,8 +89,8 @@ assert(!iconBuild.includes('folio-b-xx-dark.png'),'App icon generator must use p
 assert(iconBuild.includes("fs.readFileSync('src/design/folio-baseline.css','utf8')")&&iconBuild.includes('return mix(PLUM,MAGENTA,t)'),'App icon palette must derive from the Level-0 B colour tokens.');
 assert(!iconBuild.includes('transparentCorners')&&!iconBuild.includes('roundedInside'),'Home-screen icon PNGs must stay full square; platform masks own the corner shape.');
 
-assert(sidebar.includes('folio-wordmark-text')&&sidebar.includes('>Folio</span>'),'Sidebar must render the B Folio text lockup.');
-assert(sidebar.includes("import { FolioMark } from './FolioMark'")&&sidebar.includes('<FolioMark/>'),'Sidebar must render the original vector B xx mark.');
+assert(sidebar.includes("import { FolioWordmark } from './FolioWordmark'")&&sidebar.includes('<FolioWordmark/>'),'Sidebar must consume the canonical Folio wordmark component.');
+assert(wordmark.includes('folio-wordmark-text')&&wordmark.includes('>Folio</span>')&&wordmark.includes("import { FolioMark } from './FolioMark'")&&wordmark.includes('<FolioMark/>'),'Canonical wordmark must render live Folio text plus the vector xx mark.');
 const folioMark=read('src/components/FolioMark.tsx');
 assert(folioMark.includes('M92 33 111 52 92 71 73 52Z'),'Visible Folio mark must preserve the B negative diamond.');
 assert(!folioMark.includes('currentColor')&&folioMark.includes('var(--folio-brand-plum,#54265f)')&&folioMark.includes('var(--folio-brand-coral,#f06a45)'),'Visible Folio xx colours must be fixed to the B palette, not inherited from page text.');
