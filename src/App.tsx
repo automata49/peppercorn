@@ -1194,6 +1194,10 @@ export default function App(){
           {([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={stockTab===key} className={stockTab===key?'on':''} onClick={()=>setStockTab(key)}>{label}<b>{summaryGroups[key].length}</b></button>)}
         </div>
       </div>
+      <div className="leadership-lens-row">
+        <LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/>
+        <button type="button" className="leadership-compare" onClick={()=>showStockGroup(stockTab)}>업종·지표 상세 비교 →</button>
+      </div>
       <DecisionList
         className="leadership-page-list"
         items={classRows.slice(0,20).map((row,index)=>({
