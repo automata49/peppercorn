@@ -16,7 +16,7 @@ The identity stylesheet removes earlier text-native wordmark and alternate launc
 
 ## B app-icon proportion correction — 2026-10-06
 
-User reported that the deployed icon's xx size and proportion did not match concept B. The earlier 512 asset effectively used the mark too large/wide. The authoritative app-icon geometry is now: near-black B tile, exact interlocked B mark, mark width ≈31.25% of the tile, mark bounding aspect ≈1.72:1, centered. `scripts/generate-b-app-icons.mjs` derives the 180/192/512/maskable family from `folio-b-xx-dark.png` before build; Playwright checks the rendered 512 mark bbox and the harness locks the constants. Deploy sync persists both public and root icon copies after generation.
+User reported that the deployed icon's xx size and proportion did not match concept B. The authoritative app-icon geometry remains: near-black B tile, interlocked B mark, mark width ≈31.25% of the tile, mark bounding aspect ≈1.72:1, centered. **Superseded implementation note:** the current `scripts/generate-b-app-icons.mjs` renders that geometry procedurally and no longer reads `folio-b-xx-dark.png` or any raster mark source. Playwright checks the rendered 512 mark bbox and the harness locks the constants.
 
 ## Pages identity asset publish regression — 2026-10-06
 
@@ -29,11 +29,11 @@ Fix: branch-root sync now copies and stages every active Folio B/C identity asse
 This entry supersedes earlier Folio identity notes where they conflict.
 
 - **Source of truth:** attached column 02 `Sunset Editorial` (B) on desktop, mobile and iPad.
-- **Wordmark:** the visible lockup is now clean B geometry, not the noisy screenshot crop. `Folio` is rendered in the editorial grotesk and paired with `public/folio-b-xx-light.png` / `public/folio-b-xx-dark.png`, extracted from the B app-icon mark. The rejected `folio-b-wordmark-light/dark.webp` crops were removed.
+- **Wordmark:** this older raster-mark note is superseded by the 2026-10-06 vector identity entry above. The visible lockup uses live editorial `Folio` typography plus `src/components/FolioMark.tsx`; screenshot/raster wordmarks remain prohibited.
 - **App icon:** exact B near-black rounded tile + centered xx via `folio-b-icon-180/192/512/512-maskable.png`.
 - **Loading:** `folio-b-launch-hero.webp` preserves the B top composition; GSAP is limited to clip reveal, subtle pan/scale, progress and fade.
 - **Typography:** Inter / Neue-Grotesk proportions are authoritative; large numerals stay regular, display tracking is tight, metadata is restrained uppercase.
-- **Motif:** `folio-b-motif.webp` is placed after the market-temperature section as the B editorial identity interlude.
+- **Motif:** this older raster-motif note is superseded by the original vector `public/folio-b-motif.svg` described above.
 - **Photography:** `folio-c-photography.webp` is used only as C-style photography treatment on wider layouts. C remains prohibited as a UI theme or primary motif.
 - **Harness:** exact assets, clean wordmark DOM/CSS, icon references, loading/motif/photo placement, theme behavior and removal of generic/generated identity sources are guarded by `scripts/harness/identity.mjs` + `npm run test:identity`.
 
