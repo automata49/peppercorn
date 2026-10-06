@@ -1108,9 +1108,34 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   font-weight:620;
   letter-spacing:-.045em;
 }
+.topbar-title,.panel-head>div,.dashboard-section-head>div{text-align:left}
+.topbar h1{
+  margin:0;
+  color:var(--folio-ink);
+  font-size:var(--folio-ds-type-display)!important;
+  line-height:var(--folio-ds-leading-display)!important;
+  font-weight:650;
+  letter-spacing:-.045em;
+}
+.panel-head,.dashboard-section-head{align-items:flex-start}
+.panel-head h2,.dashboard-section-head h2{
+  margin:0;
+  font-size:var(--folio-ds-type-section)!important;
+  line-height:var(--folio-ds-leading-section)!important;
+  font-weight:650;
+}
 .panel-head p,.dashboard-section-head p,.drill-note,.focus-roster-note{
+  font-size:var(--folio-ds-type-secondary);
+  line-height:var(--folio-ds-leading-secondary);
   letter-spacing:-.01em;
-  line-height:1.55;
+  text-align:left;
+  word-break:keep-all;
+}
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .topbar h1{
+    font-size:var(--folio-ds-type-page-compact)!important;
+    line-height:var(--folio-ds-leading-page-compact)!important;
+  }
 }
 
 /* Exact B wordmark: live typography + original vector interlocked xx.
@@ -2397,7 +2422,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     box-shadow:0 -8px 24px rgba(0,0,0,.28)!important;
   }
   .page-shell-analysis .mobile-bottom-nav button{color:#7f7978!important}
-  .page-shell-analysis .mobile-bottom-nav button.active{color:#f06a45!important}
+  .page-shell-analysis .mobile-bottom-nav button.active{color:#f7f4f1!important}
 }
 @media(max-width:900px){
   .leadership-decision{grid-template-columns:1fr!important}
