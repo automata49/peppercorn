@@ -26,6 +26,14 @@ for(const file of files.sort()){
     console.error(`Playwright parse failed: ${rel}`)
     if(result.stdout?.trim())console.error(result.stdout.trim())
     if(result.stderr?.trim())console.error(result.stderr.trim())
+    const tsc=spawnSync('npx',['tsc','--pretty','false','--noEmit','--skipLibCheck','--target','ESNext','--module','ESNext','--moduleResolution','Bundler',rel],{
+      encoding:'utf8',
+      env:{...process.env,CI:'1'},
+      maxBuffer:8*1024*1024
+    })
+    const diagnostics=(tsc.stdout||'')+(tsc.stderr||'')
+    const syntaxOnly=diagnostics.split(/\r?\n/).filter(line=>/error TS1\d{3}:/.test(line))
+    if(syntaxOnly.length)console.error('TypeScript syntax diagnostics:\n'+syntaxOnly.join('\n'))
   }
 }
 if(failed)process.exit(1)
