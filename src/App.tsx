@@ -965,7 +965,6 @@ export default function App(){
     turns:focusRows.filter(r=>leadership(r)==='강세 전환').length
   }
   const broadLeaderCount=summaryGroups.core.length+summaryGroups.candidates.length+summaryGroups.turns.length
-  const focusFilterLabel=!flagFile?'실적 데이터 준비 중':lensFilter.growthOnly?'실적 성장 필터 적용':'실적 성장 필터 해제'
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),
