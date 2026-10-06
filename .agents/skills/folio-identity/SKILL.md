@@ -3,7 +3,7 @@ name: folio-identity
 description: Use for Folio xx brand, Home visual identity, System/Light/Dark theme, loading screen, responsive mobile/iPad treatment, PWA icon/manifest and Robinhood-benchmark UI work.
 ---
 
-Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` before editing.
+Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` and `docs/design/FOLIO_UI_RESEARCH.md` before editing.
 
 Hard rules:
 - The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
@@ -12,6 +12,8 @@ Hard rules:
 - Loading uses `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
 - Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - Light is the first-run/default appearance. System and Dark remain explicit user selections; OS dark preference must not silently override a fresh Folio session.
+- Liquid Glass is a functional/navigation layer only. Use Level-0 glass tokens for top/bottom navigation, sticky filters/tool controls, drawers/popovers and transient controls; charts, tables, thesis cards and analytical content stay solid. Keep opaque/reduced-transparency fallbacks.
+- Robinhood research follows `FOLIO_UI_RESEARCH.md`: capture evidence, abstract a principle, map it to a Folio user intent, and add an acceptance check. Do not copy Robinhood branding, wording, proprietary assets or trade-entry UI.
 - Compact launch preserves the 508:235 `folio-b-launch-hero.webp` composition inside safe horizontal margins; never crop it into a tall portrait card. Keep the B motif secondary/compact on phones and use a quiet monoline navigation icon system.
 - B motif = original vector `public/folio-b-motif.svg`: monochrome rock/coast, lone figure, sparse technical line work and isolated warm sun/disc. Do not paste/crop the concept-board image.
 - Fluid Market/C is not a UI theme. C is limited to photography treatment through `public/folio-c-photography.webp`: warm sunset light, shallow depth/bokeh and human-scale optimism.
