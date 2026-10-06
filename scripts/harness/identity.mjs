@@ -22,6 +22,7 @@ const required=[
   'src/components/FolioWordmark.tsx',
   'src/components/AppIcon.tsx',
   'src/components/FolioInsight.tsx',
+  'src/components/HomeDecision.tsx',
   'public/folio-b-icon-180.png',
   'public/folio-b-icon-192.png',
   'public/folio-b-icon-512.png',
@@ -108,9 +109,16 @@ assert(folioMark.includes('M92 33 111 52 92 71 73 52Z'),'Visible Folio mark must
 assert(!folioMark.includes('currentColor')&&folioMark.includes('var(--folio-brand-plum,#54265f)')&&folioMark.includes('var(--folio-brand-coral,#f06a45)'),'Visible Folio xx colours must be fixed to the B palette, not inherited from page text.');
 assert(appIcon.includes("stroke:'currentColor'")&&appIcon.includes('strokeWidth:1.55')&&appIcon.includes("strokeLinecap:'round'")&&appIcon.includes("strokeLinejoin:'round'"),'AppIcon master geometry/stroke contract drifted.');
 assert(css.includes('.folio-wordmark-text')&&css.includes('font-family:Inter'),'B wordmark typography contract is missing.');
-for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-photography.webp'])assert(app.includes(asset),`App identity placement missing ${asset}`);
+assert(app.includes('folio-b-launch-hero.webp'),'Launch hero must remain in the app shell.');
+for(const asset of ['public/folio-b-motif.svg','public/folio-c-photography.webp'])assert(existsSync(asset),`Secondary Folio identity asset missing: ${asset}`);
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
+assert(app.includes("page==='signal'")&&app.includes("page==='leadership'")&&app.includes('<HomeDecision'),'Progressive Home → Market Signal → Leadership journey must remain implemented.');
+assert(app.includes('Decision 기록 →')&&app.includes("setPage('journal')"),'Thesis must retain the explicit Decision / Journal continuation.');
+assert(sidebar.includes("page==='signal'")&&sidebar.includes('<b>신호</b>'),'Compact quick nav must expose Market Signal as 홈 / 신호 / 분석 / 관심.');
+const homeDecision=read('src/components/HomeDecision.tsx');
+assert(homeDecision.includes('MARKET REGIME')&&homeDecision.includes('AI INSIGHT')&&homeDecision.includes('STRUCTURED · 규칙 기반'),'Home must keep regime, four-class/TODAY structure and transparent structured Insight labeling.');
+assert(contract.includes('HOME-JOURNEY-1')&&contract.includes('Home → Market Signal → Leadership → Stock → Thesis → Decision'),'Engineering contract must lock the Folio decision journey.');
 assert(css.includes('FOLIO DESIGN BASELINE — compact application'),'Compact UI must consume the Level-0 baseline.');
 assert(css.includes('aspect-ratio:var(--folio-ds-wordmark-mark-ratio)')&&baselineCss.includes('--folio-ds-wordmark-mark-ratio:184 / 104'),'Visible xx must keep the master 184:104 vector aspect through the Level-0 token.');
 assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio-ds-wordmark-mark-height)')&&baselineCss.includes('--folio-ds-wordmark-mark-height:1ex'),'Phone Folio xx must consume the lowercase x-height baseline.');
