@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#f4f1ec" />
+  <meta name="theme-color" content="#0b0b0d" />
   <meta name="color-scheme" content="light dark" />
   <meta name="description" content="모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼" />
   <meta property="og:type" content="website" />
@@ -20,7 +20,7 @@
   <meta name="twitter:description" content="모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼" />
   <meta name="twitter:image" content="https://automata49.github.io/peppercorn/folio-b-icon-512.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Folio xx" />
   <meta name="application-name" content="Folio xx" />
   <link rel="canonical" href="https://automata49.github.io/peppercorn/" />
@@ -32,7 +32,7 @@
     (() => {
       try {
         const saved = localStorage.getItem('folio-theme');
-        const mode = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+        const mode = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'dark';
         const root = document.documentElement;
         if (mode === 'light' || mode === 'dark') root.dataset.theme = mode;
         root.dataset.themeMode = mode;
@@ -40,6 +40,7 @@
           ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : mode;
         root.style.colorScheme = resolved;
+        root.dataset.resolvedTheme = resolved;
         document.querySelector('meta[name="theme-color"]')
           ?.setAttribute('content', resolved === 'dark' ? '#0a0a0c' : '#f4f1ec');
       } catch {}
