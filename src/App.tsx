@@ -1021,7 +1021,7 @@ export default function App(){
   const analysisNoByTicker=new Map(baseAnalysis.filter(r=>r.ticker).map((r,i)=>[String(r.ticker),i+1]))
   const researchNoByTicker=new Map(baseResearch.filter(r=>r.ticker).map((r,i)=>[String(r.ticker),i+1]))
   const today=new Date();today.setHours(0,0,0,0)
-  const enrichedResearch=baseResearch.map((r,i)=>{
+  const enrichedResearch:EditableRow[]=baseResearch.map((r,i)=>{
     const d=r.date?new Date(String(r.date)):null
     const elapsed=d&&!Number.isNaN(d.getTime())?Math.floor((today.getTime()-d.getTime())/86400000):null
     const review=r.next_review_date?new Date(String(r.next_review_date)):null
