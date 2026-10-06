@@ -2699,6 +2699,23 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 
 /* USER-SUPPLIED IDENTITY ASSET LOCK — 2026-10-07 */
+/* supplied wordmark sizing lock */
+.folio-wordmark-system{
+  height:var(--folio-wordmark-size)!important;
+  line-height:0!important;
+}
+.folio-wordmark-image{
+  display:block;
+  width:auto!important;
+  height:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+}
+.mobile-brand-home .folio-wordmark-system{height:var(--folio-ds-wordmark-phone)!important}
+.sidebar .folio-wordmark-system{height:var(--folio-ds-wordmark-sidebar)!important}
+.menu-drawer .folio-wordmark-system{height:var(--folio-ds-wordmark-drawer)!important}
+.launch-footer .folio-wordmark-system{height:var(--folio-ds-wordmark-footer)!important}
+
 /* The seven user attachments are now the visual source of truth. No procedural
    xx/hero/motif reconstruction is allowed to override these assets. */
 .folio-wordmark-text,.folio-wordmark-mark,.folio-xx-vector{display:none!important}
