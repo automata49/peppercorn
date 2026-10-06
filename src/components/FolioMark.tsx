@@ -1,31 +1,43 @@
 import {useId} from 'react'
 
+/**
+ * Folio xx master mark.
+ * Geometry follows the approved B board: two interlocked X strokes with a
+ * centered negative diamond. The first X inherits the surrounding ink/white
+ * through currentColor before moving into Plum; the second X runs
+ * Magenta → Coral → Amber.
+ */
 export function FolioMark({className=''}:{className?:string}){
   const raw=useId().replace(/:/g,'')
   const left='folio-left-'+raw
   const right='folio-right-'+raw
-  return <svg className={('folio-xx-vector '+className).trim()} viewBox="0 0 172 100" role="presentation" aria-hidden="true" focusable="false">
+  const cut='folio-cut-'+raw
+  return <svg className={('folio-xx-vector '+className).trim()} viewBox="0 0 184 104" role="presentation" aria-hidden="true" focusable="false">
     <defs>
-      <linearGradient id={left} x1="0" y1="0" x2="1" y2="1">
+      <linearGradient id={left} gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="108" y2="92">
         <stop offset="0%" stopColor="currentColor"/>
-        <stop offset="52%" stopColor="#54265F"/>
+        <stop offset="54%" stopColor="#54265F"/>
         <stop offset="100%" stopColor="#A34F78"/>
       </linearGradient>
-      <linearGradient id={right} x1="0" y1="1" x2="1" y2="0">
+      <linearGradient id={right} gradientUnits="userSpaceOnUse" x1="82" y1="82" x2="184" y2="12">
         <stop offset="0%" stopColor="#A34F78"/>
-        <stop offset="56%" stopColor="#F06A45"/>
-        <stop offset="100%" stopColor="#F5A24A"/>
+        <stop offset="58%" stopColor="#F06A45"/>
+        <stop offset="100%" stopColor="#F7A24A"/>
       </linearGradient>
+      <mask id={cut}>
+        <rect width="184" height="104" fill="white"/>
+        <path d="M92 33 111 52 92 71 73 52Z" fill="black"/>
+      </mask>
     </defs>
-    <g fill={'url(#'+left+')'}>
-      <path d="M0 0h32l62 100H62z"/>
-      <path d="M62 0h32L32 100H0z"/>
+    <g mask={'url(#'+cut+')'}>
+      <g fill={'url(#'+left+')'}>
+        <path d="M0 0h31l68 104H66z"/>
+        <path d="M66 0h33L31 104H0z"/>
+      </g>
+      <g fill={'url(#'+right+')'}>
+        <path d="M85 0h33l66 104h-32z"/>
+        <path d="M151 0h33l-66 104H85z"/>
+      </g>
     </g>
-    <g fill={'url(#'+right+')'}>
-      <path d="M78 0h32l62 100h-32z"/>
-      <path d="M140 0h32l-62 100H78z"/>
-    </g>
-    <path d="M78 0h16l16 26-16 26-16-26z" fill="#54265F" opacity=".94"/>
-    <path d="M78 100h16l16-26-16-26-16 26z" fill="#A34F78" opacity=".96"/>
   </svg>
 }
