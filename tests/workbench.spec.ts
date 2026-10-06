@@ -138,7 +138,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await expect(side.locator('.nav-label')).toHaveText(['Dashboard','종목 분석','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
+    await expect(side.locator('.nav-label')).toHaveText(['Home','종목 분석','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
   }
   if(await side.isVisible())await side.getByRole('button',{name:'종목 분석'}).click()
   else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
