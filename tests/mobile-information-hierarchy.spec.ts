@@ -27,10 +27,21 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
-  // Dashboard: decision list first, dense search/table second.
+  // Home: only regime, four leadership states, 3–5 Focus names and one structured Insight.
+  await expect(page.locator('.home-regime')).toBeVisible()
+  await expect(page.locator('.home-class-grid button')).toHaveCount(4)
+  const homeRows=page.locator('.home-today-list .decision-row')
+  expect(await homeRows.count()).toBeGreaterThan(0)
+  expect(await homeRows.count()).toBeLessThanOrEqual(5)
+  await expect(page.locator('.home-insight')).toBeVisible()
+  await expect(page.locator('.dashboard-sector-panel')).toHaveCount(0)
+  await noHorizontalOverflow(page)
+
+  // Market Signal: dense market/sector evidence is one level deeper.
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
+  await expect(page.locator('.market-signal-metrics > div')).toHaveCount(4)
   await expect(page.locator('.mobile-sector-list')).toBeVisible()
   await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden()
-  await expect(page.locator('.dashboard-toolbar input')).toBeHidden()
   await noHorizontalOverflow(page)
 
   // Analysis: one explicit decision path; Overview is primary and records stay secondary.
