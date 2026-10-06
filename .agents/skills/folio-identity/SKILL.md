@@ -6,22 +6,20 @@ description: Use for Folio xx brand, Home visual identity, System/Light/Dark the
 Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` before editing.
 
 Hard rules:
-- The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
-- Wordmark must match B as a clean lockup: live `Folio` typography plus the original interlocked vector `src/components/FolioMark.tsx`. Raster/screenshot wordmarks, pasted B-board lettering, plain text xx and alternate symbols are prohibited. The visible xx is lowercase-scale: **height = 1ex / lowercase “o” height**, never uppercase-X/cap-height. Its Plum → Magenta → Coral → Amber colours are fixed across all surfaces and never inherit current text colour.
-- Primary installed-app icon uses B's near-black tile + assertive centered interlocked xx. `scripts/generate-b-app-icons.mjs` must rasterize the original vector geometry procedurally (~58% width, ~1.77:1), with the centered negative diamond and B colour split; never read a raster mark source.
-- Loading uses `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
-- Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
+- The seven identity files supplied by the user on 2026-10-07 are the pixel source of truth. Do not reconstruct or regenerate them from the older concept board.
+- Wordmark must use `public/folio-brand-wordmark-light.webp` / `public/folio-brand-wordmark-dark.webp` through `FolioWordmark`. Do not restore live `Folio` + `FolioMark.tsx`, plain-text xx, or newly generated lettering.
+- Primary installed-app icons `folio-b-icon-*` are static size derivatives of `public/folio-brand-icon-black.webp`. `scripts/generate-b-app-icons.mjs` is verification-only and must not draw a new mark. The supplied glossy/light icon files are approved reference variants.
+- Loading uses the supplied portrait `public/folio-brand-launch.webp` at **9:16** with restrained GSAP reveal/pan only. It already contains Folio branding, so no second caption/footer wordmark may overlay it.
+- Home identity imagery uses the supplied `public/folio-brand-typography.webp` and `public/folio-brand-photography.webp`; the former generated motif SVG and old C photography file are retired.
+- Typography in functional UI follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - Light is the first-run/default appearance. System and Dark remain explicit user selections; OS dark preference must not silently override a fresh Folio session.
-- Compact launch preserves the 508:235 `folio-b-launch-hero.webp` composition inside safe horizontal margins; never crop it into a tall portrait card. Keep the B motif secondary/compact on phones and use a quiet monoline navigation icon system.
-- B motif = original vector `public/folio-b-motif.svg`: monochrome rock/coast, lone figure, sparse technical line work and isolated warm sun/disc. Do not paste/crop the concept-board image.
-- Fluid Market/C is not a UI theme. C is limited to photography treatment through `public/folio-c-photography.webp`: warm sunset light, shallow depth/bokeh and human-scale optimism.
 - Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure only. Do not copy its branding, colours or trade-entry UI.
 - Analysis Hub owns the deep path: 핵심/후보/전환/전체/Position scope → one visible stock list → unchanged PriceRsChart composition → Overview / Analysis / Financials / Thesis. Overview owns deterministic Folio Insight, Analysis owns leadership/Swing evidence, Financials owns Position filing evidence, Thesis owns user judgement. Do not restore duplicate Focus/추가 보기 layers.
 - 3D is restricted to the shallow Leadership Pulse presentation. It must not change counts, ranking, classification or imply a new score.
 - Preserve System / Light / Dark and persisted theme behavior.
 - Preserve semantic finance colours and all investment logic. Brand colour never changes gain/loss meaning, leadership class, RS, stage, sector rank or Position Growth rules.
 - Compact Dashboard uses the Folio brand bar rather than a duplicate Dashboard titlebar. Touch iPad follows the same B language.
-- The launch screen is Folio-only: no Peppercorn logo/text co-branding and no `logo.webp`.
+- The launch screen is the supplied Folio hero only: no overlay caption/footer, Peppercorn logo/text co-branding, or `logo.webp`.
 - Superseded `folio-app-icon-*`, `folio-icon-*`, `folio-identity-*`, generic `icon-*`, legacy wordmark and old Apple-touch assets must stay deleted.
 - The visual identity regression gate is fixed at 390 / 834 / 1366 / 1440 CSS px.
 - Level-0 sizes/spacing/icon/wordmark/app-icon rules come from `src/design/folio-baseline.css`. Do not append a new “quality pass / V4 / V5” override block; change the baseline token or owning component and add regression coverage.
