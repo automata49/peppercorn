@@ -30,7 +30,7 @@ for(const view of views){
 
     const brand=page.locator('.page-shell-dashboard .mobile-brandbar')
     await expect(brand).toBeVisible()
-    expect(await brand.evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none')
+    expect(await brand.evaluate(e=>getComputedStyle(e).backdropFilter)).toContain('blur(18px)')
     expect(parseFloat(await brand.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
 
     const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
@@ -53,7 +53,7 @@ for(const view of views){
 
     const bottomActive=page.locator('.mobile-bottom-nav button.active')
     await expect(bottomActive).toBeVisible()
-    expect(await bottomActive.evaluate(e=>getComputedStyle(e).color)).toBe(bodyColor)
+    expect(await bottomActive.evaluate(e=>getComputedStyle(e).color)).toBe('rgb(240, 106, 69)')
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
     await context.close()
   })

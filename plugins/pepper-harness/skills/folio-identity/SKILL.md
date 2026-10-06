@@ -8,8 +8,8 @@ Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLI
 Hard rules:
 - The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
 - Wordmark must match B as a clean lockup: live `Folio` typography plus the original interlocked vector `src/components/FolioMark.tsx`. Raster/screenshot wordmarks, pasted B-board lettering, plain text xx and alternate symbols are prohibited.
-- Primary installed-app icon uses B's near-black tile + small centered interlocked xx. `scripts/generate-b-app-icons.mjs` must rasterize the original vector geometry procedurally (31.25% width, ~1.72:1), never read a raster mark source.
-- Loading uses `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
+- Primary installed-app icon uses B's near-black tile + prominent centered interlocked xx. `scripts/generate-b-app-icons.mjs` must rasterize the original vector geometry procedurally (56% width, ~1.84:1 with a central negative-space diamond), never read a raster mark source.
+- Loading uses the live Folio wordmark above `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
 - Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - B motif = original vector `public/folio-b-motif.svg`: monochrome rock/coast, lone figure, sparse technical line work and isolated warm sun/disc. Do not paste/crop the concept-board image.
 - Fluid Market/C is not a UI theme. C is limited to photography treatment through `public/folio-c-photography.webp`: warm sunset light, shallow depth/bokeh and human-scale optimism.

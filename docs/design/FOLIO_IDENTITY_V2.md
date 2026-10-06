@@ -27,11 +27,11 @@ The **attached concept board's column 02 — “Sunset Editorial” (B)** is the
 
 Exact B rules:
 - **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Product UI renders “Folio” as live Inter / Neue-Grotesk typography and renders the xx from the original vector geometry in `src/components/FolioMark.tsx`. No screenshot crop, raster wordmark, pasted lettering or plain-text xx is allowed. The vector uses the B proportions and plum → magenta → coral/amber transition and is the shared source-of-truth geometry for the visible mark.
-- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The mark occupies approximately **31.25% of tile width** with a **1.72:1 bounding-box aspect**, optically centered. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
+- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The mark occupies approximately **56% of tile width** with a **1.84:1 bounding-box aspect**, with the central negative-space diamond clearly visible, optically centered. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
 - **Typography:** Inter / Neue-Grotesk style grotesk. Large headings are clean, confident and tightly set; captions use restrained uppercase tracking. Avoid decorative type or overly rounded fintech styling.
 - **Motif:** `public/folio-b-motif.svg` is an original vector construction of B's editorial language: monochrome rock/coast silhouette, lone human figure, sparse technical line work and an isolated warm sun/disc. It is not a crop or pasted artwork from the concept board. The flowing multicolour wave belongs to C and is not Folio's primary motif.
 - **Photography:** C's photography *treatment* may be borrowed: warm sunset light, shallow depth of field, human-scale optimism, restrained blur/bokeh. It is photography treatment only, not a C UI system.
-- **Palette:** Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`. Warm off-white reading surfaces are allowed as B's paper field.
+- **Palette:** Ink Black `#0B0B0D`, Warm Sand `#EBE0D4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F7A24A`. Warm off-white reading surfaces are allowed as B's paper field.
 - **Semantic finance colours:** gain/loss colours remain functional and independent from the brand palette.
 
 Robinhood is benchmarked only for product hierarchy, simplicity, familiar navigation and progressive disclosure. Its green, trade-entry visual language and branding are not Folio identity.
@@ -67,9 +67,13 @@ Folio uses one linear analysis journey inspired by Robinhood's content-first sim
 
 The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. It is presentation-only and never changes or implies an investment score.
 
+### Premium detail hierarchy
+
+Stock detail keeps the proven price-momentum chart composition unchanged. Directly below it, Overview begins with a **Folio Insight** thesis layer that synthesizes leadership, RS/momentum and available Position evidence into strengths and risk considerations. This is a deterministic signal synthesis, not a hidden investment score. Deeper Swing and Position evidence remain one tap away through the existing tabs.
+
 ## Mobile / iPad visual rule
 
-Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper or near-black surfaces, monochrome chart line, text-led tabs, flat dividers, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
+Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the supplied board's **near-black product expression** by default while desktop keeps the warm editorial workspace. Both use the same wordmark, app-icon geometry, typography, palette discipline and motif logic, monochrome chart line, text-led tabs, flat dividers, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Visual Identity cleanup lock
 

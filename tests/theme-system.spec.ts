@@ -13,6 +13,8 @@ test('desktop theme control persists Light Dark and System modes',async({page})=
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const control=page.locator('.sidebar .theme-control')
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark')
+  await expect(control.getByRole('button',{name:'Dark'})).toHaveAttribute('aria-pressed','true')
 
   await control.getByRole('button',{name:'Dark'}).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark')

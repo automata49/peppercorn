@@ -26,8 +26,9 @@ for(const view of [
       await expect(brandbar).toBeVisible()
       const box=await brandbar.boundingBox()
       expect(box).not.toBeNull()
-      expect(box!.height).toBeGreaterThanOrEqual(67.5)
-      expect(box!.height).toBeLessThanOrEqual(68.5)
+      const expected=64
+      expect(box!.height).toBeGreaterThanOrEqual(expected-.5)
+      expect(box!.height).toBeLessThanOrEqual(expected+.5)
     }else{
       await expect(top.locator('h1')).toBeVisible()
       await expect(top.locator('p')).toBeHidden()

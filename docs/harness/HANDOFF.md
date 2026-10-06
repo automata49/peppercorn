@@ -1,3 +1,11 @@
+## Premium B fidelity pass — 2026-10-06
+
+The supplied Folio xx boards were re-compared against the product. The previous 31.25% installed icon mark was too small. The authoritative installed icon now uses the procedural interlocked B mark at about 56% tile width, ~1.84:1, with the visible central negative-space diamond. The live wordmark uses the same geometry; no board crop or pasted lettering is used.
+
+New users start in Dark because the supplied mobile product expression is near-black; System and Light remain explicit choices. Loading uses the live wordmark + B hero and never exposes the internal concept label. Compact Dashboard/Analysis surfaces use the dark editorial expression, while the detail price-momentum chart keeps its existing data/interaction composition.
+
+Analysis Overview now begins with a Folio Insight signal-synthesis layer (leadership + RS/momentum + available Position evidence), followed by the deeper existing Overview/Swing/Position evidence. It is explanatory synthesis only and never changes ranking or classification.
+
 ## Folio B vector identity + unified analysis experience — 2026-10-06
 
 User requested a second Visual Identity pass plus an information-architecture redesign. This change keeps the attached B / Sunset Editorial concept authoritative while prohibiting copied/cropped wordmark and illustration assets.
