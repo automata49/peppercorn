@@ -4,14 +4,15 @@ import zlib from 'node:zlib'
 const INK=[11,11,13,255]
 const WARM=[244,241,236]
 const PALE=[226,184,202]
+const PALE=[246,236,232]
 const PLUM=[84,38,95]
 const MAGENTA=[163,79,120]
 const CORAL=[240,106,69]
 const AMBER=[245,162,74]
-const MARK_WIDTH_RATIO=0.3125
-const MARK_ASPECT=1.72
+const MARK_WIDTH_RATIO=0.56
+const MARK_ASPECT=1.84
 const ROUND_RADIUS_RATIO=0.18
-const VIEW_W=172
+const VIEW_W=184
 const VIEW_H=100
 
 const polygons=[
@@ -45,7 +46,7 @@ function coverage(px,py,w,h){
   for(let sy=0;sy<n;sy++)for(let sx=0;sx<n;sx++){
     const x=((px+(sx+.5)/n)/w)*VIEW_W
     const y=((py+(sy+.5)/n)/h)*VIEW_H
-    if(polygons.some(poly=>insidePolygon(x,y,poly)))hit++
+    if(polygons.some(poly=>insidePolygon(x,y,poly))&&!insidePolygon(x,y,cutDiamond))hit++
   }
   return hit/(n*n)
 }
