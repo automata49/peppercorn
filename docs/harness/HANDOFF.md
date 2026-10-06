@@ -1,5 +1,10 @@
 ## Folio visual quality v2 — 2026-10-06
 
+## Light-first compact identity correction — 2026-10-06
+
+Latest physical-iPhone review found that the B artwork itself was being presented with the wrong compact framing: the launch hero was forced into a 1.28:1 portrait-like crop, the header/wordmark and outline icons were too heavy, and the home motif consumed too much vertical space. Light is now the first-run default while System/Dark stay explicit choices. Phone launch preserves the source 508:235 composition inside safe horizontal margins; the Folio/xx lockup and monoline icons are quieter; the B motif is short/secondary on phone. These are presentation-only changes and do not alter investment logic or data.
+
+
 Latest user review supersedes the miniature app-icon note below. The approved B boards are now treated as a product-quality contract, not merely a palette/mood reference. The master double-x uses a centered negative diamond; installed xx occupies about 58% of the near-black tile with ~1.77:1 bounding aspect. Wordmark and icon share the same vector geometry. Leadership Overview and Analysis are near-black B focal investing surfaces inside the warm editorial shell. The duplicated leadership count layer is removed.
 
 Analysis keeps the proven PriceRsChart composition, then uses four depth tabs: Overview (deterministic Folio Insight + essentials), Analysis (leadership/Swing), Financials (Position filing evidence), Thesis (user judgement/record). Folio Insight is rule-based signal synthesis and must not be described as a live LLM opinion until a provider passes the analyst contract/evals.
