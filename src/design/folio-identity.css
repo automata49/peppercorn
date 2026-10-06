@@ -2702,6 +2702,18 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 /* The seven user attachments are now the visual source of truth. No procedural
    xx/hero/motif reconstruction is allowed to override these assets. */
 .folio-wordmark-text,.folio-wordmark-mark,.folio-xx-vector{display:none!important}
+.folio-wordmark-system{
+  height:var(--folio-wordmark-size)!important;
+  min-height:var(--folio-wordmark-size)!important;
+  align-items:center!important;
+  line-height:0!important;
+}
+.folio-wordmark-image{
+  display:block;
+  height:100%!important;
+  width:auto!important;
+  max-height:100%!important;
+}
 .folio-wordmark-image-light{display:block}
 .folio-wordmark-image-dark{display:none}
 .sidebar .folio-wordmark-image-light{display:none}
