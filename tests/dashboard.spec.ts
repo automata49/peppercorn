@@ -21,7 +21,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.home-insight')).toContainText('AI INSIGHT');
   await expect(page.locator('.dashboard-sector-panel')).toHaveCount(0);
   await expect(page.locator('.dashboard-explore')).toHaveCount(0);
-  if(view.touch)await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','신호','분석','관심']);
+  if(view.touch)await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','신호','리더십','Stock']);
 
   // Market Signal: market breadth, sectors, temperature and ETF exploration appear here.
   await page.getByRole('button',{name:'Market Signal →'}).click();
@@ -51,11 +51,12 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const leadershipRows=page.locator('.leadership-page-list .decision-row');
   expect(await leadershipRows.count()).toBeGreaterThan(0);
   await leadershipRows.first().click();
-  const drill=page.locator('.drill-sheet');
-  await expect(drill.locator('.stock-snapshot')).toBeVisible();
-  const rs=drill.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
+  const stock=page.locator('.analysis-page');
+  await expect(stock).toBeVisible();
+  await expect(stock.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis']);
+  await stock.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click();
+  const rs=stock.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
-  await expect(page.getByRole('button',{name:'종목분석 기록 작성 →'})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
   await context.close();
  })
@@ -74,11 +75,14 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   await expect(page.locator('.leadership-page')).toBeVisible();
   await page.locator('.leadership-page-list .decision-row').first().click();
-  const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
+  const stock=page.locator('.analysis-page');
+  await expect(stock).toBeVisible();
+  await stock.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click();
+  const rs=stock.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong').first()).toHaveText('—');
-  await page.getByRole('button',{name:'RS 새로고침'}).click();
+  await stock.getByRole('button',{name:'RS 새로고침'}).click();
   await expect(rs.locator('.signal-strip strong').first()).toHaveText('+11.0%');
-  await expect(page.locator('.drill-sheet .drill-meta')).toContainText('TEST0');
+  await expect(stock.locator('.hero-name')).toContainText('검증 종목');
   expect(calls).toBe(2);
 });
 
@@ -104,7 +108,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.drill-sheet .leadership-section .snapshot-section-head .pill')).toHaveText('해당 없음');
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
+  await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click();
   // SPY is neutral, so switch to the full analysis list.
   await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
