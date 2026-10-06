@@ -24,7 +24,7 @@ for(const view of views){
   const launch=page.locator('.launch-overlay')
   const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
-  await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp?v=b3')
+  await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp?v=b4')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('STRUCTURED FREEDOM')
   await expect(launch.locator('.launch-editorial-caption')).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
@@ -76,8 +76,8 @@ for(const view of views){
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b3')
-  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b3')
+  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b4')
+  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b4')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
@@ -95,7 +95,7 @@ for(const view of views){
 test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-b-icon-180.png?v=b3')
+ expect(touch).toBe('./folio-b-icon-180.png?v=b4')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
  expect(manifest.background_color).toBe('#f4f1ec')
@@ -160,8 +160,8 @@ test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  expect(await meta('meta[property="og:description"]')).toBe(description)
  expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
  const image=await meta('meta[property="og:image"]')
- expect(image).toContain('folio-b-icon-512.png?v=b3')
- expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=b3')
+ expect(image).toContain('folio-b-icon-512.png?v=b4')
+ expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=b4')
  const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
  expect(res.status()).toBe(200)
 })
