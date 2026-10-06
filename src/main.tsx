@@ -19,7 +19,7 @@ class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}
     if(this.state.error){
       return <main className="fatal-error">
         <div>
-          <strong>Peppercorn Capital</strong>
+          <strong>Folio xx</strong>
           <h1>앱을 표시하지 못했습니다.</h1>
           <p>화면 데이터 처리 중 오류가 발생했습니다. 아래 진단 메시지를 남겨 두었고, 캐시를 우회해 다시 불러올 수 있습니다.</p>
           <code>{this.state.error.message||this.state.error.name}</code>
