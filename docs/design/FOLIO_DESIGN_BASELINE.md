@@ -20,9 +20,10 @@ A page-level tweak may not silently override Level 0. Any exception must be docu
 
 - Wordmark is live **Folio** text + the vector `FolioMark`.
 - The xx mark keeps its native **184:104 (~1.769:1)** aspect. Never scale X/Y independently.
-- Phone wordmark: **Folio 25px + xx 31px**.
+- Phone wordmark: **Folio 25px + lowercase-scale xx**. The xx height is **1ex** — optically the same height as the lowercase “o”, never cap-height / uppercase-X scale.
 - App/home-screen icon: square full-bleed artwork. **Do not bake rounded/transparent corners into the PNG**; iOS/Android apply the platform mask.
 - App-icon xx occupies **58% of tile width**, keeps the 184:104 aspect, remains optically centered, and keeps the negative center diamond.
+- Brand mark colour is context-independent: **Plum #54265F → Magenta #A34F78** on the left x and **Magenta → Coral #F06A45 → Amber #F5A24A** on the right x. It must not inherit page text colour.
 
 ## 3. Grid and alignment
 
@@ -31,6 +32,7 @@ Use a 4px base grid.
 | Token | Baseline |
 | --- | ---: |
 | Phone gutter | 16px |
+| Wordmark xx height | 1ex = lowercase “o” height |
 | Tablet gutter | 18px |
 | Desktop gutter | 28px |
 | Compact header | 60px |
