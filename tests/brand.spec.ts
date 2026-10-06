@@ -25,7 +25,7 @@ for(const view of views){
   const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
   await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp')
-  await expect(launch.locator('.launch-editorial-caption')).toContainText('STRUCTURED FREEDOM')
+  await expect(launch.locator('.launch-brand-lockup')).toContainText('STRUCTURED FREEDOM')
   await expect(launch.locator('.launch-editorial-caption')).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
   await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
@@ -93,7 +93,7 @@ test('B wordmark, hero, motif and C photography assets are deployable',async({re
  }
 })
 
-test('B app icon keeps the compact xx scale and proportion from concept B',async({page})=>{
+test('B app icon keeps the prominent xx scale and proportion from concept B',async({page})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const box=await page.evaluate(async()=>{
    const img=new Image()
@@ -113,12 +113,12 @@ test('B app icon keeps the compact xx scale and proportion from concept B',async
    }
    return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2}
  })
- expect(box.w/512).toBeGreaterThanOrEqual(.29)
- expect(box.w/512).toBeLessThanOrEqual(.33)
- expect(box.h/512).toBeGreaterThanOrEqual(.16)
- expect(box.h/512).toBeLessThanOrEqual(.20)
- expect(box.w/box.h).toBeGreaterThanOrEqual(1.65)
- expect(box.w/box.h).toBeLessThanOrEqual(1.80)
+ expect(box.w/512).toBeGreaterThanOrEqual(.53)
+ expect(box.w/512).toBeLessThanOrEqual(.58)
+ expect(box.h/512).toBeGreaterThanOrEqual(.28)
+ expect(box.h/512).toBeLessThanOrEqual(.33)
+ expect(box.w/box.h).toBeGreaterThanOrEqual(1.78)
+ expect(box.w/box.h).toBeLessThanOrEqual(1.90)
  expect(Math.abs(box.cx-255.5)).toBeLessThanOrEqual(5)
  expect(Math.abs(box.cy-255.5)).toBeLessThanOrEqual(5)
 })
