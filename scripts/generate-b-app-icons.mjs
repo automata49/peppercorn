@@ -10,7 +10,6 @@ const VIEW_W=184
 const VIEW_H=104
 const MARK_WIDTH_RATIO=0.58
 const MARK_ASPECT=VIEW_W/VIEW_H
-const ROUND_RADIUS_RATIO=0.205
 
 const polygons=[
   [[0,0],[31,0],[99,104],[66,104]],
@@ -48,19 +47,13 @@ function coverage(px,py,w,h){
   }
   return hit/(n*n)
 }
-function roundedInside(x,y,size,r){
-  if((x>=r&&x<size-r)||(y>=r&&y<size-r))return true
-  const cx=x<r?r:size-r-1,cy=y<r?r:size-r-1
-  return (x-cx)**2+(y-cy)**2<=r**2
-}
-function compose(size,{transparentCorners=false}={}){
+function compose(size){
   const markW=Math.round(size*MARK_WIDTH_RATIO)
   const markH=Math.round(markW/MARK_ASPECT)
   const pixels=Buffer.alloc(size*size*4)
-  const radius=Math.round(size*ROUND_RADIUS_RATIO)
   for(let y=0;y<size;y++)for(let x=0;x<size;x++){
-    const i=(y*size+x)*4,inside=!transparentCorners||roundedInside(x,y,size,radius)
-    if(inside){pixels[i]=INK[0];pixels[i+1]=INK[1];pixels[i+2]=INK[2];pixels[i+3]=255}
+    const i=(y*size+x)*4
+    pixels[i]=INK[0];pixels[i+1]=INK[1];pixels[i+2]=INK[2];pixels[i+3]=255
   }
   const ox=Math.round((size-markW)/2),oy=Math.round((size-markH)/2)
   for(let y=0;y<markH;y++)for(let x=0;x<markW;x++){
@@ -85,13 +78,13 @@ function encodePng(img){
   const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(img.w,0);ihdr.writeUInt32BE(img.h,4);ihdr[8]=8;ihdr[9]=6
   return Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),chunk('IDAT',zlib.deflateSync(raw,{level:9})),chunk('IEND',Buffer.alloc(0))])
 }
-for(const [size,file,transparentCorners] of [
-  [180,'public/folio-b-icon-180.png',false],
-  [192,'public/folio-b-icon-192.png',true],
-  [512,'public/folio-b-icon-512.png',true],
-  [512,'public/folio-b-icon-512-maskable.png',false],
+for(const [size,file] of [
+  [180,'public/folio-b-icon-180.png'],
+  [192,'public/folio-b-icon-192.png'],
+  [512,'public/folio-b-icon-512.png'],
+  [512,'public/folio-b-icon-512-maskable.png'],
 ]){
-  const img=compose(size,{transparentCorners})
+  const img=compose(size)
   fs.writeFileSync(file,encodePng(img))
   console.log(`${file}: B diamond xx ${img.markW}×${img.markH} (${(img.markW/size*100).toFixed(1)}% width)`)
 }
