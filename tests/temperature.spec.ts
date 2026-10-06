@@ -36,7 +36,7 @@ async function goTemperature(page:Page){
 async function goSignal(page:Page){
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await side.getByRole('button',{name:'Dashboard'}).click()
+    await side.getByRole('button',{name:'Home'}).click()
     await page.getByRole('button',{name:'Market Signal →'}).click()
   }else{
     await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
