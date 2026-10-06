@@ -29,6 +29,14 @@ for(const view of views){
   await expect(launch.locator('.launch-editorial-caption')).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
   await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
+  if(view.name==='phone'){
+    const frame=await launch.locator('.launch-editorial-frame').boundingBox()
+    expect(frame).not.toBeNull()
+    expect(frame!.width/frame!.height).toBeGreaterThan(2.05)
+    expect(frame!.width/frame!.height).toBeLessThan(2.25)
+    expect(frame!.x).toBeGreaterThanOrEqual(12)
+    expect(frame!.y).toBeLessThan(140)
+  }
   await expect(launch.locator('.launch-footer')).not.toContainText('Peppercorn Capital')
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000})
@@ -39,6 +47,13 @@ for(const view of views){
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
     await expect(homeBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
     await expect(homeBrand.locator('.folio-xx-vector')).toBeVisible()
+    if(view.name==='phone'){
+      const wordSize=await homeBrand.locator('.folio-wordmark-text').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))
+      const markBox=await homeBrand.locator('.folio-wordmark-mark').boundingBox()
+      expect(wordSize).toBeLessThanOrEqual(27.1)
+      expect(markBox).not.toBeNull()
+      expect(markBox!.width).toBeLessThanOrEqual(38.5)
+    }
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
   }else{
