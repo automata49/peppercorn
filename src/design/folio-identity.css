@@ -2696,3 +2696,179 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     height:clamp(var(--folio-ds-motif-phone-min),29vw,var(--folio-ds-motif-phone-max))!important;
   }
 }
+
+
+/* USER-SUPPLIED IDENTITY ASSET LOCK — 2026-10-07 */
+/* supplied wordmark sizing lock */
+.folio-wordmark-system{
+  height:var(--folio-wordmark-size)!important;
+  line-height:0!important;
+}
+.folio-wordmark-image{
+  display:block;
+  width:auto!important;
+  height:100%!important;
+  max-height:100%!important;
+  object-fit:contain!important;
+}
+.mobile-brand-home .folio-wordmark-system{height:var(--folio-ds-wordmark-phone)!important}
+.sidebar .folio-wordmark-system{height:var(--folio-ds-wordmark-sidebar)!important}
+.menu-drawer .folio-wordmark-system{height:var(--folio-ds-wordmark-drawer)!important}
+.launch-footer .folio-wordmark-system{height:var(--folio-ds-wordmark-footer)!important}
+
+/* The seven user attachments are now the visual source of truth. No procedural
+   xx/hero/motif reconstruction is allowed to override these assets. */
+.folio-wordmark-text,.folio-wordmark-mark,.folio-xx-vector{display:none!important}
+.folio-wordmark-system{
+  height:var(--folio-wordmark-size)!important;
+  min-height:var(--folio-wordmark-size)!important;
+  align-items:center!important;
+  line-height:0!important;
+}
+.page-shell-dashboard .mobile-brand-home .folio-wordmark-system{
+  --folio-wordmark-size:25px!important;
+  height:25px!important;
+  min-height:25px!important;
+  max-height:25px!important;
+}
+.page-shell-dashboard .mobile-brand-home .folio-wordmark-image{
+  height:25px!important;
+  min-height:25px!important;
+  max-height:25px!important;
+}
+.folio-wordmark-image{
+  display:block;
+  height:100%!important;
+  width:auto!important;
+  max-height:100%!important;
+}
+.folio-wordmark-image-light{display:block}
+.folio-wordmark-image-dark{display:none}
+.sidebar .folio-wordmark-image-light{display:none}
+.sidebar .folio-wordmark-image-dark{display:block}
+:root[data-theme="dark"] .folio-wordmark-image-light{display:none}
+:root[data-theme="dark"] .folio-wordmark-image-dark{display:block}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]) .folio-wordmark-image-light{display:none}
+  :root:not([data-theme]) .folio-wordmark-image-dark{display:block}
+}
+.page-shell-analysis .mobile-brandbar .folio-wordmark-image-light{display:none}
+.page-shell-analysis .mobile-brandbar .folio-wordmark-image-dark{display:block}
+
+.launch-overlay,.launch-screen{background:#0b0b0d!important}
+.launch-screen{
+  display:grid!important;
+  grid-template-rows:1fr!important;
+  place-items:center!important;
+  width:100%!important;
+  height:100dvh!important;
+  min-height:100dvh!important;
+  padding:0!important;
+  overflow:hidden!important;
+}
+.launch-center{
+  position:relative!important;
+  width:100%!important;
+  height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.launch-editorial-frame{
+  width:min(100vw,calc(100dvh * .5625))!important;
+  height:auto!important;
+  max-height:100dvh!important;
+  aspect-ratio:9/16!important;
+  margin:0!important;
+  border:0!important;
+  background:#0b0b0d!important;
+  box-shadow:none!important;
+}
+.launch-b-hero{
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center center!important;
+  transform-origin:50% 50%!important;
+}
+.launch-editorial-caption,.launch-footer{display:none!important}
+.launch-progress{
+  position:fixed!important;
+  left:50%!important;
+  bottom:max(10px,env(safe-area-inset-bottom))!important;
+  z-index:4!important;
+  width:min(180px,46vw)!important;
+  height:1px!important;
+  margin:0!important;
+  transform:translateX(-50%)!important;
+  background:rgba(255,255,255,.18)!important;
+}
+.launch-progress span{background:rgba(255,255,255,.84)!important}
+
+.folio-identity-interlude{
+  grid-template-columns:minmax(0,.92fr) minmax(300px,1.08fr)!important;
+  background:var(--folio-line)!important;
+}
+.page-shell-dashboard .folio-identity-interlude img,
+.folio-identity-interlude img{
+  height:clamp(320px,38vw,560px)!important;
+  min-height:320px!important;
+  filter:none!important;
+}
+.folio-motif-panel img{
+  object-fit:contain!important;
+  object-position:center center!important;
+  background:#f4f1ec!important;
+}
+.folio-photo-panel img{
+  object-fit:cover!important;
+  object-position:center 43%!important;
+}
+@media(max-width:1279px){
+  .folio-identity-interlude{
+    grid-template-columns:1fr!important;
+    margin-left:-16px!important;
+    margin-right:-16px!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude img,
+  .folio-identity-interlude img{
+    height:clamp(300px,92vw,520px)!important;
+    min-height:300px!important;
+  }
+  .folio-motif-panel img{object-fit:contain!important}
+}
+@media(max-width:650px){
+  .launch-editorial-frame{
+    width:min(100vw,calc(100dvh * .5625))!important;
+    height:auto!important;
+    max-height:100dvh!important;
+    aspect-ratio:9/16!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude img,
+  .folio-identity-interlude img{
+    height:clamp(300px,118vw,470px)!important;
+    min-height:300px!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude .folio-motif-panel img{
+    height:clamp(300px,118vw,470px)!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
+}
+
+/* User-supplied wordmark sizing lock: preserve the approved 25px compact height. */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .mobile-brand-home .folio-wordmark-system{
+    height:var(--folio-ds-wordmark-phone)!important;
+    min-height:var(--folio-ds-wordmark-phone)!important;
+    max-height:var(--folio-ds-wordmark-phone)!important;
+    align-items:center!important;
+  }
+  .mobile-brand-home .folio-wordmark-image{
+    display:block!important;
+    height:100%!important;
+    width:auto!important;
+    max-height:none!important;
+  }
+}

@@ -802,8 +802,6 @@ export default function App(){
     if(!showIntro||!root)return
     const frame=root.querySelector<HTMLElement>('.launch-editorial-frame')
     const hero=root.querySelector<HTMLElement>('.launch-b-hero')
-    const caption=root.querySelector<HTMLElement>('.launch-editorial-caption')
-    const footer=root.querySelector<HTMLElement>('.launch-footer')
     const progress=root.querySelector<HTMLElement>('.launch-progress span')
     const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const finish=()=>{
@@ -817,8 +815,6 @@ export default function App(){
       if(!reduceMotion){
         if(frame)timeline.fromTo(frame,{autoAlpha:0,clipPath:'inset(0 18% 0 18%)'},{autoAlpha:1,clipPath:'inset(0 0% 0 0%)',duration:1.05,ease:'power3.out'},.08)
         if(hero)timeline.fromTo(hero,{scale:1.045,xPercent:1.2},{scale:1,xPercent:0,duration:4.35,ease:'sine.out'},.08)
-        if(caption)timeline.fromTo(caption,{y:10,autoAlpha:0},{y:0,autoAlpha:1,duration:.72,ease:'power2.out'},.82)
-        if(footer)timeline.fromTo(footer,{autoAlpha:0},{autoAlpha:1,duration:.6,ease:'power2.out'},1.05)
       }
       if(progress)timeline.to(progress,{scaleX:1,duration:4.45,ease:'none'},0)
       timeline.to(root,{autoAlpha:0,duration:.62,ease:'power2.inOut'},4.48)
@@ -1154,14 +1150,12 @@ export default function App(){
 
       <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
 
-      <section className="folio-identity-interlude" aria-label="Folio 투자 원칙">
+      <section className="folio-identity-interlude" aria-label="Folio visual identity">
         <figure className="folio-motif-panel">
-          <img src="./folio-b-motif.svg?v=b5" alt="" loading="lazy"/>
-          <figcaption><span>DISCIPLINE · INSIGHT · PERSPECTIVE · FREEDOM</span><strong>Know the Market. Know Yourself.</strong></figcaption>
+          <img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself. A wider perspective for a brighter tomorrow." loading="lazy"/>
         </figure>
-        <figure className="folio-photo-panel">
-          <img src="./folio-c-photography.webp?v=b5" alt="" loading="lazy"/>
-          <figcaption><span>PHOTOGRAPHY TREATMENT</span><strong>Structured freedom, seen through warmer light.</strong></figcaption>
+        <figure className="folio-photo-panel" aria-hidden="true">
+          <img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/>
         </figure>
       </section>
 
@@ -1517,5 +1511,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-b-launch-hero.webp?v=b5" alt="Folio xx visual"/></div><div className="launch-editorial-caption"><span>STRUCTURED FREEDOM</span><p>더 멀리 보고, 더 깊이 생각하는 투자.</p></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div><footer className="launch-footer"><FolioWordmark className="launch-footer-wordmark"/><small>© {new Date().getFullYear()} Folio xx</small></footer></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={setPage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u2" alt="Folio xx visual"/></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
 }

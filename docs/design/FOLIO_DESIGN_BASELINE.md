@@ -16,14 +16,17 @@ When two rules conflict, use this order:
 
 A page-level tweak may not silently override Level 0. Any exception must be documented next to the component and added to regression coverage.
 
-## 2. Non-negotiable brand geometry
+## 2. Non-negotiable supplied brand artwork
 
-- Wordmark is live **Folio** text + the vector `FolioMark`.
-- The xx mark keeps its native **184:104 (~1.769:1)** aspect. Never scale X/Y independently.
-- Phone wordmark: **Folio 25px + lowercase-scale xx**. The xx height is **1ex** — optically the same height as the lowercase “o”, never cap-height / uppercase-X scale.
-- App/home-screen icon: square full-bleed artwork. **Do not bake rounded/transparent corners into the PNG**; iOS/Android apply the platform mask.
-- App-icon xx occupies **58% of tile width**, keeps the 184:104 aspect, remains optically centered, and keeps the negative center diamond.
-- Brand mark colour is context-independent: **Plum #54265F → Magenta #A34F78** on the left x and **Magenta → Coral #F06A45 → Amber #F5A24A** on the right x. It must not inherit page text colour.
+The seven user-supplied identity files approved on **2026-10-07** supersede reconstructed geometry.
+
+- Wordmark uses the supplied Folio xx artwork through `FolioWordmark`. `folio-brand-wordmark-light.webp` is the light-surface derivative and `folio-brand-wordmark-dark.webp` is the dark-surface derivative of the same supplied source. Do not redraw the lettering or xx.
+- Phone wordmark renders at **25px high** and preserves the supplied artwork's intrinsic aspect ratio. Do not independently scale the xx.
+- App/home-screen icons are static derivatives of the supplied near-black app-icon artwork. `scripts/generate-b-app-icons.mjs` is verification-only and must never procedurally redraw the mark.
+- Installed icons are full square before the platform mask; iOS/Android own final corner masking.
+- The supplied icon's centered negative diamond, pale left stroke and Plum/Magenta/Coral/Amber transition must remain visually intact.
+- Loading uses the supplied **9:16** portrait hero. Do not revert to the former 508:235 landscape composition.
+- Home identity imagery uses the supplied Typography and Photography files; the former generated motif SVG is retired.
 
 ## 3. Grid and alignment
 

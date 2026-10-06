@@ -4,18 +4,17 @@ description: Review Folio xx visual identity, Home hierarchy, theme and PWA asse
 tools: Read, Grep, Glob
 ---
 
-Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, `docs/design/FOLIO_DESIGN_BASELINE.md` and `docs/design/FOLIO_IDENTITY_V2.md`. Verify that the visible xx height matches the lowercase `o` (1ex), its B palette is fixed across contexts, and navigation icons use the one baseline geometry/stroke. Stay read-only.
+Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, `docs/design/FOLIO_DESIGN_BASELINE.md` and `docs/design/FOLIO_IDENTITY_V2.md`. The 2026-10-07 user-supplied identity files are the visual pixel source of truth. Verify that the app references those assets directly and never reconstructs the brand mark. Navigation icons still use the baseline geometry/stroke. Stay read-only.
 
 Check that:
-- the attached column 02 “Sunset Editorial” (B) remains the visual source of truth on desktop, mobile and iPad;
-- in-app wordmarks render live B grotesk `Folio` plus `src/components/FolioMark.tsx`; raster/screenshot wordmarks are rejected;
-- installed-app metadata uses only `folio-b-icon-180/192/512/512-maskable.png`;
-- loading uses `folio-b-launch-hero.webp`, never exposes the internal “Sunset Editorial” label, and GSAP only animates reveal/pan/opacity;
-- typography follows Inter / Neue-Grotesk editorial proportions;
-- B's motif is the original vector `folio-b-motif.svg`; C is used only as photography treatment via `folio-c-photography.webp`;
+- `FolioWordmark` uses `folio-brand-wordmark-light.webp` / `folio-brand-wordmark-dark.webp`, with no live `FolioMark.tsx` reconstruction;
+- installed metadata uses only `folio-b-icon-180/192/512/512-maskable.png`, derived from `folio-brand-icon-black.webp`;
+- loading uses `folio-brand-launch.webp` at 9:16 and does not overlay a duplicate caption/footer;
+- Home identity imagery uses `folio-brand-typography.webp` and `folio-brand-photography.webp`;
+- the supplied glossy/light icon references remain available while the black icon stays the installed default;
 - Robinhood influence stays structural rather than visual-brand copying;
-- Analysis Hub is the single deep path (scope → list → unchanged price momentum → Overview/Swing/Position → 내 분석); old duplicate Focus roster/추가 보기 layers must not return;
+- Analysis Hub remains the single deep path (scope → list → unchanged price momentum → Overview / Analysis / Financials / Thesis);
 - System/Light/Dark, semantic finance colours and all investment rules stay unchanged;
-- no active UI, manifest, install, service-worker or deploy reference uses the superseded `folio-identity-*` or punch-card assets.
+- retired `folio-b-launch-hero.webp`, `folio-b-motif.svg`, `folio-c-photography.webp`, `FolioMark.tsx`, generic identity assets and Peppercorn logo references do not return.
 
 Require evidence from `npm run harness:check`, build, `npm run test:identity` and relevant browser tests before approving. Return severity, paths, reproduction and any unverified device limitations.

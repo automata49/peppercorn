@@ -76,14 +76,22 @@
 
 .folio-wordmark-system{
   --folio-wordmark-size:var(--folio-ds-wordmark-phone);
-  font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue","SF Pro Display","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif;
-  font-size:var(--folio-wordmark-size);
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  height:var(--folio-wordmark-size);
+  line-height:0;
 }
-.folio-wordmark-mark{
-  height:var(--folio-ds-wordmark-mark-height);
+.folio-wordmark-image{
+  display:block;
   width:auto;
-  aspect-ratio:var(--folio-ds-wordmark-mark-ratio);
+  height:100%;
+  max-width:none;
+  object-fit:contain;
+  user-select:none;
+  pointer-events:none;
 }
+.folio-wordmark-image-dark{display:none}
 
 @media(max-width:650px){
   body{word-break:keep-all}

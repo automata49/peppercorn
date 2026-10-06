@@ -27,20 +27,23 @@ Official references:
 
 ## Authoritative visual reference
 
-The **attached concept board's column 02 — “Sunset Editorial” (B)** is the source of truth for Folio UI identity. Do not reinterpret B into a new style. Generated moodboards, Robinhood screenshots and later exploratory visuals are references only and must never override the B column.
+The **seven identity files supplied by the user on 2026-10-07** are the current source of truth. They supersede prior reconstructed/vector approximations of the B board while preserving the same Sunset Editorial direction.
 
-Exact B rules:
-- **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Product UI renders “Folio” as live Inter / Neue-Grotesk typography and renders the xx from the original vector geometry in `src/components/FolioMark.tsx`. No screenshot crop, raster wordmark, pasted lettering or plain-text xx is allowed. The vector uses the B proportions and fixed plum → magenta → coral/amber transition and is the shared source-of-truth geometry for the visible mark. **In a wordmark the xx is lowercase-scale: its rendered height is 1ex, matching the lowercase “o” height, not the cap height.** Its layout box uses the vector's native **184:104 (~1.77:1)** aspect; never stretch X/Y independently.
-- **App icon:** B's near-black rounded-square tile with the assertive centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The approved-board mark occupies approximately **58% of tile width** with an approximately **1.77:1 bounding-box aspect**, optically centered. The central negative diamond is mandatory. The left x transitions Plum → Magenta; the right x transitions Magenta → Coral → Amber. Those colours are fixed and must not inherit the surrounding text colour. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
-- **Typography:** Inter / Neue-Grotesk style grotesk. Large headings are clean, confident and tightly set; captions use restrained uppercase tracking. Avoid decorative type or overly rounded fintech styling.
-- **Compact fit:** phone launch keeps the source 508:235 B composition inside the safe horizontal frame; do not re-crop it into a tall portrait card. The home B motif is secondary and deliberately short on phone. Navigation icons use one quiet monoline system; active state may gain contrast but not become visibly chunky.
-- **Phone optical lock:** compact header is 60px; phone `Folio` is 25px with an **x-height (1ex) interlocked xx**; top/bottom navigation icons are 20px monoline; active navigation uses a short 16px rule instead of a heavy filled state. The phone motif image stays at roughly 108–122px high so it supports the editorial system instead of taking over the screen.
-- **Motif:** `public/folio-b-motif.svg` is an original vector construction of B's editorial language: monochrome rock/coast silhouette, lone human figure, sparse technical line work and an isolated warm sun/disc. It is not a crop or pasted artwork from the concept board. The flowing multicolour wave belongs to C and is not Folio's primary motif.
-- **Photography:** C's photography *treatment* may be borrowed: warm sunset light, shallow depth of field, human-scale optimism, restrained blur/bokeh. It is photography treatment only, not a C UI system.
-- **Palette:** Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`. Warm off-white reading surfaces are allowed as B's paper field.
-- **Semantic finance colours:** gain/loss colours remain functional and independent from the brand palette.
+Canonical supplied assets:
+- **Loading hero:** `public/folio-brand-launch.webp` — supplied 9:16 portrait/sunset Folio artwork. It already contains the wordmark and brand copy, so the loading UI must not overlay a second caption or footer logo.
+- **Installed icon source:** `public/folio-brand-icon-black.webp` — supplied near-black icon. `folio-b-icon-180/192/512/512-maskable.png` are static size derivatives only; do not redraw or reinterpret the xx.
+- **Wordmark:** `public/folio-brand-wordmark-light.webp` and `public/folio-brand-wordmark-dark.webp`, derived only for transparent/light-dark surface use from the supplied wordmark file. `FolioWordmark` displays these assets directly.
+- **Typography:** `public/folio-brand-typography.webp` — supplied “Know The Market. Know Yourself.” poster.
+- **Photography:** `public/folio-brand-photography.webp` — supplied portrait/sunset treatment with geometric line work.
+- **Alternate icon references:** `public/folio-brand-icon-glossy.webp` and `public/folio-brand-icon-light.webp` remain part of the approved identity asset set, but the black flat icon is the installed-app default.
 
-Robinhood is benchmarked only for product hierarchy, simplicity, familiar navigation and progressive disclosure. Its green, trade-entry visual language and branding are not Folio identity.
+Hard rules:
+- Do not reconstruct the wordmark, xx, hero, typography poster or photography from code, SVG geometry, generated text, or a new image-generation pass.
+- Do not bring back `FolioMark.tsx`, the generated motif SVG, the old launch hero, or the old photography asset as active sources.
+- Typography inside the app UI remains Inter / Neue-Grotesk style grotesk; the supplied typography poster is imagery, not a replacement for functional UI text.
+- Palette remains Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`.
+- Semantic gain/loss colours remain functional and independent from the brand palette.
+- Robinhood is benchmarked only for product hierarchy, simplicity, familiar navigation and progressive disclosure. Its branding, colours and trade-entry UI are not Folio identity.
 
 ## Home information architecture
 
@@ -82,9 +85,9 @@ Desktop, mobile and iPad all use B/Sunset Editorial. Warm editorial paper is the
 
 The active product identity is **Folio xx / Sunset Editorial B only**. Peppercorn may remain a repository or company/project name, but it is not a second visible brand in the app shell or launch screen.
 
-- Active visual assets are limited to the live/vector B wordmark, procedurally generated B app-icon family, B launch hero, original vector B motif and the explicitly secondary C photography-treatment image.
+- Active visual assets are limited to the user-supplied wordmark derivatives, user-supplied black app-icon derivatives, supplied 9:16 launch hero, supplied Typography poster and supplied Photography treatment.
 - Superseded punch-card, generic `folio-icon-*`, generated `folio-identity-*`, old `folio-app-icon-*`, legacy wordmark and generic `icon-*` assets must not remain in deployable source/root locations.
-- Launch footer uses the Folio xx lockup only; it must not show `logo.webp` or “Peppercorn Capital”. The loading page must never expose the internal concept label “Sunset Editorial”.
+- Loading is the supplied 9:16 hero itself; no secondary Folio footer/caption, `logo.webp`, “Peppercorn Capital”, or internal “Sunset Editorial” label may be overlaid.
 - Identity CSS must not keep raster mark switching, screenshot wordmarks or alternate launch compositions underneath the B Exact Lock.
 - Canonical visual-regression widths are **390 / 834 / 1366 / 1440 CSS px**. `npm run test:visual-identity` and `npm run test:identity` must pass before identity-related work is approved.
 

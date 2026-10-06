@@ -1,8 +1,6 @@
-import { FolioMark } from './FolioMark'
-
 export function FolioWordmark({className=''}:{className?:string}){
   return <span className={('folio-wordmark-system '+className).trim()} role="img" aria-label="Folio xx">
-    <span className="folio-wordmark-text" aria-hidden="true">Folio</span>
-    <span className="folio-wordmark-mark" aria-hidden="true"><FolioMark/></span>
+    <img className="folio-wordmark-image folio-wordmark-image-light" src="./folio-brand-wordmark-light.webp?v=u2" alt="" draggable={false}/>
+    <img className="folio-wordmark-image folio-wordmark-image-dark" src="./folio-brand-wordmark-dark.webp?v=u2" alt="" draggable={false}/>
   </span>
 }
