@@ -1100,91 +1100,71 @@ export default function App(){
 
   let content
   if(page==='dashboard'){
-    content=<div className="discovery-home">{filters}
-      <section className="dashboard-section leadership-overview focus-overview">
-        <div className="dashboard-section-head">
-          <div><h2>{discoveryLayout.title}</h2><p>{discoveryLayout.subtitle}</p><MarketSegment label="주도 종목" value={leaderMkt} onChange={setLeaderMkt}/></div>
-          <button className="dashboard-section-action" onClick={()=>{setDrillStock(null);setSummaryTab(null);setDrillSectorKey('ALL')}}>전체 후보 {broadLeaderCount} →</button>
-        </div>
-        <LeaderSpotlight key={leaderMkt} rows={focusRows.slice(0,discoveryLayout.previewCount)} labelFor={leadership} onSelect={chartOpenStock}/>
-        <div className="leadership-decision">
-          <LeadershipPulse counts={{core:leadCount,candidates:candidateCount,turns:turnCount}} label="전체 리더십 분포" showStats={false}/>
-          <div className="leadership-class-nav focus-class-strip" aria-label="리더십 분류">
-            <button type="button" onClick={()=>showStockGroup('core')}><span>Core Leaders</span><b>{leadCount}</b><small>핵심 주도</small></button>
-            <button type="button" onClick={()=>showStockGroup('candidates')}><span>Watch Candidates</span><b>{candidateCount}</b><small>주도 후보</small></button>
-            <button type="button" onClick={()=>showStockGroup('turns')}><span>Turnaround</span><b>{turnCount}</b><small>강세 전환</small></button>
-          </div>
-        </div>
-        <div className="leadership-next">
-          <span>목록·세부 지표·내 판단은 분석 허브에서 한 번에 이어집니다.</span>
-          <button type="button" className="dashboard-section-action" onClick={()=>setPage('analysis')}>분석 허브 열기 →</button>
-        </div>
+    content=<div className="discovery-home home-progressive">
+      <div className="home-market-filter"><MarketSegment label="Home" value={market} onChange={setMarket}/></div>
+      <HomeDecision
+        regime={marketRegime}
+        counts={{core:leadCount,candidates:candidateCount,turns:turnCount,corrections:correctionCount}}
+        rows={homeTodayRows}
+        insight={homeInsight}
+        onSignal={()=>setPage('signal')}
+        onLeadership={openJourneyLeadership}
+        onStock={openJourneyStock}
+      />
+    </div>
+  }else if(page==='signal'){
+    content=<div className="market-signal-page">
+      <section className="journey-head">
+        <button type="button" onClick={()=>setPage('dashboard')}>← Home</button>
+        <div><span>MARKET SIGNAL</span><h2>시장 전체보다 먼저, 구조의 변화를 봅니다.</h2><p>시장 폭과 섹터 리더십을 확인한 뒤 Leadership 단계로 이동합니다.</p></div>
+      </section>
+      {filters}
+      <section className="market-signal-metrics" aria-label="시장 구조 요약">
+        <div><span>MA50 위</span><b>{ma50Rows.length?Math.round(breadth*100)+'%':'—'}</b><small>{ma50Rows.length.toLocaleString('ko-KR')}종목 기준</small></div>
+        <div><span>MA200 위</span><b>{ma200Rows.length?Math.round(ma200Breadth*100)+'%':'—'}</b><small>{ma200Rows.length.toLocaleString('ko-KR')}종목 기준</small></div>
+        <div><span>52W 고점 근접</span><b>{high52Rows.length?Math.round(highNearShare*100)+'%':'—'}</b><small>고점 -10% 이내</small></div>
+        <div><span>상승 / 하락</span><b>{advanceCount+declineCount?advanceDeclineRatio.toFixed(1)+' : 1':'—'}</b><small>1W 기준</small></div>
       </section>
 
-      <section className="dashboard-lower-grid dashboard-sector-only">
-        <div className="dashboard-left-column">
-        <div className="panel industry-panel dashboard-sector-panel focus-sector-panel">
-          <div className="panel-head dashboard-sector-head">
-            <div><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
-            <div className="sector-actions">
-              <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
-            </div>
-          </div>
-          <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table focus-sector-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>주도</th><th>등락 20D</th><th>등락 50D</th><th>52W 근접</th></tr></thead><tbody>
-            {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
-              <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
-              <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
-              <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 {g.core}</small></td>
-              <td className={g.medRet20d!=null&&g.medRet20d>0?'pos':g.medRet20d!=null&&g.medRet20d<0?'neg':''}>{pct(g.medRet20d)}</td>
-              <td className={g.medRet50d!=null&&g.medRet50d>0?'pos':g.medRet50d!=null&&g.medRet50d<0?'neg':''}>{pct(g.medRet50d)}</td>
-              <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
-            </tr>)}
-            {!dashboardTopSectors.length&&<tr><td colSpan={6} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
-          </tbody></table></div>
-          <DecisionList
-            className="mobile-sector-list"
-            items={dashboardTopSectors.map((g,index)=>({
-              key:g.key,
-              data:g,
-              rank:index+1,
-              eyebrow:g.market,
-              title:sectorLabel(g),
-              meta:`RS ${g.medRank==null?'—':Math.round(g.medRank)} · 주도 ${g.core+g.candidate}`,
-              badge:g.core>0?`핵심 ${g.core}`:g.verdict,
-              badgeTone:g.core>0?'green':'gray',
-              value:pct(g.medRet20d),
-              subvalue:`50D ${pct(g.medRet50d)}`,
-              valueTone:(g.medRet20d??0)>0?'positive':(g.medRet20d??0)<0?'negative':undefined,
-              ariaLabel:`${sectorLabel(g)} 주도 종목 보기`
-            }))}
-            onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
-            emptyLabel="조건에 맞는 섹터가 없습니다."
-          />
-          <details className="dashboard-disclosure sector-heat-disclosure"><summary>시장 지표 · 섹터 히트맵</summary><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
+      <section className="panel industry-panel dashboard-sector-panel focus-sector-panel signal-sector-panel">
+        <div className="panel-head dashboard-sector-head">
+          <div><h2>Sector Leadership</h2><p>RS와 가격 구조가 강한 섹터를 확인하고 Leadership 후보군으로 들어갑니다.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
+          <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button></div>
         </div>
-        </div>
+        <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table focus-sector-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>주도</th><th>등락 20D</th><th>등락 50D</th><th>52W 근접</th></tr></thead><tbody>
+          {dashboardTopSectors.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={sectorLabel(g)+' Leadership 보기'} onClick={()=>{setSectorKeySelected(g.key);setStockTab(g.core>0?'core':g.candidate>0?'candidates':'turns');setPage('leadership')}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+            <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
+            <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
+            <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 {g.core}</small></td>
+            <td className={g.medRet20d!=null&&g.medRet20d>0?'pos':g.medRet20d!=null&&g.medRet20d<0?'neg':''}>{pct(g.medRet20d)}</td>
+            <td className={g.medRet50d!=null&&g.medRet50d>0?'pos':g.medRet50d!=null&&g.medRet50d<0?'neg':''}>{pct(g.medRet50d)}</td>
+            <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
+          </tr>)}
+          {!dashboardTopSectors.length&&<tr><td colSpan={6} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
+        </tbody></table></div>
+        <DecisionList
+          className="mobile-sector-list"
+          items={dashboardTopSectors.map((g,index)=>({
+            key:g.key,data:g,rank:index+1,eyebrow:g.market,title:sectorLabel(g),
+            meta:'RS '+(g.medRank==null?'—':Math.round(g.medRank))+' · 주도 '+(g.core+g.candidate),
+            badge:g.core>0?'핵심 '+g.core:g.verdict,badgeTone:g.core>0?'green':'gray',
+            value:pct(g.medRet20d),subvalue:'50D '+pct(g.medRet50d),
+            valueTone:(g.medRet20d??0)>0?'positive':(g.medRet20d??0)<0?'negative':undefined,
+            ariaLabel:sectorLabel(g)+' Leadership 보기'
+          }))}
+          onSelect={g=>{setSectorKeySelected(g.key);setStockTab(g.core>0?'core':g.candidate>0?'candidates':'turns');setPage('leadership')}}
+          emptyLabel="조건에 맞는 섹터가 없습니다."
+        />
+        <details className="dashboard-disclosure sector-heat-disclosure"><summary>시장 지표 · 섹터 히트맵</summary><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
       </section>
 
       <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
 
-      <section className="folio-identity-interlude" aria-label="Folio 투자 원칙">
-        <figure className="folio-motif-panel">
-          <img src="./folio-b-motif.svg?v=b5" alt="" loading="lazy"/>
-          <figcaption><span>DISCIPLINE · INSIGHT · PERSPECTIVE · FREEDOM</span><strong>Know the Market. Know Yourself.</strong></figcaption>
-        </figure>
-        <figure className="folio-photo-panel">
-          <img src="./folio-c-photography.webp?v=b5" alt="" loading="lazy"/>
-          <figcaption><span>PHOTOGRAPHY TREATMENT</span><strong>Structured freedom, seen through warmer light.</strong></figcaption>
-        </figure>
-      </section>
-
-      <details className="dashboard-explore">
-        <summary><span>ETF · 시장 탐색</span><small>필요할 때 펼쳐서 확인</small></summary>
+      <details className="dashboard-explore signal-explore">
+        <summary><span>ETF · 시장 탐색</span><small>필요할 때만 펼치기</small></summary>
         <div className="dashboard-explore-body">
           <div className="panel dashboard-etf-industry-panel">
-            <div className="panel-head dashboard-sector-head">
-              <div><h2>ETF 주도 산업</h2><p title={ETF_INDUSTRY_VERSION}>ETF 거래대금과 RS로 산업 흐름을 확인합니다.</p></div>
-            </div>
+            <div className="panel-head dashboard-sector-head"><div><h2>ETF 주도 산업</h2><p title={ETF_INDUSTRY_VERSION}>ETF 거래대금과 RS로 산업 흐름을 확인합니다.</p></div></div>
             <div className="mini-segment etf-heat-periods" role="group" aria-label="RS 기간">{ETF_HEAT_PERIODS.map(([period])=><button key={period} type="button" className={etfHeatPeriod===period?'on':''} aria-pressed={etfHeatPeriod===period} onClick={()=>setEtfHeatPeriod(period)}>{period}</button>)}</div>
             <EtfIndustryHeatmap groups={etfIndustries} markets={market==='ALL'?['KR','US']:[market]} period={etfHeatPeriod} onSelect={openEtfIndustry}/>
           </div>
@@ -1198,6 +1178,35 @@ export default function App(){
           </section>
         </div>
       </details>
+    </div>
+  }else if(page==='leadership'){
+    const activeSector=sectorKeySelected?allSectorRows.find(g=>g.key===sectorKeySelected)||null:null
+    const classRows=lens(summaryGroups[stockTab]).filter(r=>!activeSector||sectorKey(r)===activeSector.key).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
+    content=<div className="leadership-page">
+      <section className="journey-head">
+        <button type="button" onClick={()=>setPage('signal')}>← Market Signal</button>
+        <div><span>LEADERSHIP</span><h2>{activeSector?sectorName(activeSector.market,activeSector.sector):'주도 종목을 좁혀 봅니다.'}</h2><p>분류와 RS를 비교하고 한 종목을 선택하면 Stock 단계로 이동합니다.</p></div>
+      </section>
+      <div className="leadership-tools">
+        <MarketSegment label="Leadership" value={leaderMkt} onChange={m=>{setLeaderMkt(m);setSectorKeySelected(null)}}/>
+        <div className="leadership-tabs" role="tablist" aria-label="리더십 분류">
+          {([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={stockTab===key} className={stockTab===key?'on':''} onClick={()=>setStockTab(key)}>{label}<b>{summaryGroups[key].length}</b></button>)}
+        </div>
+      </div>
+      <DecisionList
+        className="leadership-page-list"
+        items={classRows.slice(0,20).map((row,index)=>({
+          key:row.id||row.market+':'+row.ticker,data:row,rank:index+1,eyebrow:row.market,
+          title:row.name||row.ticker,meta:[row.ticker,row.industry,stageLabel(row.stage)].filter(Boolean).join(' · '),
+          badge:leadership(row),badgeTone:leadTone(leadership(row)) as 'green'|'blue'|'amber'|'gray',
+          value:'RS '+(row.rs_rank==null?'—':Math.round(row.rs_rank)),subvalue:'20D '+pct(row.return_20d),
+          valueTone:(row.return_20d??0)>0?'positive':(row.return_20d??0)<0?'negative':undefined,
+          ariaLabel:(row.name||row.ticker)+' Stock 단계로 이동'
+        }))}
+        onSelect={openJourneyStock}
+        emptyLabel="선택한 Leadership 범위에 종목이 없습니다."
+      />
+      <div className="leadership-foot"><button type="button" onClick={()=>{setSectorKeySelected(null);setPage('signal')}}>다른 시장 신호 보기</button><button type="button" onClick={()=>setPage('leaderboard')}>전체 Leaderboard →</button></div>
     </div>
   }else if(page==='leaderboard'){
     const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
