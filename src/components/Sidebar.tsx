@@ -47,7 +47,7 @@ function applyTheme(mode:ThemeMode){
   const resolved=resolvedTheme(mode)
   root.style.colorScheme=resolved
   document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
-    ?.setAttribute('content',resolved==='dark'?'#0a0a0c':'#f4f1ec')
+    ?.setAttribute('content',resolved==='dark'?'#0a0a0c':'#faf8f5')
 }
 
 function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode)=>void}){
