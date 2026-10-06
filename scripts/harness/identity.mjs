@@ -82,12 +82,12 @@ for(const file of [
   'icon-192.png','icon-512.png','icon-512-maskable.png'
 ])assert(!existsSync(file),`Retired identity asset must stay removed: ${file}`);
 
-assert(wordmark.includes('folio-brand-wordmark-light.webp?v=u1')&&wordmark.includes('folio-brand-wordmark-dark.webp?v=u1'),'Canonical FolioWordmark must display the supplied light/dark artwork.');
+assert(wordmark.includes('folio-brand-wordmark-light.webp?v=u2')&&wordmark.includes('folio-brand-wordmark-dark.webp?v=u2'),'Canonical FolioWordmark must display the supplied light/dark artwork.');
 assert(!wordmark.includes('FolioMark')&&!wordmark.includes('folio-wordmark-text'),'Canonical wordmark must not reconstruct the supplied lettering.');
 assert(sidebar.includes("import { FolioWordmark } from './FolioWordmark'")&&sidebar.includes('<FolioWordmark/>'),'Sidebar must consume canonical FolioWordmark.');
 assert(authModal.includes('<FolioWordmark className="auth-wordmark"/>')&&installApp.includes('<FolioWordmark className="install-wordmark"/>')&&mainEntry.includes('<FolioWordmark className="fatal-wordmark"/>'),'All brand surfaces must consume canonical FolioWordmark.');
 
-for(const asset of ['folio-brand-launch.webp?v=u1','folio-brand-typography.webp?v=u1','folio-brand-photography.webp?v=u1']){
+for(const asset of ['folio-brand-launch.webp?v=u2','folio-brand-typography.webp?v=u2','folio-brand-photography.webp?v=u2']){
   assert(app.includes(asset),`App supplied identity placement missing ${asset}`);
 }
 assert(!app.includes('launch-editorial-caption')&&!app.includes('<footer className="launch-footer"'),'Supplied launch hero must not be duplicated by caption/footer branding.');
@@ -117,12 +117,12 @@ assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financial
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep structured Folio Insight.');
 
 const expectedIcons=[
-  './folio-b-icon-192.png?v=u1',
-  './folio-b-icon-512.png?v=u1',
-  './folio-b-icon-512-maskable.png?v=u1'
+  './folio-b-icon-192.png?v=u2',
+  './folio-b-icon-512.png?v=u2',
+  './folio-b-icon-512-maskable.png?v=u2'
 ];
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use the supplied-icon derivatives.');
-assert(appIndex.includes('folio-b-icon-180.png?v=u1'),'Apple touch icon must use supplied-icon cache revision u1.');
+assert(appIndex.includes('folio-b-icon-180.png?v=u2'),'Apple touch icon must use supplied-icon cache revision u1.');
 assert.equal(manifest.background_color,'#f4f1ec');
 assert.equal(manifest.theme_color,'#f4f1ec');
 
