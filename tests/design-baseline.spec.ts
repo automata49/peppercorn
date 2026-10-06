@@ -81,7 +81,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   const glassLayers=await page.evaluate(()=>['.page-shell-dashboard .mobile-brandbar','.page-shell-dashboard .dashboard-toolbar','.page-shell-dashboard .mobile-bottom-nav'].map(selector=>{
     const el=document.querySelector<HTMLElement>(selector)
     const s=el?getComputedStyle(el):null
-    return {selector,background:s?.backgroundColor||'',backdrop:(s?.backdropFilter||'')+(s?.webkitBackdropFilter||'')}
+    return {selector,background:s?.backgroundColor||'',backdrop:(s?.backdropFilter||'')+(((s as any)?.webkitBackdropFilter)||'')}
   }))
   for(const layer of glassLayers){
     expect(layer.background).toContain('rgba')
