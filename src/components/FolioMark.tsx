@@ -16,7 +16,7 @@ export function FolioMark({className=''}:{className?:string}){
         <stop offset="0%" stopColor="#54265F"/>
         <stop offset="44%" stopColor="#A34F78"/>
         <stop offset="72%" stopColor="#F06A45"/>
-        <stop offset="100%" stopColor="#F5A24A"/>
+        <stop offset="100%" stopColor="#F7A24A"/>
       </linearGradient>
       <mask id={mask}>
         <rect width="184" height="100" fill="white"/>
