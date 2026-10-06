@@ -3,7 +3,7 @@ import zlib from 'node:zlib'
 
 const baseline=fs.readFileSync('src/design/folio-baseline.css','utf8')
 function brandHex(name){
-  const m=baseline.match(new RegExp(name+':\\\\s*(#[0-9a-fA-F]{6})'))
+  const m=baseline.match(new RegExp(name+':\\s*(#[0-9a-fA-F]{6})'))
   if(!m)throw new Error('Missing brand colour token: '+name)
   return m[1]
 }
