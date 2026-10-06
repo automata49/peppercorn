@@ -2387,7 +2387,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .leadership-overview .leadership-orbit::after{inset:30px}
   .leadership-class-nav.focus-class-strip{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
   .leadership-class-nav.focus-class-strip button{min-height:92px!important;padding:12px 10px!important;border-radius:13px!important}
-  .leadership-class-nav.focus-class-strip button span{font-size:7px!important;letter-spacing:.06em!important}
+  .leadership-class-nav.focus-class-strip button span{font-size:10px!important;letter-spacing:.02em!important}
   .leadership-class-nav.focus-class-strip button b{font-size:26px!important;margin-top:7px!important}
   .leadership-class-nav.focus-class-strip button small{font-size:8px!important}
   .analysis-page{
