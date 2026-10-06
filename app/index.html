@@ -32,7 +32,7 @@
     (() => {
       try {
         const saved = localStorage.getItem('folio-theme');
-        const mode = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+        const mode = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light';
         const root = document.documentElement;
         if (mode === 'light' || mode === 'dark') root.dataset.theme = mode;
         root.dataset.themeMode = mode;
