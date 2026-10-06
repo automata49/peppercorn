@@ -45,7 +45,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await noHorizontalOverflow(page)
 
   // Analysis: one explicit decision path; Overview is primary and records stay secondary.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   await expect(page.locator('.analysis-hub-head')).toBeVisible()
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   await expect(page.locator('.analysis-records-disclosure')).not.toHaveAttribute('open','')
