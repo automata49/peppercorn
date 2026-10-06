@@ -28,7 +28,7 @@ test('phone Home stays editorial-flat while deeper evidence remains solid',async
   expect(await metric.evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none')
   expect(await metric.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgba(0, 0, 0, 0)')
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   const primary=page.locator('.analysis-main > .analysis-price-momentum')
   await expect(primary).toHaveCount(1)
   expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
@@ -51,7 +51,7 @@ test('desktop Home keeps the same progressive editorial hierarchy',async({page})
   await expect(page.locator('.home-class-grid button')).toHaveCount(4)
   await expect(page.locator('.spotlight-chart')).toHaveCount(0)
 
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
