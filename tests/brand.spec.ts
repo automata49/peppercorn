@@ -111,7 +111,7 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  expect(touch).toBe('./folio-b-icon-180.png?v=b5')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
- expect(manifest.background_color).toBe('#f4f1ec')
+ expect(manifest.background_color).toBe('#faf8f5')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-b-icon-'))).toBe(true)
  for(const src of srcs){
