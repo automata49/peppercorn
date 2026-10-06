@@ -2856,3 +2856,19 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     object-position:center center!important;
   }
 }
+
+/* User-supplied wordmark sizing lock: preserve the approved 25px compact height. */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .mobile-brand-home .folio-wordmark-system{
+    height:var(--folio-ds-wordmark-phone)!important;
+    min-height:var(--folio-ds-wordmark-phone)!important;
+    max-height:var(--folio-ds-wordmark-phone)!important;
+    align-items:center!important;
+  }
+  .mobile-brand-home .folio-wordmark-image{
+    display:block!important;
+    height:100%!important;
+    width:auto!important;
+    max-height:none!important;
+  }
+}
