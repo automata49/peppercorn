@@ -1262,9 +1262,11 @@ export default function App(){
       </ProgressiveDisclosure></>
   }else if(page==='analysis'){
     const analysisClass={'core':'핵심 주도','candidates':'주도 후보','turns':'강세 전환'} as const
-    const scoped=visible.filter(r=>analysisScope==='all'
-      ||analysisScope==='position'&&position.rows.has(positionKey(r.market,r.ticker))
-      ||analysisScope!=='position'&&analysisScope!=='all'&&leadership(r)===analysisClass[analysisScope])
+    const scoped=visible.filter(r=>{
+      if(analysisScope==='all')return true
+      if(analysisScope==='position')return position.rows.has(positionKey(r.market,r.ticker))
+      return leadership(r)===analysisClass[analysisScope]
+    })
     const analysisCounts={
       core:visible.filter(r=>leadership(r)==='핵심 주도').length,
       candidates:visible.filter(r=>leadership(r)==='주도 후보').length,
