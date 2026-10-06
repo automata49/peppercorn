@@ -17,7 +17,7 @@ export type AppIconName =
 const common={
   fill:'none',
   stroke:'currentColor',
-  strokeWidth:1.8,
+  strokeWidth:1.65,
   strokeLinecap:'round' as const,
   strokeLinejoin:'round' as const
 }
