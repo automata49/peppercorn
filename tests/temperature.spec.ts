@@ -35,6 +35,19 @@ async function goTemperature(page:Page){
 }
 const mark=(page:Page,key:string,n:number)=>page.locator(`.temp-row[data-item="${key}"] .temp-dot`).nth(n).click()
 
+test('dashboard temperature stays compact before the first record',async({page})=>{
+  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.removeItem('peppercorn-temperature')})
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[row]}}))
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  const card=page.locator('.temp-card')
+  await expect(card).toHaveClass(/empty/)
+  await expect(card.locator('.temp-empty')).toContainText('아직 기록이 없습니다')
+  await expect(card.locator('.temp-gauge')).toHaveCount(0)
+  await expect(card.getByRole('button',{name:'첫 온도 기록 →'})).toBeVisible()
+})
+
 for(const view of views){
  test(view.name+' market temperature records, compares and feeds the dashboard card',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
