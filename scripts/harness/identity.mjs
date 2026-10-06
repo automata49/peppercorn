@@ -94,7 +94,7 @@ const expectedIcons=[
 ];
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use only exact B app icons.');
 assert.equal(manifest.background_color,'#0b0b0d','Manifest splash must match the dark-first B product expression.');
-assert.equal(manifest.theme_color,'#f4f1ec','Manifest theme color must match B editorial paper.');
+assert.equal(manifest.theme_color,'#0b0b0d','Manifest theme color must match the dark-first B product expression.');
 
 for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.tsx','.github/workflows/deploy.yml']){
   const content=read(file);
