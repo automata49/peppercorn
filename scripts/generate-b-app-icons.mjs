@@ -2,6 +2,8 @@ import fs from 'node:fs'
 import zlib from 'node:zlib'
 
 const INK=[11,11,13,255]
+const WARM=[244,241,236]
+const PALE=[226,184,202]
 const PLUM=[84,38,95]
 const MAGENTA=[163,79,120]
 const CORAL=[240,106,69]
@@ -31,9 +33,11 @@ function insidePolygon(x,y,points){
 function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t))}
 function markColor(x){
   const t=Math.max(0,Math.min(1,x/VIEW_W))
-  if(t<.42)return mix(PLUM,MAGENTA,t/.42)
-  if(t<.72)return mix(MAGENTA,CORAL,(t-.42)/.30)
-  return mix(CORAL,AMBER,(t-.72)/.28)
+  if(t<.24)return mix(WARM,PALE,t/.24)
+  if(t<.44)return mix(PALE,PLUM,(t-.24)/.20)
+  if(t<.66)return mix(PLUM,MAGENTA,(t-.44)/.22)
+  if(t<.82)return mix(MAGENTA,CORAL,(t-.66)/.16)
+  return mix(CORAL,AMBER,(t-.82)/.18)
 }
 function coverage(px,py,w,h){
   let hit=0
