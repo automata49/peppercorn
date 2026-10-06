@@ -44,7 +44,8 @@ for(const view of views){
     await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
     await expect(page.locator('.market-signal-page')).toBeVisible()
     await expect(page.locator('.market-signal-metrics > div')).toHaveCount(4)
-    await expect(page.locator('.mobile-sector-list')).toBeVisible()
+    if(view.width<=650)await expect(page.locator('.mobile-sector-list')).toBeVisible()
+    else await expect(page.locator('.dashboard-sector-table')).toBeVisible()
 
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
     await context.close()
