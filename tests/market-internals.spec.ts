@@ -10,6 +10,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{},failed:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.getByRole('button',{name:'Market Signal →'}).click()
   const tools=page.locator('.sector-heat-disclosure')
   await tools.locator(':scope > summary').click()
   await tools.getByRole('button',{name:'시장 지표 보기'}).click()
