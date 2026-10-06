@@ -2528,3 +2528,151 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
   .compare-view{scroll-margin-block:150px}
 }
+
+
+/* =========================================================
+   COMPACT B OPTICAL LOCK V3 — physical iPhone/iPad correction
+   Keep the brand quiet, the hierarchy editorial, and imagery secondary.
+   ========================================================= */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  .page-shell-dashboard .mobile-brandbar{
+    height:60px!important;
+    padding:0 18px!important;
+    background:var(--folio-paper)!important;
+    border-bottom:1px solid var(--folio-line)!important;
+    backdrop-filter:none!important;
+    box-shadow:none!important;
+  }
+  .page-shell-dashboard .mobile-brand-home{
+    min-height:44px!important;
+    display:flex;
+    align-items:center;
+    padding:0!important;
+  }
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{
+    align-items:center!important;
+    font-size:inherit!important;
+    height:auto!important;
+  }
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-text{
+    font-family:"Helvetica Neue",Inter,"Neue Haas Grotesk Text",Arial,sans-serif;
+    font-size:26px!important;
+    font-weight:680!important;
+    line-height:.88!important;
+    letter-spacing:-.072em!important;
+  }
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-mark{
+    width:32px!important;
+    margin-left:3px!important;
+    transform:translateY(-.5px)!important;
+  }
+  .page-shell-dashboard .mobile-brand-search,
+  .page-shell-dashboard .mobile-brand-menu{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+    min-height:42px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  .page-shell-dashboard .mobile-brand-search .app-icon,
+  .page-shell-dashboard .mobile-brand-menu .app-icon{
+    width:20px!important;
+    height:20px!important;
+    stroke-width:1.55!important;
+  }
+  .page-shell-dashboard .dashboard-toolbar{
+    top:60px!important;
+    padding:0 18px!important;
+    border-bottom:1px solid var(--folio-line)!important;
+    background:var(--folio-paper)!important;
+    backdrop-filter:none!important;
+  }
+  .page-shell-dashboard .dashboard-toolbar .segment button{
+    min-height:44px!important;
+    border-radius:0!important;
+    font-size:13px!important;
+    font-weight:620!important;
+    letter-spacing:-.01em!important;
+  }
+  .page-shell-dashboard .dashboard-toolbar .segment button.on::after{
+    left:34%!important;
+    right:34%!important;
+    bottom:0!important;
+    height:1.5px!important;
+    border-radius:0!important;
+    background:var(--folio-ink)!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav{
+    padding:6px 12px calc(6px + env(safe-area-inset-bottom))!important;
+    border-top:1px solid var(--folio-line)!important;
+    background:var(--folio-paper)!important;
+    backdrop-filter:none!important;
+    box-shadow:none!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav button{
+    min-height:50px!important;
+    gap:2px!important;
+    border-radius:0!important;
+    background:transparent!important;
+    font-weight:560!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav .app-icon{
+    width:20px!important;
+    height:20px!important;
+    stroke-width:1.55!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav button.active .app-icon{
+    transform:none!important;
+    stroke-width:1.75!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav button b{
+    font-size:10px!important;
+    line-height:1.1!important;
+    font-weight:580!important;
+    letter-spacing:-.01em!important;
+  }
+  .page-shell-dashboard .mobile-bottom-nav button.active::before{
+    top:2px!important;
+    width:16px!important;
+    height:1.5px!important;
+    border-radius:0!important;
+    background:var(--folio-ink)!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude{
+    margin-top:24px!important;
+    margin-bottom:20px!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude img{
+    height:clamp(112px,15vw,132px)!important;
+    object-position:center 44%!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude figcaption{
+    min-height:48px!important;
+    padding:9px 18px 11px!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude figcaption span{
+    font-size:8px!important;
+    letter-spacing:.15em!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude figcaption strong{
+    font-size:13.5px!important;
+    line-height:1.18!important;
+  }
+}
+
+@media(max-width:650px){
+  .page-shell-dashboard .mobile-brandbar{padding-left:16px!important;padding-right:16px!important}
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-text{font-size:25px!important}
+  .page-shell-dashboard .mobile-brand-home .folio-wordmark-mark{width:31px!important}
+  .page-shell-dashboard .dashboard-toolbar{padding-left:16px!important;padding-right:16px!important}
+  .page-shell-dashboard .folio-identity-interlude{
+    margin-left:-18px!important;
+    margin-right:-18px!important;
+  }
+  .page-shell-dashboard .folio-identity-interlude img{
+    height:clamp(108px,29vw,122px)!important;
+  }
+}
