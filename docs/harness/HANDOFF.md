@@ -1,3 +1,16 @@
+## 2026-10-07 — User-supplied identity assets replace reconstructed artwork
+
+The seven image files attached by the user are now the visual pixel source of truth. The prior vector/procedural approximation path is superseded.
+
+- Wordmark: supplied source → `folio-brand-wordmark-light.webp` / `folio-brand-wordmark-dark.webp`.
+- Installed icon: supplied black icon → static `folio-b-icon-180/192/512/512-maskable.png` size derivatives.
+- Launch: supplied `folio-brand-launch.webp`, 9:16, no duplicate caption/footer.
+- Home identity: supplied `folio-brand-typography.webp` + `folio-brand-photography.webp`.
+- Approved reference variants: `folio-brand-icon-glossy.webp` and `folio-brand-icon-light.webp`.
+- `scripts/generate-b-app-icons.mjs` is verification-only; it may not synthesize brand artwork.
+- Retire `FolioMark.tsx`, `folio-b-launch-hero.webp`, `folio-b-motif.svg`, and `folio-c-photography.webp`.
+- Preserve the existing Analysis UX/investment logic and the 390 / 834 / 1366 / 1440 regression gate.
+
 ## Folio visual quality v2 — 2026-10-06
 
 ## Wordmark fidelity correction — 2026-10-06
