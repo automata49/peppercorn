@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { babelParse } from 'playwright/lib/transform/babelBundle'
+import { transformSync } from 'esbuild'
 
 const ROOT=path.resolve('tests')
 const files=[]
@@ -15,17 +15,27 @@ walk(ROOT)
 
 let failed=false
 for(const file of files.sort()){
-  const rel=path.relative(process.cwd(),file)
   const source=fs.readFileSync(file,'utf8')
   try{
-    babelParse(source,file,true)
+    transformSync(source,{
+      loader:file.endsWith('.tsx')?'tsx':'ts',
+      sourcefile:path.relative(process.cwd(),file),
+      format:'esm',
+      target:'es2022',
+      sourcemap:false,
+      logLevel:'silent'
+    })
   }catch(error){
     failed=true
-    const loc=error?.loc
-    const where=loc?`:${loc.line}:${loc.column+1}`:''
-    console.error(`Playwright parse failed: ${rel}${where}`)
-    console.error(error?.message||String(error))
+    const errors=error?.errors||[]
+    if(errors.length){
+      for(const e of errors){
+        const loc=e.location
+        console.error(`${loc?.file||file}:${loc?.line||0}:${loc?.column||0} ${e.text}`)
+        if(loc?.lineText)console.error(`  ${loc.lineText}`)
+      }
+    }else console.error(`Syntax parse failed: ${file}\n${error?.stack||error}`)
   }
 }
 if(failed)process.exit(1)
-console.log(`Playwright test syntax OK: ${files.length} files`)
+console.log(`Test syntax OK: ${files.length} files`)
