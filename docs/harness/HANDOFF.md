@@ -1,3 +1,13 @@
+## Folio B vector identity + unified analysis experience — 2026-10-06
+
+User requested a second Visual Identity pass plus an information-architecture redesign. This change keeps the attached B / Sunset Editorial concept authoritative while prohibiting copied/cropped wordmark and illustration assets.
+
+Identity: the visible wordmark now renders live “Folio” typography plus original vector `src/components/FolioMark.tsx`. App icons are generated procedurally from the same interlocked double-x geometry; the generator no longer reads a raster mark. The B illustration is an original `public/folio-b-motif.svg` composition (monochrome rock/coast, lone figure, sparse technical linework, warm disc). The internal phrase “Sunset Editorial” is removed from the loading UI. Loading/Home type and image sizing use responsive clamps and mobile viewport bounds. Existing B launch hero and C photography treatment remain secondary image assets.
+
+Analysis IA: Home no longer repeats the same leadership set through Focus roster + “추가 보기”. It keeps one hero, one restrained CSS-3D Leadership Pulse, three class quick-list buttons and one explicit Analysis Hub path. Analysis Hub is scope (핵심/후보/전환/전체/Position) → one visible stock list → existing PriceRsChart → Overview/Swing/Position → 내 분석. The PriceRsChart composition/data/interaction is intentionally unchanged; only its surrounding visual identity changes. The 3D ring is presentation-only and does not create a new score or signal.
+
+No leadership threshold, RS, stage, Position calculation, data fetch, database schema or persistence rule changes. Required before merge: `npm run harness:check`, build, identity suite and full Playwright suite. Physical Safari remains separate.
+
 ## Folio B visual identity cleanup — 2026-10-06
 
 User requested a cleanup pass rather than another redesign. Sunset Editorial B remains the only UI identity across desktop, phone and iPad. The launch footer is Folio-only; the legacy Peppercorn logo/text co-brand is removed. Superseded root/public identity assets are deleted instead of merely left unused, and the deploy workflow no longer republishes `logo.webp`.
