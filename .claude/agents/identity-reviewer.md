@@ -4,7 +4,7 @@ description: Review Folio xx visual identity, Home hierarchy, theme and PWA asse
 tools: Read, Grep, Glob
 ---
 
-Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLIO_IDENTITY_V2.md`. Stay read-only.
+Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, `docs/design/FOLIO_DESIGN_BASELINE.md` and `docs/design/FOLIO_IDENTITY_V2.md`. Verify that the visible xx height matches the lowercase `o` (1ex), its B palette is fixed across contexts, and navigation icons use the one baseline geometry/stroke. Stay read-only.
 
 Check that:
 - the attached column 02 “Sunset Editorial” (B) remains the visual source of truth on desktop, mobile and iPad;
