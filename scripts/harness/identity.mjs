@@ -4,6 +4,7 @@ import {existsSync,readFileSync} from 'node:fs';
 const required=[
   'docs/design/FOLIO_IDENTITY_V2.md',
   'docs/design/FOLIO_DESIGN_BASELINE.md',
+  'docs/design/FOLIO_UI_RESEARCH.md',
   'src/design/folio-baseline.css',
   'tests/design-baseline.spec.ts',
   'harness/skills/folio-identity/SKILL.md',
@@ -35,6 +36,7 @@ const read=file=>readFileSync(file,'utf8');
 const contract=read('docs/harness/CONTRACT.md');
 const design=read('docs/design/FOLIO_IDENTITY_V2.md');
 const baseline=read('docs/design/FOLIO_DESIGN_BASELINE.md');
+const research=read('docs/design/FOLIO_UI_RESEARCH.md');
 const baselineCss=read('src/design/folio-baseline.css');
 const css=read('src/design/folio-identity.css');
 const main=read('src/main.tsx');
@@ -52,6 +54,8 @@ const claudeEntry=read('CLAUDE.md');
 const visualRegression=read('tests/visual-identity-regression.spec.ts');
 
 assert(contract.includes('attached concept B is authoritative')&&contract.includes('FolioMark'), 'CONTRACT must keep B authoritative and lock the vector Folio mark.');
+assert(contract.includes('UI-BENCHMARK-1')&&contract.includes('LIQUID-GLASS-1'),'CONTRACT must govern benchmark research and the functional glass layer.');
+assert(research.includes('evidence → reusable principle → Folio user intent → acceptance test')&&research.includes('Liquid Glass belongs to the **functional layer**'),'UI research protocol must prevent reference cloning and constrain glass to functional layers.');
 assert(design.includes('attached concept board\'s column 02 — “Sunset Editorial” (B)'), 'Design doc must name the B concept board as source of truth.');
 assert(design.includes('C remains photography treatment only') || design.includes('C is limited to photography treatment'), 'Design doc must limit C to photography treatment.');
 assert(css.includes('B EXACT LOCK'), 'Exact B CSS lock is missing.');
@@ -113,10 +117,14 @@ assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact icons must consume baseline tokens.');
 assert(!/OPTICAL LOCK V[4-9]|QUALITY PASS V[3-9]/.test(css),'Do not append new quality-pass override generations; change baseline tokens or component owners.');
 assert(baselineCss.includes('--folio-brand-plum:#54265f')&&baselineCss.includes('--folio-brand-magenta:#a34f78')&&baselineCss.includes('--folio-brand-coral:#f06a45')&&baselineCss.includes('--folio-brand-amber:#f5a24a'),'Level-0 B palette tokens drifted.');
+assert(baselineCss.includes('--folio-ds-light-paper:#faf8f5')&&baselineCss.includes('--folio-ds-glass-bg:rgba(255,255,255,.68)')&&baselineCss.includes('--folio-ds-glass-bg-strong:rgba(255,255,255,.82)')&&baselineCss.includes('--folio-ds-glass-blur:22px'),'Bright-default / Liquid Glass Level-0 tokens drifted.');
+assert(css.includes('var(--folio-ds-glass-bg-strong')&&css.includes('var(--folio-ds-glass-blur')&&css.includes('-webkit-backdrop-filter'),'Functional glass must be implemented with shared tokens and Safari-compatible blur.');
+assert(css.includes('Glass is for navigation/controls, never analytical content')||baselineCss.includes('Glass is for navigation/controls, never analytical content'),'Glass/content-layer boundary must stay documented in source.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 const appIndex=read('app/index.html');
 assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
 assert(appIndex.includes("saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light'"),'Pre-React shell must start fresh installs in Light.');
+assert(appIndex.includes('#faf8f5'),'Pre-React shell must use the bright editorial paper color.');
 assert(css.includes('aspect-ratio:508/235')&&css.includes('width:calc(100vw - 36px)'),'Phone launch must preserve the B source aspect inside safe margins.');
 assert(css.includes('clamp(var(--folio-ds-motif-phone-min),29vw,var(--folio-ds-motif-phone-max))')&&baselineCss.includes('--folio-ds-motif-phone-min:108px')&&baselineCss.includes('--folio-ds-motif-phone-max:122px'),'Phone B motif must consume the compact baseline bounds.');
 const themeTest=read('tests/theme-system.spec.ts');
@@ -137,8 +145,8 @@ const expectedIcons=[
   './folio-b-icon-512-maskable.png?v=b5'
 ];
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use only exact B app icons.');
-assert.equal(manifest.background_color,'#f4f1ec','Manifest paper color must match B editorial paper.');
-assert.equal(manifest.theme_color,'#f4f1ec','Manifest theme color must match B editorial paper.');
+assert.equal(manifest.background_color,'#faf8f5','Manifest paper color must match bright editorial baseline.');
+assert.equal(manifest.theme_color,'#faf8f5','Manifest theme color must match bright editorial baseline.');
 assert(read('app/index.html').includes('folio-b-icon-180.png?v=b5'),'Apple touch icon must carry the B4 baseline cache revision.');
 
 for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.tsx','.github/workflows/deploy.yml']){
