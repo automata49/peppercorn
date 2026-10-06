@@ -6,6 +6,12 @@ Decision date: 2026-10-05. This document records product-design principles, not 
 
 Implementation now follows [FOLIO_DESIGN_BASELINE.md](./FOLIO_DESIGN_BASELINE.md) as **Level 0**. This document still defines visual direction and information hierarchy, but sizes, spacing, icon metrics, wordmark geometry, touch targets, and app-icon masking rules must come from the baseline. Do not solve visual drift by appending another page-specific quality-pass override.
 
+## Research method
+
+Use [FOLIO_UI_RESEARCH.md](./FOLIO_UI_RESEARCH.md) for any Robinhood/platform benchmark. A reference must be converted into **evidence → reusable principle → Folio user intent → acceptance test**. Never copy brand styling, proprietary assets, wording, or trade-entry interaction merely because it exists in the reference.
+
+Liquid Glass follows Apple’s functional-layer model: navigation, sticky controls, drawers/popovers and transient controls may use the glass tokens; analytical content remains on solid/standard surfaces. Light remains the fresh-install default.
+
 ## Benchmark: what Robinhood actually optimizes
 
 Official Robinhood material consistently points to a small set of principles:
