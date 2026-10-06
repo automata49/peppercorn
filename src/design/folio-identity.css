@@ -1135,7 +1135,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   position:relative;
   display:block;
   width:clamp(38px,3.4vw,46px);
-  aspect-ratio:1.72/1;
+  aspect-ratio:184/104;
   margin-left:clamp(4px,.45vw,6px);
   flex:0 0 auto;
 }
