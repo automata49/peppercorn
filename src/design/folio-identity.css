@@ -2737,8 +2737,8 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 }
 .launch-editorial-frame{
   width:min(100vw,calc(100dvh * .5625))!important;
-  height:100dvh!important;
-  max-height:none!important;
+  height:auto!important;
+  max-height:100dvh!important;
   aspect-ratio:9/16!important;
   margin:0!important;
   border:0!important;
@@ -2795,7 +2795,8 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 @media(max-width:650px){
   .launch-editorial-frame{
     width:min(100vw,calc(100dvh * .5625))!important;
-    height:100dvh!important;
+    height:auto!important;
+    max-height:100dvh!important;
     aspect-ratio:9/16!important;
   }
   .folio-identity-interlude img{height:clamp(300px,118vw,470px)!important}
