@@ -16,7 +16,7 @@ test('fresh install starts in Light even when the device prefers dark',async({br
   await expect(page.locator('html')).toHaveAttribute('data-theme','light')
   await expect(page.locator('html')).toHaveAttribute('data-theme-mode','light')
   await expect.poll(()=>page.evaluate(()=>localStorage.getItem('folio-theme'))).toBe('light')
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#f4f1ec')
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#faf8f5')
   await context.close()
 })
 
@@ -33,7 +33,7 @@ test('desktop theme control persists Light Dark and System modes',async({page})=
   await control.getByRole('button',{name:'Light'}).click()
   await expect(page.locator('html')).toHaveAttribute('data-theme','light')
   await expect.poll(()=>page.evaluate(()=>localStorage.getItem('folio-theme'))).toBe('light')
-  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#f4f1ec')
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#faf8f5')
 
   await control.getByRole('button',{name:'System'}).click()
   await expect(page.locator('html')).not.toHaveAttribute('data-theme')
