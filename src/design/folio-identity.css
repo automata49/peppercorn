@@ -410,6 +410,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
    C remains photography treatment only. */
 .fatal-error,.boot-fallback{background:var(--folio-paper);color:var(--folio-ink)}
 .fatal-error>div{background:var(--folio-surface);border-color:var(--folio-line);box-shadow:none}
+.fatal-error .fatal-wordmark{--folio-wordmark-size:20px;margin-bottom:12px;color:var(--folio-ink)}
 
 /* Photography utility for future editorial imagery: C treatment is consistent everywhere. */
 .folio-photo{
