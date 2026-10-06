@@ -1113,7 +1113,8 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   line-height:1.55;
 }
 
-/* Exact B wordmark: bold Folio + compact interlocked xx from the B icon artwork. */
+/* Exact B wordmark: live typography + original vector interlocked xx.
+   No screenshot crop or raster wordmark is used in the product UI. */
 .folio-wordmark-system{
   display:inline-flex;
   align-items:center;
@@ -1125,47 +1126,31 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 .folio-wordmark-text{
   display:block;
   font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue",Arial,sans-serif;
-  font-size:28px;
+  font-size:clamp(24px,2.2vw,30px);
   font-weight:720;
-  line-height:.9;
-  letter-spacing:-.075em;
+  line-height:.88;
+  letter-spacing:-.078em;
 }
 .folio-wordmark-mark{
   position:relative;
   display:block;
-  width:43px;
-  height:24px;
-  margin-left:5px;
+  width:clamp(38px,3.4vw,46px);
+  aspect-ratio:1.72/1;
+  margin-left:clamp(4px,.45vw,6px);
   flex:0 0 auto;
 }
-.folio-xx-art{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  user-select:none;
-  pointer-events:none;
-}
-.folio-xx-art-dark{display:none}
+.folio-xx-vector{display:block;width:100%;height:100%;overflow:visible}
 .sidebar .folio-wordmark-system{color:#fff}
-.sidebar .folio-wordmark-text{font-size:25px;font-weight:680}
-.sidebar .folio-wordmark-mark{width:39px;height:21px;margin-left:4px}
-.sidebar .folio-xx-art-light{display:none}
-.sidebar .folio-xx-art-dark{display:block}
-.mobile-brand-home .folio-wordmark-text{font-size:30px}
-.mobile-brand-home .folio-wordmark-mark{width:46px;height:25px}
+.sidebar .folio-wordmark-text{font-size:25px;font-weight:690}
+.sidebar .folio-wordmark-mark{width:39px;margin-left:4px}
+.mobile-brand-home .folio-wordmark-text{font-size:clamp(25px,7.2vw,30px)}
+.mobile-brand-home .folio-wordmark-mark{width:clamp(39px,11vw,46px)}
 .menu-drawer .folio-wordmark-text{font-size:30px}
-.menu-drawer .folio-wordmark-mark{width:46px;height:25px}
+.menu-drawer .folio-wordmark-mark{width:46px}
 :root[data-theme="dark"] .folio-wordmark-system{color:#f7f4f1}
-:root[data-theme="dark"] .folio-xx-art-light{display:none}
-:root[data-theme="dark"] .folio-xx-art-dark{display:block}
 @media(prefers-color-scheme:dark){
   :root:not([data-theme]) .folio-wordmark-system{color:#f7f4f1}
-  :root:not([data-theme]) .folio-xx-art-light{display:none}
-  :root:not([data-theme]) .folio-xx-art-dark{display:block}
 }
-.sidebar .folio-xx-art-dark{display:block!important}
 
 /* B typography: large type stays regular and editorial, metadata is tracked. */
 .spotlight-kicker,.launch-editorial-caption span,.folio-identity-interlude figcaption span,
@@ -1203,6 +1188,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   position:relative;
   width:min(980px,94vw);
   aspect-ratio:508/235;
+  max-height:min(54dvh,452px);
   overflow:hidden;
   background:#0b0b0d;
   box-shadow:0 24px 70px rgba(11,11,13,.12);
@@ -1225,7 +1211,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   padding:18px 2px 0;
   color:var(--folio-black);
 }
-.launch-editorial-caption span{font-size:9px}
+.launch-editorial-caption span{font-size:clamp(8px,1.8vw,10px)}
 .launch-editorial-caption p{
   margin:0;
   font-family:var(--folio-display);
@@ -1385,20 +1371,47 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 @media(max-width:650px){
   .folio-identity-interlude{margin-left:-18px;margin-right:-18px}
-  .launch-center{width:100%;padding:0 0 22px;align-content:center}
+  .folio-identity-interlude img{height:clamp(156px,47vw,190px)}
+  .launch-screen{grid-template-rows:minmax(0,1fr) auto}
+  .launch-center{
+    width:100%;
+    min-height:0;
+    padding:clamp(12px,4dvh,28px) 0 16px;
+    align-content:center;
+  }
   .launch-editorial-frame{
     width:100vw;
+    aspect-ratio:1.28/1;
+    max-height:min(58dvh,520px);
     box-shadow:none;
   }
+  .launch-b-hero{object-position:51% 50%}
   .launch-editorial-caption{
     width:calc(100vw - 36px);
     display:grid;
-    gap:8px;
-    padding-top:16px;
+    gap:6px;
+    padding-top:clamp(10px,2.4dvh,16px);
   }
-  .launch-editorial-caption p{font-size:15px}
-  .launch-progress{width:calc(100vw - 36px)!important;margin-top:18px!important}
-  .launch-footer{width:calc(100vw - 36px)}
+  .launch-editorial-caption p{
+    max-width:30ch;
+    font-size:clamp(13px,3.8vw,15px);
+    line-height:1.35;
+  }
+  .launch-progress{
+    width:calc(100vw - 36px)!important;
+    margin-top:clamp(12px,2.4dvh,18px)!important;
+  }
+  .launch-footer{
+    width:calc(100vw - 36px);
+    padding-bottom:max(12px,env(safe-area-inset-bottom));
+  }
+  .launch-footer .folio-wordmark-text{font-size:clamp(17px,5vw,20px)}
+  .launch-footer .folio-wordmark-mark{width:clamp(27px,8vw,31px)}
+  .launch-footer small{font-size:clamp(8px,2.5vw,10px)}
+}
+@media(max-width:390px) and (max-height:740px){
+  .launch-editorial-frame{aspect-ratio:1.5/1;max-height:50dvh}
+  .launch-editorial-caption p{display:none}
 }
 
 /* Dark mode preserves the B composition: black field, white wordmark, warm-photo accent. */
