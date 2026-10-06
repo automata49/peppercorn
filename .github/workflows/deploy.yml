@@ -157,9 +157,14 @@ jobs:
             folio-b-icon-192.png \
             folio-b-icon-512.png \
             folio-b-icon-512-maskable.png \
-            folio-b-launch-hero.webp \
-            folio-b-motif.svg \
-            folio-c-photography.webp
+            folio-brand-launch.webp \
+            folio-brand-typography.webp \
+            folio-brand-photography.webp \
+            folio-brand-wordmark-light.webp \
+            folio-brand-wordmark-dark.webp \
+            folio-brand-icon-black.webp \
+            folio-brand-icon-glossy.webp \
+            folio-brand-icon-light.webp
           do
             cp "dist/$f" "$f"
           done
@@ -169,7 +174,9 @@ jobs:
           git add index.html assets manifest.webmanifest sw.js discovery-layout.json \
             folio-b-icon-180.png folio-b-icon-192.png folio-b-icon-512.png folio-b-icon-512-maskable.png \
             public/folio-b-icon-180.png public/folio-b-icon-192.png public/folio-b-icon-512.png public/folio-b-icon-512-maskable.png \
-            folio-b-launch-hero.webp folio-b-motif.svg folio-c-photography.webp \
+            folio-brand-launch.webp folio-brand-typography.webp folio-brand-photography.webp \
+            folio-brand-wordmark-light.webp folio-brand-wordmark-dark.webp \
+            folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "chore: sync built Pages output [skip ci]"
