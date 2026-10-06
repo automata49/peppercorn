@@ -5,7 +5,7 @@ const APP_ROOT = new URL('./', self.registration.scope)
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll([
     APP_ROOT.href,
-    new URL('folio-b-icon-192.png?v=b4', APP_ROOT).href,
+    new URL('folio-b-icon-192.png?v=b5', APP_ROOT).href,
   ])))
   self.skipWaiting()
 })
