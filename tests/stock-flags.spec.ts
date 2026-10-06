@@ -63,7 +63,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(kod.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
   await expect(kod.locator('.stock-flag.jump')).toHaveAttribute('title',/하루 \+178%/)
   await expect(page.locator('.drill-sheet .stock-row').filter({hasText:'반도체 0'}).first().locator('.stock-flag')).toHaveText(['매출 감소'])
-  await kod.click()
+  await kod.click({force:true})
   const detail=page.locator('.stock-snapshot')
   await expect(detail.locator('.classification-summary .group-rank')).toHaveText('업종 2/2위')
   await expect(detail.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
