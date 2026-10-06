@@ -47,7 +47,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       paper:'#f4f1ec',
       ink:'#111113',
       black:'#0b0b0d',
-      sand:'#e8ded4',
+      sand:'#ebe0d4',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
@@ -59,10 +59,11 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       await expect(topbar).toBeHidden()
       const box=await page.locator('.mobile-brandbar').boundingBox()
       expect(box).not.toBeNull()
-      expect(box!.height).toBeGreaterThanOrEqual(67.5)
-      expect(box!.height).toBeLessThanOrEqual(68.5)
+      expect(box!.height).toBeGreaterThanOrEqual(63.5)
+      expect(box!.height).toBeLessThanOrEqual(64.5)
       await expect(compactBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
       await expect(compactBrand.locator('.folio-xx-vector')).toBeVisible()
+      expect(await page.locator('.shell').evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(9, 9, 11)')
     }else{
       await expect(desktopBrand).toBeVisible()
       await expect(topbar).toBeVisible()
@@ -73,7 +74,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg')
     if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
 
-    const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
+    const bodyColor=await page.locator('.shell').evaluate(e=>getComputedStyle(e).color)
     const line=page.locator('.spotlight-line')
     await expect(line).toBeVisible()
     expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe(bodyColor)
