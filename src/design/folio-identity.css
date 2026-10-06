@@ -3010,6 +3010,27 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   color:var(--folio-ink);
   box-shadow:inset 0 -2px 0 var(--folio-coral);
 }
+.leadership-lens-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:0 0 14px;
+}
+.leadership-lens-row .lens-bar{margin:0;min-width:0}
+.leadership-compare{
+  min-height:40px;
+  flex:0 0 auto;
+  border:0;
+  border-bottom:1px solid var(--folio-line);
+  background:transparent;
+  color:var(--folio-ink);
+  padding:7px 0;
+  font-size:10px;
+  font-weight:650;
+  cursor:pointer;
+}
+.leadership-compare:hover{border-bottom-color:var(--folio-coral)}
 .leadership-page-list{border-top:1px solid var(--folio-line)}
 .leadership-page-list .decision-row{
   min-height:64px;
@@ -3076,6 +3097,9 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .market-signal-metrics>div{padding:12px}
   .market-signal-metrics b{font-size:25px}
   .leadership-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .leadership-lens-row{align-items:flex-start;flex-direction:column}
+  .leadership-lens-row .lens-bar{width:100%}
+  .leadership-compare{align-self:flex-start}
   .leadership-tabs button:nth-child(2){border-right:0}
   .leadership-tabs button:nth-child(-n+2){border-bottom:1px solid var(--folio-line)}
   .leadership-foot{flex-direction:column}
