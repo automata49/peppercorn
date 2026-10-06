@@ -65,11 +65,13 @@ for(const width of [390,834,1194,1366,1440]){
     await expect(page.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
     await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Thesis'}).click()
     await expect(page.locator('.analysis-judgement')).toContainText('MY THESIS')
+    await expect(page.locator('.thesis-research-evidence')).toBeVisible()
     await expect(page.getByRole('button',{name:'Decision 기록 →'})).toBeVisible()
 
     // Decision continues into tracking rather than adding more Home detail.
     await page.getByRole('button',{name:'Decision 기록 →'}).click()
     await expect(page.locator('.page-journal')).toBeVisible()
+    await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-journal')||'[]').some((row:any)=>row.status==='관찰중'))).toBe(true)
 
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
     await context.close()
