@@ -1,5 +1,9 @@
 ## Folio visual quality v2 — 2026-10-06
 
+## Compact empty-state cleanup — 2026-10-06
+
+After the B mobile fit correction, Home's market-temperature module still wasted a large first-screen area when no manual temperature record existed. The empty dashboard state now removes the meaningless gauge/dash and shows one short explanatory line plus a single “첫 온도 기록” action. Existing recorded-temperature behavior, calculation, history and persistence are unchanged. The theme fallback also remains Light even when localStorage is unavailable.
+
 ## Light-first compact identity correction — 2026-10-06
 
 Latest physical-iPhone review found that the B artwork itself was being presented with the wrong compact framing: the launch hero was forced into a 1.28:1 portrait-like crop, the header/wordmark and outline icons were too heavy, and the home motif consumed too much vertical space. Light is now the first-run default while System/Dark stay explicit choices. Phone launch preserves the source 508:235 composition inside safe horizontal margins; the Folio/xx lockup and monoline icons are quieter; the B motif is short/secondary on phone. These are presentation-only changes and do not alter investment logic or data.
