@@ -2531,8 +2531,9 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 
 /* =========================================================
-   COMPACT B OPTICAL LOCK V3 — physical iPhone/iPad correction
-   Keep the brand quiet, the hierarchy editorial, and imagery secondary.
+   FOLIO DESIGN BASELINE — compact application
+   Consumes Level-0 tokens from folio-baseline.css.
+   Do not append another quality-pass block; change tokens or the owner.
    ========================================================= */
 @media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
   .page-shell-dashboard .mobile-brandbar{
