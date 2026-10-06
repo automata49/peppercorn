@@ -3,7 +3,7 @@ name: folio-identity
 description: Use for Folio xx brand, Home visual identity, System/Light/Dark theme, loading screen, responsive mobile/iPad treatment, PWA icon/manifest and Robinhood-benchmark UI work.
 ---
 
-Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLIO_IDENTITY_V2.md` before editing.
+Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, **`docs/design/FOLIO_DESIGN_BASELINE.md` first**, then `docs/design/FOLIO_IDENTITY_V2.md` before editing.
 
 Hard rules:
 - The attached column 02 “Sunset Editorial” (B) concept is the visual source of truth on desktop, mobile and iPad. Do not reinterpret it into a new Folio style.
@@ -24,6 +24,7 @@ Hard rules:
 - The launch screen is Folio-only: no Peppercorn logo/text co-branding and no `logo.webp`.
 - Superseded `folio-app-icon-*`, `folio-icon-*`, `folio-identity-*`, generic `icon-*`, legacy wordmark and old Apple-touch assets must stay deleted.
 - The visual identity regression gate is fixed at 390 / 834 / 1366 / 1440 CSS px.
+- Level-0 sizes/spacing/icon/wordmark/app-icon rules come from `src/design/folio-baseline.css`. Do not append a new “quality pass / V4 / V5” override block; change the baseline token or owning component and add regression coverage.
 
 Workflow:
 1. Inspect the authoritative B artwork and shared source components before editing.
