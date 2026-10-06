@@ -2709,8 +2709,15 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   line-height:0!important;
 }
 .page-shell-dashboard .mobile-brand-home .folio-wordmark-system{
-  height:var(--folio-wordmark-size)!important;
-  min-height:var(--folio-wordmark-size)!important;
+  --folio-wordmark-size:25px!important;
+  height:25px!important;
+  min-height:25px!important;
+  max-height:25px!important;
+}
+.page-shell-dashboard .mobile-brand-home .folio-wordmark-image{
+  height:25px!important;
+  min-height:25px!important;
+  max-height:25px!important;
 }
 .folio-wordmark-image{
   display:block;
