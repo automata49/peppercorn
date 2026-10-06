@@ -8,12 +8,13 @@ Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md` and `docs/design/FOLI
 
 Check that:
 - the attached column 02 “Sunset Editorial” (B) remains the visual source of truth on desktop, mobile and iPad;
-- in-app wordmarks render B's bold editorial `Folio` plus `folio-b-xx-light.png` / `folio-b-xx-dark.png`; noisy screenshot-crop wordmarks are not accepted;
+- in-app wordmarks render live B grotesk `Folio` plus `src/components/FolioMark.tsx`; raster/screenshot wordmarks are rejected;
 - installed-app metadata uses only `folio-b-icon-180/192/512/512-maskable.png`;
-- loading uses `folio-b-launch-hero.webp` and GSAP only animates reveal/pan/opacity without redesigning the composition;
+- loading uses `folio-b-launch-hero.webp`, never exposes the internal “Sunset Editorial” label, and GSAP only animates reveal/pan/opacity;
 - typography follows Inter / Neue-Grotesk editorial proportions;
-- B's motif is `folio-b-motif.webp` and C is used only as photography treatment via `folio-c-photography.webp`;
+- B's motif is the original vector `folio-b-motif.svg`; C is used only as photography treatment via `folio-c-photography.webp`;
 - Robinhood influence stays structural rather than visual-brand copying;
+- Analysis Hub is the single deep path (scope → list → unchanged price momentum → Overview/Swing/Position → 내 분석); old duplicate Focus roster/추가 보기 layers must not return;
 - System/Light/Dark, semantic finance colours and all investment rules stay unchanged;
 - no active UI, manifest, install, service-worker or deploy reference uses the superseded `folio-identity-*` or punch-card assets.
 
