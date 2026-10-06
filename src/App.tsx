@@ -1144,9 +1144,9 @@ export default function App(){
           <div className="focus-summary">
             <div className="focus-summary-main"><span>FOCUS</span><strong>{focusRows.length}</strong><small>{focusFilterLabel} · 대표 리더만 먼저 보여줍니다.</small></div>
             <div className="focus-class-strip" aria-label="분석 허브 분류">
-              <button type="button" onClick={()=>{setAnalysisScope('core');setPage('analysis')}}><span>핵심</span><b>{focusCounts.core}</b><small>Core Leaders</small></button>
-              <button type="button" onClick={()=>{setAnalysisScope('candidates');setPage('analysis')}}><span>후보</span><b>{focusCounts.candidates}</b><small>Watch Candidates</small></button>
-              <button type="button" onClick={()=>{setAnalysisScope('turns');setPage('analysis')}}><span>전환</span><b>{focusCounts.turns}</b><small>Turnaround</small></button>
+              <button type="button" onClick={()=>showStockGroup('core')}><span>핵심</span><b>{focusCounts.core}</b><small>Core Leaders</small></button>
+              <button type="button" onClick={()=>showStockGroup('candidates')}><span>후보</span><b>{focusCounts.candidates}</b><small>Watch Candidates</small></button>
+              <button type="button" onClick={()=>showStockGroup('turns')}><span>전환</span><b>{focusCounts.turns}</b><small>Turnaround</small></button>
             </div>
           </div>
         </div>
