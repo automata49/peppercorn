@@ -11,6 +11,8 @@ Hard rules:
 - Primary installed-app icon uses B's near-black tile + assertive centered interlocked xx. `scripts/generate-b-app-icons.mjs` must rasterize the original vector geometry procedurally (~58% width, ~1.77:1), with the centered negative diamond and B colour split; never read a raster mark source.
 - Loading uses `public/folio-b-launch-hero.webp` with restrained GSAP reveal/pan only and must never display the internal concept label “Sunset Editorial”.
 - Typography follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
+- Light is the first-run/default appearance. System and Dark remain explicit user selections; OS dark preference must not silently override a fresh Folio session.
+- Compact launch preserves the 508:235 `folio-b-launch-hero.webp` composition inside safe horizontal margins; never crop it into a tall portrait card. Keep the B motif secondary/compact on phones and use a quiet monoline navigation icon system.
 - B motif = original vector `public/folio-b-motif.svg`: monochrome rock/coast, lone figure, sparse technical line work and isolated warm sun/disc. Do not paste/crop the concept-board image.
 - Fluid Market/C is not a UI theme. C is limited to photography treatment through `public/folio-c-photography.webp`: warm sunset light, shallow depth/bokeh and human-scale optimism.
 - Robinhood is a benchmark for hierarchy, simplicity, familiar navigation and progressive disclosure only. Do not copy its branding, colours or trade-entry UI.
