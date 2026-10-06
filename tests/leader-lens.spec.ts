@@ -69,7 +69,9 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await page.locator('.home-class-grid button').filter({hasText:'핵심 주도'}).click()
+  await expect(page.locator('.leadership-page')).toBeVisible()
+  await page.getByRole('button',{name:'업종·지표 상세 비교 →'}).click()
   const sheet=page.locator('.drill-sheet')
   const names=()=>sheet.locator('.stock-row .stock-id b').allTextContents()
   // GROWTH-FILTER-1 is on by default: only the stock with quarterly growth shows; the classification count stays.
@@ -77,7 +79,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(sheet.locator('.lens-chip',{hasText:'실적 성장만'})).toHaveAttribute('aria-pressed','true')
   expect(await names()).toEqual(['반도체 0'])
   await expect(sheet.locator('.drill-note')).toContainText('필터로 5종목 제외')
-  await expect(page.locator('.focus-class-strip button').filter({hasText:'핵심'})).toContainText('6')
+  await expect(page.locator('.leadership-tabs button').filter({hasText:'핵심 주도'})).toContainText('6')
   await sheet.locator('.lens-chip',{hasText:'실적 성장만'}).click()
   // 업종별 (default view): the top-ranked group and its stocks come first; the group chip shows its rank.
   await expect(sheet.locator('.lens-group').nth(1)).toContainText('Semiconductors')
@@ -110,7 +112,9 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // The choice is remembered on this device.
   await page.reload()
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await page.locator('.home-class-grid button').filter({hasText:'핵심 주도'}).click()
+  await expect(page.locator('.leadership-page')).toBeVisible()
+  await page.getByRole('button',{name:'업종·지표 상세 비교 →'}).click()
   await page.locator('.drill-sheet .summary-tabs button',{hasText:'대형 주도주'}).click()
   await expect(page.locator('.drill-sheet .summary-tabs button[aria-selected="true"]')).toContainText('대형 주도주')
   await expect(page.locator('.drill-sheet .lens-bar button[aria-pressed="true"]',{hasText:'RS순'})).toHaveCount(1)
