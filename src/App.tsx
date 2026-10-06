@@ -1182,7 +1182,7 @@ export default function App(){
     </div>
   }else if(page==='leadership'){
     const activeSector=sectorKeySelected?allSectorRows.find(g=>g.key===sectorKeySelected)||null:null
-    const classRows=lens(summaryGroups[stockTab]).filter(r=>!activeSector||sectorKey(r)===activeSector.key).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
+    const classRows=lens(summaryGroups[stockTab]).filter(r=>(leaderMkt==='ALL'||r.market===leaderMkt)&&(!activeSector||sectorKey(r)===activeSector.key)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))
     content=<div className="leadership-page">
       <section className="journey-head">
         <button type="button" onClick={()=>setPage('signal')}>← Market Signal</button>
