@@ -2,10 +2,10 @@ import {useId} from 'react'
 
 /**
  * Folio xx master mark.
- * Geometry follows the approved B board: two interlocked X strokes with a
- * centered negative diamond. The first X inherits the surrounding ink/white
- * through currentColor before moving into Plum; the second X runs
- * Magenta → Coral → Amber.
+ * Geometry follows the approved B board: two interlocked lowercase-scale x
+ * strokes with a centered negative diamond. Colour is fixed to the B palette
+ * so the mark never changes hue between Home, launch, drawer or dark mode.
+ * Visible size is controlled by CSS at the font x-height (≈ the “o” height).
  */
 export function FolioMark({className=''}:{className?:string}){
   const raw=useId().replace(/:/g,'')
@@ -15,14 +15,14 @@ export function FolioMark({className=''}:{className?:string}){
   return <svg className={('folio-xx-vector '+className).trim()} viewBox="0 0 184 104" role="presentation" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id={left} gradientUnits="userSpaceOnUse" x1="0" y1="12" x2="108" y2="92">
-        <stop offset="0%" stopColor="currentColor"/>
-        <stop offset="54%" stopColor="#54265F"/>
-        <stop offset="100%" stopColor="#A34F78"/>
+        <stop offset="0%" stopColor="var(--folio-brand-plum,#54265f)"/>
+        <stop offset="58%" stopColor="var(--folio-brand-plum,#54265f)"/>
+        <stop offset="100%" stopColor="var(--folio-brand-magenta,#a34f78)"/>
       </linearGradient>
       <linearGradient id={right} gradientUnits="userSpaceOnUse" x1="82" y1="82" x2="184" y2="12">
-        <stop offset="0%" stopColor="#A34F78"/>
-        <stop offset="58%" stopColor="#F06A45"/>
-        <stop offset="100%" stopColor="#F7A24A"/>
+        <stop offset="0%" stopColor="var(--folio-brand-magenta,#a34f78)"/>
+        <stop offset="58%" stopColor="var(--folio-brand-coral,#f06a45)"/>
+        <stop offset="100%" stopColor="var(--folio-brand-amber,#f5a24a)"/>
       </linearGradient>
       <mask id={cut}>
         <rect width="184" height="104" fill="white"/>
