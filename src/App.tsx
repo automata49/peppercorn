@@ -12,10 +12,9 @@ import { PeriodToggle } from './components/PeriodToggle'
 import { PriceRsChart } from './components/PriceRsChart'
 import { useElementWidth } from './lib/useElementWidth'
 import { animateSurface } from './motion/system'
-import { LeaderSpotlight } from './components/LeaderSpotlight'
 import { LeadershipPulse } from './components/LeadershipPulse'
-import { useDiscoveryLayout } from './lib/discoveryLayout'
 import { ProgressiveDisclosure } from './components/ProgressiveDisclosure'
+import { HomeDecision, type HomeLeadershipKey } from './components/HomeDecision'
 import { AuthModal } from './components/AuthModal'
 import { PositionPanel, valuation } from './components/PositionPanel'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
@@ -681,7 +680,6 @@ function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
 }
 
 export default function App(){
-  const discoveryLayout=useDiscoveryLayout()
   const [showIntro,setShowIntro]=useState(()=>{
     try{return sessionStorage.getItem('peppercorn-intro-seen')!=='1'}catch{return true}
   })
@@ -966,6 +964,21 @@ export default function App(){
     turns:focusRows.filter(r=>leadership(r)==='강세 전환').length
   }
   const broadLeaderCount=summaryGroups.core.length+summaryGroups.candidates.length+summaryGroups.turns.length
+
+  // HOME-JOURNEY-1: display-only market regime. It summarizes existing breadth/leadership facts and never changes classification.
+  const regimeScore=(breadth>=.60?1:breadth<.40?-1:0)+(ma200Breadth>=.60?1:ma200Breadth<.40?-1:0)+(advanceDeclineRatio>=1.20?1:advanceDeclineRatio<.80?-1:0)+(highNearShare>=.25?1:highNearShare<.10?-1:0)
+  const marketRegime=regimeScore>=2
+    ?{label:'확산 강세',tone:'strong' as const,summary:'상승 종목과 장기 추세가 함께 확산되는 구간입니다.',detail:'시장 구조 요약 · 투자 신호 아님'}
+    :regimeScore<=-2
+      ?{label:'리스크 축소',tone:'weak' as const,summary:'시장 폭과 추세 참여가 약해져 선별이 더 중요한 구간입니다.',detail:'시장 구조 요약 · 투자 신호 아님'}
+      :{label:'선별 장세',tone:'neutral' as const,summary:'시장 전체보다 리더십이 있는 종목과 섹터에 집중할 구간입니다.',detail:'시장 구조 요약 · 투자 신호 아님'}
+  const homeTodayRows=focusRows.slice(0,5)
+  const topToday=homeTodayRows[0]||null
+  const homeInsight=topToday
+    ?`${marketRegime.label}. ${topToday.name||topToday.ticker}이(가) ${leadership(topToday)}로 Focus 상단에 있으며, 다음 단계에서 리더십 근거와 Thesis 조건을 확인하세요.`
+    :`${marketRegime.label}. 현재 Focus 조건을 충족한 종목이 없어 Market Signal과 Leadership 변화를 먼저 확인하세요.`
+  const openJourneyLeadership=(tab:HomeLeadershipKey)=>{setStockTab(tab);setSectorKeySelected(null);setPage('leadership')}
+  const openJourneyStock=(row:LeaderRow)=>{setSelected(row);setAnalysisSection('overview');setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}));setPage('analysis')}
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),
@@ -1413,7 +1426,7 @@ export default function App(){
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
-  const pageTitle:Record<string,string>={dashboard:'Dashboard',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'종목 분석',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={dashboard:'Home',signal:'Market Signal',leadership:'Leadership',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:'Stock',temperature:'시장 온도계',journal:'Decision · Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
