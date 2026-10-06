@@ -39,7 +39,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
       glassRadius:get('--folio-ds-glass-radius'),
     }
   })
-  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',markHeight:'1ex',markRatio:'184 / 104',plum:'#54265f',coral:'#f06a45',paper:'#faf8f5',glass:'rgba(255,255,255,.68)',glassStrong:'rgba(255,255,255,.82)',glassBlur:'22px',glassRadius:'18px'})
+  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',markHeight:'1ex',markRatio:'184 / 104',plum:'#54265f',coral:'#f06a45',paper:'#faf8f5',glass:'#ffffffad',glassStrong:'#ffffffd1',glassBlur:'22px',glassRadius:'18px'})
 
   const header=await page.locator('.page-shell-dashboard .mobile-brandbar').boundingBox()
   expect(header).not.toBeNull()
