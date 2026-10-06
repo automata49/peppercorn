@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { spawnSync } from 'node:child_process'
+import { babelParse } from 'playwright/lib/transform/babelBundle'
 
 const ROOT=path.resolve('tests')
 const files=[]
@@ -16,24 +16,15 @@ walk(ROOT)
 let failed=false
 for(const file of files.sort()){
   const rel=path.relative(process.cwd(),file)
-  const result=spawnSync('npx',['playwright','test',rel,'--list'],{
-    encoding:'utf8',
-    env:{...process.env,CI:'1'},
-    maxBuffer:8*1024*1024
-  })
-  if(result.status!==0){
+  const source=fs.readFileSync(file,'utf8')
+  try{
+    babelParse(source,file,true)
+  }catch(error){
     failed=true
-    console.error(`Playwright parse failed: ${rel}`)
-    if(result.stdout?.trim())console.error(result.stdout.trim())
-    if(result.stderr?.trim())console.error(result.stderr.trim())
-    const tsc=spawnSync('npx',['tsc','--pretty','false','--noEmit','--skipLibCheck','--target','ESNext','--module','ESNext','--moduleResolution','Bundler',rel],{
-      encoding:'utf8',
-      env:{...process.env,CI:'1'},
-      maxBuffer:8*1024*1024
-    })
-    const diagnostics=(tsc.stdout||'')+(tsc.stderr||'')
-    const syntaxOnly=diagnostics.split(/\r?\n/).filter(line=>/error TS1\d{3}:/.test(line))
-    if(syntaxOnly.length)console.error('TypeScript syntax diagnostics:\n'+syntaxOnly.join('\n'))
+    const loc=error?.loc
+    const where=loc?`:${loc.line}:${loc.column+1}`:''
+    console.error(`Playwright parse failed: ${rel}${where}`)
+    console.error(error?.message||String(error))
   }
 }
 if(failed)process.exit(1)
