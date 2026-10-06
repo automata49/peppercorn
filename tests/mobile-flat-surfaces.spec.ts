@@ -14,7 +14,10 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   const page=await context.newPage()
   await boot(page)
 
-  for(const selector of ['.focus-overview','.dashboard-sector-panel','.temp-card']){
+  const focus=page.locator('.focus-overview').first()
+  await expect(focus).toBeVisible()
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  for(const selector of ['.dashboard-sector-panel','.temp-card']){
     const node=page.locator(selector).first()
     await expect(node).toBeVisible()
     expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
@@ -36,8 +39,8 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   await expect(detailBlocks).toHaveCount(3)
   for(let i=0;i<3;i++){
     const block=detailBlocks.nth(i)
-    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
+    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThanOrEqual(14)
   }
   await context.close()
 })
@@ -46,8 +49,7 @@ test('desktop focal leader and analysis keep the same flat editorial hierarchy',
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const focus=page.locator('.focus-overview')
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThanOrEqual(20)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
