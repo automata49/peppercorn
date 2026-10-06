@@ -44,8 +44,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       }
     })
     expect(rootVars).toEqual({
-      paper:'#f4f1ec',
-      ink:'#111113',
+      paper:'#0a0a0c',
+      ink:'#f7f4f1',
       black:'#0b0b0d',
       sand:'#ebe0d4',
     })
