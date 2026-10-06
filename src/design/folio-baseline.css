@@ -80,6 +80,21 @@
   --folio-ds-motif-phone-max:122px;
 }
 
+:root[data-theme="dark"]{
+  --folio-ds-glass-bg:rgba(17,17,20,.70);
+  --folio-ds-glass-bg-strong:rgba(17,17,20,.84);
+  --folio-ds-glass-border:rgba(255,255,255,.11);
+  --folio-ds-glass-shadow:0 10px 30px rgba(0,0,0,.24);
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme]){
+    --folio-ds-glass-bg:rgba(17,17,20,.70);
+    --folio-ds-glass-bg-strong:rgba(17,17,20,.84);
+    --folio-ds-glass-border:rgba(255,255,255,.11);
+    --folio-ds-glass-shadow:0 10px 30px rgba(0,0,0,.24);
+  }
+}
+
 .app-icon{
   width:var(--folio-ds-icon-size);
   height:var(--folio-ds-icon-size);
