@@ -63,6 +63,18 @@
   --folio-ds-control-radius:10px;
   --folio-ds-rule:1px;
 
+  /* Bright-default surface + functional glass layer. Glass is for navigation/controls, never analytical content. */
+  --folio-ds-light-paper:#faf8f5;
+  --folio-ds-light-surface:#ffffff;
+  --folio-ds-light-surface-2:#f1ede8;
+  --folio-ds-glass-bg:rgba(255,255,255,.68);
+  --folio-ds-glass-bg-strong:rgba(255,255,255,.82);
+  --folio-ds-glass-border:rgba(17,17,19,.10);
+  --folio-ds-glass-shadow:0 10px 30px rgba(35,24,34,.08);
+  --folio-ds-glass-blur:22px;
+  --folio-ds-glass-saturation:1.18;
+  --folio-ds-glass-radius:18px;
+
   --folio-ds-launch-ratio:508 / 235;
   --folio-ds-motif-phone-min:108px;
   --folio-ds-motif-phone-max:122px;
