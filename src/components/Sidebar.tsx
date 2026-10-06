@@ -102,7 +102,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     </aside>
 
     <div className="mobile-brandbar">
-      <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Dashboard로 이동">
+      <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Home으로 이동">
         <span className="folio-brand"><FolioBrand/></span>
       </button>
       <div className="mobile-brand-actions">
