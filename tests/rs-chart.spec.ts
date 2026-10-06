@@ -66,18 +66,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
-  // DASHBOARD-FOCUS-1 keeps charts secondary: the ranked focus list and compact sector table are visible first.
-  await expect(page.locator('.focus-leader-row')).toHaveCount(4)
-  await expect(page.locator('.leader-detail')).not.toHaveAttribute('open','')
-  await page.locator('.leader-detail > summary').click()
-  const leaderChart=page.locator('.leadership-overview .rs-chart')
-  await expect(leaderChart.locator('.rs-mode-toggle')).toHaveCount(0)
-  await expect(leaderChart.locator('.rs-period-toggle button')).toHaveText(['5D','20D','50D','120D','200D','52W'])
-  await expect(leaderChart.locator('svg .line-axis-title')).toHaveText('지수 (시작=100)')
-  await expect(leaderChart.locator('.line-legend li')).toHaveCount(4)
-  await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/109-1)*100).toFixed(1)}%`)
-  await leaderChart.getByRole('button',{name:'5D',exact:true}).click()
-  await expect(leaderChart.locator('.line-legend em').first()).toHaveText(`+${((129/124-1)*100).toFixed(1)}%`)
+  // Dashboard keeps one hero plus one leadership decision surface; detailed momentum lives in the class popup.
+  await expect(page.locator('.leadership-decision')).toBeVisible()
+  await expect(page.locator('.focus-class-strip button')).toHaveCount(3)
+  await expect(page.locator('.leader-detail')).toHaveCount(0)
 
   const sectorDisclosure=page.locator('.sector-heat-disclosure')
   await expect(sectorDisclosure).not.toHaveAttribute('open','')
@@ -145,12 +137,6 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   await expect(drill).toHaveCount(0)
 
-  // Opened from a dashboard chart there is no list behind it: 뒤로 closes the sheet.
-  await leaderChart.locator('.line-legend button').first().click()
-  await expect(back).toHaveText('‹ 뒤로')
-  await back.click()
-  await expect(drill).toHaveCount(0)
-
   // Opened from the ETF dialog: 뒤로 reopens that dialog.
   await page.locator('.dashboard-etf-panel').getByRole('button',{name:'전체 보기 →'}).click()
   await page.locator('.etf-summary-dialog .stock-row').first().click()
@@ -183,8 +169,9 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   ok=true
   await banner.getByRole('button',{name:'다시 연결'}).click()
   await expect(banner).toHaveCount(0)
-  await page.locator('.leader-detail > summary').click()
-  await expect(page.locator('.leadership-overview .line-legend b').first()).toHaveText('검증 종목 0')
+  await expect(page.locator('.leadership-decision')).toBeVisible()
+  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await expect(page.locator('.drill-sheet .stock-row').first()).toBeVisible()
   await context.close()
 })
 
@@ -197,14 +184,12 @@ test('주도 종목 popup shows momentum lines for its group; data is fetched pe
   await mockHistory(page,asked)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.leader-detail > summary').click()
-  const chart=page.locator('.leadership-overview .rs-chart')
-  // Focus contains TEST0,1 and TEST5,6: two representatives from each industry group.
-  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 6','검증 종목 5','검증 종목 1','검증 종목 0'])
-  expect(asked.some(ids=>ids.length===4)).toBeTruthy()
   await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
   const drill=page.locator('.drill-sheet')
-  await expect(drill.locator('.rs-chart .line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
+  const chart=drill.locator('.rs-chart')
+  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
+  expect(new Set(asked.flat()).size).toBeGreaterThanOrEqual(4)
+  for(const id of ['0','1','2','3'])expect(asked.flat()).toContain(id)
   await drill.locator('.rs-chart .line-legend button').first().click()
   await expect(drill.locator('.drill-meta')).toContainText('TEST3')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
@@ -246,8 +231,8 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await page.locator('.dashboard-explore > summary').click()
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
-  await page.locator('.leader-detail > summary').click()
-  await page.locator('.leadership-overview .line-legend button').first().click()
+  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await page.locator('.drill-sheet .rs-chart .line-legend button').first().click()
   const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
   await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
   // Legend: stock, benchmark (flat SPY → +0.0%), RS line (= stock change against a flat benchmark).

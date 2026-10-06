@@ -8,7 +8,7 @@ import { BENCHMARK, PRICE_RS_VERSION, priceRs, type PriceRsData } from '../lib/b
 import { yScale, type RsChartPeriod } from '../lib/rsChart'
 import { AnimatedNumber } from './motion/AnimatedNumber'
 const pct=(n:number|null)=>n==null?'—':`${n>=0?'+':''}${(n*100).toFixed(1)}%`
-export const PRICE_C='#28486f',BENCH_C='#8a96a6',RS_C='#c33d36'
+export const PRICE_C='var(--folio-ink)',BENCH_C='var(--folio-muted)',RS_C='var(--folio-magenta)'
 
 export function PriceRsSvg({data,width,benchTicker}:{data:PriceRsData;width:number;benchTicker:string}){
   const narrow=width<520,n=data.dates.length

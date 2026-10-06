@@ -14,14 +14,13 @@ const required=[
   'tests/compact-editorial.spec.ts',
   'tests/visual-identity-regression.spec.ts',
   'scripts/generate-b-app-icons.mjs',
-  'public/folio-b-xx-light.png',
-  'public/folio-b-xx-dark.png',
+  'src/components/FolioMark.tsx',
   'public/folio-b-icon-180.png',
   'public/folio-b-icon-192.png',
   'public/folio-b-icon-512.png',
   'public/folio-b-icon-512-maskable.png',
   'public/folio-b-launch-hero.webp',
-  'public/folio-b-motif.webp',
+  'public/folio-b-motif.svg',
   'public/folio-c-photography.webp'
 ];
 for(const file of required)assert(existsSync(file),`Missing Folio B identity file: ${file}`);
@@ -41,7 +40,7 @@ const agentsEntry=read('AGENTS.md');
 const claudeEntry=read('CLAUDE.md');
 const visualRegression=read('tests/visual-identity-regression.spec.ts');
 
-assert(contract.includes('attached column 02 “Sunset Editorial” (B) is the authoritative visual reference'), 'CONTRACT must make the attached B column authoritative.');
+assert(contract.includes('Sunset Editorial” (B)')&&contract.includes('FolioMark'), 'CONTRACT must keep B authoritative and lock the vector Folio mark.');
 assert(design.includes('attached concept board\'s column 02 — “Sunset Editorial” (B)'), 'Design doc must name the B concept board as source of truth.');
 assert(design.includes('C remains photography treatment only') || design.includes('C is limited to photography treatment'), 'Design doc must limit C to photography treatment.');
 assert(css.includes('B EXACT LOCK'), 'Exact B CSS lock is missing.');
@@ -50,6 +49,8 @@ assert(main.includes("import './design/folio-identity.css'"), 'Folio identity st
 assert(!existsSync('src/design/robinhood.css'), 'Superseded robinhood.css must stay removed.');
 assert(!existsSync('scripts/generate-folio-icons.mjs'), 'Generic icon generator must stay removed once exact B artwork is committed.');
 const legacyIdentityAssets=[
+  'folio-b-xx-light.png','folio-b-xx-dark.png','public/folio-b-xx-light.png','public/folio-b-xx-dark.png',
+  'folio-b-motif.webp','public/folio-b-motif.webp',
   'apple-touch-icon.png',
   'folio-app-icon-180.png','folio-app-icon-192.png','folio-app-icon-512.png','folio-app-icon-512-maskable.png',
   'folio-apple-touch-icon.png',
@@ -61,6 +62,7 @@ const legacyIdentityAssets=[
 ];
 for(const file of legacyIdentityAssets)assert(!existsSync(file),`Legacy identity asset must stay removed: ${file}`);
 assert(!app.includes('Peppercorn Capital')&&!app.includes('logo.webp'),'Launch must remain Folio-only without Peppercorn co-branding.');
+assert(!app.includes('SUNSET EDITORIAL'),'Launch must not expose the internal Sunset Editorial concept label.');
 assert(!css.includes('\\n'),'Identity CSS contains a literal \\n escape.');
 assert(!css.includes('launch-wordmark-system')&&!css.includes('radial-gradient(circle at 24% 78%'),'Superseded launch/wordmark identity CSS returned.');
 assert(!existsSync('public/folio-b-wordmark-light.webp')&&!existsSync('public/folio-b-wordmark-dark.webp'),'Noisy screenshot-crop wordmarks must stay removed.');
@@ -68,11 +70,12 @@ assert(!pkg.scripts?.predev&&!pkg.scripts?.prebuild, 'Exact B artwork must not b
 const iconBuild=read('scripts/generate-b-app-icons.mjs');
 assert(pkg.scripts?.build?.startsWith('node scripts/generate-b-app-icons.mjs &&'),'Build must render the corrected B app-icon family before Vite.');
 assert(iconBuild.includes('MARK_WIDTH_RATIO=0.3125')&&iconBuild.includes('MARK_ASPECT=1.72'),'B app-icon xx scale/aspect drifted from the corrected concept-B geometry.');
+assert(!iconBuild.includes('folio-b-xx-dark.png'),'App icon generator must use procedural vector geometry, not a raster source.');
 
 assert(sidebar.includes('folio-wordmark-text')&&sidebar.includes('>Folio</span>'),'Sidebar must render the B Folio text lockup.');
-for(const asset of ['folio-b-xx-light.png','folio-b-xx-dark.png'])assert(sidebar.includes(asset),`Sidebar B xx mark missing ${asset}`);
+assert(sidebar.includes("import { FolioMark } from './FolioMark'")&&sidebar.includes('<FolioMark/>'),'Sidebar must render the original vector B xx mark.');
 assert(css.includes('.folio-wordmark-text')&&css.includes('font-family:Inter'),'B wordmark typography contract is missing.');
-for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.webp','folio-c-photography.webp'])assert(app.includes(asset),`App identity placement missing ${asset}`);
+for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-photography.webp'])assert(app.includes(asset),`App identity placement missing ${asset}`);
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 assert.equal(pkg.scripts?.['test:visual-identity'],'playwright test tests/visual-identity-regression.spec.ts','Visual identity regression command drifted.');
 assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts','test:identity script drifted.');
@@ -101,10 +104,8 @@ for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.ts
 const deployWorkflow=read('.github/workflows/deploy.yml');
 assert(!deployWorkflow.includes('logo.webp'),'Deploy workflow must not republish the legacy Peppercorn logo.');
 for(const asset of [
-  'folio-b-xx-light.png',
-  'folio-b-xx-dark.png',
   'folio-b-launch-hero.webp',
-  'folio-b-motif.webp',
+  'folio-b-motif.svg',
   'folio-c-photography.webp'
 ]){
   assert(deployWorkflow.includes(asset),`Pages root sync missing active identity asset: ${asset}`);

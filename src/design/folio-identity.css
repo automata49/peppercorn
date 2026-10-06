@@ -1113,7 +1113,8 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   line-height:1.55;
 }
 
-/* Exact B wordmark: bold Folio + compact interlocked xx from the B icon artwork. */
+/* Exact B wordmark: live typography + original vector interlocked xx.
+   No screenshot crop or raster wordmark is used in the product UI. */
 .folio-wordmark-system{
   display:inline-flex;
   align-items:center;
@@ -1125,47 +1126,31 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 .folio-wordmark-text{
   display:block;
   font-family:Inter,"Neue Haas Grotesk Text","Helvetica Neue",Arial,sans-serif;
-  font-size:28px;
+  font-size:clamp(24px,2.2vw,30px);
   font-weight:720;
-  line-height:.9;
-  letter-spacing:-.075em;
+  line-height:.88;
+  letter-spacing:-.078em;
 }
 .folio-wordmark-mark{
   position:relative;
   display:block;
-  width:43px;
-  height:24px;
-  margin-left:5px;
+  width:clamp(38px,3.4vw,46px);
+  aspect-ratio:1.72/1;
+  margin-left:clamp(4px,.45vw,6px);
   flex:0 0 auto;
 }
-.folio-xx-art{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  user-select:none;
-  pointer-events:none;
-}
-.folio-xx-art-dark{display:none}
+.folio-xx-vector{display:block;width:100%;height:100%;overflow:visible}
 .sidebar .folio-wordmark-system{color:#fff}
-.sidebar .folio-wordmark-text{font-size:25px;font-weight:680}
-.sidebar .folio-wordmark-mark{width:39px;height:21px;margin-left:4px}
-.sidebar .folio-xx-art-light{display:none}
-.sidebar .folio-xx-art-dark{display:block}
-.mobile-brand-home .folio-wordmark-text{font-size:30px}
-.mobile-brand-home .folio-wordmark-mark{width:46px;height:25px}
+.sidebar .folio-wordmark-text{font-size:25px;font-weight:690}
+.sidebar .folio-wordmark-mark{width:39px;margin-left:4px}
+.mobile-brand-home .folio-wordmark-text{font-size:clamp(25px,7.2vw,30px)}
+.mobile-brand-home .folio-wordmark-mark{width:clamp(39px,11vw,46px)}
 .menu-drawer .folio-wordmark-text{font-size:30px}
-.menu-drawer .folio-wordmark-mark{width:46px;height:25px}
+.menu-drawer .folio-wordmark-mark{width:46px}
 :root[data-theme="dark"] .folio-wordmark-system{color:#f7f4f1}
-:root[data-theme="dark"] .folio-xx-art-light{display:none}
-:root[data-theme="dark"] .folio-xx-art-dark{display:block}
 @media(prefers-color-scheme:dark){
   :root:not([data-theme]) .folio-wordmark-system{color:#f7f4f1}
-  :root:not([data-theme]) .folio-xx-art-light{display:none}
-  :root:not([data-theme]) .folio-xx-art-dark{display:block}
 }
-.sidebar .folio-xx-art-dark{display:block!important}
 
 /* B typography: large type stays regular and editorial, metadata is tracked. */
 .spotlight-kicker,.launch-editorial-caption span,.folio-identity-interlude figcaption span,
@@ -1203,6 +1188,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   position:relative;
   width:min(980px,94vw);
   aspect-ratio:508/235;
+  max-height:min(54dvh,452px);
   overflow:hidden;
   background:#0b0b0d;
   box-shadow:0 24px 70px rgba(11,11,13,.12);
@@ -1225,7 +1211,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   padding:18px 2px 0;
   color:var(--folio-black);
 }
-.launch-editorial-caption span{font-size:9px}
+.launch-editorial-caption span{font-size:clamp(8px,1.8vw,10px)}
 .launch-editorial-caption p{
   margin:0;
   font-family:var(--folio-display);
@@ -1385,20 +1371,47 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 @media(max-width:650px){
   .folio-identity-interlude{margin-left:-18px;margin-right:-18px}
-  .launch-center{width:100%;padding:0 0 22px;align-content:center}
+  .folio-identity-interlude img{height:clamp(156px,47vw,190px)}
+  .launch-screen{grid-template-rows:minmax(0,1fr) auto}
+  .launch-center{
+    width:100%;
+    min-height:0;
+    padding:clamp(12px,4dvh,28px) 0 16px;
+    align-content:center;
+  }
   .launch-editorial-frame{
     width:100vw;
+    aspect-ratio:1.28/1;
+    max-height:min(58dvh,520px);
     box-shadow:none;
   }
+  .launch-b-hero{object-position:51% 50%}
   .launch-editorial-caption{
     width:calc(100vw - 36px);
     display:grid;
-    gap:8px;
-    padding-top:16px;
+    gap:6px;
+    padding-top:clamp(10px,2.4dvh,16px);
   }
-  .launch-editorial-caption p{font-size:15px}
-  .launch-progress{width:calc(100vw - 36px)!important;margin-top:18px!important}
-  .launch-footer{width:calc(100vw - 36px)}
+  .launch-editorial-caption p{
+    max-width:30ch;
+    font-size:clamp(13px,3.8vw,15px);
+    line-height:1.35;
+  }
+  .launch-progress{
+    width:calc(100vw - 36px)!important;
+    margin-top:clamp(12px,2.4dvh,18px)!important;
+  }
+  .launch-footer{
+    width:calc(100vw - 36px);
+    padding-bottom:max(12px,env(safe-area-inset-bottom));
+  }
+  .launch-footer .folio-wordmark-text{font-size:clamp(17px,5vw,20px)}
+  .launch-footer .folio-wordmark-mark{width:clamp(27px,8vw,31px)}
+  .launch-footer small{font-size:clamp(8px,2.5vw,10px)}
+}
+@media(max-width:390px) and (max-height:740px){
+  .launch-editorial-frame{aspect-ratio:1.5/1;max-height:50dvh}
+  .launch-editorial-caption p{display:none}
 }
 
 /* Dark mode preserves the B composition: black field, white wordmark, warm-photo accent. */
@@ -1416,4 +1429,373 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   :root:not([data-theme]) .launch-editorial-caption{color:#f7f4f1}
   :root:not([data-theme]) .launch-progress{background:rgba(255,255,255,.18)!important}
   :root:not([data-theme]) .launch-progress span{background:#f7f4f1!important}
+}
+
+
+/* =========================================================
+   FOLIO ANALYSIS EXPERIENCE — one decision path, less duplication
+   Robinhood benchmark: simple, mobile-familiar, progressive depth.
+   ========================================================= */
+.leadership-decision{
+  display:grid;
+  grid-template-columns:minmax(220px,280px) minmax(0,1fr);
+  gap:clamp(24px,4vw,56px);
+  align-items:center;
+  margin:18px 0 4px;
+  padding:22px 0 24px;
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+}
+.leadership-pulse{
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  align-items:center;
+  gap:18px;
+  min-width:0;
+}
+.leadership-orbit-wrap{
+  position:relative;
+  width:150px;
+  height:112px;
+  display:grid;
+  place-items:center;
+  perspective:520px;
+}
+.leadership-orbit{
+  position:absolute;
+  width:128px;
+  height:128px;
+  border-radius:50%;
+  background:conic-gradient(
+    from -32deg,
+    var(--folio-plum) 0 var(--lead-core),
+    var(--folio-magenta) var(--lead-core) calc(var(--lead-core) + var(--lead-candidate)),
+    var(--folio-coral) calc(var(--lead-core) + var(--lead-candidate)) 100%
+  );
+  transform:rotateX(63deg) rotateZ(-16deg);
+  box-shadow:0 24px 32px rgba(11,11,13,.16);
+}
+.leadership-orbit::after{
+  content:"";
+  position:absolute;
+  inset:28px;
+  border-radius:50%;
+  background:var(--folio-paper);
+  box-shadow:inset 0 0 0 1px var(--folio-line);
+}
+.leadership-orbit-center{
+  position:relative;
+  z-index:1;
+  display:grid;
+  place-items:center;
+  margin-top:3px;
+  pointer-events:none;
+}
+.leadership-orbit-center strong{
+  font-family:var(--folio-display);
+  font-size:30px;
+  font-weight:520;
+  letter-spacing:-.06em;
+}
+.leadership-orbit-center span{
+  margin-top:2px;
+  color:var(--folio-muted);
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.17em;
+}
+.leadership-pulse-stats{display:grid;gap:9px;min-width:0}
+.leadership-pulse-stats>div{
+  display:grid;
+  grid-template-columns:8px 1fr auto;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--folio-line);
+}
+.leadership-pulse-stats>div:last-child{border-bottom:0}
+.leadership-pulse-stats i{width:7px;height:7px;border-radius:50%}
+.leadership-pulse-stats i.core{background:var(--folio-plum)}
+.leadership-pulse-stats i.candidate{background:var(--folio-magenta)}
+.leadership-pulse-stats i.turn{background:var(--folio-coral)}
+.leadership-pulse-stats span{color:var(--folio-muted);font-size:10px}
+.leadership-pulse-stats b{font-size:15px;font-weight:620}
+
+.leadership-decision .focus-summary{display:grid;gap:15px;margin:0}
+.leadership-decision .focus-summary-main{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  align-items:end;
+  gap:2px 12px;
+}
+.leadership-decision .focus-summary-main>span{
+  grid-column:1/-1;
+  color:var(--folio-muted);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.16em;
+}
+.leadership-decision .focus-summary-main strong{
+  font-family:var(--folio-display);
+  font-size:clamp(32px,4vw,48px);
+  line-height:.9;
+  font-weight:480;
+  letter-spacing:-.06em;
+}
+.leadership-decision .focus-summary-main small{color:var(--folio-muted);font-size:11px;line-height:1.45}
+.leadership-decision .focus-class-strip{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border:0;
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+  border-radius:0;
+  background:transparent;
+}
+.leadership-decision .focus-class-strip button{
+  display:block;
+  min-height:74px;
+  padding:12px 14px;
+  border:0;
+  border-right:1px solid var(--folio-line);
+  background:transparent;
+  color:var(--folio-ink);
+  text-align:left;
+}
+.leadership-decision .focus-class-strip button:last-child{border-right:0}
+.leadership-decision .focus-class-strip button span{
+  color:var(--folio-muted);
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:.08em;
+}
+.leadership-decision .focus-class-strip button b{
+  display:block;
+  margin-top:5px;
+  font-family:var(--folio-display);
+  font-size:24px;
+  font-weight:520;
+}
+.leadership-decision .focus-class-strip button small{
+  display:block;
+  margin-top:3px;
+  color:var(--folio-muted);
+  font-size:8px;
+  letter-spacing:.06em;
+}
+.leadership-next{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:12px 0 2px;
+  color:var(--folio-muted);
+  font-size:11px;
+}
+.leadership-next .dashboard-section-action{white-space:nowrap}
+
+.analysis-hub-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(250px,360px);
+  align-items:center;
+  gap:clamp(28px,5vw,72px);
+  padding:clamp(22px,4vw,46px) 0 26px;
+  border-bottom:1px solid var(--folio-line);
+}
+.analysis-hub-copy>span{
+  display:block;
+  margin-bottom:10px;
+  color:var(--folio-muted);
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.18em;
+}
+.analysis-hub-copy h2{
+  max-width:760px;
+  margin:0;
+  font-family:var(--folio-display);
+  font-size:clamp(28px,4.2vw,54px);
+  font-weight:560;
+  line-height:1.02;
+  letter-spacing:-.06em;
+}
+.analysis-hub-copy p{
+  max-width:720px;
+  margin:13px 0 0;
+  color:var(--folio-muted);
+  font-size:13px;
+  line-height:1.6;
+}
+.analysis-hub-head .leadership-pulse{justify-self:end}
+
+.analysis-finder{
+  max-width:none!important;
+  margin:18px 0 22px;
+}
+.analysis-finder .stock-search{
+  max-width:720px;
+  margin:0 0 14px!important;
+}
+.analysis-browse{
+  display:grid;
+  grid-template-columns:minmax(300px,430px) minmax(0,1fr);
+  gap:16px;
+  align-items:start;
+}
+.analysis-scope{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:0!important;
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+}
+.analysis-scope button{
+  min-height:44px;
+  border:0!important;
+  border-right:1px solid var(--folio-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--folio-muted)!important;
+  font-size:11px;
+}
+.analysis-scope button:last-child{border-right:0!important}
+.analysis-scope button.on{
+  color:var(--folio-ink)!important;
+  box-shadow:inset 0 -2px 0 var(--folio-ink)!important;
+}
+.analysis-browse .stock-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:1px;
+  max-height:300px;
+  overflow:auto;
+  border:1px solid var(--folio-line);
+  background:var(--folio-line);
+}
+.analysis-browse .stock-list>button{
+  min-width:0;
+  padding:12px 14px;
+  border:0;
+  border-radius:0;
+  background:var(--folio-paper);
+  text-align:left;
+}
+.analysis-browse .stock-list>button.on{background:var(--folio-surface-2)}
+.analysis-browse .stock-list>button b{font-size:13px}
+.analysis-browse .stock-list>button span,
+.analysis-browse .stock-list>button em{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.analysis-browse .stock-list>button span{margin-top:3px;font-size:12px}
+.analysis-browse .stock-list>button em{margin-top:5px;color:var(--folio-muted);font-size:9px;font-style:normal}
+
+.analysis-card{gap:0!important}
+.analysis-price-momentum{
+  border-radius:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  padding:clamp(18px,3vw,28px) 0!important;
+}
+.analysis-price-momentum .analysis-hero .hero-name{
+  font-size:clamp(28px,4vw,44px);
+  font-weight:560;
+}
+.analysis-price-momentum .analysis-hero .hero-price{
+  font-family:var(--folio-display);
+  font-size:clamp(40px,5vw,62px);
+  font-weight:430;
+  letter-spacing:-.055em;
+}
+.analysis-detail-tabs{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin:0;
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+  background:color-mix(in srgb,var(--folio-paper) 94%,transparent);
+  backdrop-filter:blur(16px);
+}
+.analysis-detail-tabs button{
+  position:relative;
+  min-height:48px;
+  border:0;
+  border-right:1px solid var(--folio-line);
+  border-radius:0;
+  background:transparent;
+  color:var(--folio-muted);
+  font-size:11px;
+  font-weight:620;
+}
+.analysis-detail-tabs button:last-child{border-right:0}
+.analysis-detail-tabs button.on{color:var(--folio-ink)}
+.analysis-detail-tabs button.on::after{
+  content:"";
+  position:absolute;
+  left:30%;right:30%;bottom:-1px;height:2px;
+  background:var(--folio-coral);
+}
+.analysis-secondary{
+  display:block!important;
+  min-width:0;
+}
+.analysis-secondary-body{
+  display:grid;
+  gap:1px!important;
+  margin:0!important;
+  background:var(--folio-line);
+}
+.analysis-secondary-body>.analysis-block{
+  margin:0;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:var(--folio-paper)!important;
+  padding:clamp(18px,3vw,26px)!important;
+}
+
+@media(max-width:900px){
+  .leadership-decision{grid-template-columns:1fr;gap:12px}
+  .leadership-pulse{grid-template-columns:130px 1fr}
+  .leadership-orbit-wrap{width:130px;height:100px}
+  .leadership-orbit{width:112px;height:112px}
+  .analysis-hub-head{grid-template-columns:1fr;gap:18px}
+  .analysis-hub-head .leadership-pulse{justify-self:start}
+  .analysis-browse{grid-template-columns:1fr}
+  .analysis-browse .stock-list{grid-template-columns:repeat(2,minmax(0,1fr));max-height:250px}
+}
+@media(max-width:650px){
+  .leadership-decision{padding:16px 0 18px}
+  .leadership-pulse{grid-template-columns:112px 1fr;gap:12px}
+  .leadership-orbit-wrap{width:112px;height:88px}
+  .leadership-orbit{width:98px;height:98px;box-shadow:0 16px 22px rgba(11,11,13,.12)}
+  .leadership-orbit::after{inset:22px}
+  .leadership-orbit-center strong{font-size:25px}
+  .leadership-pulse-stats>div{padding-bottom:5px}
+  .leadership-decision .focus-class-strip button{min-height:66px;padding:10px}
+  .leadership-decision .focus-class-strip button b{font-size:21px}
+  .leadership-next{align-items:flex-start;flex-direction:column;gap:8px}
+  .analysis-hub-head{padding:18px 0}
+  .analysis-hub-copy h2{font-size:clamp(27px,9vw,36px)}
+  .analysis-hub-copy p{font-size:11.5px}
+  .analysis-hub-head .leadership-pulse{width:100%}
+  .analysis-finder .stock-search{margin-bottom:10px!important}
+  .analysis-scope{overflow-x:auto;grid-template-columns:repeat(5,minmax(72px,1fr))}
+  .analysis-browse .stock-list{grid-template-columns:1fr;max-height:260px}
+  .analysis-price-momentum{padding:16px 0!important}
+  .analysis-detail-tabs{top:60px}
+  .analysis-detail-tabs button{min-height:44px}
+  .analysis-secondary-body>.analysis-block{padding:16px 0!important}
+  .page-shell-dashboard .spotlight-body h3{font-size:clamp(30px,10vw,42px)}
+  .page-shell-dashboard .spotlight-price strong{font-size:clamp(42px,14vw,58px)}
+  .page-shell-dashboard .spotlight-chart svg{max-height:clamp(170px,50vw,230px)}
 }

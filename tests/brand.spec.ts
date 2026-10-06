@@ -22,10 +22,11 @@ for(const view of views){
   await boot(page)
 
   const launch=page.locator('.launch-overlay')
-  const hero=launch.getByRole('img',{name:'Folio xx Sunset Editorial'})
+  const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
   await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp')
-  await expect(launch.locator('.launch-editorial-caption')).toContainText('SUNSET EDITORIAL')
+  await expect(launch.locator('.launch-editorial-caption')).toContainText('STRUCTURED FREEDOM')
+  await expect(launch.locator('.launch-editorial-caption')).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
   await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
   await expect(launch.locator('.launch-footer')).not.toContainText('Peppercorn Capital')
@@ -37,20 +38,18 @@ for(const view of views){
     await expect(homeBrand).toBeVisible()
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
     await expect(homeBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-    await expect(homeBrand.locator('.folio-xx-art-light')).toHaveAttribute('src','./folio-b-xx-light.png')
-    await expect(homeBrand.locator('.folio-xx-art-light')).toBeVisible()
+    await expect(homeBrand.locator('.folio-xx-vector')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
   }else{
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
     await expect(sideBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-    await expect(sideBrand.locator('.folio-xx-art-dark')).toHaveAttribute('src','./folio-b-xx-dark.png')
-    await expect(sideBrand.locator('.folio-xx-art-dark')).toBeVisible()
+    await expect(sideBrand.locator('.folio-xx-vector')).toBeVisible()
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.webp')
+  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg')
   if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
@@ -84,10 +83,8 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
 
 test('B wordmark, hero, motif and C photography assets are deployable',async({request})=>{
  for(const asset of [
-  'folio-b-xx-light.png',
-  'folio-b-xx-dark.png',
   'folio-b-launch-hero.webp',
-  'folio-b-motif.webp',
+  'folio-b-motif.svg',
   'folio-c-photography.webp'
  ]){
   const res=await request.get(asset)

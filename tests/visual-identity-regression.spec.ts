@@ -62,15 +62,15 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       expect(box!.height).toBeGreaterThanOrEqual(67.5)
       expect(box!.height).toBeLessThanOrEqual(68.5)
       await expect(compactBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-      await expect(compactBrand.locator('.folio-xx-art-light')).toHaveAttribute('src','./folio-b-xx-light.png')
+      await expect(compactBrand.locator('.folio-xx-vector')).toBeVisible()
     }else{
       await expect(desktopBrand).toBeVisible()
       await expect(topbar).toBeVisible()
       await expect(desktopBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-      await expect(desktopBrand.locator('.folio-xx-art-dark')).toHaveAttribute('src','./folio-b-xx-dark.png')
+      await expect(desktopBrand.locator('.folio-xx-vector')).toBeVisible()
     }
 
-    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.webp')
+    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg')
     if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp')
 
     const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
@@ -94,7 +94,8 @@ test('launch is Folio-only and keeps the exact B hero',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   const launch=page.locator('.launch-overlay')
-  await expect(launch.getByRole('img',{name:'Folio xx Sunset Editorial'})).toHaveAttribute('src','./folio-b-launch-hero.webp')
+  await expect(launch.getByRole('img',{name:'Folio xx visual'})).toHaveAttribute('src','./folio-b-launch-hero.webp')
+  await expect(launch).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
   await expect(launch).not.toContainText('Peppercorn Capital')
 })

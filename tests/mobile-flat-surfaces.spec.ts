@@ -27,17 +27,22 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
-  const blocks=page.locator('.analysis-main > .analysis-block')
-  await expect(blocks).toHaveCount(2)
-  for(let i=0;i<2;i++){
-    const block=blocks.nth(i)
+  const primary=page.locator('.analysis-main > .analysis-price-momentum')
+  await expect(primary).toHaveCount(1)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  await page.locator('.analysis-card').getByRole('tab',{name:'Overview'}).click()
+  const detailBlocks=page.locator('.analysis-secondary-body > .analysis-block')
+  await expect(detailBlocks).toHaveCount(3)
+  for(let i=0;i<3;i++){
+    const block=detailBlocks.nth(i)
     expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
     expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
   }
   await context.close()
 })
 
-test('desktop focal leader is flat while analysis keeps card boundaries',async({page})=>{
+test('desktop focal leader and analysis keep the same flat editorial hierarchy',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const focus=page.locator('.focus-overview')
@@ -45,7 +50,7 @@ test('desktop focal leader is flat while analysis keeps card boundaries',async({
   expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
-  const block=page.locator('.analysis-main > .analysis-block').first()
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  const block=page.locator('.analysis-main > .analysis-price-momentum').first()
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 })

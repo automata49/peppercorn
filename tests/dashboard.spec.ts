@@ -9,9 +9,13 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  // DASHBOARD-FOCUS-1: the fixture has one industry group per market, so the strict two-per-group cap shows four names.
-  await expect(page.locator('.focus-leader-row')).toHaveCount(4);
+  // Unified Home: one leadership decision surface replaces the duplicate Focus roster/additional view.
+  await expect(page.locator('.leadership-decision')).toBeVisible();
+  await expect(page.locator('.leadership-pulse')).toBeVisible();
   await expect(page.locator('.focus-summary-main strong')).toHaveText('4');
+  await expect(page.locator('.focus-class-strip button')).toHaveCount(3);
+  await expect(page.locator('.focus-roster')).toHaveCount(0);
+  await expect(page.locator('.leader-detail')).toHaveCount(0);
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
   if(view.touch){
@@ -153,14 +157,11 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
-  // The analysis list starts with dashboard leaders; SPY is neutral, so switch to the full list.
-  await page.locator('.analysis-browse > summary').click();
+  // SPY is neutral, so switch to the full analysis list.
   await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
-  const secondary=page.locator('.analysis-card .analysis-secondary');
-  if((await secondary.getAttribute('open'))===null)await secondary.locator(':scope > summary').click();
-  await page.locator('.analysis-more > summary').click();
+  await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Swing'}).click();
   const rs=page.locator('.analysis-card .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위50');

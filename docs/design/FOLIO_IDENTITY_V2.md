@@ -26,10 +26,10 @@ Official references:
 The **attached concept board's column 02 — “Sunset Editorial” (B)** is the source of truth for Folio UI identity. Do not reinterpret B into a new style. Generated moodboards, Robinhood screenshots and later exploratory visuals are references only and must never override the B column.
 
 Exact B rules:
-- **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Implementation is deliberately clean rather than a screenshot crop: the `Folio` text uses the B grotesk proportions and the mark comes from `folio-b-xx-light.png` / `folio-b-xx-dark.png`, extracted from the exact B icon geometry. The xx is plum → magenta → coral/amber. Plain text “x x”, rounded letterforms, noisy raster crops, a punch-card emblem or a newly invented mark are not acceptable substitutes.
-- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. User correction 2026-10-06 fixes the icon mark at approximately **31.25% of tile width** with a **1.72:1 xx bounding-box aspect**, optically centered. The icon must derive from the exact interlocked B mark; do not reuse the earlier oversized/wide treatment. A warm-sand alternate may be used only where a light preview is appropriate. Do not use a full-gradient tile as the primary icon.
+- **Wordmark:** bold black/white “Folio” plus the compact angular/interlocked double-x mark shown in B. Product UI renders “Folio” as live Inter / Neue-Grotesk typography and renders the xx from the original vector geometry in `src/components/FolioMark.tsx`. No screenshot crop, raster wordmark, pasted lettering or plain-text xx is allowed. The vector uses the B proportions and plum → magenta → coral/amber transition and is the shared source-of-truth geometry for the visible mark.
+- **App icon:** B's near-black rounded-square tile with the small centered angular xx mark. `scripts/generate-b-app-icons.mjs` rasterizes the same original interlocked vector geometry procedurally; it must not read a raster xx source. The mark occupies approximately **31.25% of tile width** with a **1.72:1 bounding-box aspect**, optically centered. A warm-sand alternate may be used only as a preview, never as the primary installed icon.
 - **Typography:** Inter / Neue-Grotesk style grotesk. Large headings are clean, confident and tightly set; captions use restrained uppercase tracking. Avoid decorative type or overly rounded fintech styling.
-- **Motif:** B's editorial motif language = monochrome landscape/rock silhouette, sparse technical line work, isolated warm sun/disc, and disciplined words such as DISCIPLINE / INSIGHT / PERSPECTIVE / FREEDOM. The flowing multicolour wave belongs to C and is not Folio's primary motif.
+- **Motif:** `public/folio-b-motif.svg` is an original vector construction of B's editorial language: monochrome rock/coast silhouette, lone human figure, sparse technical line work and an isolated warm sun/disc. It is not a crop or pasted artwork from the concept board. The flowing multicolour wave belongs to C and is not Folio's primary motif.
 - **Photography:** C's photography *treatment* may be borrowed: warm sunset light, shallow depth of field, human-scale optimism, restrained blur/bokeh. It is photography treatment only, not a C UI system.
 - **Palette:** Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`. Warm off-white reading surfaces are allowed as B's paper field.
 - **Semantic finance colours:** gain/loss colours remain functional and independent from the brand palette.
@@ -48,13 +48,24 @@ Compact Dashboard primary flow:
 6. 1D / 1W / 1M / 3M / 1Y / ALL.
 7. Alternate Focus leaders as small chips.
 8. RS rank / industry rank / 52W-high distance.
-9. 핵심 / 후보 / 전환 compact cards.
-10. Secondary disclosure: full Focus roster, momentum/live view.
-11. 주도 섹터.
-12. 시장 온도계.
-13. ETF / market exploration.
+9. One restrained **Leadership Pulse** that summarizes 핵심 / 후보 / 전환 without duplicating the stock list.
+10. Three class buttons open their existing quick classified lists.
+11. One explicit **분석 허브** path owns deep stock selection and analysis.
+12. 주도 섹터 → 시장 온도계 → ETF / market exploration.
 
-This is deliberately **not** a dense dashboard. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+The former separate Focus roster and “추가 보기 · 모멘텀 / 현재가” disclosure are removed from Home. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+
+## Analysis experience
+
+Folio uses one linear analysis journey inspired by Robinhood's content-first simplicity, without copying its trade UI:
+
+1. **Leadership scope:** 핵심 / 후보 / 전환 / 전체 / Position.
+2. **Stock selection:** one persistent, readable list under search; no second hidden “목록에서 고르기” layer.
+3. **Price momentum:** the existing `PriceRsChart` composition and interaction stay intact. Identity changes are limited to B typography, surfaces, rules and restrained accent use.
+4. **Depth tabs:** Overview / Swing / Position replace nested “상세 데이터” + “상세 지표 · 공시 더 보기” disclosures.
+5. **My analysis:** remains the user's judgement/record area and stays separate from automated Swing/Position evidence.
+
+The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. It is presentation-only and never changes or implies an investment score.
 
 ## Mobile / iPad visual rule
 
@@ -64,10 +75,10 @@ Desktop, mobile and iPad all use B/Sunset Editorial. Compact layouts use the sam
 
 The active product identity is **Folio xx / Sunset Editorial B only**. Peppercorn may remain a repository or company/project name, but it is not a second visible brand in the app shell or launch screen.
 
-- Active visual assets are limited to the B wordmark marks, B app-icon family, B launch hero, B motif and the explicitly secondary C photography-treatment image.
+- Active visual assets are limited to the live/vector B wordmark, procedurally generated B app-icon family, B launch hero, original vector B motif and the explicitly secondary C photography-treatment image.
 - Superseded punch-card, generic `folio-icon-*`, generated `folio-identity-*`, old `folio-app-icon-*`, legacy wordmark and generic `icon-*` assets must not remain in deployable source/root locations.
-- Launch footer uses the Folio xx lockup only; it must not show `logo.webp` or “Peppercorn Capital”.
-- Identity CSS must not keep an earlier text-native wordmark or alternate launch composition underneath the B Exact Lock.
+- Launch footer uses the Folio xx lockup only; it must not show `logo.webp` or “Peppercorn Capital”. The loading page must never expose the internal concept label “Sunset Editorial”.
+- Identity CSS must not keep raster mark switching, screenshot wordmarks or alternate launch compositions underneath the B Exact Lock.
 - Canonical visual-regression widths are **390 / 834 / 1366 / 1440 CSS px**. `npm run test:visual-identity` and `npm run test:identity` must pass before identity-related work is approved.
 
 ## Non-negotiable implementation rules
