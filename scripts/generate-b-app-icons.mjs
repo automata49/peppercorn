@@ -1,11 +1,21 @@
 import fs from 'node:fs'
 import zlib from 'node:zlib'
 
-const INK=[11,11,13,255]
-const PLUM=[84,38,95]
-const MAGENTA=[163,79,120]
-const CORAL=[240,106,69]
-const AMBER=[247,162,74]
+const baseline=fs.readFileSync('src/design/folio-baseline.css','utf8')
+function brandHex(name){
+  const m=baseline.match(new RegExp(name+':\\\\s*(#[0-9a-fA-F]{6})'))
+  if(!m)throw new Error('Missing brand colour token: '+name)
+  return m[1]
+}
+function rgb(hex){
+  return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)]
+}
+
+const INK=[...rgb(brandHex('--folio-brand-icon-bg')),255]
+const PLUM=rgb(brandHex('--folio-brand-plum'))
+const MAGENTA=rgb(brandHex('--folio-brand-magenta'))
+const CORAL=rgb(brandHex('--folio-brand-coral'))
+const AMBER=rgb(brandHex('--folio-brand-amber'))
 const VIEW_W=184
 const VIEW_H=104
 const MARK_WIDTH_RATIO=0.58
@@ -32,7 +42,7 @@ function mix(a,b,t){return a.map((v,i)=>Math.round(v+(b[i]-v)*t))}
 function colorAt(x){
   if(x<85){
     const t=Math.max(0,Math.min(1,x/99))
-    return t<.54?mix([247,244,241],PLUM,t/.54):mix(PLUM,MAGENTA,(t-.54)/.46)
+    return mix(PLUM,MAGENTA,t)
   }
   const t=Math.max(0,Math.min(1,(x-85)/(VIEW_W-85)))
   return t<.58?mix(MAGENTA,CORAL,t/.58):mix(CORAL,AMBER,(t-.58)/.42)
