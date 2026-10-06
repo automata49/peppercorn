@@ -57,10 +57,10 @@ export function LeaderSpotlight({rows,onSelect,labelFor}:{rows:LeaderRow[];label
           <svg viewBox="0 0 640 204" role="img" aria-label={`${row.name} ${period} 일간 종가`} onPointerMove={e=>{if(e.pointerType==='touch'&&e.buttons===0)return;const rect=e.currentTarget.getBoundingClientRect();setExploration({id:row.id,index:Math.round(Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width))*(points.length-1))})}} onPointerLeave={()=>setExploration(null)}>
             <defs>
               <linearGradient id="spotlight-line-gradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#54265f"/><stop offset="38%" stopColor="#a34f78"/><stop offset="72%" stopColor="#f06a45"/><stop offset="100%" stopColor="#f5a24a"/>
+                <stop offset="0%" stopColor="#54265f"/><stop offset="38%" stopColor="#a34f78"/><stop offset="72%" stopColor="#f06a45"/><stop offset="100%" stopColor="#f7a24a"/>
               </linearGradient>
               <linearGradient id="spotlight-area-gradient" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#54265f" stopOpacity=".04"/><stop offset="45%" stopColor="#a34f78" stopOpacity=".12"/><stop offset="100%" stopColor="#f5a24a" stopOpacity=".22"/>
+                <stop offset="0%" stopColor="#54265f" stopOpacity=".04"/><stop offset="45%" stopColor="#a34f78" stopOpacity=".12"/><stop offset="100%" stopColor="#f7a24a" stopOpacity=".22"/>
               </linearGradient>
             </defs>
             <path className="spotlight-area" d={path+' L628,202 L12,202 Z'} fill="url(#spotlight-area-gradient)"/>
