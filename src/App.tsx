@@ -257,7 +257,7 @@ const journalCols:ColDef<EditableRow>[]=[
   {field:'evidence_type',headerName:'근거 유형',minWidth:110,...selectEditor(['펀더멘털','기술적','이벤트','매크로'])},{field:'confidence',headerName:'확신도(1~5)',width:100,flex:0,...selectEditor([1,2,3,4,5])},
   {field:'target_price',headerName:'목표가'},{field:'target_return',headerName:'목표수익률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'stop_price',headerName:'손절가'},{field:'stop_return',headerName:'손절률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
-  {field:'review_condition',headerName:'재검토 조건',minWidth:250},{field:'review_date',headerName:'재검토일',width:118,flex:0},{field:'status',headerName:'상태',width:110,flex:0,...selectEditor(['보유중','재검토중','목표달성','손절','청산'])},
+  {field:'review_condition',headerName:'재검토 조건',minWidth:250},{field:'review_date',headerName:'재검토일',width:118,flex:0},{field:'status',headerName:'상태',width:110,flex:0,...selectEditor(['관찰중','보유중','재검토중','목표달성','손절','청산'])},
   {field:'exit_date',headerName:'결과일',width:110,flex:0},{field:'sell_price',headerName:'매도가'},{field:'realized_return',headerName:'실현수익률(자동)',editable:false,valueFormatter:p=>pct(p.value),cellClassRules:upDownRules},
   {field:'thesis_hit',headerName:'가설 적중',width:105,flex:0,...selectEditor(['적중','부분적중','빗나감'])},{field:'review_note',headerName:'결과 복기',minWidth:250},{field:'lesson',headerName:'교훈',minWidth:250},
   {field:'stage',headerName:'리더보드 단계(자동)',editable:false,minWidth:150,valueFormatter:p=>stageLabel(p.value),cellClassRules:stageRules},{field:'market',headerName:'시장(자동)',editable:false,width:98,flex:0},
@@ -1301,6 +1301,7 @@ export default function App(){
     const positionOf=(r:LeaderRow)=>position.rows.get(positionKey(r.market,r.ticker))
     const keyOf=(r:LeaderRow)=>r.market+'|'+r.ticker
     const record=selected?(enrichedAnalysis as EditableRow[]).find(r=>r.market===selected.market&&r.ticker===selected.ticker):undefined
+    const selectedResearch=selected?enrichedResearch.filter(r=>r.market===selected.market&&r.ticker===selected.ticker).slice(0,3):[]
     const compareRows=compareKeys.map(k=>leaders.find(r=>keyOf(r)===k)).filter((r):r is LeaderRow=>!!r)
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
@@ -1309,7 +1310,21 @@ export default function App(){
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');window.setTimeout(()=>document.querySelector('.analysis-detail-tabs')?.scrollIntoView({behavior:'smooth',block:'start'}),60)}
     const goDecision=()=>{
       if(!selected)return
-      if(!journal.some(r=>r.market===selected.market&&r.ticker===selected.ticker))addTickerRecord('journal',selected.market+':'+selected.ticker)
+      if(!journal.some(r=>r.market===selected.market&&r.ticker===selected.ticker)){
+        const thesis=String(record?.conclusion||record?.growth_driver||'').trim()
+        const reviewCondition=String(record?.key_risk||'').trim()
+        updateJournal([{
+          id:crypto.randomUUID(),
+          date:new Date().toISOString().slice(0,10),
+          market:selected.market,
+          ticker:selected.ticker,
+          name:selected.name,
+          currency:selected.market==='KR'?'KRW':'USD',
+          status:'관찰중',
+          thesis,
+          review_condition:reviewCondition
+        },...journal])
+      }
       setPage('journal')
     }
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
@@ -1355,6 +1370,13 @@ export default function App(){
               <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
                 <div className="thesis-head"><div><span>MY THESIS</span><h3>내 분석</h3></div><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
                 <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
+                <section className="thesis-research-evidence" aria-label="Research evidence">
+                  <div className="thesis-research-head"><div><span>RESEARCH EVIDENCE</span><h4>관련 Research</h4></div><small>{selectedResearch.length?selectedResearch.length+'건 연결':'연결된 기록 없음'}</small></div>
+                  {selectedResearch.length?<div className="thesis-research-list">{selectedResearch.map(r=><article key={String(r.id||r.no||r.date||r.title)}>
+                    <div><b>{String(r.title||r.target||selected.name||selected.ticker)}</b><small>{[r.date,r.verification,r.source_type].filter(Boolean).join(' · ')}</small></div>
+                    <p>{String(r.fact||r.interpretation||'기록된 Research 내용을 확인하세요.')}</p>
+                  </article>)}</div>:<p className="thesis-research-empty">Research 기록이 없으면 Thesis는 가격·공시 근거와 내 판단만으로 구성됩니다.</p>}
+                </section>
                 <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
                   <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
