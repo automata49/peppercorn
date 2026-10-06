@@ -4,7 +4,7 @@ import { AppIcon, type AppIconName } from './AppIcon'
 import { FolioWordmark } from './FolioWordmark'
 
 const pages:[string,AppIconName,string][]=[
-  ['dashboard','home','Dashboard'],
+  ['dashboard','home','Home'],
   ['analysis','analysis','종목 분석'],
   ['temperature','temperature','시장 온도계'],
   ['watchlist','watchlist','Watchlist'],
