@@ -174,11 +174,12 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   await page.locator('.home-class-grid button').filter({hasText:'핵심 주도'}).click()
   await expect(page.locator('.leadership-page')).toBeVisible()
   await page.locator('.leadership-page-list .decision-row').first().click()
-  await expect(page.locator('.drill-sheet .stock-snapshot')).toBeVisible()
+  await expect(page.locator('.analysis-page')).toBeVisible()
+  await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   await context.close()
 })
 
-test('Leadership narrows Focus before Stock detail',async({browser})=>{
+test('Leadership narrows Focus before Stock analysis',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
@@ -192,7 +193,8 @@ test('Leadership narrows Focus before Stock detail',async({browser})=>{
   await expect(list).toHaveCount(4)
   await expect(list.first()).toContainText('RS')
   await list.first().click()
-  await expect(page.locator('.drill-sheet .stock-snapshot')).toBeVisible()
+  await expect(page.locator('.analysis-page')).toBeVisible()
+  await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
   await context.close()
 })
@@ -238,7 +240,10 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   else await page.locator('.dashboard-sector-table tbody tr').first().click()
   await expect(page.locator('.leadership-page')).toBeVisible()
   await page.locator('.leadership-page-list .decision-row').first().click()
-  const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
+  const stock=page.locator('.analysis-page')
+  await expect(stock).toBeVisible()
+  await stock.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click()
+  const chart=stock.locator('.snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
   await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
   // Legend: stock, benchmark (flat SPY → +0.0%), RS line (= stock change against a flat benchmark).
   await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 0','SPY','RS 라인'])
@@ -248,7 +253,6 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(chart.locator('.price-rs-new-high')).toHaveCount(51)
   await expect(chart.locator('.price-rs-callout')).toHaveCount(0)
   expect(asked.some(ids=>ids.includes('spy'))).toBeTruthy()
-  await page.getByRole('button',{name:'닫기',exact:true}).click()
   // Refresh: compact layouts keep the same action in the secondary drawer.
   const before=asked.length
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
@@ -271,8 +275,9 @@ test('cold history mounts and sizes the stock chart after data arrives',async({p
     await route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:60},(_,i)=>[`2026-08-${String(i+1).padStart(2,'0')}`,100+i])]))}})
   })
   await page.goto('http://127.0.0.1:4173/peppercorn/')
-  await page.getByRole('button',{name:/이 종목 깊이 보기/}).click()
-  const chart=page.locator('.drill-sheet .price-rs')
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.locator('.home-today-list .decision-row').first().click()
+  const chart=page.locator('.analysis-price-momentum .price-rs')
   await expect(chart).toContainText('일별 가격을 불러오는 중')
   release()
   await expect(chart.locator('svg [data-key="price"]')).toBeVisible()
