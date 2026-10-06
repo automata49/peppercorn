@@ -24,20 +24,17 @@ for(const view of views){
   const launch=page.locator('.launch-overlay')
   const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
-  await expect(hero).toHaveAttribute('src','./folio-b-launch-hero.webp?v=b5')
-  await expect(launch.locator('.launch-editorial-caption')).toContainText('STRUCTURED FREEDOM')
-  await expect(launch.locator('.launch-editorial-caption')).not.toContainText('SUNSET EDITORIAL')
-  await expect(launch.locator('.launch-editorial-caption')).toContainText('더 멀리 보고')
-  await expect(launch.locator('.launch-footer .folio-wordmark-system')).toBeVisible()
+  await expect(hero).toHaveAttribute('src','./folio-brand-launch.webp?v=u1')
+  await expect(launch.locator('.launch-editorial-caption')).toBeHidden()
+  await expect(launch.locator('.launch-footer')).toBeHidden()
   if(view.name==='phone'){
     const frame=await launch.locator('.launch-editorial-frame').boundingBox()
     expect(frame).not.toBeNull()
-    expect(frame!.width/frame!.height).toBeGreaterThan(2.05)
-    expect(frame!.width/frame!.height).toBeLessThan(2.25)
-    expect(frame!.x).toBeGreaterThanOrEqual(12)
-    expect(frame!.y).toBeLessThan(140)
+    expect(frame!.width/frame!.height).toBeGreaterThan(.55)
+    expect(frame!.width/frame!.height).toBeLessThan(.575)
+    expect(frame!.x).toBeGreaterThanOrEqual(0)
+    expect(frame!.y).toBeGreaterThanOrEqual(0)
   }
-  await expect(launch.locator('.launch-footer')).not.toContainText('Peppercorn Capital')
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000})
 
@@ -45,31 +42,16 @@ for(const view of views){
     const homeBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
     await expect(homeBrand).toBeVisible()
     await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
-    await expect(homeBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-    await expect(homeBrand.locator('.folio-xx-vector')).toBeVisible()
+    await expect(homeBrand.locator('.folio-wordmark-image-light')).toBeVisible()
+    await expect(homeBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u1')
     if(view.name==='phone'){
-      const wordSize=await homeBrand.locator('.folio-wordmark-text').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))
-      expect(wordSize).toBeGreaterThanOrEqual(24.5)
-      expect(wordSize).toBeLessThanOrEqual(25.5)
-      const markMetrics=await homeBrand.evaluate(root=>{
-        const text=root.querySelector<HTMLElement>('.folio-wordmark-text')!
-        const mark=root.querySelector<HTMLElement>('.folio-wordmark-mark')!
-        const s=getComputedStyle(text)
-        const canvas=document.createElement('canvas')
-        const ctx=canvas.getContext('2d')!
-        ctx.font=`${s.fontWeight} ${s.fontSize} ${s.fontFamily}`
-        const metric=ctx.measureText('o')
-        const oHeight=metric.actualBoundingBoxAscent+metric.actualBoundingBoxDescent
-        const box=mark.getBoundingClientRect()
-        const stops=[...root.querySelectorAll<SVGStopElement>('stop')].map(stop=>getComputedStyle(stop).stopColor)
-        return {oHeight,markHeight:box.height,ratio:box.width/box.height,stops}
-      })
-      expect(markMetrics.markHeight/markMetrics.oHeight).toBeGreaterThanOrEqual(.92)
-      expect(markMetrics.markHeight/markMetrics.oHeight).toBeLessThanOrEqual(1.08)
-      expect(markMetrics.ratio).toBeGreaterThanOrEqual(1.74)
-      expect(markMetrics.ratio).toBeLessThanOrEqual(1.80)
-      expect(markMetrics.stops).toContain('rgb(84, 38, 95)')
-      expect(markMetrics.stops).toContain('rgb(240, 106, 69)')
+      const brandBox=await homeBrand.boundingBox()
+      expect(brandBox).not.toBeNull()
+      expect(brandBox!.height).toBeGreaterThanOrEqual(24.5)
+      expect(brandBox!.height).toBeLessThanOrEqual(25.5)
+      const ratio=await homeBrand.locator('.folio-wordmark-image-light').evaluate((e:any)=>e.naturalWidth/e.naturalHeight)
+      expect(ratio).toBeGreaterThanOrEqual(3.9)
+      expect(ratio).toBeLessThanOrEqual(4.1)
       const navIcon=page.locator('.mobile-bottom-nav .app-icon').first()
       const navIconBox=await navIcon.boundingBox()
       expect(navIconBox).not.toBeNull()
@@ -77,20 +59,20 @@ for(const view of views){
       expect(navIconBox!.width).toBeLessThanOrEqual(20.5)
       const motifBox=await page.locator('.folio-motif-panel img').boundingBox()
       expect(motifBox).not.toBeNull()
-      expect(motifBox!.height).toBeLessThanOrEqual(122.5)
+      expect(motifBox!.height).toBeGreaterThanOrEqual(299)
     }
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-brand-menu')).toBeVisible()
   }else{
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
-    await expect(sideBrand.locator('.folio-xx-vector')).toBeVisible()
+    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toBeVisible()
+    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u1')
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 
-  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-b-motif.svg?v=b5')
-  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-c-photography.webp?v=b5')
+  await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u1')
+  if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u1')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
@@ -108,7 +90,7 @@ for(const view of views){
 test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-b-icon-180.png?v=b5')
+ expect(touch).toBe('./folio-b-icon-180.png?v=u1')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
  expect(manifest.background_color).toBe('#f4f1ec')
@@ -121,11 +103,16 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  }
 })
 
-test('B wordmark, hero, motif and C photography assets are deployable',async({request})=>{
+test('user supplied wordmark, hero, typography and photography assets are deployable',async({request})=>{
  for(const asset of [
-  'folio-b-launch-hero.webp',
-  'folio-b-motif.svg',
-  'folio-c-photography.webp'
+  'folio-brand-launch.webp',
+  'folio-brand-typography.webp',
+  'folio-brand-photography.webp',
+  'folio-brand-wordmark-light.webp',
+  'folio-brand-wordmark-dark.webp',
+  'folio-brand-icon-black.webp',
+  'folio-brand-icon-glossy.webp',
+  'folio-brand-icon-light.webp'
  ]){
   const res=await request.get(asset)
   expect(res.status(),asset).toBe(200)
@@ -154,12 +141,12 @@ test('B app icon keeps the approved board-scale xx and negative diamond',async({
    const p=(x:number,y:number)=>{const i=(y*512+x)*4;return [data[i],data[i+1],data[i+2],data[i+3]]}
    return {x0,y0,x1,y1,w:x1-x0+1,h:y1-y0+1,cx:(x0+x1)/2,cy:(y0+y1)/2,center:p(256,256)}
  })
- expect(box.w/512).toBeGreaterThanOrEqual(.55)
- expect(box.w/512).toBeLessThanOrEqual(.61)
- expect(box.h/512).toBeGreaterThanOrEqual(.30)
- expect(box.h/512).toBeLessThanOrEqual(.36)
- expect(box.w/box.h).toBeGreaterThanOrEqual(1.70)
- expect(box.w/box.h).toBeLessThanOrEqual(1.84)
+ expect(box.w/512).toBeGreaterThanOrEqual(.70)
+ expect(box.w/512).toBeLessThanOrEqual(.76)
+ expect(box.h/512).toBeGreaterThanOrEqual(.35)
+ expect(box.h/512).toBeLessThanOrEqual(.41)
+ expect(box.w/box.h).toBeGreaterThanOrEqual(1.85)
+ expect(box.w/box.h).toBeLessThanOrEqual(2.02)
  expect(Math.abs(box.cx-255.5)).toBeLessThanOrEqual(5)
  expect(Math.abs(box.cy-255.5)).toBeLessThanOrEqual(5)
  expect(Math.max(...box.center.slice(0,3))).toBeLessThan(40)
@@ -173,8 +160,8 @@ test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  expect(await meta('meta[property="og:description"]')).toBe(description)
  expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
  const image=await meta('meta[property="og:image"]')
- expect(image).toContain('folio-b-icon-512.png?v=b5')
- expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=b5')
+ expect(image).toContain('folio-b-icon-512.png?v=u1')
+ expect(await meta('meta[name="twitter:image"]')).toContain('folio-b-icon-512.png?v=u1')
  const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
  expect(res.status()).toBe(200)
 })
