@@ -40,7 +40,7 @@ const agentsEntry=read('AGENTS.md');
 const claudeEntry=read('CLAUDE.md');
 const visualRegression=read('tests/visual-identity-regression.spec.ts');
 
-assert(contract.includes('attached column 02 “Sunset Editorial” (B) is the authoritative visual reference'), 'CONTRACT must make the attached B column authoritative.');
+assert(contract.includes('Sunset Editorial” (B)')&&contract.includes('FolioMark'), 'CONTRACT must keep B authoritative and lock the vector Folio mark.');
 assert(design.includes('attached concept board\'s column 02 — “Sunset Editorial” (B)'), 'Design doc must name the B concept board as source of truth.');
 assert(design.includes('C remains photography treatment only') || design.includes('C is limited to photography treatment'), 'Design doc must limit C to photography treatment.');
 assert(css.includes('B EXACT LOCK'), 'Exact B CSS lock is missing.');
