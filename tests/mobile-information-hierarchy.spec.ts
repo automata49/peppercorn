@@ -44,15 +44,21 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden()
   await noHorizontalOverflow(page)
 
-  // Analysis: one explicit decision path; Overview is primary and records stay secondary.
+  // Leadership: candidate comparison is one level deeper than Market Signal.
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'리더십'}).click()
+  await expect(page.locator('.leadership-page')).toBeVisible()
+  await expect(page.locator('.leadership-tabs button')).toHaveCount(4)
+  await noHorizontalOverflow(page)
+
+  // Stock: one explicit decision path; Overview is primary and records stay secondary.
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
   await expect(page.locator('.analysis-hub-head')).toBeVisible()
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   await expect(page.locator('.analysis-records-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  // Watchlist / Portfolio / Journal: compact decision rows first, editable grids closed.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'관심'}).click()
+  // Watchlist / Portfolio / Decision: compact decision rows first, editable grids closed.
+  await openDrawerPage(page,'Watchlist')
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
@@ -62,7 +68,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  await openDrawerPage(page,'Journal')
+  await openDrawerPage(page,'Decision')
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-mobile-summary .decision-row')).toHaveCount(1)
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
