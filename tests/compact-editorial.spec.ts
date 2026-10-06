@@ -37,7 +37,7 @@ for(const view of views){
     await expect(page.locator('.spotlight-chart')).toHaveCount(0)
     await expect(page.locator('.dashboard-sector-panel')).toHaveCount(0)
 
-    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','신호','분석','관심'])
+    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','신호','리더십','Stock'])
     const bottom=page.locator('.mobile-bottom-nav')
     expect((await bottom.evaluate(e=>getComputedStyle(e).backdropFilter)).includes('blur')).toBe(true)
 
