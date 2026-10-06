@@ -49,14 +49,27 @@ for(const view of views){
     await expect(homeBrand.locator('.folio-xx-vector')).toBeVisible()
     if(view.name==='phone'){
       const wordSize=await homeBrand.locator('.folio-wordmark-text').evaluate(e=>parseFloat(getComputedStyle(e).fontSize))
-      const markBox=await homeBrand.locator('.folio-wordmark-mark').boundingBox()
       expect(wordSize).toBeGreaterThanOrEqual(24.5)
       expect(wordSize).toBeLessThanOrEqual(25.5)
-      expect(markBox).not.toBeNull()
-      expect(markBox!.width).toBeGreaterThanOrEqual(30.5)
-      expect(markBox!.width).toBeLessThanOrEqual(31.5)
-      expect(markBox!.width/markBox!.height).toBeGreaterThanOrEqual(1.74)
-      expect(markBox!.width/markBox!.height).toBeLessThanOrEqual(1.80)
+      const markMetrics=await homeBrand.evaluate(root=>{
+        const text=root.querySelector<HTMLElement>('.folio-wordmark-text')!
+        const mark=root.querySelector<HTMLElement>('.folio-wordmark-mark')!
+        const s=getComputedStyle(text)
+        const canvas=document.createElement('canvas')
+        const ctx=canvas.getContext('2d')!
+        ctx.font=`${s.fontWeight} ${s.fontSize} ${s.fontFamily}`
+        const metric=ctx.measureText('o')
+        const oHeight=metric.actualBoundingBoxAscent+metric.actualBoundingBoxDescent
+        const box=mark.getBoundingClientRect()
+        const stops=[...root.querySelectorAll<SVGStopElement>('stop')].map(stop=>getComputedStyle(stop).stopColor)
+        return {oHeight,markHeight:box.height,ratio:box.width/box.height,stops}
+      })
+      expect(markMetrics.markHeight/markMetrics.oHeight).toBeGreaterThanOrEqual(.92)
+      expect(markMetrics.markHeight/markMetrics.oHeight).toBeLessThanOrEqual(1.08)
+      expect(markMetrics.ratio).toBeGreaterThanOrEqual(1.74)
+      expect(markMetrics.ratio).toBeLessThanOrEqual(1.80)
+      expect(markMetrics.stops).toContain('rgb(84, 38, 95)')
+      expect(markMetrics.stops).toContain('rgb(240, 106, 69)')
       const navIcon=page.locator('.mobile-bottom-nav .app-icon').first()
       const navIconBox=await navIcon.boundingBox()
       expect(navIconBox).not.toBeNull()
