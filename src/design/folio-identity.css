@@ -3104,3 +3104,58 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .leadership-tabs button:nth-child(-n+2){border-bottom:1px solid var(--folio-line)}
   .leadership-foot{flex-direction:column}
 }
+
+
+/* Thesis owns research evidence; Decision owns tracking. */
+.thesis-research-evidence{
+  margin:18px 0 22px;
+  padding:16px 0;
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+}
+.thesis-research-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:10px;
+}
+.thesis-research-head span{
+  display:block;
+  color:var(--folio-coral);
+  font-size:8px;
+  font-weight:760;
+  letter-spacing:.15em;
+}
+.thesis-research-head h4{
+  margin:5px 0 0;
+  color:var(--folio-ink);
+  font-size:14px;
+  font-weight:620;
+}
+.thesis-research-head>small,
+.thesis-research-empty{color:var(--folio-muted);font-size:10px}
+.thesis-research-list{display:grid;gap:1px;background:var(--folio-line)}
+.thesis-research-list article{
+  min-width:0;
+  padding:12px 14px;
+  background:var(--folio-paper);
+}
+.thesis-research-list article>div{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:12px;
+}
+.thesis-research-list article b{min-width:0;color:var(--folio-ink);font-size:12px}
+.thesis-research-list article small{flex:0 0 auto;color:var(--folio-muted);font-size:9px}
+.thesis-research-list article p{
+  margin:7px 0 0;
+  color:var(--folio-muted);
+  font-size:11px;
+  line-height:1.55;
+}
+.thesis-research-empty{margin:0;line-height:1.55}
+@media(max-width:650px){
+  .thesis-research-list article>div{align-items:flex-start;flex-direction:column;gap:4px}
+}
