@@ -1,3 +1,17 @@
+## Progressive Folio decision journey — 2026-10-06
+
+User locked the product UX to **Home → Market Signal → Leadership → Stock → Thesis → Decision**, reflecting Folio's goal of 발견 → 판단 → Thesis → 추적 rather than Robinhood's investment → trade funnel.
+
+Implementation:
+- Home is intentionally shallow: Total/KR/US, deterministic display-only Market Regime, four leadership states (핵심 주도 / 주도 후보 / 강세 전환 / 조정 중), at most five existing Focus names, and one `AI INSIGHT · STRUCTURED` sentence. The wording is explicitly structured/rules-based because no live Analyst provider has passed the existing model/evidence gates.
+- Market Signal now owns MA50/MA200 breadth, 52W-high proximity, advance/decline, Sector Leadership, market temperature, sector heatmap and collapsed ETF exploration.
+- Leadership owns class/sector narrowing. The existing filing-based Leadership Lens filters remain here, and the former group/RS/full comparison sheet is preserved behind `업종·지표 상세 비교 →`.
+- Selecting a Leadership row opens the existing Stock detail first. `종목분석 기록 작성 →` continues into the deep Stock analysis; Thesis now has `Decision 기록 →`, which creates a Journal row when one does not exist and navigates to tracking.
+- Compact quick navigation is 홈 / 신호 / 분석 / 관심. Home no longer renders the old hero chart, sector table, temperature card, ETF exploration or B motif/photo interlude.
+- No leadership classification, Focus algorithm, RS/stage/sector calculation, Position rule, database write rule or stored-data schema changed.
+
+Regression coverage was rewritten around the progressive path, while existing Leader Lens, stock flags and live-quote comparisons are retained one level deeper.
+
 ## Bright-default + Liquid Glass research lock — 2026-10-06
 
 The user set three new visual requirements: **Light is the default**, use **Liquid Glass**, and study Robinhood's innovative UI structure in a way that serves Folio xx rather than cloning it. `docs/design/FOLIO_UI_RESEARCH.md` now defines the benchmark loop: evidence → reusable principle → Folio intent → acceptance test. It measures first-view clarity, hierarchy, progressive disclosure, navigation, state feedback, motion, density and recovery across 390 / 834 / 1366 / 1440 CSS px.
