@@ -59,8 +59,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       await expect(topbar).toBeHidden()
       const box=await page.locator('.mobile-brandbar').boundingBox()
       expect(box).not.toBeNull()
-      expect(box!.height).toBeGreaterThanOrEqual(67.5)
-      expect(box!.height).toBeLessThanOrEqual(68.5)
+      expect(box!.height).toBeGreaterThanOrEqual(59.5)
+      expect(box!.height).toBeLessThanOrEqual(60.5)
       await expect(compactBrand.locator('.folio-wordmark-text')).toHaveText('Folio')
       await expect(compactBrand.locator('.folio-xx-vector')).toBeVisible()
     }else{
