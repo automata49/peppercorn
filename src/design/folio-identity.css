@@ -3066,7 +3066,8 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 @media(max-width:650px){
   /* Radix/react-remove-scroll can apply scrollbar compensation to the locked body.
      Mobile has no desktop scrollbar gutter; compensation must not widen the layout viewport. */
-  body[data-scroll-locked]{
+  html body[data-scroll-locked]{
+    --removed-body-scroll-bar-size:0px!important;
     margin-right:0!important;
     padding-right:0!important;
   }
