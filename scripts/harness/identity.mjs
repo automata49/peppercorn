@@ -84,6 +84,15 @@ assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financial
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
 assert(css.includes('FOLIO B QUALITY PASS V2'),'B v2 product-surface visual lock is missing.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
+const appIndex=read('app/index.html');
+assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
+assert(appIndex.includes("saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'light'"),'Pre-React shell must start fresh installs in Light.');
+assert(css.includes('aspect-ratio:508/235')&&css.includes('width:calc(100vw - 36px)'),'Phone launch must preserve the B source aspect inside safe margins.');
+assert(css.includes('height:clamp(118px,34vw,136px)'),'Phone B motif must remain secondary and compact.');
+const themeTest=read('tests/theme-system.spec.ts');
+const brandTest=read('tests/brand.spec.ts');
+assert(themeTest.includes('fresh install starts in Light even when the device prefers dark'),'Light-first regression test is missing.');
+assert(brandTest.includes('frame!.width/frame!.height'),'Compact B launch-ratio regression test is missing.');
 assert.equal(pkg.scripts?.['test:visual-identity'],'playwright test tests/visual-identity-regression.spec.ts','Visual identity regression command drifted.');
 assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts','test:identity script drifted.');
 for(const width of [390,834,1366,1440])assert(visualRegression.includes(`width:${width}`),`Missing canonical visual-regression viewport: ${width}px`);
