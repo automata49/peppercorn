@@ -1,6 +1,7 @@
 import { Component, StrictMode, type ErrorInfo, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import './design/folio-baseline.css'
 import './styles.css'
 import './design/folio-identity.css'
 
