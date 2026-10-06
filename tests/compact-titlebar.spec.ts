@@ -26,7 +26,7 @@ for(const view of [
       await expect(brandbar).toBeVisible()
       const box=await brandbar.boundingBox()
       expect(box).not.toBeNull()
-      const expected=view.width<=1279?64:68
+      const expected=64
       expect(box!.height).toBeGreaterThanOrEqual(expected-.5)
       expect(box!.height).toBeLessThanOrEqual(expected+.5)
     }else{
