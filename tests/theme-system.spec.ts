@@ -9,6 +9,17 @@ async function boot(page:any){
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
+test('fresh install starts in Light even when the device prefers dark',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true,colorScheme:'dark'})
+  const page=await context.newPage()
+  await boot(page)
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light')
+  await expect(page.locator('html')).toHaveAttribute('data-theme-mode','light')
+  await expect.poll(()=>page.evaluate(()=>localStorage.getItem('folio-theme'))).toBe('light')
+  await expect(page.locator('meta[name="theme-color"]')).toHaveAttribute('content','#f4f1ec')
+  await context.close()
+})
+
 test('desktop theme control persists Light Dark and System modes',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
