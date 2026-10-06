@@ -62,16 +62,16 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       expect(box!.height).toBeGreaterThanOrEqual(59.5)
       expect(box!.height).toBeLessThanOrEqual(60.5)
       await expect(compactBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-      await expect(compactBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u1')
+      await expect(compactBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
     }else{
       await expect(desktopBrand).toBeVisible()
       await expect(topbar).toBeVisible()
       await expect(desktopBrand.locator('.folio-wordmark-image-dark')).toBeVisible()
-      await expect(desktopBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u1')
+      await expect(desktopBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u2')
     }
 
-    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u1')
-    if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u1')
+    await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
+    if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
 
     const leader=page.locator('.leadership-overview')
     await expect(leader).toBeVisible()
@@ -106,7 +106,7 @@ test('launch is Folio-only and keeps the exact B hero',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   const launch=page.locator('.launch-overlay')
-  await expect(launch.getByRole('img',{name:'Folio xx visual'})).toHaveAttribute('src','./folio-brand-launch.webp?v=u1')
+  await expect(launch.getByRole('img',{name:'Folio xx visual'})).toHaveAttribute('src','./folio-brand-launch.webp?v=u2')
   await expect(launch).not.toContainText('SUNSET EDITORIAL')
   await expect(launch.locator('.launch-footer')).toBeHidden()
   await expect(launch).not.toContainText('Peppercorn Capital')
