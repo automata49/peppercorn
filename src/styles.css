@@ -156,9 +156,9 @@
 .menu-drawer nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:11px 13px;border:0;border-radius:9px;background:transparent;color:#566579;text-align:left;cursor:pointer}
 .menu-drawer nav button .nav-icon{width:22px;flex:none;text-align:center;color:#8591a1;font-size:18px}
 .menu-drawer nav button .nav-label{font-size:15px}
-.menu-drawer nav button:hover,.menu-drawer nav button:focus-visible{background:#f4f7fa;color:#24476f}
-.menu-drawer nav button.active{background:#eaf0f7;color:#24476f;font-weight:700}
-.menu-drawer nav button.active .nav-icon{color:#9a7438}
+.menu-drawer nav button:hover,.menu-drawer nav button:focus-visible{background:var(--folio-surface-2,#f0ece7);color:var(--folio-ink,#111113)}
+.menu-drawer nav button.active{background:var(--folio-surface-2,#f0ece7);color:var(--folio-ink,#111113);font-weight:650}
+.menu-drawer nav button.active .nav-icon{color:inherit}
 .menu-drawer[data-state="open"]{animation:menuSlideIn var(--motion-sheet) var(--motion-ease)}
 .menu-drawer[data-state="closed"]{animation:menuSlideOut var(--motion-base) var(--motion-ease-in)}
 @keyframes menuSlideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
@@ -179,18 +179,18 @@
 .signal-strip>div{min-width:76px}
 .signal-strip span,.snapshot-item>span{white-space:nowrap}
 @media(max-width:760px){.signal-strip{grid-template-columns:repeat(6,minmax(76px,1fr))}}
-.top-actions .install-trigger{border-color:#b2c4d9;background:#ecf3fa;color:#24476f;font-weight:700;white-space:nowrap}
-.top-actions .install-trigger:hover{background:#e0ecf8}
+.top-actions .install-trigger{border-color:var(--folio-line,#ddd5cf);background:var(--folio-paper,#f4f1ec);color:var(--folio-ink,#111113);font-weight:650;white-space:nowrap}
+.top-actions .install-trigger:hover{background:var(--folio-surface-2,#eee9e4)}
 @media(max-width:650px){.top-actions .install-trigger{display:inline-flex;padding:8px 10px;font-size:12px}.topbar h1{font-size:16px}}
 .ui-popover-content{z-index:101;outline:none}
-.install-dialog.ui-popover-content{width:min(400px,calc(100vw - 24px));padding:28px;background:#fff;border:1px solid #dce3eb;border-radius:16px;box-shadow:0 26px 80px rgba(51,65,83,.18);color:#26364b;text-align:center}
+.install-dialog.ui-popover-content{width:min(400px,calc(100vw - 24px));padding:28px;background:var(--folio-paper,#f4f1ec);border:1px solid var(--folio-line,#ddd5cf);border-radius:var(--folio-ds-card-radius,14px);box-shadow:0 18px 48px rgba(11,11,13,.10);color:var(--folio-ink,#111113);text-align:center}
 .install-icon{width:72px;height:72px;object-fit:contain;border-radius:16px;margin:0 auto 14px}
 .install-dialog h2{font-size:20px}.install-dialog .install-wordmark{--folio-wordmark-size:20px;margin:0 auto 10px;color:var(--folio-ink,#111113)}
-.install-dialog .install-description{margin-top:9px;color:#6e7d8e;font-size:13px}
-.install-dialog ol{padding:0 0 0 24px;margin:24px 0 0;text-align:left;color:#46576d;font-size:13px;line-height:1.8}
+.install-dialog .install-description{margin-top:9px;color:var(--folio-muted,#756f6b);font-size:13px}
+.install-dialog ol{padding:0 0 0 24px;margin:24px 0 0;text-align:left;color:var(--folio-ink,#111113);font-size:13px;line-height:1.8}
 .install-dialog li+li{margin-top:7px}
-.install-dialog .install-note{margin-top:20px;color:#8a6b38;font-size:12px;line-height:1.5}
-.install-close{position:absolute;top:12px;right:14px;border:0;background:transparent;color:#6e7d8e;font-size:25px;cursor:pointer}
+.install-dialog .install-note{margin-top:20px;color:var(--folio-muted,#756f6b);font-size:12px;line-height:1.5}
+.install-close{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:var(--folio-ds-touch-min,44px);height:var(--folio-ds-touch-min,44px);padding:0;border:0;background:transparent;color:var(--folio-muted,#756f6b);cursor:pointer}.install-close .app-icon{width:var(--folio-ds-icon-size,20px);height:var(--folio-ds-icon-size,20px)}
 /* GSAP controls the first-visit entrance, progress, and dashboard reveal. */
 .launch-overlay{position:fixed;z-index:200;inset:0;background:#f4f6fa}
 .launch-screen{display:grid;place-items:center;width:100vw;height:100dvh;padding:24px;color:#26364b}
@@ -1790,7 +1790,7 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 .app-icon{display:block;flex:none;color:currentColor;vector-effect:non-scaling-stroke}
 .nav-icon{display:grid;place-items:center;width:22px!important;height:22px;color:inherit!important}
 .nav-icon .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size);stroke-width:var(--folio-ds-icon-stroke)}
-.sidebar nav button.active .nav-icon{color:#8a6b38!important}
+.sidebar nav button.active .nav-icon{color:inherit!important}
 .menu-drawer .nav-icon .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size)}
 .mobile-brand-menu .app-icon,.mobile-brand-search .app-icon,.topbar-menu .app-icon,.menu-drawer-close .app-icon,.topbar-refresh .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size);stroke-width:var(--folio-ds-icon-stroke)}
 .topbar-refresh .app-icon{transition:transform var(--motion-base) var(--motion-ease)}
