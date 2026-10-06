@@ -2704,13 +2704,13 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 /* Accessibility/browser fallback: functional glass becomes an opaque navigation layer when blur is unavailable or transparency is reduced. */
 @supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
-  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar{
+  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar,.home-market-filter .mini-segment{
     background:var(--folio-surface)!important;
     box-shadow:none!important;
   }
 }
 @media(prefers-reduced-transparency:reduce){
-  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar{
+  .topbar,.mobile-brandbar,.mobile-bottom-nav,.menu-drawer,.page-shell-dashboard .dashboard-toolbar,.home-market-filter .mini-segment{
     background:var(--folio-surface)!important;
     backdrop-filter:none!important;
     -webkit-backdrop-filter:none!important;
