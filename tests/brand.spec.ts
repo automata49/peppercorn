@@ -95,7 +95,7 @@ for(const view of views){
 test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
- expect(touch).toBe('./folio-b-icon-180.png')
+ expect(touch).toBe('./folio-b-icon-180.png?v=b3')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
  expect(manifest.background_color).toBe('#f4f1ec')
@@ -160,7 +160,7 @@ test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  expect(await meta('meta[property="og:description"]')).toBe(description)
  expect(await meta('meta[name="application-name"]')).toBe('Folio xx')
  const image=await meta('meta[property="og:image"]')
- expect(image).toContain('folio-b-icon-512.png')
+ expect(image).toContain('folio-b-icon-512.png?v=b3')
  const res=await request.get(new URL(image!).pathname.replace('/peppercorn/',''))
  expect(res.status()).toBe(200)
 })
