@@ -28,7 +28,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.market-signal-metrics > div')).toHaveCount(4);
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
-  if(view.touch){
+  if(view.width<=650){
     await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
     await expect(page.locator('.mobile-sector-list')).toBeVisible();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
