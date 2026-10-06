@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import * as ts from 'typescript'
+import * as tsModule from 'typescript'
+const ts=tsModule.default??tsModule
 
 const ROOT=path.resolve('tests')
 const files=[]
@@ -16,8 +17,7 @@ walk(ROOT)
 let failed=false
 for(const file of files.sort()){
   const source=fs.readFileSync(file,'utf8')
-  const kind=file.endsWith('.tsx')?ts.ScriptKind.TSX:ts.ScriptKind.TS
-  const sf=ts.createSourceFile(file,source,ts.ScriptTarget.Latest,true,kind)
+  const sf=ts.createSourceFile(file,source,99,true)
   for(const d of sf.parseDiagnostics){
     failed=true
     const pos=sf.getLineAndCharacterOfPosition(d.start??0)
