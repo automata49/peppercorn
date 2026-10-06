@@ -1171,7 +1171,11 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 .launch-screen{
   display:grid;
   grid-template-rows:1fr auto;
+  place-items:stretch center;
+  width:100%;
+  height:100dvh;
   min-height:100dvh;
+  padding:0;
   background:var(--folio-editorial-paper)!important;
   color:var(--folio-black);
   overflow:hidden;
