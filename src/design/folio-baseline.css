@@ -1,0 +1,65 @@
+/* Folio xx design baseline — Level 0 tokens.
+   These values are the stable product baseline. Page CSS may consume them;
+   it must not redefine them locally without an explicit documented exception. */
+:root{
+  --folio-ds-unit:4px;
+  --folio-ds-space-1:4px;
+  --folio-ds-space-2:8px;
+  --folio-ds-space-3:12px;
+  --folio-ds-space-4:16px;
+  --folio-ds-space-6:24px;
+  --folio-ds-space-8:32px;
+  --folio-ds-space-12:48px;
+
+  --folio-ds-gutter-phone:16px;
+  --folio-ds-gutter-tablet:18px;
+  --folio-ds-gutter-desktop:28px;
+
+  --folio-ds-touch-min:44px;
+  --folio-ds-header-compact:60px;
+  --folio-ds-nav-item:52px;
+
+  --folio-ds-icon-size:20px;
+  --folio-ds-icon-stroke:1.55;
+  --folio-ds-icon-stroke-active:1.75;
+
+  --folio-ds-wordmark-phone:25px;
+  --folio-ds-wordmark-mark-phone:31px;
+  --folio-ds-wordmark-mark-ratio:184 / 104;
+
+  --folio-ds-type-display:28px;
+  --folio-ds-type-section:18px;
+  --folio-ds-type-subhead:15px;
+  --folio-ds-type-body:14px;
+  --folio-ds-type-secondary:12px;
+  --folio-ds-type-meta:11px;
+  --folio-ds-type-number:32px;
+
+  --folio-ds-leading-display:32px;
+  --folio-ds-leading-section:24px;
+  --folio-ds-leading-subhead:20px;
+  --folio-ds-leading-body:20px;
+  --folio-ds-leading-secondary:18px;
+  --folio-ds-leading-meta:16px;
+  --folio-ds-leading-number:36px;
+
+  --folio-ds-card-radius:14px;
+  --folio-ds-control-radius:10px;
+  --folio-ds-rule:1px;
+
+  --folio-ds-launch-ratio:508 / 235;
+  --folio-ds-motif-phone-min:108px;
+  --folio-ds-motif-phone-max:122px;
+}
+
+.app-icon{
+  width:var(--folio-ds-icon-size);
+  height:var(--folio-ds-icon-size);
+  stroke-width:var(--folio-ds-icon-stroke);
+}
+
+.folio-wordmark-mark{aspect-ratio:var(--folio-ds-wordmark-mark-ratio)}
+
+@media(max-width:650px){
+  body{word-break:keep-all}
+}
