@@ -27,7 +27,7 @@ const themeLabels:Record<ThemeMode,string>={system:'System',light:'Light',dark:'
 function readTheme():ThemeMode{
   try{
     const saved=window.localStorage.getItem(THEME_KEY)
-    return saved==='light'||saved==='dark'||saved==='system'?saved:'system'
+    return saved==='light'||saved==='dark'||saved==='system'?saved:'light'
   }catch{
     return 'system'
   }
