@@ -2621,9 +2621,9 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     font-weight:560!important;
   }
   .page-shell-dashboard .mobile-bottom-nav .app-icon{
-    width:20px!important;
-    height:20px!important;
-    stroke-width:1.55!important;
+    width:var(--folio-ds-icon-size)!important;
+    height:var(--folio-ds-icon-size)!important;
+    stroke-width:var(--folio-ds-icon-stroke)!important;
   }
   .page-shell-dashboard .mobile-bottom-nav button.active .app-icon{
     transform:none!important;
