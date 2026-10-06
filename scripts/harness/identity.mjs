@@ -83,21 +83,24 @@ assert(pkg.scripts?.dev?.startsWith('node scripts/generate-b-app-icons.mjs &&'),
 assert(iconBuild.includes('MARK_WIDTH_RATIO=0.58')&&iconBuild.includes('MARK_ASPECT=VIEW_W/VIEW_H'),'B app-icon xx scale/aspect drifted from the approved concept-B board.');
 assert(iconBuild.includes('const diamond=[[92,33],[111,52],[92,71],[73,52]]'),'B app-icon must preserve the centered negative diamond.');
 assert(!iconBuild.includes('folio-b-xx-dark.png'),'App icon generator must use procedural vector geometry, not a raster source.');
+assert(iconBuild.includes("fs.readFileSync('src/design/folio-baseline.css','utf8')")&&iconBuild.includes('return mix(PLUM,MAGENTA,t)'),'App icon palette must derive from the Level-0 B colour tokens.');
 assert(!iconBuild.includes('transparentCorners')&&!iconBuild.includes('roundedInside'),'Home-screen icon PNGs must stay full square; platform masks own the corner shape.');
 
 assert(sidebar.includes('folio-wordmark-text')&&sidebar.includes('>Folio</span>'),'Sidebar must render the B Folio text lockup.');
 assert(sidebar.includes("import { FolioMark } from './FolioMark'")&&sidebar.includes('<FolioMark/>'),'Sidebar must render the original vector B xx mark.');
 const folioMark=read('src/components/FolioMark.tsx');
 assert(folioMark.includes('M92 33 111 52 92 71 73 52Z'),'Visible Folio mark must preserve the B negative diamond.');
+assert(!folioMark.includes('currentColor')&&folioMark.includes('var(--folio-brand-plum,#54265f)')&&folioMark.includes('var(--folio-brand-coral,#f06a45)'),'Visible Folio xx colours must be fixed to the B palette, not inherited from page text.');
 assert(css.includes('.folio-wordmark-text')&&css.includes('font-family:Inter'),'B wordmark typography contract is missing.');
 for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-photography.webp'])assert(app.includes(asset),`App identity placement missing ${asset}`);
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
-assert(css.includes('FOLIO B QUALITY PASS V2'),'B v2 product-surface visual lock is missing.');
 assert(css.includes('FOLIO DESIGN BASELINE — compact application'),'Compact UI must consume the Level-0 baseline.');
 assert(css.includes('aspect-ratio:var(--folio-ds-wordmark-mark-ratio)')&&baselineCss.includes('--folio-ds-wordmark-mark-ratio:184 / 104'),'Visible xx must keep the master 184:104 vector aspect through the Level-0 token.');
-assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio-ds-wordmark-mark-phone)'),'Phone wordmark must consume baseline tokens.');
+assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio-ds-wordmark-mark-height)')&&baselineCss.includes('--folio-ds-wordmark-mark-height:1ex'),'Phone Folio xx must consume the lowercase x-height baseline.');
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact icons must consume baseline tokens.');
+assert(!/OPTICAL LOCK V[4-9]|QUALITY PASS V[3-9]/.test(css),'Do not append new quality-pass override generations; change baseline tokens or component owners.');
+assert(baselineCss.includes('--folio-brand-plum:#54265f')&&baselineCss.includes('--folio-brand-magenta:#a34f78')&&baselineCss.includes('--folio-brand-coral:#f06a45')&&baselineCss.includes('--folio-brand-amber:#f5a24a'),'Level-0 B palette tokens drifted.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 const appIndex=read('app/index.html');
 assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
