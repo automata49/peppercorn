@@ -2793,8 +2793,10 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   grid-template-columns:minmax(0,.92fr) minmax(300px,1.08fr)!important;
   background:var(--folio-line)!important;
 }
+.page-shell-dashboard .folio-identity-interlude img,
 .folio-identity-interlude img{
   height:clamp(320px,38vw,560px)!important;
+  min-height:320px!important;
   filter:none!important;
 }
 .folio-motif-panel img{
@@ -2812,7 +2814,11 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     margin-left:-16px!important;
     margin-right:-16px!important;
   }
-  .folio-identity-interlude img{height:clamp(300px,92vw,520px)!important}
+  .page-shell-dashboard .folio-identity-interlude img,
+  .folio-identity-interlude img{
+    height:clamp(300px,92vw,520px)!important;
+    min-height:300px!important;
+  }
   .folio-motif-panel img{object-fit:contain!important}
 }
 @media(max-width:650px){
@@ -2822,7 +2828,11 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     max-height:100dvh!important;
     aspect-ratio:9/16!important;
   }
-  .folio-identity-interlude img{height:clamp(300px,118vw,470px)!important}
+  .page-shell-dashboard .folio-identity-interlude img,
+  .folio-identity-interlude img{
+    height:clamp(300px,118vw,470px)!important;
+    min-height:300px!important;
+  }
   .page-shell-dashboard .folio-identity-interlude .folio-motif-panel img{
     height:clamp(300px,118vw,470px)!important;
     object-fit:contain!important;
