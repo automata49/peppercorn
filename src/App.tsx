@@ -978,7 +978,7 @@ export default function App(){
     ?`${marketRegime.label}. ${topToday.name||topToday.ticker}이(가) ${leadership(topToday)}로 Focus 상단에 있으며, 다음 단계에서 리더십 근거와 Thesis 조건을 확인하세요.`
     :`${marketRegime.label}. 현재 Focus 조건을 충족한 종목이 없어 Market Signal과 Leadership 변화를 먼저 확인하세요.`
   const openJourneyLeadership=(tab:HomeLeadershipKey)=>{setStockTab(tab);setSectorKeySelected(null);setPage('leadership')}
-  const openJourneyStock=(row:LeaderRow)=>{setSelected(row);setAnalysisSection('overview');setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}));setPage('analysis')}
+  const openJourneyStock=(row:LeaderRow)=>{setSelected(row);setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}));setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
   const drillStockGroups={
     core:lens(drillSectorStocks.filter(r=>leadership(r)==='핵심 주도')),
     candidates:lens(drillSectorStocks.filter(r=>leadership(r)==='주도 후보')),
