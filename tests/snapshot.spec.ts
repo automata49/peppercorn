@@ -12,7 +12,7 @@ async function setup(page:Page,snapshot:{status:number;age_h?:number}){
     return route.fulfill({json:{published_at:new Date(Date.now()-(snapshot.age_h??1)*3600_000).toISOString(),rows:[row('SNAP')]}})})
   await page.goto('/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
   return calls
 }
 test('fresh snapshot is used without calling the live function',async({page})=>{
