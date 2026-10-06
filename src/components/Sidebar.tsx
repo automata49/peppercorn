@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './ui/dialog'
 import { AppIcon, type AppIconName } from './AppIcon'
-import { FolioMark } from './FolioMark'
+import { FolioWordmark } from './FolioWordmark'
 
 const pages:[string,AppIconName,string][]=[
   ['dashboard','home','Dashboard'],
@@ -61,13 +61,6 @@ function ThemeControl({value,onChange}:{value:ThemeMode;onChange:(mode:ThemeMode
       >{themeLabels[mode]}</button>
     )}
   </div>
-}
-
-export function FolioWordmark({className=''}:{className?:string}){
-  return <span className={('folio-wordmark-system '+className).trim()} role="img" aria-label="Folio xx">
-    <span className="folio-wordmark-text" aria-hidden="true">Folio</span>
-    <span className="folio-wordmark-mark" aria-hidden="true"><FolioMark/></span>
-  </span>
 }
 
 function FolioBrand(){
