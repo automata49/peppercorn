@@ -56,7 +56,7 @@ export function HomeDecision({
         <button type="button" onClick={()=>onLeadership('core')}>Leadership →</button>
       </div>
       <div className="home-class-grid">
-        {(Object.keys(classMeta) as HomeLeadershipKey[]).map(key=><button key={key} type="button" onClick={()=>onLeadership(key)} aria-label={\`\${classMeta[key].label} \${counts[key]}종목\`}>
+        {(Object.keys(classMeta) as HomeLeadershipKey[]).map(key=><button key={key} type="button" onClick={()=>onLeadership(key)} aria-label={`${classMeta[key].label} ${counts[key]}종목`}>
           <span>{classMeta[key].eyebrow}</span>
           <b>{counts[key]}</b>
           <small>{classMeta[key].label}</small>
@@ -80,7 +80,7 @@ export function HomeDecision({
           meta:row.ticker,
           badge:labelFor(row),
           badgeTone:labelFor(row)==='핵심 주도'?'green':labelFor(row)==='주도 후보'?'blue':labelFor(row)==='강세 전환'?'amber':'gray',
-          ariaLabel:\`\${row.name||row.ticker} Stock 단계로 이동\`
+          ariaLabel:`${row.name||row.ticker} Stock 단계로 이동`
         }))}
         onSelect={onStock}
         emptyLabel="현재 Focus 종목이 없습니다."
