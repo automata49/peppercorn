@@ -1789,20 +1789,20 @@ p.checkup-quadrant{display:grid;gap:2px;margin-top:10px;padding:10px 12px;border
 /* NAV-ICON-1 — one line-icon language across desktop, drawer and quick navigation. */
 .app-icon{display:block;flex:none;color:currentColor;vector-effect:non-scaling-stroke}
 .nav-icon{display:grid;place-items:center;width:22px!important;height:22px;color:inherit!important}
-.nav-icon .app-icon{width:20px;height:20px;stroke-width:1.8}
+.nav-icon .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size);stroke-width:var(--folio-ds-icon-stroke)}
 .sidebar nav button.active .nav-icon{color:#8a6b38!important}
-.menu-drawer .nav-icon .app-icon{width:21px;height:21px}
-.mobile-brand-menu .app-icon,.mobile-brand-search .app-icon,.topbar-menu .app-icon,.menu-drawer-close .app-icon,.topbar-refresh .app-icon{width:21px;height:21px;stroke-width:1.6}
+.menu-drawer .nav-icon .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size)}
+.mobile-brand-menu .app-icon,.mobile-brand-search .app-icon,.topbar-menu .app-icon,.menu-drawer-close .app-icon,.topbar-refresh .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size);stroke-width:var(--folio-ds-icon-stroke)}
 .topbar-refresh .app-icon{transition:transform var(--motion-base) var(--motion-ease)}
 .refreshing-mark{display:grid;place-items:center;width:20px;height:20px;font-weight:800;line-height:1}
-.mobile-bottom-nav .app-icon{width:21px;height:21px;stroke-width:1.6;transition:transform var(--motion-fast) var(--motion-ease)}
-.mobile-bottom-nav button.active .app-icon{transform:translateY(-.5px);stroke-width:1.8}
+.mobile-bottom-nav .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size);stroke-width:var(--folio-ds-icon-stroke);transition:transform var(--motion-fast) var(--motion-ease)}
+.mobile-bottom-nav button.active .app-icon{transform:translateY(-.5px);stroke-width:var(--folio-ds-icon-stroke-active)}
 .mobile-bottom-nav button:active .app-icon{transform:scale(.94)}
 @media(max-width:650px){
-  .mobile-bottom-nav .app-icon{width:20px;height:20px}
+  .mobile-bottom-nav .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size)}
 }
 @media(min-width:651px) and (max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
-  .mobile-bottom-nav .app-icon{width:21px;height:21px}
+  .mobile-bottom-nav .app-icon{width:var(--folio-ds-icon-size);height:var(--folio-ds-icon-size)}
 }
 @media(prefers-reduced-motion:reduce){
   .mobile-bottom-nav .app-icon,.topbar-refresh .app-icon{transition:none}
