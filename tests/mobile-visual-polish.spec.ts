@@ -30,11 +30,12 @@ for(const width of [390,430]){
     const marketButton=page.locator('.dashboard-toolbar .segment button').first()
     await boxAtLeast(marketButton,44,44)
 
-    await page.locator('.focus-roster > summary').click()
-    const focusRow=page.locator('.focus-decision-list .decision-row').first()
-    await boxAtLeast(focusRow,200,64)
-    expect(parseFloat(await focusRow.locator('.decision-main small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
-    expect(parseFloat(await focusRow.locator('.decision-value small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    const pulse=page.locator('.leadership-pulse')
+    await expect(pulse).toBeVisible()
+    const classButton=page.locator('.leadership-decision .focus-class-strip button').first()
+    await boxAtLeast(classButton,80,64)
+    expect(parseFloat(await classButton.locator('span').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    expect(parseFloat(await classButton.locator('b').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(20)
 
     const sectorRow=page.locator('.mobile-sector-list .decision-row').first()
     await boxAtLeast(sectorRow,160,76)
