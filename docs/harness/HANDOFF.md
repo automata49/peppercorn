@@ -1,14 +1,18 @@
 ## Folio visual quality v2 — 2026-10-06
 
+## Wordmark fidelity correction — 2026-10-06
+
+The earlier 25px + 31px width lock could still read as “Folio XX” because the interlocked mark was sized as a standalone symbol rather than as lowercase letters. The Level-0 contract now defines the visible xx by **height = 1ex**, matching the rendered lowercase “o” height. All wordmark locations (Home, sidebar, drawer, launch footer) use the same rule. The mark no longer inherits currentColor: left x is fixed Plum → Magenta and right x is Magenta → Coral → Amber. The app-icon generator reads those same colour tokens from `folio-baseline.css`, so the installed icon and in-app mark cannot drift in hue. Identity assets are revision B5.
+
 ## Level-0 design baseline — 2026-10-06
 
-Repeated phone/iPad visual corrections were drifting because wordmark, typography, icon metrics, alignment and PWA masking were being repaired through page-specific overrides. `docs/design/FOLIO_DESIGN_BASELINE.md` and `src/design/folio-baseline.css` are now Level-0. They own the 4px grid, 16/18/28 gutters, 60px compact header, 44px touch target, 52px quick-nav item, 20px monoline icon at 1.55 stroke (1.75 active max), phone Folio 25px + xx 31px with native 184:104 aspect, typography roles and 508:235 launch / 108–122px phone motif bounds. Future visual work must change a baseline token or the owning component; do not append another quality-pass/V4/V5 override block.
+Repeated phone/iPad visual corrections were drifting because wordmark, typography, icon metrics, alignment and PWA masking were being repaired through page-specific overrides. `docs/design/FOLIO_DESIGN_BASELINE.md` and `src/design/folio-baseline.css` are now Level-0. They own the 4px grid, 16/18/28 gutters, 60px compact header, 44px touch target, 52px quick-nav item, 20px monoline icon at 1.55 stroke (1.75 active max), phone Folio 25px + lowercase-scale xx whose height is 1ex / the lowercase “o” height, with native 184:104 aspect, typography roles and 508:235 launch / 108–122px phone motif bounds. Future visual work must change a baseline token or the owning component; do not append another quality-pass/V4/V5 override block.
 
 The installed/home-screen icon generator now outputs full-square near-black PNG artwork with no baked transparent/rounded corners, leaving iOS/Android to apply the platform mask. Icon references were cache-bumped to B4, and both `npm run dev` and `npm run build` regenerate the same icon family. `tests/design-baseline.spec.ts` checks baseline tokens, compact wordmark/icon/touch metrics and opaque square icon corners. `AppIcon` and navigation/drawer icon CSS now share the baseline icon metrics.
 
 ## Compact B optical lock V3 — 2026-10-06
 
-A second physical-phone quality pass tightens the visible B system after deployment verification. Dashboard compact header remains 60px, phone Folio wordmark is 25px with a 31px vector xx, search/menu and bottom-nav icons use a 20px quiet monoline treatment, the active tab uses only a short 16px rule, and the B motif is capped around 108–122px on phone. This removes the oversized fintech-app feel and keeps the image/motif subordinate to the analytical content. No ranking, screening, data or persistence logic changed.
+A second physical-phone quality pass tightens the visible B system after deployment verification. Dashboard compact header remains 60px, phone Folio wordmark is 25px with an x-height (1ex) vector xx, search/menu and bottom-nav icons use a 20px quiet monoline treatment, the active tab uses only a short 16px rule, and the B motif is capped around 108–122px on phone. This removes the oversized fintech-app feel and keeps the image/motif subordinate to the analytical content. No ranking, screening, data or persistence logic changed.
 
 ## Compact empty-state cleanup — 2026-10-06
 
