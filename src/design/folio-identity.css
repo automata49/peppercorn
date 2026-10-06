@@ -2708,6 +2708,10 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   align-items:center!important;
   line-height:0!important;
 }
+.page-shell-dashboard .mobile-brand-home .folio-wordmark-system{
+  height:var(--folio-wordmark-size)!important;
+  min-height:var(--folio-wordmark-size)!important;
+}
 .folio-wordmark-image{
   display:block;
   height:100%!important;
