@@ -427,17 +427,6 @@ function LensBar({view,setView,filter,setFilter,flagsReady,showView=true}:{view:
   </div>
 }
 
-// LIVE-LEADERS-1: rendered inside the quote provider so the pool's live quotes drive the order.
-function LiveLeaders({pool,live,onSelect}:{pool:LeaderRow[];live:boolean;onSelect:(row:LeaderRow)=>void}){
-  const quote=useLiveQuotes(live?pool:[],150)
-  const ranked=pool.map(r=>({r,c:liveChange(quote(r))})).sort((a,b)=>(b.c??-Infinity)-(a.c??-Infinity)||(b.r.rs_rank??0)-(a.r.rs_rank??0))
-  const quoted=ranked.filter(x=>x.c!=null).length
-  return <>
-    <p className="live-leaders-note">핵심 주도·주도 후보·강세 전환 {pool.length}종목을 전일 종가 대비 현재가 등락률 순으로 표시합니다 · 시세 {quoted}/{pool.length} · 분류는 일간 종가 기준</p>
-    {live?<StockRows rows={ranked.slice(0,12).map(x=>x.r)} onSelect={onSelect}/>:<div className="empty">실시간 시세는 Supabase Live 연결에서만 표시됩니다.</div>}
-  </>
-}
-
 // RS-CHART-2: line chart, x = period (5D…52W), y = % (RS vs benchmark or return); built from loaded rows, display only.
 const LINE_COLORS=['#28486f','#c33d36','#1f8a70','#c98a00','#7b52ab']
 const yLabel=(v:number,digits:number)=>`${v>0?'+':''}${(v*100).toFixed(digits)}%`
@@ -493,14 +482,8 @@ function MomentumChart({title,rows,onSelect,sub,unit}:{title:string;rows:LeaderR
   </div>
 }
 
-const isLeaderClass=(r:LeaderRow)=>r.asset_class==='Equity'&&['핵심 주도','주도 후보','강세 전환'].includes(leadership(r))
 const leaderSub=(r:LeaderRow)=>`${r.market} · ${r.ticker} · ${leadership(r)}`
 const etfSub=(r:LeaderRow)=>`${r.market} · ${r.ticker}`
-
-const LeaderRsChart=memo(function LeaderRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  const pool=useMemo(()=>rows.filter(isLeaderClass),[rows])
-  return <MomentumChart title="주도 종목" rows={pool} onSelect={onSelect} sub={leaderSub} unit="종목"/>
-})
 
 const EtfRsChart=memo(function EtfRsChart({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
   const etfs=useMemo(()=>rows.filter(r=>r.asset_class==='ETF'),[rows])
@@ -569,34 +552,6 @@ function focusLeaderRows(rows:LeaderRow[],market:MarketFilter){
     }
     return selected
   })
-}
-
-function FocusLeaderList({rows,onSelect}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
-  const groups=leaderGroups(rows)
-  const displayRows=groups.flatMap(g=>g.rows)
-  return <div className="focus-leader-list" aria-label="포커스 주도 종목">
-    {groups.map(g=><section className="focus-group" key={g.key} aria-label={`${g.market} ${g.name}`}>
-      <div className="focus-group-head"><span>{g.market} · {g.name}</span><small>{g.rank!=null&&g.total?`업종 ${g.rank}/${g.total}위`:'업종 순위 —'} · {g.rows.length}종목</small></div>
-      <DecisionList
-        className="focus-decision-list"
-        rowClassName="focus-leader-row"
-        items={g.rows.map(r=>({
-          key:r.id||r.market+':'+r.ticker,
-          data:r,
-          rank:displayRows.indexOf(r)+1,
-          title:r.name||r.ticker,
-          meta:`${r.ticker} · ${stageLabel(r.stage)}`,
-          badge:leadership(r),
-          badgeTone:leadTone(leadership(r)) as 'green'|'blue'|'amber'|'gray',
-          value:`RS ${r.rs_rank==null?'—':Math.round(r.rs_rank)}`,
-          subvalue:`${pct(r.return_20d)} · 20D`,
-          valueTone:(r.return_20d??0)>0?'positive':(r.return_20d??0)<0?'negative':undefined
-        }))}
-        onSelect={onSelect}
-      />
-    </section>)}
-    {!rows.length&&<p className="empty">현재 포커스 조건을 통과한 종목이 없습니다.</p>}
-  </div>
 }
 
 // PRICE-RS-1: one detail chart — stock vs benchmark (top, both rebased to 100) and the RS line (bottom), shared period and dates.
@@ -747,7 +702,6 @@ export default function App(){
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
   const [marketMetricsOpen,setMarketMetricsOpen]=useState(false)
-  const [leaderBasis,setLeaderBasis]=useState<'close'|'live'>('close')
   const [sectorNameWidth,startSectorColumnResize]=useColumnWidth(SECTOR_NAME_WIDTH_KEY,SECTOR_NAME_DEFAULT_WIDTH,SECTOR_NAME_MIN_WIDTH,SECTOR_NAME_MAX_WIDTH)
   const [etfSummaryOpen,setEtfSummaryOpen]=useState(false)
   const [etfIndustryKey,setEtfIndustryKey]=useState<string|null>(null)
