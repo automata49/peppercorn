@@ -60,9 +60,7 @@ for(const width of [390,834,1194,1366,1440]){
     await expect(leader).toBeVisible()
     await leader.click()
 
-    // Stock detail precedes Thesis.
-    await expect(page.locator('.drill-sheet')).toBeVisible()
-    await page.getByRole('button',{name:'종목분석 기록 작성 →'}).click()
+    // Stock is the dedicated deep-analysis page and Thesis is one level inside it.
     await expect(page.locator('.analysis-page')).toBeVisible()
     await expect(page.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
     await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Thesis'}).click()
