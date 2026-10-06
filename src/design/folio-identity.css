@@ -2568,10 +2568,10 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
   .page-shell-dashboard .mobile-brand-search,
   .page-shell-dashboard .mobile-brand-menu{
-    width:42px!important;
-    height:42px!important;
-    min-width:42px!important;
-    min-height:42px!important;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    min-height:44px!important;
     padding:0!important;
     border:0!important;
     border-radius:0!important;
@@ -2613,7 +2613,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     box-shadow:none!important;
   }
   .page-shell-dashboard .mobile-bottom-nav button{
-    min-height:50px!important;
+    min-height:52px!important;
     gap:2px!important;
     border-radius:0!important;
     background:transparent!important;
@@ -2629,7 +2629,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     stroke-width:1.75!important;
   }
   .page-shell-dashboard .mobile-bottom-nav button b{
-    font-size:10px!important;
+    font-size:11px!important;
     line-height:1.1!important;
     font-weight:580!important;
     letter-spacing:-.01em!important;
