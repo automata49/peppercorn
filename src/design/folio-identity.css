@@ -2345,6 +2345,44 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   background:linear-gradient(108deg,#a34f78,#f06a45,#f7a24a)!important;
   color:#0b0b0d!important;
 }
+.analysis-page,
+.analysis-page>*,
+.analysis-main,
+.analysis-secondary,
+.analysis-secondary-body,
+.analysis-secondary-body>.analysis-block,
+.compare-view,
+.compare-scroll{min-width:0}
+.analysis-page{max-width:100%;box-sizing:border-box}
+.analysis-page .compare-scroll{
+  max-width:100%;
+  overscroll-behavior-inline:contain;
+  scrollbar-gutter:stable;
+}
+.analysis-page .compare-view thead th{
+  position:relative;
+  padding-right:42px;
+}
+.analysis-page .compare-view thead small{pointer-events:none}
+.analysis-page .compare-remove{
+  position:absolute;
+  top:5px;
+  right:5px;
+  z-index:4;
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  padding:0!important;
+  border-radius:50%!important;
+  background:#1a191d!important;
+  color:#d7d1ce!important;
+  font-size:18px!important;
+  line-height:1;
+  touch-action:manipulation;
+  scroll-margin-block:140px;
+}
+.analysis-page .compare-remove:hover{background:#242228!important;color:#fff!important}
 
 /* Analysis mobile shell follows the approved black app screens while the rest of Folio may stay System/Light/Dark. */
 @media(max-width:1279px){
@@ -2406,9 +2444,12 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .analysis-price-momentum{padding:22px 0!important}
   .analysis-detail-tabs{
     top:60px!important;
-    margin-left:-18px;
-    margin-right:-18px;
-    padding:0 8px;
+    margin-left:0;
+    margin-right:0;
+    width:100%;
+    max-width:100%;
+    padding:0;
+    overflow:hidden;
   }
   .analysis-detail-tabs button{min-height:48px!important;font-size:10px}
   .analysis-secondary-body{padding-top:12px}
@@ -2426,4 +2467,12 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     grid-template-columns:46px 72px 1fr!important;
   }
   .analysis-actionbar button{padding:8px 10px}
+  .analysis-page .compare-scroll{scroll-padding-block-end:150px}
+  .analysis-page .compare-remove{
+    width:36px;
+    height:36px;
+    top:4px;
+    right:4px;
+    scroll-margin-bottom:160px;
+  }
 }
