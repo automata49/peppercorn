@@ -67,8 +67,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
   // Dashboard keeps one hero plus one leadership decision surface; detailed momentum lives in the class popup.
-  await expect(page.locator('.focus-leader-row')).toHaveCount(4)
   await expect(page.locator('.leadership-decision')).toBeVisible()
+  await expect(page.locator('.focus-class-strip button')).toHaveCount(3)
   await expect(page.locator('.leader-detail')).toHaveCount(0)
 
   const sectorDisclosure=page.locator('.sector-heat-disclosure')
