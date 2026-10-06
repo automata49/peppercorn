@@ -64,5 +64,7 @@ test('stock analysis survives a failed Position load',async({page})=>{
   await openAnalysis(page)
   await page.locator('.analysis-card').getByRole('tab',{name:'Position'}).click()
   await expect(page.locator('.analysis-card .position-empty')).toContainText('불러오지 못했습니다')
+  await expect(page.locator('.analysis-card .checklist')).toHaveCount(0)
+  await page.locator('.analysis-card').getByRole('tab',{name:'Swing'}).click()
   await expect(page.locator('.analysis-card .checklist')).toBeVisible()
 })
