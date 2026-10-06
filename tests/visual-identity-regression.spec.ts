@@ -77,9 +77,9 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(page.locator('.folio-photo-panel')).toHaveCount(0)
 
     if(view.compact){
-      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'Stock'}).click()
     }else{
-      await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+      await page.locator('.sidebar nav').getByRole('button',{name:'Stock'}).click()
     }
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
