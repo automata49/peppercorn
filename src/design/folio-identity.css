@@ -3064,6 +3064,12 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
 }
 @media(max-width:650px){
+  /* Radix/react-remove-scroll can apply scrollbar compensation to the locked body.
+     Mobile has no desktop scrollbar gutter; compensation must not widen the layout viewport. */
+  body[data-scroll-locked]{
+    margin-right:0!important;
+    padding-right:0!important;
+  }
   .page-shell-dashboard .home-market-filter{
     margin-left:calc(-1 * var(--folio-ds-gutter-phone));
     margin-right:calc(-1 * var(--folio-ds-gutter-phone));
