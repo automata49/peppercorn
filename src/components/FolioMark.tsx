@@ -18,14 +18,14 @@ export function FolioMark({className=''}:{className?:string}){
       </linearGradient>
     </defs>
     <g fill={'url(#'+left+')'}>
-      <path d="M0 8h32l62 84H62z"/>
-      <path d="M62 8h32L32 92H0z"/>
+      <path d="M0 0h32l62 100H62z"/>
+      <path d="M62 0h32L32 100H0z"/>
     </g>
     <g fill={'url(#'+right+')'}>
-      <path d="M78 8h32l62 84h-32z"/>
-      <path d="M140 8h32l-62 84H78z"/>
+      <path d="M78 0h32l62 100h-32z"/>
+      <path d="M140 0h32l-62 100H78z"/>
     </g>
-    <path d="M78 8h16l16 22-16 22-16-22z" fill="#54265F" opacity=".94"/>
-    <path d="M78 92h16l16-22-16-22-16 22z" fill="#A34F78" opacity=".96"/>
+    <path d="M78 0h16l16 26-16 26-16-26z" fill="#54265F" opacity=".94"/>
+    <path d="M78 100h16l16-26-16-26-16 26z" fill="#A34F78" opacity=".96"/>
   </svg>
 }
