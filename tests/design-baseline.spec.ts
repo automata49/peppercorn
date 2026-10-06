@@ -81,7 +81,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   // Headless Chromium can report backdrop-filter as "none" even when the declaration is
   // present (compositor support differs by runner). The harness source gate owns the blur
   // declaration; the browser gate verifies that the functional layers consume translucent material.
-  const glassLayers=await page.evaluate(()=>['.page-shell-dashboard .mobile-brandbar','.page-shell-dashboard .home-market-filter','.page-shell-dashboard .mobile-bottom-nav'].map(selector=>{
+  const glassLayers=await page.evaluate(()=>['.page-shell-dashboard .mobile-brandbar','.page-shell-dashboard .home-market-filter .mini-segment','.page-shell-dashboard .mobile-bottom-nav'].map(selector=>{
     const el=document.querySelector<HTMLElement>(selector)
     const s=el?getComputedStyle(el):null
     return {selector,background:s?.backgroundColor||'',border:s?.borderTopColor||s?.borderBottomColor||''}
