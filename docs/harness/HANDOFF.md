@@ -1,3 +1,11 @@
+## Bright-default + Liquid Glass research lock — 2026-10-06
+
+The user set three new visual requirements: **Light is the default**, use **Liquid Glass**, and study Robinhood's innovative UI structure in a way that serves Folio xx rather than cloning it. `docs/design/FOLIO_UI_RESEARCH.md` now defines the benchmark loop: evidence → reusable principle → Folio intent → acceptance test. It measures first-view clarity, hierarchy, progressive disclosure, navigation, state feedback, motion, density and recovery across 390 / 834 / 1366 / 1440 CSS px.
+
+Level-0 now owns bright paper `#FAF8F5` and the functional-glass tokens. Glass is restricted to navigation/control layers: desktop topbar, compact brand bar, sticky market tabs, bottom nav and menu drawer. Analytical content remains solid. The old Analysis-only black mobile navigation shell was removed so Light mode has one consistent app chrome; the deep analysis content may still use deliberate dark focal contrast. Opaque / reduced-transparency fallbacks are included.
+
+Harness and identity tests now check the research document, glass token contract, bright manifest/shell color and compact navigation blur. Canonical/generated `folio-identity` skills carry the same rule.
+
 ## Folio visual quality v2 — 2026-10-06
 
 ## Wordmark fidelity correction — 2026-10-06
