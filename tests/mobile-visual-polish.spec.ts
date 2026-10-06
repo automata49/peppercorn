@@ -42,7 +42,8 @@ for(const width of [390,430]){
     expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(9)
     expect(parseFloat(await sectorRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(9)
 
-    await nav.getByRole('button',{name:'관심'}).click()
+    await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
+    await page.locator('.menu-drawer').getByRole('button',{name:'Watchlist'}).click()
     const tickerInput=page.locator('.ticker-entry input').first()
     await boxAtLeast(tickerInput,120,44)
     expect(parseFloat(await tickerInput.evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16)
