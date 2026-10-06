@@ -47,24 +47,12 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   expect(brandBox!.x).toBeGreaterThanOrEqual(15.5)
   expect(brandBox!.x).toBeLessThanOrEqual(16.5)
 
-  const word=brand.locator('.folio-wordmark-text')
-  expect(parseFloat(await word.evaluate(e=>getComputedStyle(e).fontSize))).toBeCloseTo(25,1)
-  const wordmarkMetrics=await brand.evaluate(root=>{
-    const text=root.querySelector<HTMLElement>('.folio-wordmark-text')!
-    const mark=root.querySelector<HTMLElement>('.folio-wordmark-mark')!
-    const s=getComputedStyle(text)
-    const canvas=document.createElement('canvas')
-    const ctx=canvas.getContext('2d')!
-    ctx.font=`${s.fontWeight} ${s.fontSize} ${s.fontFamily}`
-    const metric=ctx.measureText('o')
-    const oHeight=metric.actualBoundingBoxAscent+metric.actualBoundingBoxDescent
-    const box=mark.getBoundingClientRect()
-    return {oHeight,markHeight:box.height,markWidth:box.width}
-  })
-  expect(wordmarkMetrics.markHeight/wordmarkMetrics.oHeight).toBeGreaterThanOrEqual(.92)
-  expect(wordmarkMetrics.markHeight/wordmarkMetrics.oHeight).toBeLessThanOrEqual(1.08)
-  expect(wordmarkMetrics.markWidth/wordmarkMetrics.markHeight).toBeGreaterThanOrEqual(1.74)
-  expect(wordmarkMetrics.markWidth/wordmarkMetrics.markHeight).toBeLessThanOrEqual(1.80)
+  const word=brand.locator('.folio-wordmark-image-light')
+  await expect(word).toBeVisible()
+  const wordmarkMetrics=await word.evaluate((img:any)=>({ratio:img.naturalWidth/img.naturalHeight,height:img.getBoundingClientRect().height}))
+  expect(wordmarkMetrics.height).toBeCloseTo(25,1)
+  expect(wordmarkMetrics.ratio).toBeGreaterThanOrEqual(3.9)
+  expect(wordmarkMetrics.ratio).toBeLessThanOrEqual(4.1)
 
   for(const selector of ['.mobile-brand-menu','.mobile-brand-search']){
     const box=await page.locator(selector).boundingBox()
@@ -98,7 +86,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
 test('home-screen icons are full square before platform masking',async({page})=>{
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   const samples=await page.evaluate(async()=>{
-    const files=['folio-b-icon-180.png?v=b5','folio-b-icon-192.png?v=b5','folio-b-icon-512.png?v=b5','folio-b-icon-512-maskable.png?v=b5']
+    const files=['folio-b-icon-180.png?v=u1','folio-b-icon-192.png?v=u1','folio-b-icon-512.png?v=u1','folio-b-icon-512-maskable.png?v=u1']
     const out:any[]=[]
     for(const src of files){
       const img=new Image()
