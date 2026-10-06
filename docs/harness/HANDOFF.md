@@ -1,5 +1,9 @@
 ## Folio visual quality v2 — 2026-10-06
 
+## Compact B optical lock V3 — 2026-10-06
+
+A second physical-phone quality pass tightens the visible B system after deployment verification. Dashboard compact header remains 60px, phone Folio wordmark is 25px with a 31px vector xx, search/menu and bottom-nav icons use a 20px quiet monoline treatment, the active tab uses only a short 16px rule, and the B motif is capped around 108–122px on phone. This removes the oversized fintech-app feel and keeps the image/motif subordinate to the analytical content. No ranking, screening, data or persistence logic changed.
+
 ## Compact empty-state cleanup — 2026-10-06
 
 After the B mobile fit correction, Home's market-temperature module still wasted a large first-screen area when no manual temperature record existed. The empty dashboard state now removes the meaningless gauge/dash and shows one short explanatory line plus a single “첫 온도 기록” action. Existing recorded-temperature behavior, calculation, history and persistence are unchanged. The theme fallback also remains Light even when localStorage is unavailable.
