@@ -83,6 +83,10 @@ for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-phot
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
 assert(css.includes('FOLIO B QUALITY PASS V2'),'B v2 product-surface visual lock is missing.');
+assert(css.includes('COMPACT B OPTICAL LOCK V3'),'Compact B optical lock V3 is missing.');
+assert(css.includes('aspect-ratio:184/104'),'Visible xx must keep the master 184:104 vector aspect.');
+assert(css.includes('font-size:25px!important')&&css.includes('width:31px!important'),'Phone wordmark optical scale drifted.');
+assert(css.includes('width:20px!important')&&css.includes('stroke-width:1.55!important'),'Compact monoline icon lock drifted.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 const appIndex=read('app/index.html');
 assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
