@@ -6,7 +6,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.width<900});
   const page=await context.newPage();
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
-  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}));
+  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
