@@ -2823,4 +2823,9 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     aspect-ratio:9/16!important;
   }
   .folio-identity-interlude img{height:clamp(300px,118vw,470px)!important}
+  .page-shell-dashboard .folio-identity-interlude .folio-motif-panel img{
+    height:clamp(300px,118vw,470px)!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
 }
