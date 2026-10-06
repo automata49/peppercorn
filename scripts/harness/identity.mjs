@@ -55,7 +55,7 @@ const visualRegression=read('tests/visual-identity-regression.spec.ts');
 
 assert(contract.includes('attached concept B is authoritative')&&contract.includes('FolioMark'), 'CONTRACT must keep B authoritative and lock the vector Folio mark.');
 assert(contract.includes('UI-BENCHMARK-1')&&contract.includes('LIQUID-GLASS-1'),'CONTRACT must govern benchmark research and the functional glass layer.');
-assert(research.includes('evidence → reusable principle → Folio user intent → acceptance test')&&research.includes('Liquid Glass belongs to the **functional layer**'),'UI research protocol must prevent reference cloning and constrain glass to functional layers.');
+assert(research.includes('principle + evidence + Folio hypothesis + acceptance test')&&research.includes('Liquid Glass belongs to the **functional layer**'),'UI research protocol must prevent reference cloning and constrain glass to functional layers.');
 assert(design.includes('attached concept board\'s column 02 — “Sunset Editorial” (B)'), 'Design doc must name the B concept board as source of truth.');
 assert(design.includes('C remains photography treatment only') || design.includes('C is limited to photography treatment'), 'Design doc must limit C to photography treatment.');
 assert(css.includes('B EXACT LOCK'), 'Exact B CSS lock is missing.');
