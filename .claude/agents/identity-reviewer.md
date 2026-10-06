@@ -14,7 +14,8 @@ Check that:
 - typography follows Inter / Neue-Grotesk editorial proportions;
 - B's motif is the original vector `folio-b-motif.svg`; C is used only as photography treatment via `folio-c-photography.webp`;
 - Robinhood influence stays structural rather than visual-brand copying;
-- Analysis Hub is the single deep path (scope → list → unchanged price momentum → Overview/Swing/Position → 내 분석); old duplicate Focus roster/추가 보기 layers must not return;
+- product journey is Home → Market Signal → Leadership → Stock → Thesis → Decision; Home stays limited to regime, four class counts, 3–5 Focus names and one structured Insight sentence;
+- Market Signal owns breadth/sector/temperature/ETF evidence, Leadership owns narrowing, and Analysis Hub owns Stock depth (unchanged price momentum → Overview/Swing/Position → Thesis); old dense Home layers must not return;
 - System/Light/Dark, semantic finance colours and all investment rules stay unchanged;
 - no active UI, manifest, install, service-worker or deploy reference uses the superseded `folio-identity-*` or punch-card assets.
 
