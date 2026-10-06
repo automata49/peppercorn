@@ -82,6 +82,7 @@ assert(pkg.scripts?.build?.startsWith('node scripts/generate-b-app-icons.mjs &&'
 assert(iconBuild.includes('MARK_WIDTH_RATIO=0.58')&&iconBuild.includes('MARK_ASPECT=VIEW_W/VIEW_H'),'B app-icon xx scale/aspect drifted from the approved concept-B board.');
 assert(iconBuild.includes('const diamond=[[92,33],[111,52],[92,71],[73,52]]'),'B app-icon must preserve the centered negative diamond.');
 assert(!iconBuild.includes('folio-b-xx-dark.png'),'App icon generator must use procedural vector geometry, not a raster source.');
+assert(!iconBuild.includes('transparentCorners')&&!iconBuild.includes('roundedInside'),'Home-screen icon PNGs must stay full square; platform masks own the corner shape.');
 
 assert(sidebar.includes('folio-wordmark-text')&&sidebar.includes('>Folio</span>'),'Sidebar must render the B Folio text lockup.');
 assert(sidebar.includes("import { FolioMark } from './FolioMark'")&&sidebar.includes('<FolioMark/>'),'Sidebar must render the original vector B xx mark.');
@@ -109,8 +110,8 @@ assert(brandTest.includes('frame!.width/frame!.height'),'Compact B launch-ratio 
 assert.equal(pkg.scripts?.['test:visual-identity'],'playwright test tests/visual-identity-regression.spec.ts','Visual identity regression command drifted.');
 assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/design-baseline.spec.ts tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts','test:identity script drifted.');
 for(const width of [390,834,1366,1440])assert(visualRegression.includes(`width:${width}`),`Missing canonical visual-regression viewport: ${width}px`);
-assert(agentsEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&agentsEntry.includes('folio-identity'),'AGENTS.md must route identity work through the design doc and skill.');
-assert(claudeEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&claudeEntry.includes('folio-identity'),'CLAUDE.md must route identity work through the design doc and skill.');
+assert(agentsEntry.includes('docs/design/FOLIO_DESIGN_BASELINE.md')&&agentsEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&agentsEntry.includes('folio-identity'),'AGENTS.md must route identity work through the Level-0 baseline, identity doc and skill.');
+assert(claudeEntry.includes('docs/design/FOLIO_DESIGN_BASELINE.md')&&claudeEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&claudeEntry.includes('folio-identity'),'CLAUDE.md must route identity work through the Level-0 baseline, identity doc and skill.');
 assert.equal(claudePlugin.version,'1.2.0','Claude harness plugin version must match exact-B bundle.');
 assert.equal(codexPlugin.version,'1.2.0','Codex harness plugin version must match exact-B bundle.');
 
@@ -122,7 +123,7 @@ const expectedIcons=[
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use only exact B app icons.');
 assert.equal(manifest.background_color,'#f4f1ec','Manifest paper color must match B editorial paper.');
 assert.equal(manifest.theme_color,'#f4f1ec','Manifest theme color must match B editorial paper.');
-assert(read('app/index.html').includes('folio-b-icon-180.png?v=b4'),'Apple touch icon must carry the B3 cache revision.');
+assert(read('app/index.html').includes('folio-b-icon-180.png?v=b4'),'Apple touch icon must carry the B4 baseline cache revision.');
 
 for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.tsx','.github/workflows/deploy.yml']){
   const content=read(file);
