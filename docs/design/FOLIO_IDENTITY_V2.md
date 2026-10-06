@@ -50,22 +50,28 @@ Robinhood is benchmarked only for product hierarchy, simplicity, familiar naviga
 
 ## Home information architecture
 
-Compact Dashboard primary flow:
+Folio’s product journey is now explicit:
 
-1. Folio xx brand + menu.
-2. Total / KR / US.
-3. One representative leader.
-4. Large price + current selected-period return.
-5. One large daily-close chart.
-6. 1D / 1W / 1M / 3M / 1Y / ALL.
-7. Alternate Focus leaders as small chips.
-8. RS rank / industry rank / 52W-high distance.
-9. One restrained **Leadership Pulse** that summarizes 핵심 / 후보 / 전환 without duplicating the stock list.
-10. Three class buttons open their existing quick classified lists.
-11. One explicit **분석 허브** path owns deep stock selection and analysis.
-12. 주도 섹터 → 시장 온도계 → ETF / market exploration.
+**Home → Market Signal → Leadership → Stock → Thesis → Decision**
 
-The former separate Focus roster and “추가 보기 · 모멘텀 / 현재가” disclosure are removed from Home. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+Home is deliberately shallow. Its primary content is limited to:
+
+1. **Market regime** — a display-only synthesis of existing breadth/trend facts; never a new trading signal.
+2. **Four leadership states** — 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
+3. **Today 3–5 Focus stocks** — names first; detailed RS/return/fundamental evidence is deferred.
+4. **One Insight sentence** — currently labelled `AI INSIGHT · STRUCTURED` because it is deterministic synthesis, not a live generative model opinion.
+
+Home does **not** show the former hero price chart, sector table, market-temperature card, ETF exploration, full Focus roster or dense period metrics. Total/KR/US remains a functional filter.
+
+**Market Signal** owns market breadth, MA50/MA200 participation, 52W-high proximity, advance/decline, Sector Leadership, market temperature and optional ETF/heatmap exploration.
+
+**Leadership** owns class/sector narrowing and a ranked stock list. It may show comparison metrics such as RS and a compact return, but it does not expose the full stock evidence stack.
+
+**Stock** is the existing analysis surface. Detailed period returns, 52W position, Swing evidence, filed fundamentals and Position Growth appear only after a stock is chosen.
+
+**Thesis** remains the user’s judgement area. **Decision** routes that thesis into the Journal/tracking workflow.
+
+This is progressive disclosure: every deeper step adds evidence only after the user expresses intent.
 
 ## Analysis experience
 
