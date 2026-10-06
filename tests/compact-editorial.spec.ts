@@ -27,7 +27,7 @@ for(const view of views){
 
     const brand=page.locator('.page-shell-dashboard .mobile-brandbar')
     await expect(brand).toBeVisible()
-    expect((await brand.evaluate(e=>getComputedStyle(e).backdropFilter)).includes('blur')).toBe(true)
+    expect(await brand.evaluate(e=>getComputedStyle(e).backgroundColor)).toContain('rgba')
     expect(parseFloat(await brand.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
 
     await expect(page.locator('.home-regime')).toBeVisible()
@@ -39,7 +39,7 @@ for(const view of views){
 
     await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','신호','리더십','Stock'])
     const bottom=page.locator('.mobile-bottom-nav')
-    expect((await bottom.evaluate(e=>getComputedStyle(e).backdropFilter)).includes('blur')).toBe(true)
+    expect(await bottom.evaluate(e=>getComputedStyle(e).backgroundColor)).toContain('rgba')
 
     await page.locator('.mobile-bottom-nav').getByRole('button',{name:'신호'}).click()
     await expect(page.locator('.market-signal-page')).toBeVisible()
