@@ -28,10 +28,13 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
       icon:get('--folio-ds-icon-size'),
       stroke:get('--folio-ds-icon-stroke'),
       word:get('--folio-ds-wordmark-phone'),
-      mark:get('--folio-ds-wordmark-mark-phone'),
+      markHeight:get('--folio-ds-wordmark-mark-height'),
+      markRatio:get('--folio-ds-wordmark-mark-ratio'),
+      plum:get('--folio-brand-plum'),
+      coral:get('--folio-brand-coral'),
     }
   })
-  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',mark:'31px'})
+  expect(tokens).toEqual({gutter:'16px',touch:'44px',header:'60px',nav:'52px',icon:'20px',stroke:'1.55',word:'25px',markHeight:'1ex',markRatio:'184 / 104',plum:'#54265f',coral:'#f06a45'})
 
   const header=await page.locator('.page-shell-dashboard .mobile-brandbar').boundingBox()
   expect(header).not.toBeNull()
@@ -46,11 +49,22 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
 
   const word=brand.locator('.folio-wordmark-text')
   expect(parseFloat(await word.evaluate(e=>getComputedStyle(e).fontSize))).toBeCloseTo(25,1)
-  const markBox=await brand.locator('.folio-wordmark-mark').boundingBox()
-  expect(markBox).not.toBeNull()
-  expect(markBox!.width).toBeCloseTo(31,1)
-  expect(markBox!.width/markBox!.height).toBeGreaterThan(1.74)
-  expect(markBox!.width/markBox!.height).toBeLessThan(1.80)
+  const wordmarkMetrics=await brand.evaluate(root=>{
+    const text=root.querySelector<HTMLElement>('.folio-wordmark-text')!
+    const mark=root.querySelector<HTMLElement>('.folio-wordmark-mark')!
+    const s=getComputedStyle(text)
+    const canvas=document.createElement('canvas')
+    const ctx=canvas.getContext('2d')!
+    ctx.font=`${s.fontWeight} ${s.fontSize} ${s.fontFamily}`
+    const metric=ctx.measureText('o')
+    const oHeight=metric.actualBoundingBoxAscent+metric.actualBoundingBoxDescent
+    const box=mark.getBoundingClientRect()
+    return {oHeight,markHeight:box.height,markWidth:box.width}
+  })
+  expect(wordmarkMetrics.markHeight/wordmarkMetrics.oHeight).toBeGreaterThanOrEqual(.92)
+  expect(wordmarkMetrics.markHeight/wordmarkMetrics.oHeight).toBeLessThanOrEqual(1.08)
+  expect(wordmarkMetrics.markWidth/wordmarkMetrics.markHeight).toBeGreaterThanOrEqual(1.74)
+  expect(wordmarkMetrics.markWidth/wordmarkMetrics.markHeight).toBeLessThanOrEqual(1.80)
 
   for(const selector of ['.mobile-brand-menu','.mobile-brand-search']){
     const box=await page.locator(selector).boundingBox()
