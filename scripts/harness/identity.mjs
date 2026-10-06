@@ -115,7 +115,7 @@ assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financial
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
 assert(app.includes("page==='signal'")&&app.includes("page==='leadership'")&&app.includes('<HomeDecision'),'Progressive Home → Market Signal → Leadership journey must remain implemented.');
 assert(app.includes('Decision 기록 →')&&app.includes("setPage('journal')"),'Thesis must retain the explicit Decision / Journal continuation.');
-assert(sidebar.includes("page==='signal'")&&sidebar.includes('<b>신호</b>'),'Compact quick nav must expose Market Signal as 홈 / 신호 / 분석 / 관심.');
+assert(sidebar.includes("page==='signal'")&&sidebar.includes("page==='leadership'")&&sidebar.includes('<b>신호</b>')&&sidebar.includes('<b>리더십</b>')&&sidebar.includes('<b>Stock</b>'),'Compact quick nav must stay 홈 / 신호 / 리더십 / Stock.');
 const homeDecision=read('src/components/HomeDecision.tsx');
 assert(homeDecision.includes('MARKET REGIME')&&homeDecision.includes('AI INSIGHT')&&homeDecision.includes('STRUCTURED · 규칙 기반'),'Home must keep regime, four-class/TODAY structure and transparent structured Insight labeling.');
 assert(contract.includes('HOME-JOURNEY-1')&&contract.includes('Home → Market Signal → Leadership → Stock → Thesis → Decision'),'Engineering contract must lock the Folio decision journey.');
