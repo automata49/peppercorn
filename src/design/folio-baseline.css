@@ -42,6 +42,7 @@
   --folio-ds-wordmark-nudge:.015em;
 
   --folio-ds-type-display:28px;
+  --folio-ds-type-page-compact:22px;
   --folio-ds-type-section:18px;
   --folio-ds-type-subhead:15px;
   --folio-ds-type-body:14px;
@@ -50,6 +51,7 @@
   --folio-ds-type-number:32px;
 
   --folio-ds-leading-display:32px;
+  --folio-ds-leading-page-compact:26px;
   --folio-ds-leading-section:24px;
   --folio-ds-leading-subhead:20px;
   --folio-ds-leading-body:20px;
