@@ -3,6 +3,9 @@ import {existsSync,readFileSync} from 'node:fs';
 
 const required=[
   'docs/design/FOLIO_IDENTITY_V2.md',
+  'docs/design/FOLIO_DESIGN_BASELINE.md',
+  'src/design/folio-baseline.css',
+  'tests/design-baseline.spec.ts',
   'harness/skills/folio-identity/SKILL.md',
   '.agents/skills/folio-identity/SKILL.md',
   '.claude/skills/folio-identity/SKILL.md',
@@ -29,6 +32,8 @@ for(const file of required)assert(existsSync(file),`Missing Folio B identity fil
 const read=file=>readFileSync(file,'utf8');
 const contract=read('docs/harness/CONTRACT.md');
 const design=read('docs/design/FOLIO_IDENTITY_V2.md');
+const baseline=read('docs/design/FOLIO_DESIGN_BASELINE.md');
+const baselineCss=read('src/design/folio-baseline.css');
 const css=read('src/design/folio-identity.css');
 const main=read('src/main.tsx');
 const app=read('src/App.tsx');
@@ -46,7 +51,7 @@ assert(design.includes('attached concept board\'s column 02 — “Sunset Editor
 assert(design.includes('C remains photography treatment only') || design.includes('C is limited to photography treatment'), 'Design doc must limit C to photography treatment.');
 assert(css.includes('B EXACT LOCK'), 'Exact B CSS lock is missing.');
 assert(css.includes('Inter,"Neue Haas Grotesk Text"'), 'B typography stack drifted.');
-assert(main.includes("import './design/folio-identity.css'"), 'Folio identity stylesheet is not loaded.');
+assert(main.includes("import './design/folio-baseline.css'")&&main.includes("import './design/folio-identity.css'"), 'Folio baseline and identity stylesheets must both be loaded.');
 assert(!existsSync('src/design/robinhood.css'), 'Superseded robinhood.css must stay removed.');
 assert(!existsSync('scripts/generate-folio-icons.mjs'), 'Generic icon generator must stay removed once exact B artwork is committed.');
 const legacyIdentityAssets=[
@@ -87,10 +92,10 @@ for(const asset of ['folio-b-launch-hero.webp','folio-b-motif.svg','folio-c-phot
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep the structured Folio Insight.');
 assert(css.includes('FOLIO B QUALITY PASS V2'),'B v2 product-surface visual lock is missing.');
-assert(css.includes('COMPACT B OPTICAL LOCK V3'),'Compact B optical lock V3 is missing.');
+assert(css.includes('FOLIO DESIGN BASELINE — compact application'),'Compact UI must consume the Level-0 baseline.');
 assert(css.includes('aspect-ratio:184/104'),'Visible xx must keep the master 184:104 vector aspect.');
-assert(css.includes('font-size:25px!important')&&css.includes('width:31px!important'),'Phone wordmark optical scale drifted.');
-assert(css.includes('width:20px!important')&&css.includes('stroke-width:1.55!important'),'Compact monoline icon lock drifted.');
+assert(css.includes('var(--folio-ds-wordmark-phone)')&&css.includes('var(--folio-ds-wordmark-mark-phone)'),'Phone wordmark must consume baseline tokens.');
+assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact icons must consume baseline tokens.');
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 const appIndex=read('app/index.html');
 assert(sidebar.includes("saved==='light'||saved==='dark'||saved==='system'?saved:'light'"),'React theme fallback must be Light on a fresh install.');
@@ -102,7 +107,7 @@ const brandTest=read('tests/brand.spec.ts');
 assert(themeTest.includes('fresh install starts in Light even when the device prefers dark'),'Light-first regression test is missing.');
 assert(brandTest.includes('frame!.width/frame!.height'),'Compact B launch-ratio regression test is missing.');
 assert.equal(pkg.scripts?.['test:visual-identity'],'playwright test tests/visual-identity-regression.spec.ts','Visual identity regression command drifted.');
-assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts','test:identity script drifted.');
+assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/design-baseline.spec.ts tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts','test:identity script drifted.');
 for(const width of [390,834,1366,1440])assert(visualRegression.includes(`width:${width}`),`Missing canonical visual-regression viewport: ${width}px`);
 assert(agentsEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&agentsEntry.includes('folio-identity'),'AGENTS.md must route identity work through the design doc and skill.');
 assert(claudeEntry.includes('docs/design/FOLIO_IDENTITY_V2.md')&&claudeEntry.includes('folio-identity'),'CLAUDE.md must route identity work through the design doc and skill.');
