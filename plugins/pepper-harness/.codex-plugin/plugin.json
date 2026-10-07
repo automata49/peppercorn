@@ -1,6 +1,6 @@
 {
   "name": "pepper-harness",
   "version": "1.2.0",
-  "description": "Pepper shared engineering skills with the exact Folio Sunset Editorial B identity, UI, analysis and review gates.",
+  "description": "Pepper shared engineering skills for Folio Sunset Editorial + Pebble Liquid Glass identity, UI, analysis and review gates.",
   "skills": "./skills/"
 }
