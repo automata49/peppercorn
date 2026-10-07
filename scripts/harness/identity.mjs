@@ -106,6 +106,8 @@ assert(pkg.scripts?.dev?.startsWith('node scripts/generate-b-app-icons.mjs &&'),
 assert(appIcon.includes("stroke:'currentColor'")&&appIcon.includes('strokeWidth:1.55')&&appIcon.includes("strokeLinecap:'round'")&&appIcon.includes("strokeLinejoin:'round'"),'Functional AppIcon geometry/stroke contract drifted.');
 assert(baselineCss.includes('.folio-wordmark-image')&&baselineCss.includes('height:100%'),'Level-0 must size the supplied wordmark image without reconstructing it.');
 assert(css.includes('.folio-wordmark-image-light')&&css.includes('.folio-wordmark-image-dark'),'Light/dark supplied wordmark switching is missing.');
+assert(css.includes('display:inline-grid!important')&&css.includes('grid-area:1 / 1!important'),'Wordmark variants must share one grid cell so they can never render side-by-side.');
+assert(css.includes(':root[data-theme="light"] .leadership-overview')&&css.includes(':root[data-theme="light"] .analysis-page'),'Light theme must explicitly keep Leadership and Analysis surfaces light.');
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact functional icons must consume baseline tokens.');
 assert(!/OPTICAL LOCK V[4-9]|QUALITY PASS V[3-9]/.test(css),'Do not append new quality-pass override generations.');
 
