@@ -1,11 +1,12 @@
 import {test,expect} from '@playwright/test'
 
 const views=[
-  {name:'phone',width:390,height:844,touch:true,compact:true},
-  {name:'ipad-portrait',width:834,height:1194,touch:true,compact:true},
-  {name:'ipad-landscape',width:1194,height:834,touch:true,compact:true},
-  {name:'ipad-pro',width:1366,height:1024,touch:true,compact:true},
-  {name:'desktop',width:1440,height:900,touch:false,compact:false}
+  {name:'phone',width:390,height:844,touch:true,compact:true,launchMin:.99,launchMax:1.01},
+  {name:'phone-landscape',width:844,height:390,touch:true,compact:true,launchMin:.99,launchMax:1.01},
+  {name:'ipad-portrait',width:834,height:1194,touch:true,compact:true,launchMin:.90,launchMax:.93},
+  {name:'ipad-landscape',width:1194,height:834,touch:true,compact:true,launchMin:.92,launchMax:.95},
+  {name:'ipad-pro',width:1366,height:1024,touch:true,compact:true,launchMin:.86,launchMax:.90},
+  {name:'desktop',width:1440,height:900,touch:false,compact:false,launchMin:.84,launchMax:.88}
 ]
 const shots=process.env.BRAND_SHOTS
 
@@ -38,8 +39,8 @@ for(const view of views){
     const ratio=frame!.width/frame!.height
     expect(ratio).toBeGreaterThan(.55)
     expect(ratio).toBeLessThan(.575)
-    expect(frame!.height).toBeGreaterThanOrEqual(view.height*.80)
-    expect(frame!.height).toBeLessThanOrEqual(view.height*.92)
+    expect(frame!.height).toBeGreaterThanOrEqual(view.height*view.launchMin)
+    expect(frame!.height).toBeLessThanOrEqual(view.height*view.launchMax)
     expect(frame!.x).toBeGreaterThanOrEqual(0)
     expect(frame!.y).toBeGreaterThanOrEqual(0)
   }
