@@ -77,7 +77,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
 
     await expect(page.locator('.journey-today')).toBeVisible()
     await expect(page.locator('.leader-spotlight')).toHaveCount(0)
-    await expect(page.getByRole('group',{name:'분류'}).getByRole('button')).toHaveText(['대형주','중소형주','ETF','전체'])
+    await expect(page.getByRole('group',{name:'분류'}).getByRole('button')).toHaveText(['대형주','중소형주','전체','ETF'])
     await expect(page.locator('.journey-classes button span')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
 
     if(view.compact){
@@ -105,7 +105,7 @@ test('Light theme keeps one Folio visual system across every product workspace',
   await boot(page)
   const destinations=[
     ['홈','dashboard'],['탐색','analysis'],['Thesis','thesis'],['추적','tracking'],
-    ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
+    ['섹터 › ETF','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
     ['Portfolio','portfolio'],['Journal','journal'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
