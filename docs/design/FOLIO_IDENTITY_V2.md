@@ -79,7 +79,7 @@ The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a sha
 
 ## Mobile / iPad visual rule
 
-Desktop, mobile and iPad all use B/Sunset Editorial. Warm editorial paper is the shell; the approved dark mobile/product boards permit near-black **focal investing surfaces** for Leadership Overview and Analysis so the analytical path feels concentrated and premium. Compact layouts use the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop: warm-paper shell, near-black focal analysis surfaces, restrained sunset accents, text-led tabs, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
+Desktop, mobile and iPad all use B/Sunset Editorial. The selected appearance governs the entire product surface: **Light keeps the shell, Leadership Overview and Analysis light**, while Dark/System-dark may use the approved near-black focal investing treatment. Compact layouts keep the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop, with restrained sunset accents, text-led tabs, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Visual Identity cleanup lock
 
