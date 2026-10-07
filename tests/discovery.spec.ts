@@ -15,7 +15,7 @@ test('home preview does not depend on chart history or obsolete hero payload',as
   await page.route('**/functions/v1/price-history?*',r=>r.fulfill({status:503,body:'unavailable'}))
   await page.route('**/discovery-layout.json',r=>r.fulfill({json:{...DEFAULT_DISCOVERY,title:'retired hero',previewCount:12}}))
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/')
-  await expect(page.getByRole('heading',{name:'오늘 볼 종목'})).toBeVisible()
+  await expect(page.getByRole('heading',{name:'오늘의 주도주'})).toBeVisible()
   expect(await page.locator('.journey-today .decision-row').count()).toBeLessThanOrEqual(5)
   await expect(page.locator('.leader-spotlight')).toHaveCount(0)
   await page.locator('.journey-today .decision-row').first().click()
