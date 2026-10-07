@@ -185,3 +185,5 @@ assert(marketCss.includes('[data-market="KR"]')&&marketCss.includes('[data-marke
 assert(app.includes('data-market={r.market}')&&app.includes('data-market={g.market}'),'Mixed-market stock and sector rows must carry their own market.');
 assert(pebbleCss.includes('.journey-today')&&pebbleCss.includes('.journey-classes button')&&pebbleCss.includes('.analysis-scope button')&&pebbleCss.includes('backdrop-filter:blur(18px) saturate(1.22)'),'PEBBLE-REGIONS-1 must cover major regions and leadership controls.');
 assert(journeyCss.includes('FLAT-METRICS-1')&&journeyCss.includes('--folio-surface:var(--folio-paper)'),'Nested metrics must remain unboxed on the common paper base.');
+
+assert(pebbleCss.includes('LEADERSHIP-GLASS-2')&&pebbleCss.includes('border-radius:24px!important')&&pebbleCss.includes('content:none!important'),'Leadership glass must be borderless rounded rectangles without edge decorations.');

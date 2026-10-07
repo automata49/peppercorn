@@ -1,3 +1,10 @@
+## 2026-10-07 — Borderless leadership Liquid Glass
+
+- User screenshots/request at 18:58 KST: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 must use consistent borderless rounded Liquid Glass.
+- Owning folio-pebble.css now uses 24px rounded rectangles with safe 16px padding, warm glass and actual blur. Remove oval geometry, coloured edge strips, legacy selection underline, wrapper border and black active fill for those controls only. Explore has 8px gaps; selected state uses subtle coral glass and theme ink; keyboard focus remains visible.
+- LEADERSHIP-GLASS-2 recorded in CONTRACT, baseline, identity, AGENTS/CLAUDE and canonical skills; adapters synced. Market colours, ranking, classification, stock-category pebbles, major regions and supplied assets unchanged.
+- Validation: harness:check, build and diff check pass; identity 30/30; final sequential complete Playwright 166/166 (2.9m). Eight light/dark viewport cases assert no borders, radius, blur, no edge pseudo-elements, safe label geometry, 8px gap and readable selected/unselected state for every Home/Explore control. Actual rendered phone light screenshot inspected.
+
 ## 2026-10-07 — Market colours and shared Pebble regions
 
 - User authority: rename the secondary destination to 시장 신호; retain expanded sector/ETF content. All major regions, including 오늘의 주도주, and 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 controls now share Pebble Liquid Glass. This supersedes selector-only glass guidance.
