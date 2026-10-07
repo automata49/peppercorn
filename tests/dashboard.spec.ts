@@ -121,7 +121,7 @@ test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',as
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  const homeNames=await page.locator('.journey-today .stock-trend-copy>b').allTextContents();
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>.decision-eyebrow').allTextContents();
   expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
   await expect(page.locator('.signal-journey-heading h2')).toHaveText('섹터>ETF');
