@@ -1,3 +1,4 @@
+import {openLeaderTools,openSignal,openPage,pickFirstStock,backToExplore} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {groupSeries,peerSeries,rsValue,seriesOf,topByRs,yScale} from '../src/lib/rsChart'
 import {priceRs} from '../src/lib/benchmarkChart'
@@ -66,10 +67,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const noOverflow=async()=>expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
 
-  // Dashboard keeps one hero plus one leadership decision surface; detailed momentum lives in the class popup.
-  await expect(page.locator('.leadership-decision')).toBeVisible()
-  await expect(page.locator('.focus-class-strip button')).toHaveCount(3)
-  await expect(page.locator('.leader-detail')).toHaveCount(0)
+  await expect(page.locator('.journey-classes button')).toHaveCount(4)
+  await openSignal(page)
 
   const sectorDisclosure=page.locator('.sector-heat-disclosure')
   await expect(sectorDisclosure).not.toHaveAttribute('open','')
@@ -169,8 +168,8 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   ok=true
   await banner.getByRole('button',{name:'다시 연결'}).click()
   await expect(banner).toHaveCount(0)
-  await expect(page.locator('.leadership-decision')).toBeVisible()
-  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await expect(page.locator('.journey-today')).toBeVisible()
+  await openLeaderTools(page)
   await expect(page.locator('.drill-sheet .stock-row').first()).toBeVisible()
   await context.close()
 })
@@ -184,7 +183,7 @@ test('주도 종목 popup shows momentum lines for its group; data is fetched pe
   await mockHistory(page,asked)
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await openLeaderTools(page)
   const drill=page.locator('.drill-sheet')
   const chart=drill.locator('.rs-chart')
   await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
@@ -211,6 +210,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   })
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page)
   // Section toggles: the sector section switches to KR without touching 주도 종목; the global toggle resets all.
   const sectorPanel=page.locator('.dashboard-sector-panel')
   await sectorPanel.locator('.sector-heat-disclosure > summary').click()
@@ -223,7 +223,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   expect(ratio).toBeGreaterThan(2.6);expect(ratio).toBeLessThan(3.4)
   await sectorPanel.locator('.section-market').getByRole('button',{name:'KR'}).click()
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR'])
-  await expect(page.locator('.leadership-overview .section-market button.on')).toHaveText('전체')
+  await expect(page.locator('.toolbar .segment button.on')).toHaveText('전체')
   await page.locator('.toolbar .segment').getByRole('button',{name:'US'}).click()
   await expect(sectorPanel.locator('.section-market button.on')).toHaveText('US')
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['US'])
@@ -231,7 +231,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await page.locator('.dashboard-explore > summary').click()
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
-  await page.locator('.focus-class-strip button').filter({hasText:'핵심'}).click()
+  await openLeaderTools(page)
   await page.locator('.drill-sheet .rs-chart .line-legend button').first().click()
   const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
   await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
@@ -266,8 +266,8 @@ test('cold history mounts and sizes the stock chart after data arrives',async({p
     await route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:60},(_,i)=>[`2026-08-${String(i+1).padStart(2,'0')}`,100+i])]))}})
   })
   await page.goto('http://127.0.0.1:4173/peppercorn/')
-  await page.getByRole('button',{name:/이 종목 깊이 보기/}).click()
-  const chart=page.locator('.drill-sheet .price-rs')
+  await page.locator('.journey-today .decision-row').first().click()
+  const chart=page.locator('.analysis-price-momentum .price-rs')
   await expect(chart).toContainText('일별 가격을 불러오는 중')
   release()
   await expect(chart.locator('svg [data-key="price"]')).toBeVisible()

@@ -73,23 +73,17 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
     if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
 
-    const leader=page.locator('.leadership-overview')
-    await expect(leader).toBeVisible()
-    expect(await leader.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
-    const line=page.locator('.spotlight-line')
-    await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(17, 17, 19)')
-    expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
-
-    const period=page.locator('.spotlight-periods button.on')
-    expect(parseFloat(await period.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await period.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
+    await expect(page.locator('.journey-today')).toBeVisible()
+    await expect(page.locator('.leader-spotlight')).toHaveCount(0)
+    await expect(page.locator('.journey-classes button')).toHaveCount(4)
 
     if(view.compact){
-      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
     }else{
-      await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+      await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
     }
+    await page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true}).click()
+    await page.locator('.analysis-idea-list > button').first().click()
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
     expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')

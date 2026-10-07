@@ -27,22 +27,20 @@ for(const width of [390,430]){
     await boxAtLeast(nav.getByRole('button',{name:'홈'}),44,52)
     expect(parseFloat(await nav.locator('b').first().evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(11)
 
-    const marketButton=page.locator('.dashboard-toolbar .segment button').first()
+    const marketButton=page.locator('.journey-home .section-market button').first()
     await boxAtLeast(marketButton,44,44)
 
-    const pulse=page.locator('.leadership-pulse')
-    await expect(pulse).toBeVisible()
-    const classButton=page.locator('.leadership-decision .focus-class-strip button').first()
+    const classButton=page.locator('.journey-classes button').first()
     await boxAtLeast(classButton,80,64)
     expect(parseFloat(await classButton.locator('span').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
     expect(parseFloat(await classButton.locator('b').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(20)
 
-    const sectorRow=page.locator('.mobile-sector-list .decision-row').first()
+    const sectorRow=page.locator('.journey-today .decision-row').first()
     await boxAtLeast(sectorRow,160,76)
     expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
     expect(parseFloat(await sectorRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
-    await nav.getByRole('button',{name:'관심'}).click()
+    await nav.getByRole('button',{name:'추적'}).click()
     const tickerInput=page.locator('.ticker-entry input').first()
     await boxAtLeast(tickerInput,120,44)
     expect(parseFloat(await tickerInput.evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16)

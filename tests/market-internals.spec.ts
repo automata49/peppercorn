@@ -1,3 +1,4 @@
+import {openSignal,openPage,pickFirstStock} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 const base={asset_class:'Equity',sector:'Technology',industry:'Semiconductors',index_memberships:[],rs_rank:80,ibd_rs_estimate:80,leader_tt:false,leadership_class:'중립',stage:'횡보',rs_3m:.01,rs_6m:.01,return_1w:.01,ma50:90,ma200:80,exchange:'NASDAQ'}
 // 25 stocks, 8 within 10% of the 52W high (32%); one row has no high history.
@@ -10,6 +11,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{},failed:[]}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   const tools=page.locator('.sector-heat-disclosure')
   await tools.locator(':scope > summary').click()
   await tools.getByRole('button',{name:'시장 지표 보기'}).click()

@@ -806,9 +806,9 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   .page-shell-dashboard .dashboard-lower-grid{margin-top:22px}
   .page-shell-dashboard .focus-sector-panel{padding:22px 0 0!important}
   .page-shell-dashboard .dashboard-sector-head{padding:0!important}
-  .page-shell-dashboard .dashboard-sector-table-wrap{display:none!important}
-  .page-shell-dashboard .mobile-sector-list{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(210px,78vw);overflow-x:auto;gap:10px;padding-bottom:4px;scroll-snap-type:x proximity}
-  .page-shell-dashboard .mobile-sector-list .decision-row{scroll-snap-align:start}
+  :is(.page-shell-dashboard,.page-shell-signal) .dashboard-sector-table-wrap{display:none!important}
+  :is(.page-shell-dashboard,.page-shell-signal) .mobile-sector-list{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(210px,78vw);overflow-x:auto;gap:10px;padding-bottom:4px;scroll-snap-type:x proximity}
+  :is(.page-shell-dashboard,.page-shell-signal) .mobile-sector-list .decision-row{scroll-snap-align:start}
   .page-shell-dashboard .mobile-bottom-nav{
     border-top:1px solid var(--folio-line);
     background:color-mix(in srgb,var(--folio-surface) 92%,transparent);
@@ -1039,14 +1039,14 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
   .page-shell-dashboard .focus-class-strip button b{font-size:24px;font-weight:580}
 
   /* iPad/mobile sectors become an editorial list, not Fluid Market cards. */
-  .page-shell-dashboard .mobile-sector-list{
+  :is(.page-shell-dashboard,.page-shell-signal) .mobile-sector-list{
     display:block!important;
     overflow:visible;
     padding:0;
     border-top:1px solid var(--folio-line);
     scroll-snap-type:none;
   }
-  .page-shell-dashboard .mobile-sector-list .decision-row{
+  :is(.page-shell-dashboard,.page-shell-signal) .mobile-sector-list .decision-row{
     min-height:76px;
     margin:0;
     padding:14px 4px!important;
@@ -1057,7 +1057,7 @@ select,textarea,input[type="text"],input[type="number"],input[type="date"]{
     box-shadow:none!important;
     scroll-snap-align:none;
   }
-  .page-shell-dashboard .mobile-sector-list .decision-row:hover{background:var(--folio-surface-2)!important}
+  :is(.page-shell-dashboard,.page-shell-signal) .mobile-sector-list .decision-row:hover{background:var(--folio-surface-2)!important}
 
   .page-shell-dashboard .dashboard-lower-grid{margin-top:34px}
   .page-shell-dashboard .focus-sector-panel,
@@ -2112,7 +2112,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
   gap:10px!important;
-  max-height:380px!important;
+  max-height:none!important;
   padding:0!important;
   border:0!important;
   background:transparent!important;
@@ -2463,7 +2463,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   .analysis-hub-copy p{font-size:12px!important;line-height:1.55}
   .analysis-hub-head .leadership-pulse{display:none}
   .analysis-scope{width:100%;grid-template-columns:repeat(5,minmax(78px,1fr))!important}
-  .analysis-browse .analysis-idea-list{max-height:360px!important}
+  .analysis-browse .analysis-idea-list{max-height:none!important}
   .analysis-browse .analysis-idea-list>button{min-height:88px;padding:13px!important}
   .analysis-price-momentum{padding:22px 0!important}
   .analysis-detail-tabs{

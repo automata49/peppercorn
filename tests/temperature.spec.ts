@@ -1,3 +1,4 @@
+import {openSignal} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {TEMP_ITEMS,changes,previousOf,tempPosture,tempWord,temperature,upsertEntry} from '../src/lib/temperature'
 
@@ -41,6 +42,7 @@ test('dashboard temperature stays compact before the first record',async({page})
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await openSignal(page)
   const card=page.locator('.temp-card')
   await expect(card).toHaveClass(/empty/)
   await expect(card.locator('.temp-empty')).toContainText('아직 기록이 없습니다')
@@ -60,6 +62,7 @@ for(const view of views){
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
+  await openSignal(page)
   const card=page.locator('.temp-card')
   await expect(card.locator('.temp-value')).toHaveText('58°')
   await expect(card.locator('.temp-moved')).toHaveText('첫 기록입니다.')
@@ -110,8 +113,7 @@ for(const view of views){
 
   // Dashboard card follows the latest entry.
   const side=page.locator('.sidebar nav')
-  if(await side.isVisible())await side.getByRole('button',{name:'Dashboard'}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'홈'}).click()
+  await openSignal(page)
   await expect(card.locator('.temp-value')).toHaveText('63°')
   await expect(card.locator('.temp-moved')).toHaveText('바뀐 항목: 금리 ▼ · 신용 스프레드 ▲')
   await card.getByRole('button',{name:'온도계 열기 →'}).click()
