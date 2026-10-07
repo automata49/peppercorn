@@ -27,11 +27,12 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const browse=page.locator('.analysis-browse')
   const list=page.locator('.stock-list')
   await expect(list.locator('> button')).toHaveCount(10)
-  await browse.getByRole('tab',{name:'Position'}).click()
-  await expect(list.locator('> button')).toHaveCount(2)
-  await browse.getByRole('tab',{name:'전체'}).click()
+  const scope=browse.getByRole('group',{name:'주도 분류'})
+  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
+  await expect(scope.getByRole('button',{name:'Position'})).toHaveCount(0)
+  await scope.getByRole('button',{name:'핵심 주도',exact:true}).click()
   await expect(list.locator('> button')).toHaveCount(20)
-  await browse.getByRole('tab',{name:'핵심'}).click()
+  await scope.getByRole('button',{name:'핵심 주도',exact:true}).click()
   await list.locator('> button').filter({hasText:'TEST0'}).click()
   const card=page.locator('.analysis-body')
   await card.getByRole('tab',{name:'Financials'}).click()
@@ -57,7 +58,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  })
 }
 
-test('stock analysis survives a failed Position load',async({page})=>{
+test('stock analysis survives a failed fundamentals load',async({page})=>{
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({status:502,json:{error:'read_failed'}}))
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
