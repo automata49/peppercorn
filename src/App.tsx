@@ -705,8 +705,7 @@ export default function App(){
   const [sector,setSector]=useState<string|null>(null)
   const [leaderMkt,setLeaderMkt]=useState<MarketFilter>('ALL')
   const [sectorMkt,setSectorMkt]=useState<MarketFilter>('ALL')
-  const [etfMkt,setEtfMkt]=useState<MarketFilter>('ALL')
-  useEffect(()=>{setLeaderMkt(market);setSectorMkt(market);setEtfMkt(market);setSector(null)},[market])
+  useEffect(()=>{setLeaderMkt(market);setSectorMkt(market);setSector(null)},[market])
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
   const [marketMetricsOpen,setMarketMetricsOpen]=useState(false)
@@ -907,10 +906,11 @@ export default function App(){
   const byMkt=(m:MarketFilter)=>m==='ALL'?leaders:leaders.filter(r=>r.market===m)
   const leaderRows=useMemo(()=>byMkt(leaderMkt),[leaders,leaderMkt])
   const sectorRows=useMemo(()=>byMkt(sectorMkt),[leaders,sectorMkt])
-  const etfRows=useMemo(()=>byMkt(etfMkt),[leaders,etfMkt])
+  // ETF-PARITY-1: Home ETF and Sector > ETF consume the exact same global market pool.
+  const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
   const leaderStocks=leaderRows.filter(r=>r.asset_class==='Equity')
-  const rankedEtfRows=etfRows.filter(r=>r.asset_class==='ETF').sort((a,b)=>(b.etf_rs_rank??-1)-(a.etf_rs_rank??-1)||a.market.localeCompare(b.market)||a.ticker.localeCompare(b.ticker))
+  const rankedEtfRows=etfRows.slice().sort((a,b)=>(b.etf_rs_rank??-1)-(a.etf_rs_rank??-1)||a.market.localeCompare(b.market)||a.ticker.localeCompare(b.ticker))
   const etfIndustries=buildEtfIndustries(marketRows)
   const chosenEtfIndustry=etfIndustries.find(g=>g.key===etfIndustryKey)||null
   const dialogEtfRows=chosenEtfIndustry?rankedEtfRows.filter(r=>`${r.market}|${String(r.industry||'').trim()}`===chosenEtfIndustry.key):rankedEtfRows
@@ -1109,7 +1109,7 @@ export default function App(){
 
   let content
   if(page==='dashboard'){
-    const etfPreview=marketRows.filter(r=>r.asset_class==='ETF').slice().sort((a,b)=>(b.etf_rs_rank??-1)-(a.etf_rs_rank??-1)||a.ticker.localeCompare(b.ticker))
+    const etfPreview=rankedEtfRows
     const todayRows=(stockSize==='etf'?etfPreview:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
     const sizePool=sizedRows(stockRows)
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
@@ -1128,12 +1128,12 @@ export default function App(){
         <StockTrendList rows={todayRows} onSelect={openAnalysisStock} getClass={displayClass} emptyLabel="이 분류에서 선별된 종목이 없습니다. 전체 또는 탐색 필터를 확인하세요."/>
         {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 보기</button>}
       </section>
-      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 시장 신호를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
+      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 섹터 › ETF를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
   }else if(page==='signal'){
     content=<div className="discovery-home">{filters}
-      <div className="journey-heading"><h2>시장 신호</h2><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
+      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>섹터 <em>›</em> ETF</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
         <div className="dashboard-left-column">
@@ -1174,7 +1174,7 @@ export default function App(){
             onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
             emptyLabel="조건에 맞는 섹터가 없습니다."
           />
-          <details className="dashboard-disclosure sector-heat-disclosure"><summary>시장 지표 · 섹터 히트맵</summary><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></details>
+          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head"><div><span>SECTOR MAP</span><h3>시장 지표 · 섹터 히트맵</h3></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
         </div>
         </div>
       </section>
@@ -1190,8 +1190,8 @@ export default function App(){
         </figure>
       </section>
 
-      <details className="dashboard-explore">
-        <summary><span>ETF · 시장 탐색</span><small>필요할 때 펼쳐서 확인</small></summary>
+      <section className="dashboard-explore dashboard-explore-expanded" aria-label="ETF 시장 탐색">
+        <div className="signal-expanded-head signal-etf-head"><div><span>ETF MAP</span><h2>ETF</h2><p>홈과 동일한 {`${market==='ALL'?'전체 시장':market} ETF RS 순위`}를 이어서 봅니다.</p></div></div>
         <div className="dashboard-explore-body">
           <div className="panel dashboard-etf-industry-panel">
             <div className="panel-head dashboard-sector-head">
@@ -1202,14 +1202,14 @@ export default function App(){
           </div>
           <section className="panel dashboard-etf-panel">
             <div className="panel-head dashboard-sector-head">
-              <div><h2>ETF 요약</h2><p>ETF 전용 RS 순위 Top 5</p><MarketSegment label="ETF 요약" value={etfMkt} onChange={setEtfMkt}/></div>
+              <div><h2>ETF 요약</h2><p>홈 ETF와 동일한 ETF 전용 RS 순위 Top 5</p></div>
               <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
             </div>
             <EtfRsChart rows={etfRows} onSelect={chartOpenEtf}/>
             <StockRows label="ETF" rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/>
           </section>
         </div>
-      </details>
+      </section>
     </div>
   }else if(page==='leaderboard'){
     const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
@@ -1443,7 +1443,7 @@ export default function App(){
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
-  const pageTitle:Record<string,string>={signal:'시장 신호',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={signal:'섹터 › ETF',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
