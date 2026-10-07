@@ -8,7 +8,7 @@ const views=[
 ]
 
 for(const view of views){
-  test(view.name+' uses Sunset Editorial B on the compact Dashboard',async({browser})=>{
+  test(view.name+' uses Sunset Editorial + Pebble Liquid Glass on the compact Dashboard',async({browser})=>{
     const context=await browser.newContext({
       viewport:{width:view.width,height:view.height},
       hasTouch:true,
