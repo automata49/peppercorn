@@ -82,7 +82,9 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }else{
       await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
     }
-    await page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true}).click()
+    const scope=page.locator('.analysis-scope')
+    const active=scope.locator('button[aria-pressed="true"]')
+    if(await active.count())await active.first().click()
     await page.locator('.analysis-idea-list > button').first().click()
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
