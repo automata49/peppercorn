@@ -2408,233 +2408,6 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 }
 .analysis-page .compare-remove:hover{background:#242228!important;color:#fff!important}
 
-/* Light appearance contract: when Light is selected, product chrome and analysis surfaces
-   stay light. Dark editorial surfaces belong only to Dark/System-dark mode. */
-:root[data-theme="light"] .leadership-overview{
-  --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
-  --folio-surface-2:#e8ded4;
-  --folio-ink:#111113;
-  --folio-muted:#77716f;
-  --folio-line:rgba(17,17,19,.12);
-  --folio-line-strong:rgba(17,17,19,.22);
-  border-color:var(--folio-line)!important;
-  background:
-    radial-gradient(circle at 87% 18%,rgba(240,106,69,.08),transparent 25rem),
-    radial-gradient(circle at 72% 34%,rgba(163,79,120,.06),transparent 24rem),
-    var(--folio-paper)!important;
-  color:var(--folio-ink);
-}
-:root[data-theme="light"] .leadership-overview::before{
-  background:linear-gradient(115deg,rgba(255,255,255,.34),transparent 34%);
-}
-:root[data-theme="light"] .leadership-overview .dashboard-section-head h2,
-:root[data-theme="light"] .leadership-overview .spotlight-body h3,
-:root[data-theme="light"] .leadership-overview .spotlight-price strong,
-:root[data-theme="light"] .leadership-overview .leadership-orbit-center strong,
-:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button b{
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .leadership-overview .dashboard-section-head p,
-:root[data-theme="light"] .leadership-overview .leadership-next,
-:root[data-theme="light"] .leadership-overview .spotlight-kicker,
-:root[data-theme="light"] .leadership-overview .spotlight-identity,
-:root[data-theme="light"] .leadership-overview .spotlight-price span,
-:root[data-theme="light"] .leadership-overview .spotlight-performance span,
-:root[data-theme="light"] .leadership-overview .section-market button,
-:root[data-theme="light"] .leadership-overview .leadership-orbit-center span,
-:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button span,
-:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button small{
-  color:var(--folio-muted)!important;
-}
-:root[data-theme="light"] .leadership-overview .dashboard-section-action{
-  border-color:var(--folio-line)!important;
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .leadership-overview .dashboard-section-action:hover{background:var(--folio-surface-2)!important}
-:root[data-theme="light"] .leadership-overview .section-market button.on{
-  background:var(--folio-ink)!important;
-  border-color:var(--folio-ink)!important;
-  color:var(--folio-paper)!important;
-}
-:root[data-theme="light"] .leadership-overview .leader-spotlight{
-  border-top-color:var(--folio-line)!important;
-  border-bottom-color:var(--folio-line)!important;
-}
-:root[data-theme="light"] .leadership-overview .spotlight-periods{border-bottom-color:var(--folio-line)!important}
-:root[data-theme="light"] .leadership-overview .spotlight-periods button{color:var(--folio-muted)!important}
-:root[data-theme="light"] .leadership-overview .spotlight-periods button.on{color:var(--folio-ink)!important}
-:root[data-theme="light"] .leadership-overview .leadership-decision{border-bottom-color:var(--folio-line)!important}
-:root[data-theme="light"] .leadership-overview .leadership-orbit{
-  box-shadow:0 12px 0 rgba(84,38,95,.12),0 24px 42px rgba(17,17,19,.14);
-}
-:root[data-theme="light"] .leadership-overview .leadership-orbit::after{
-  background:var(--folio-paper);
-  border-color:var(--folio-line);
-  box-shadow:inset 0 8px 20px rgba(17,17,19,.08);
-}
-:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button{
-  border-color:var(--folio-line)!important;
-  background:rgba(255,255,255,.56)!important;
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button:hover{
-  border-color:var(--folio-line-strong)!important;
-  background:var(--folio-surface)!important;
-}
-
-:root[data-theme="light"] .analysis-page{
-  --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
-  --folio-surface-2:#e8ded4;
-  --folio-ink:#111113;
-  --folio-muted:#77716f;
-  --folio-line:rgba(17,17,19,.12);
-  --folio-line-strong:rgba(17,17,19,.22);
-  --bg:var(--folio-paper);
-  --card:var(--folio-surface);
-  --ink:var(--folio-ink);
-  --muted:var(--folio-muted);
-  --line:var(--folio-line);
-  border-color:var(--folio-line);
-  background:
-    radial-gradient(circle at 94% 4%,rgba(240,106,69,.07),transparent 28rem),
-    radial-gradient(circle at 75% 10%,rgba(84,38,95,.06),transparent 24rem),
-    var(--folio-paper);
-  color:var(--folio-ink);
-}
-:root[data-theme="light"] .analysis-hub-head,
-:root[data-theme="light"] .analysis-price-momentum{border-color:var(--folio-line)!important}
-:root[data-theme="light"] .analysis-hub-copy h2,
-:root[data-theme="light"] .analysis-hub-head .leadership-orbit-center strong,
-:root[data-theme="light"] .analysis-list-copy>b,
-:root[data-theme="light"] .analysis-list-signal>b,
-:root[data-theme="light"] .analysis-price-momentum .hero-name,
-:root[data-theme="light"] .analysis-price-momentum .hero-price,
-:root[data-theme="light"] .analysis-price-momentum .line-legend b,
-:root[data-theme="light"] .analysis-price-momentum .chart-readout b,
-:root[data-theme="light"] .analysis-secondary-body .block-title,
-:root[data-theme="light"] .analysis-secondary-body .analysis-part,
-:root[data-theme="light"] .analysis-secondary-body .key-stats b,
-:root[data-theme="light"] .folio-insight>header h3,
-:root[data-theme="light"] .folio-insight-grid h4,
-:root[data-theme="light"] .thesis-head h3,
-:root[data-theme="light"] .analysis-page .checkup-card header h3,
-:root[data-theme="light"] .analysis-page .checkup-score,
-:root[data-theme="light"] .analysis-page .position-label-card strong{
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .analysis-hub-copy p,
-:root[data-theme="light"] .analysis-hub-head .leadership-orbit-center span,
-:root[data-theme="light"] .analysis-list-copy>small,
-:root[data-theme="light"] .analysis-list-copy>em,
-:root[data-theme="light"] .analysis-price-momentum .hero-meta,
-:root[data-theme="light"] .analysis-price-momentum .hero-change span,
-:root[data-theme="light"] .analysis-price-momentum .line-legend small,
-:root[data-theme="light"] .analysis-price-momentum .rs-chart-note,
-:root[data-theme="light"] .analysis-price-momentum .chart-scrub-hint,
-:root[data-theme="light"] .analysis-price-momentum .chart-readout,
-:root[data-theme="light"] .analysis-secondary-body .key-stats span,
-:root[data-theme="light"] .analysis-secondary-body .peer-strip span,
-:root[data-theme="light"] .folio-thesis,
-:root[data-theme="light"] .folio-insight-grid li,
-:root[data-theme="light"] .analysis-judgement .analysis-mine,
-:root[data-theme="light"] .analysis-page .checkup-card header span,
-:root[data-theme="light"] .analysis-page .checkup-count,
-:root[data-theme="light"] .analysis-page .position-label-card span,
-:root[data-theme="light"] .analysis-page .position-label-card p{
-  color:var(--folio-muted)!important;
-}
-:root[data-theme="light"] .analysis-hub-head .leadership-orbit::after{background:var(--folio-paper);border-color:var(--folio-line)}
-:root[data-theme="light"] .analysis-page .stock-search input,
-:root[data-theme="light"] .analysis-page .stock-search-results,
-:root[data-theme="light"] .analysis-page .recent-stocks button,
-:root[data-theme="light"] .analysis-browse .analysis-idea-list>button,
-:root[data-theme="light"] .analysis-secondary-body>.analysis-block,
-:root[data-theme="light"] .analysis-judgement .action-box,
-:root[data-theme="light"] .analysis-page .checkup-card,
-:root[data-theme="light"] .analysis-page .position-label-card,
-:root[data-theme="light"] .analysis-page .analysis-sheet input,
-:root[data-theme="light"] .analysis-page .analysis-sheet textarea,
-:root[data-theme="light"] .analysis-page .analysis-sheet select{
-  border-color:var(--folio-line)!important;
-  background:var(--folio-surface)!important;
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .analysis-page .stock-search-results li[aria-selected="true"],
-:root[data-theme="light"] .analysis-browse .analysis-idea-list>button:hover,
-:root[data-theme="light"] .analysis-browse .analysis-idea-list>button.on{
-  background:var(--folio-surface-2)!important;
-}
-:root[data-theme="light"] .analysis-scope{border-color:var(--folio-line)!important}
-:root[data-theme="light"] .analysis-scope button{border-right-color:var(--folio-line)!important;color:var(--folio-muted)!important}
-:root[data-theme="light"] .analysis-scope button.on{background:var(--folio-ink)!important;color:var(--folio-paper)!important}
-:root[data-theme="light"] .analysis-price-momentum{
-  --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
-  --folio-ink:#111113;
-  --folio-muted:#77716f;
-  --folio-line:rgba(17,17,19,.12);
-}
-:root[data-theme="light"] .analysis-price-momentum .price-rs{--rs-chart-bg:#f4f1ec}
-:root[data-theme="light"] .analysis-price-momentum .line-grid{stroke:rgba(17,17,19,.08)!important}
-:root[data-theme="light"] .analysis-price-momentum .line-zero,
-:root[data-theme="light"] .analysis-price-momentum .price-rs-divider{stroke:rgba(17,17,19,.18)!important}
-:root[data-theme="light"] .analysis-price-momentum .line-tick,
-:root[data-theme="light"] .analysis-price-momentum .line-axis-title{fill:#77716f!important}
-:root[data-theme="light"] .analysis-detail-tabs{
-  border-color:var(--folio-line)!important;
-  background:rgba(244,241,236,.94)!important;
-}
-:root[data-theme="light"] .analysis-detail-tabs button{border-right-color:var(--folio-line)!important;color:var(--folio-muted)!important}
-:root[data-theme="light"] .analysis-detail-tabs button.on{color:var(--folio-ink)!important}
-:root[data-theme="light"] .analysis-secondary-body>.analysis-block.insight-block{
-  background:linear-gradient(135deg,rgba(84,38,95,.07),rgba(240,106,69,.045) 62%,transparent),var(--folio-surface)!important;
-}
-:root[data-theme="light"] .analysis-secondary-body .peer-strip button{
-  border-color:var(--folio-line)!important;
-  background:var(--folio-surface)!important;
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .folio-insight>header,
-:root[data-theme="light"] .folio-insight-grid>div,
-:root[data-theme="light"] .analysis-page .checklist label,
-:root[data-theme="light"] .analysis-page .analysis-sheet table,
-:root[data-theme="light"] .analysis-page .analysis-sheet th,
-:root[data-theme="light"] .analysis-page .analysis-sheet td{
-  border-color:var(--folio-line)!important;
-}
-:root[data-theme="light"] .folio-insight-grid>div{background:rgba(255,255,255,.56)}
-:root[data-theme="light"] .analysis-actionbar{
-  border-color:var(--folio-line)!important;
-  background:rgba(244,241,236,.94)!important;
-  box-shadow:0 16px 40px rgba(17,17,19,.12)!important;
-}
-:root[data-theme="light"] .analysis-actionbar button{
-  border-color:var(--folio-line)!important;
-  background:var(--folio-surface)!important;
-  color:var(--folio-ink)!important;
-}
-:root[data-theme="light"] .analysis-page .compare-remove{background:var(--folio-surface-2)!important;color:var(--folio-ink)!important}
-
-/* Analysis mobile shell follows the selected appearance. */
-@media(max-width:1279px){
-  :root[data-theme="light"] .page-shell-analysis .mobile-brandbar{
-    background:rgba(244,241,236,.96)!important;
-    border-bottom-color:var(--folio-line)!important;
-    backdrop-filter:blur(18px)!important;
-  }
-  :root[data-theme="light"] .page-shell-analysis .mobile-brandbar .folio-wordmark-system,
-  :root[data-theme="light"] .page-shell-analysis .mobile-brand-actions button{color:var(--folio-ink)!important}
-  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav{
-    border-top-color:var(--folio-line)!important;
-    background:rgba(244,241,236,.96)!important;
-    box-shadow:none!important;
-  }
-  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav button{color:var(--folio-muted)!important}
-  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav button.active{color:var(--folio-ink)!important}
-}
-
 /* Analysis mobile shell follows the approved black app screens while the rest of Folio may stay System/Light/Dark. */
 @media(max-width:1279px){
   .page-shell-analysis .mobile-brandbar{
@@ -2947,6 +2720,9 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
    xx/hero/motif reconstruction is allowed to override these assets. */
 .folio-wordmark-text,.folio-wordmark-mark,.folio-xx-vector{display:none!important}
 .folio-wordmark-system{
+  display:inline-grid!important;
+  grid-template-columns:max-content!important;
+  grid-template-rows:var(--folio-wordmark-size)!important;
   height:var(--folio-wordmark-size)!important;
   min-height:var(--folio-wordmark-size)!important;
   align-items:center!important;
@@ -2964,20 +2740,23 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   max-height:25px!important;
 }
 .folio-wordmark-image{
+  grid-area:1 / 1!important;
+  align-self:center!important;
+  justify-self:start!important;
   display:block;
   height:100%!important;
   width:auto!important;
   max-height:100%!important;
 }
-.folio-wordmark-image-light{display:block}
-.folio-wordmark-image-dark{display:none}
-.sidebar .folio-wordmark-image-light{display:none}
-.sidebar .folio-wordmark-image-dark{display:block}
-:root[data-theme="dark"] .folio-wordmark-image-light{display:none}
-:root[data-theme="dark"] .folio-wordmark-image-dark{display:block}
+.folio-wordmark-image-light{display:block!important}
+.folio-wordmark-image-dark{display:none!important}
+.sidebar .folio-wordmark-image-light{display:none!important}
+.sidebar .folio-wordmark-image-dark{display:block!important}
+:root[data-theme="dark"] .folio-wordmark-image-light{display:none!important}
+:root[data-theme="dark"] .folio-wordmark-image-dark{display:block!important}
 @media(prefers-color-scheme:dark){
-  :root:not([data-theme]) .folio-wordmark-image-light{display:none}
-  :root:not([data-theme]) .folio-wordmark-image-dark{display:block}
+  :root:not([data-theme]) .folio-wordmark-image-light{display:none!important}
+  :root:not([data-theme]) .folio-wordmark-image-dark{display:block!important}
 }
 
 .launch-overlay,.launch-screen{background:#0b0b0d!important}
@@ -3095,4 +2874,231 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
     width:auto!important;
     max-height:none!important;
   }
+}
+
+/* Light appearance contract: when Light is selected, product chrome and analysis surfaces
+   stay light. Dark editorial surfaces belong only to Dark/System-dark mode. */
+:root[data-theme="light"] .leadership-overview{
+  --folio-paper:#f4f1ec;
+  --folio-surface:#ffffff;
+  --folio-surface-2:#e8ded4;
+  --folio-ink:#111113;
+  --folio-muted:#77716f;
+  --folio-line:rgba(17,17,19,.12);
+  --folio-line-strong:rgba(17,17,19,.22);
+  border-color:var(--folio-line)!important;
+  background:
+    radial-gradient(circle at 87% 18%,rgba(240,106,69,.08),transparent 25rem),
+    radial-gradient(circle at 72% 34%,rgba(163,79,120,.06),transparent 24rem),
+    var(--folio-paper)!important;
+  color:var(--folio-ink);
+}
+:root[data-theme="light"] .leadership-overview::before{
+  background:linear-gradient(115deg,rgba(255,255,255,.34),transparent 34%);
+}
+:root[data-theme="light"] .leadership-overview .dashboard-section-head h2,
+:root[data-theme="light"] .leadership-overview .spotlight-body h3,
+:root[data-theme="light"] .leadership-overview .spotlight-price strong,
+:root[data-theme="light"] .leadership-overview .leadership-orbit-center strong,
+:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button b{
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .leadership-overview .dashboard-section-head p,
+:root[data-theme="light"] .leadership-overview .leadership-next,
+:root[data-theme="light"] .leadership-overview .spotlight-kicker,
+:root[data-theme="light"] .leadership-overview .spotlight-identity,
+:root[data-theme="light"] .leadership-overview .spotlight-price span,
+:root[data-theme="light"] .leadership-overview .spotlight-performance span,
+:root[data-theme="light"] .leadership-overview .section-market button,
+:root[data-theme="light"] .leadership-overview .leadership-orbit-center span,
+:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button span,
+:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button small{
+  color:var(--folio-muted)!important;
+}
+:root[data-theme="light"] .leadership-overview .dashboard-section-action{
+  border-color:var(--folio-line)!important;
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .leadership-overview .dashboard-section-action:hover{background:var(--folio-surface-2)!important}
+:root[data-theme="light"] .leadership-overview .section-market button.on{
+  background:var(--folio-ink)!important;
+  border-color:var(--folio-ink)!important;
+  color:var(--folio-paper)!important;
+}
+:root[data-theme="light"] .leadership-overview .leader-spotlight{
+  border-top-color:var(--folio-line)!important;
+  border-bottom-color:var(--folio-line)!important;
+}
+:root[data-theme="light"] .leadership-overview .spotlight-periods{border-bottom-color:var(--folio-line)!important}
+:root[data-theme="light"] .leadership-overview .spotlight-periods button{color:var(--folio-muted)!important}
+:root[data-theme="light"] .leadership-overview .spotlight-periods button.on{color:var(--folio-ink)!important}
+:root[data-theme="light"] .leadership-overview .leadership-decision{border-bottom-color:var(--folio-line)!important}
+:root[data-theme="light"] .leadership-overview .leadership-orbit{
+  box-shadow:0 12px 0 rgba(84,38,95,.12),0 24px 42px rgba(17,17,19,.14);
+}
+:root[data-theme="light"] .leadership-overview .leadership-orbit::after{
+  background:var(--folio-paper);
+  border-color:var(--folio-line);
+  box-shadow:inset 0 8px 20px rgba(17,17,19,.08);
+}
+:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button{
+  border-color:var(--folio-line)!important;
+  background:rgba(255,255,255,.56)!important;
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button:hover{
+  border-color:var(--folio-line-strong)!important;
+  background:var(--folio-surface)!important;
+}
+
+:root[data-theme="light"] .analysis-page{
+  --folio-paper:#f4f1ec;
+  --folio-surface:#ffffff;
+  --folio-surface-2:#e8ded4;
+  --folio-ink:#111113;
+  --folio-muted:#77716f;
+  --folio-line:rgba(17,17,19,.12);
+  --folio-line-strong:rgba(17,17,19,.22);
+  --bg:var(--folio-paper);
+  --card:var(--folio-surface);
+  --ink:var(--folio-ink);
+  --muted:var(--folio-muted);
+  --line:var(--folio-line);
+  border-color:var(--folio-line);
+  background:
+    radial-gradient(circle at 94% 4%,rgba(240,106,69,.07),transparent 28rem),
+    radial-gradient(circle at 75% 10%,rgba(84,38,95,.06),transparent 24rem),
+    var(--folio-paper);
+  color:var(--folio-ink);
+}
+:root[data-theme="light"] .analysis-hub-head,
+:root[data-theme="light"] .analysis-price-momentum{border-color:var(--folio-line)!important}
+:root[data-theme="light"] .analysis-hub-copy h2,
+:root[data-theme="light"] .analysis-hub-head .leadership-orbit-center strong,
+:root[data-theme="light"] .analysis-list-copy>b,
+:root[data-theme="light"] .analysis-list-signal>b,
+:root[data-theme="light"] .analysis-price-momentum .hero-name,
+:root[data-theme="light"] .analysis-price-momentum .hero-price,
+:root[data-theme="light"] .analysis-price-momentum .line-legend b,
+:root[data-theme="light"] .analysis-price-momentum .chart-readout b,
+:root[data-theme="light"] .analysis-secondary-body .block-title,
+:root[data-theme="light"] .analysis-secondary-body .analysis-part,
+:root[data-theme="light"] .analysis-secondary-body .key-stats b,
+:root[data-theme="light"] .folio-insight>header h3,
+:root[data-theme="light"] .folio-insight-grid h4,
+:root[data-theme="light"] .thesis-head h3,
+:root[data-theme="light"] .analysis-page .checkup-card header h3,
+:root[data-theme="light"] .analysis-page .checkup-score,
+:root[data-theme="light"] .analysis-page .position-label-card strong{
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .analysis-hub-copy p,
+:root[data-theme="light"] .analysis-hub-head .leadership-orbit-center span,
+:root[data-theme="light"] .analysis-list-copy>small,
+:root[data-theme="light"] .analysis-list-copy>em,
+:root[data-theme="light"] .analysis-price-momentum .hero-meta,
+:root[data-theme="light"] .analysis-price-momentum .hero-change span,
+:root[data-theme="light"] .analysis-price-momentum .line-legend small,
+:root[data-theme="light"] .analysis-price-momentum .rs-chart-note,
+:root[data-theme="light"] .analysis-price-momentum .chart-scrub-hint,
+:root[data-theme="light"] .analysis-price-momentum .chart-readout,
+:root[data-theme="light"] .analysis-secondary-body .key-stats span,
+:root[data-theme="light"] .analysis-secondary-body .peer-strip span,
+:root[data-theme="light"] .folio-thesis,
+:root[data-theme="light"] .folio-insight-grid li,
+:root[data-theme="light"] .analysis-judgement .analysis-mine,
+:root[data-theme="light"] .analysis-page .checkup-card header span,
+:root[data-theme="light"] .analysis-page .checkup-count,
+:root[data-theme="light"] .analysis-page .position-label-card span,
+:root[data-theme="light"] .analysis-page .position-label-card p{
+  color:var(--folio-muted)!important;
+}
+:root[data-theme="light"] .analysis-hub-head .leadership-orbit::after{background:var(--folio-paper);border-color:var(--folio-line)}
+:root[data-theme="light"] .analysis-page .stock-search input,
+:root[data-theme="light"] .analysis-page .stock-search-results,
+:root[data-theme="light"] .analysis-page .recent-stocks button,
+:root[data-theme="light"] .analysis-browse .analysis-idea-list>button,
+:root[data-theme="light"] .analysis-secondary-body>.analysis-block,
+:root[data-theme="light"] .analysis-judgement .action-box,
+:root[data-theme="light"] .analysis-page .checkup-card,
+:root[data-theme="light"] .analysis-page .position-label-card,
+:root[data-theme="light"] .analysis-page .analysis-sheet input,
+:root[data-theme="light"] .analysis-page .analysis-sheet textarea,
+:root[data-theme="light"] .analysis-page .analysis-sheet select{
+  border-color:var(--folio-line)!important;
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .analysis-page .stock-search-results li[aria-selected="true"],
+:root[data-theme="light"] .analysis-browse .analysis-idea-list>button:hover,
+:root[data-theme="light"] .analysis-browse .analysis-idea-list>button.on{
+  background:var(--folio-surface-2)!important;
+}
+:root[data-theme="light"] .analysis-scope{border-color:var(--folio-line)!important}
+:root[data-theme="light"] .analysis-scope button{border-right-color:var(--folio-line)!important;color:var(--folio-muted)!important}
+:root[data-theme="light"] .analysis-scope button.on{background:var(--folio-ink)!important;color:var(--folio-paper)!important}
+:root[data-theme="light"] .analysis-price-momentum{
+  --folio-paper:#f4f1ec;
+  --folio-surface:#ffffff;
+  --folio-ink:#111113;
+  --folio-muted:#77716f;
+  --folio-line:rgba(17,17,19,.12);
+}
+:root[data-theme="light"] .analysis-price-momentum .price-rs{--rs-chart-bg:#f4f1ec}
+:root[data-theme="light"] .analysis-price-momentum .line-grid{stroke:rgba(17,17,19,.08)!important}
+:root[data-theme="light"] .analysis-price-momentum .line-zero,
+:root[data-theme="light"] .analysis-price-momentum .price-rs-divider{stroke:rgba(17,17,19,.18)!important}
+:root[data-theme="light"] .analysis-price-momentum .line-tick,
+:root[data-theme="light"] .analysis-price-momentum .line-axis-title{fill:#77716f!important}
+:root[data-theme="light"] .analysis-detail-tabs{
+  border-color:var(--folio-line)!important;
+  background:rgba(244,241,236,.94)!important;
+}
+:root[data-theme="light"] .analysis-detail-tabs button{border-right-color:var(--folio-line)!important;color:var(--folio-muted)!important}
+:root[data-theme="light"] .analysis-detail-tabs button.on{color:var(--folio-ink)!important}
+:root[data-theme="light"] .analysis-secondary-body>.analysis-block.insight-block{
+  background:linear-gradient(135deg,rgba(84,38,95,.07),rgba(240,106,69,.045) 62%,transparent),var(--folio-surface)!important;
+}
+:root[data-theme="light"] .analysis-secondary-body .peer-strip button{
+  border-color:var(--folio-line)!important;
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .folio-insight>header,
+:root[data-theme="light"] .folio-insight-grid>div,
+:root[data-theme="light"] .analysis-page .checklist label,
+:root[data-theme="light"] .analysis-page .analysis-sheet table,
+:root[data-theme="light"] .analysis-page .analysis-sheet th,
+:root[data-theme="light"] .analysis-page .analysis-sheet td{
+  border-color:var(--folio-line)!important;
+}
+:root[data-theme="light"] .folio-insight-grid>div{background:rgba(255,255,255,.56)}
+:root[data-theme="light"] .analysis-actionbar{
+  border-color:var(--folio-line)!important;
+  background:rgba(244,241,236,.94)!important;
+  box-shadow:0 16px 40px rgba(17,17,19,.12)!important;
+}
+:root[data-theme="light"] .analysis-actionbar button{
+  border-color:var(--folio-line)!important;
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+}
+:root[data-theme="light"] .analysis-page .compare-remove{background:var(--folio-surface-2)!important;color:var(--folio-ink)!important}
+
+/* Analysis mobile shell follows the selected appearance. */
+@media(max-width:1279px){
+  :root[data-theme="light"] .page-shell-analysis .mobile-brandbar{
+    background:rgba(244,241,236,.96)!important;
+    border-bottom-color:var(--folio-line)!important;
+    backdrop-filter:blur(18px)!important;
+  }
+  :root[data-theme="light"] .page-shell-analysis .mobile-brandbar .folio-wordmark-system,
+  :root[data-theme="light"] .page-shell-analysis .mobile-brand-actions button{color:var(--folio-ink)!important}
+  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav{
+    border-top-color:var(--folio-line)!important;
+    background:rgba(244,241,236,.96)!important;
+    box-shadow:none!important;
+  }
+  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav button{color:var(--folio-muted)!important}
+  :root[data-theme="light"] .page-shell-analysis .mobile-bottom-nav button.active{color:var(--folio-ink)!important}
 }
