@@ -50,21 +50,21 @@ Hard rules:
 User decision 2026-10-07 supersedes the former representative-leader hero Home.
 
 1. Supplied Folio brand + market selection.
-2. **오늘의 시장** = compact market-signal summary: market breadth (MA50 with MA200 context) → leading sector → ETF RS leader. It adds no regime score. Its `전체 보기 →` opens **섹터 > ETF**.
+2. **오늘의 시장** = compact market-signal summary: market breadth (MA50 with MA200 context) → leading sector → ETF RS leader. It adds no regime score. Its `전체 보기 →` opens **섹터>ETF**.
 3. Stock category selector = **대형주 / 중소형주 / 전체 / ETF** using the branded Pebble Liquid Glass treatment; default = 대형주.
-4. **오늘의 주도주** = at most five stocks from the unchanged Focus funnel within the selected equity size pool, or the same ranked ETF pool used by 섹터 > ETF when ETF is selected. It shows ticker/name, actual 20-session mini trend, daily price and explicitly labeled 20D return.
+4. **오늘의 주도주** = at most five stocks from the unchanged Focus funnel within the selected equity size pool, or the same ranked ETF pool used by 섹터>ETF when ETF is selected. It shows ticker/name, actual 20-session mini trend, daily price and explicitly labeled 20D return.
 5. Four equity leadership navigation buttons appear **below 오늘의 주도주**: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
 6. One deterministic Folio Insight sentence; no live generative-AI claim.
 7. Existing supplied Typography / Photography artwork as secondary identity imagery.
 
-**섹터 > ETF** owns the sector summary/heatmap followed immediately by ETF industry and ETF RS exploration. These core sections are always expanded; Howard Marks temperature remains secondary. Home contains no representative-leader chart or duplicated list/summary layers.
+**섹터>ETF** owns the sector summary/heatmap followed immediately by ETF industry and ETF RS exploration. These core sections are always expanded; Howard Marks temperature remains secondary. Home contains no representative-leader chart or duplicated list/summary layers.
 
 ## Analysis experience
 
 - Primary navigation: 홈 / 탐색 / Thesis / 추적.
 - Explore: one market/search/category/leadership/sector/lens-filter list, with 20-row progressive pages and mini trends loaded in batches of at most 10 IDs. The primary category control is exactly **대형주 / 중소형주 / 전체 / ETF**. The equity leadership control is exactly **핵심 주도 / 주도 후보 / 강세 전환 / 조정 중**; it is disabled for ETF. Position is not a visible Explore category or product label. No separate hidden focus roster.
 - The stock-category control uses the branded **Pebble Liquid Glass** treatment: the first three equity categories read as one family, a visible `/` separates ETF, and irregular translucent warm-glass shapes are restricted to this selector.
-- Home ETF and **섹터 > ETF** share the exact same global market pool and `etf_rs_rank` ordering; there is no independent ETF-market state that can make the two Top 5 lists disagree.
+- Home ETF and **섹터>ETF** share the exact same global market pool and `etf_rs_rank` ordering; there is no independent ETF-market state that can make the two Top 5 lists disagree.
 - Selecting a stock opens Detail; the list is replaced, not stacked above the chart. Return to list preserves filters. Primary Explore navigation clears hidden global query/sector state.
 - Detail preserves the existing PriceRsChart and Overview / Analysis / Financials / Thesis depth. These retain their existing evidence and semantics.
 - Thesis workspace uses existing analysis records and exact record identity for editing multiple dates of the same ticker. The editable records grid remains progressively disclosed.
@@ -75,7 +75,7 @@ Existing supplied artwork and the Level-0 visual baseline remain authoritative. 
 
 ## Mobile / iPad visual rule
 
-Desktop, mobile and iPad all use **Folio Sunset Editorial + Pebble Liquid Glass**. The selected appearance governs the **entire product surface**: Home, Explore, Detail, Thesis, Tracking, 섹터 > ETF, Temperature, Watchlist, Portfolio, Journal, Leaderboard, Universe, Settings and dialogs all consume the same Folio paper/surface/ink/rule/type/sunset tokens. Light stays light end-to-end; Dark/System-dark may use the approved near-black focal treatment. Compact layouts keep the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop, with restrained sunset accents, text-led tabs, editorial evidence columns and list-like rows. Legacy blue/white workspace styling, rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
+Desktop, mobile and iPad all use **Folio Sunset Editorial + Pebble Liquid Glass**. The selected appearance governs the **entire product surface**: Home, Explore, Detail, Thesis, Tracking, 섹터>ETF, Temperature, Watchlist, Portfolio, Journal, Leaderboard, Universe, Settings and dialogs all consume the same Folio paper/surface/ink/rule/type/sunset tokens. Light stays light end-to-end; Dark/System-dark may use the approved near-black focal treatment. Compact layouts keep the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop, with restrained sunset accents, text-led tabs, editorial evidence columns and list-like rows. Legacy blue/white workspace styling, rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Visual Identity cleanup lock
 
