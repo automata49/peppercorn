@@ -111,6 +111,24 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  })
 }
 
+test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',async({page})=>{
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
+  await page.addInitScript(()=>{
+    sessionStorage.setItem('peppercorn-intro-seen','1');
+    localStorage.setItem('folio-theme','light');
+    localStorage.setItem('folio-stock-size','etf');
+  });
+  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>b').allTextContents();
+  expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
+  await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'섹터>ETF',exact:true})).toBeVisible();
+  const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
+  expect(signalNames).toEqual(homeNames);
+});
+
 test('RS bands refresh in an already open stock detail',async({page})=>{
   let calls=0;
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
