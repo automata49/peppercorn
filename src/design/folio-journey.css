@@ -342,6 +342,110 @@
 .journey-classes button span{color:var(--folio-muted)}
 .journey-classes button b{color:var(--folio-ink)}
 
+/* Sector › ETF is an open editorial sequence, not a nested disclosure. */
+.signal-journey-heading{
+  align-items:end;
+  padding:10px 0 22px;
+  border-bottom:1px solid var(--folio-line);
+}
+.signal-journey-heading>div{display:grid;gap:4px}
+.signal-kicker,
+.signal-expanded-head>div>span{
+  color:var(--folio-coral);
+  font-size:9px;
+  line-height:14px;
+  font-weight:750;
+  letter-spacing:.16em;
+}
+.signal-journey-heading h2{
+  font-size:clamp(30px,4vw,48px)!important;
+  font-weight:560!important;
+  letter-spacing:-.06em!important;
+}
+.signal-journey-heading h2 em{
+  margin:0 .16em;
+  color:var(--folio-magenta);
+  font-style:normal;
+  font-weight:360;
+}
+.signal-expanded-block{
+  display:grid;
+  gap:16px;
+  margin:18px 0 2px!important;
+  padding:18px 0 4px!important;
+  border-top:1px solid var(--folio-line-strong)!important;
+  background:transparent!important;
+}
+.signal-expanded-head{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:16px;
+}
+.signal-expanded-head h2,
+.signal-expanded-head h3{
+  margin:2px 0 0;
+  color:var(--folio-ink);
+  font-family:var(--folio-display);
+  font-size:var(--folio-ds-type-section);
+  line-height:var(--folio-ds-leading-section);
+  font-weight:650;
+  letter-spacing:-.04em;
+}
+.signal-expanded-head p{
+  margin-top:5px;
+  color:var(--folio-muted);
+  font-size:var(--folio-ds-type-secondary);
+  line-height:var(--folio-ds-leading-secondary);
+}
+.dashboard-explore-expanded{
+  display:grid!important;
+  gap:16px;
+  margin-top:28px!important;
+  padding:24px 0 0!important;
+  border:0!important;
+  border-top:1px solid var(--folio-line-strong)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.dashboard-explore-expanded .dashboard-explore-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr);
+  gap:16px;
+  padding:0!important;
+}
+.dashboard-explore-expanded .dashboard-etf-industry-panel,
+.dashboard-explore-expanded .dashboard-etf-panel{
+  margin:0!important;
+  background:color-mix(in srgb,var(--folio-surface) 88%,transparent)!important;
+  border:1px solid var(--folio-line)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26)!important;
+}
+.page-signal .sector-heat-disclosure .sector-heat{
+  margin-top:0;
+}
+
+@media(min-width:1100px){
+  .dashboard-explore-expanded .dashboard-explore-body{
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+    align-items:start;
+  }
+}
+@media(max-width:650px){
+  .signal-journey-heading{align-items:flex-start}
+  .signal-journey-heading h2{font-size:30px!important}
+  .signal-expanded-head{align-items:flex-start}
+  .dashboard-explore-expanded{margin-top:22px!important;padding-top:20px!important}
+  .dashboard-explore-expanded .dashboard-etf-industry-panel,
+  .dashboard-explore-expanded .dashboard-etf-panel{
+    border-left:0!important;
+    border-right:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+}
+
 /* Explore + stock detail */
 .page-analysis .analysis-page,
 .page-thesis .analysis-page{
