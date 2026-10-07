@@ -652,3 +652,14 @@ Changes:
 - Legacy exact `background:#fff` structural fills in `src/styles.css` were normalized to the Folio surface token; translucent white shell bars were converted to theme-aware Paper mixes. Semantic gain/loss colours and white foreground text were not changed.
 - Light Analysis/Leadership local surface tokens and translucent light cards use the same warm surface so Detail, Home, Signal, Thesis, Tracking, grids, dialogs and settings read as one system.
 - Level-0 baseline, identity doc, shared contract, harness and visual regression now forbid a pure-white structural surface regression.
+
+## Sunset Editorial + Pebble Liquid Glass / 섹터>ETF — 2026-10-07
+
+Latest user decisions:
+- Current Visual Identity is **Folio Sunset Editorial + Pebble Liquid Glass**. Warm Paper `#F4F1EC`, warm Surface `#EFE9E3`, Warm Sand `#E8DED4`, Ink and restrained sunset accents are the product-wide Light hierarchy. Pebble Liquid Glass is intentionally limited to the primary stock-category selector.
+- Primary category presentation is **대형주 / 중소형주 / 전체 / ETF**. The first three are visually grouped as equity beach-pebble glass controls; a visible `/` separates the standalone ETF pebble. Default remains 대형주.
+- The former 시장 신호 destination is now exactly **섹터>ETF**. Core sector heatmap, ETF industry map and ETF summary are always laid out open; no disclosure click is required for those sections.
+- Home ETF and 섹터>ETF use the same global market selection and the same `etf_rs_rank` ordering. The independent ETF market state was removed so the Top 5 cannot diverge.
+- Home **오늘의 시장** now summarizes that same market-signal path: market breadth → leading sector → ETF RS leader. Its **전체 보기 →** navigates to 섹터>ETF.
+- Home **오늘 볼 종목** is renamed **오늘의 주도주** and is positioned above 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
+- Harness contract, Level-0 baseline, identity spec, Claude/Codex/plugin identity/UI skills, read-only reviewers and deterministic identity gate were updated to enforce these decisions.
