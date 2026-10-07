@@ -48,6 +48,20 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  await expect(page.locator('.analysis-scope button[aria-pressed="true"]')).toHaveCount(0)
  await context.close()
 })
+test('Home Today market summarizes the Sector ETF signal and opens the full signal page',async({page})=>{
+ await boot(page)
+ const market=page.locator('.journey-market')
+ await expect(market.getByRole('heading',{name:'오늘의 시장'})).toBeVisible()
+ await expect(market).toContainText('시장 폭 · MA50 위')
+ await expect(market).toContainText('주도 섹터')
+ await expect(market).toContainText('ETF RS 1위')
+ await market.getByRole('button',{name:'전체 보기 →',exact:true}).click()
+ await expect(page.locator('.page-signal')).toBeVisible()
+ await expect(page.getByRole('heading',{name:'섹터 › ETF',exact:true})).toBeVisible()
+ await expect(page.locator('.sector-heat-disclosure')).toBeVisible()
+ await expect(page.locator('.dashboard-explore-expanded')).toBeVisible()
+})
+
 test('Thesis opens and edits the selected dated record, retaining both versions after reload',async({page})=>{
  const stock=rows[0]
  await page.addInitScript((r)=>{if(!localStorage.getItem('peppercorn-analysis'))localStorage.setItem('peppercorn-analysis',JSON.stringify([{id:100,date:'2026-09-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'older thesis'},{id:'new',date:'2026-10-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'newer thesis'}]))},stock)
