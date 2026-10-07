@@ -1109,7 +1109,8 @@ export default function App(){
 
   let content
   if(page==='dashboard'){
-    const todayRows=focusLeaderRows(sizedRows(focusBase),market).slice(0,5)
+    const etfPreview=marketRows.filter(r=>r.asset_class==='ETF').slice().sort((a,b)=>(b.etf_rs_rank??-1)-(a.etf_rs_rank??-1)||a.ticker.localeCompare(b.ticker))
+    const todayRows=(stockSize==='etf'?etfPreview:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
     const sizePool=sizedRows(stockRows)
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
     content=<div className="journey-home">
@@ -1120,14 +1121,14 @@ export default function App(){
         <div className="journey-market-facts"><div><span>MA50 위 비율</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>MA200 위 비율</span><strong>{ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>상승 / 하락 · 1W</span><strong>{declineCount?advanceDeclineRatio.toFixed(1)+' : 1':advanceCount?'상승만':'—'}</strong></div></div>
       </section>
       {sizeControl}
-      <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
+      <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} disabled={stockSize==='etf'} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
       <section className="journey-today" aria-label="오늘 볼 종목">
         <div className="journey-heading"><h2>오늘 볼 종목</h2><button className="dashboard-section-action" onClick={()=>exploreClass(null)}>전체 탐색 →</button></div>
         <p className="note">일간 종가 · 20D 등락 · 최대 5종목{lensFilter.growthOnly&&flagFile?' · 실적 성장 필터 적용':''}</p>
         <StockTrendList rows={todayRows} onSelect={openAnalysisStock} getClass={displayClass} emptyLabel="이 분류에서 선별된 종목이 없습니다. 전체 또는 탐색 필터를 확인하세요."/>
         {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 보기</button>}
       </section>
-      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{todayRows.length?`선택한 규모의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.'}</p></section>
+      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 시장 신호를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
   }else if(page==='signal'){
