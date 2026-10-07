@@ -59,7 +59,7 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.getByRole('heading',{name:'주도 종목',exact:true})).toBeVisible()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(6)
+ await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
  const scope=page.getByRole('group',{name:'주도 분류'})
  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
  for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});if(await button.getAttribute('aria-pressed')!=='true')await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(count)}
