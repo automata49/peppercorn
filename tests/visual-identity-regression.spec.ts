@@ -23,7 +23,7 @@ async function boot(page:any){
 }
 
 for(const view of VISUAL_IDENTITY_VIEWPORTS){
-  test(view.name+' locks the Sunset Editorial B visual signature',async({browser})=>{
+  test(view.name+' locks the Sunset Editorial + Pebble Liquid Glass visual signature',async({browser})=>{
     const context=await browser.newContext({
       viewport:{width:view.width,height:view.height},
       hasTouch:view.touch,
