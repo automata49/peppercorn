@@ -1,3 +1,4 @@
+import {openSignal,pickFirstStock} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -14,9 +15,10 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   const page=await context.newPage()
   await boot(page)
 
-  const focus=page.locator('.focus-overview').first()
+  const focus=page.locator('.journey-market').first()
   await expect(focus).toBeVisible()
   expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  await openSignal(page)
   for(const selector of ['.dashboard-sector-panel','.temp-card']){
     const node=page.locator(selector).first()
     await expect(node).toBeVisible()
@@ -29,7 +31,8 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
   expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await pickFirstStock(page)
   const primary=page.locator('.analysis-main > .analysis-price-momentum')
   await expect(primary).toHaveCount(1)
   expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
@@ -48,10 +51,11 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
 test('desktop focal leader and analysis keep the same flat editorial hierarchy',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  const focus=page.locator('.focus-overview')
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThanOrEqual(20)
+  const focus=page.locator('.journey-market')
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await pickFirstStock(page)
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)

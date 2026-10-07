@@ -1,3 +1,4 @@
+import {pickFirstStock,openPage} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -28,20 +29,23 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
   // Dashboard: decision list first, dense search/table second.
-  await expect(page.locator('.mobile-sector-list')).toBeVisible()
-  await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden()
-  await expect(page.locator('.dashboard-toolbar input')).toBeHidden()
+  await expect(page.locator('.journey-today')).toBeVisible()
+  await expect(page.locator('.dashboard-sector-table-wrap')).toHaveCount(0)
+  await expect(page.locator('.journey-home input')).toHaveCount(0)
   await noHorizontalOverflow(page)
 
   // Analysis: one explicit decision path; Overview is primary and records stay secondary.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
   await expect(page.locator('.analysis-hub-head')).toBeVisible()
+  await pickFirstStock(page)
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
+  await expect(page.locator('.analysis-records-disclosure')).toHaveCount(0)
+  await openPage(page,'Thesis')
   await expect(page.locator('.analysis-records-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
   // Watchlist / Portfolio / Journal: compact decision rows first, editable grids closed.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'관심'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'추적'}).click()
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)

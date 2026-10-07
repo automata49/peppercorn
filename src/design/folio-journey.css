@@ -1,0 +1,61 @@
+/* DISCOVERY-JOURNEY-2: component layout only; brand/appearance tokens stay Level 0. */
+.journey-home{max-width:880px;margin-inline:auto;display:grid;gap:24px}
+.journey-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.journey-heading h2,.journey-insight h2{margin:0;font-size:var(--folio-ds-type-section);line-height:24px;font-weight:650}
+.journey-market,.journey-today,.journey-insight{padding-block:8px 24px;border-bottom:1px solid var(--line)}
+.journey-source{font-size:12px;color:var(--muted);margin:8px 0 20px}
+.journey-market-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.journey-market-facts>div{display:grid;gap:8px}
+.journey-market-facts span{font-size:12px;color:var(--muted)}
+.journey-market-facts strong{font-size:clamp(22px,5vw,32px);line-height:1.15;font-weight:550;white-space:nowrap;font-variant-numeric:tabular-nums}
+.journey-classes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.journey-classes button{display:grid;gap:8px;text-align:left;min-height:72px;padding:12px 8px;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:var(--folio-ds-control-radius,10px)}
+.journey-classes span{font-size:12px;word-break:keep-all}
+.journey-classes b{font-size:20px;font-variant-numeric:tabular-nums}
+.journey-home .decision-list{display:block}
+.journey-home .decision-row{min-height:80px;grid-template-columns:minmax(0,1fr) auto}
+.journey-home .decision-main{min-width:0}
+.journey-home .decision-main>small,.journey-theses .decision-main>small{font-size:var(--folio-ds-type-meta)!important;color:var(--muted)!important}
+.journey-home .decision-main>b,.journey-theses .decision-main>b{font-size:var(--folio-ds-type-subhead)}
+.journey-home .decision-main small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.journey-home .decision-value{flex-shrink:0}
+.journey-home .decision-value>b{color:var(--ink)}
+.journey-insight h2 small{font-size:11px;color:var(--muted);font-weight:450;margin-left:8px}
+.journey-insight p{font-size:14px;line-height:1.6;word-break:keep-all;margin-bottom:0}
+.journey-home .folio-identity-interlude{margin-top:0}
+.journey-explore-filters{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-block:12px}
+.journey-explore-filters label{display:flex;align-items:center;gap:8px;font-size:12px}
+.journey-explore-filters select{max-width:220px;min-height:44px}
+.journey-explore-filters>span{font-size:12px;color:var(--muted)}
+.journey-back{min-height:44px;margin-bottom:16px}
+.journey-theses{margin-bottom:24px}
+.journey-theses .decision-list{display:block;margin-top:12px}
+.journey-theses .decision-row{grid-template-columns:minmax(0,1fr)}
+.journey-tracking-tabs{display:flex;gap:8px;margin-bottom:24px}
+.journey-tracking-tabs button{min-height:44px;padding:10px 16px;background:transparent;border:1px solid var(--line);border-radius:var(--folio-ds-control-radius,10px);color:var(--ink)}
+.journey-tracking-tabs button[aria-selected=true]{border-color:currentColor;font-weight:650}
+.page-analysis .analysis-page,.page-thesis .analysis-page{max-width:960px;margin-inline:auto}
+.page-analysis .analysis-finder{display:block}
+.page-analysis .analysis-browse{margin-top:16px}
+.page-analysis .analysis-idea-list{max-height:none;overflow:visible}
+.page-analysis .analysis-idea-list>button{min-height:80px}
+.page-analysis .analysis-scope{flex-wrap:wrap}
+.page-analysis .analysis-body,.page-thesis .analysis-body{grid-template-columns:minmax(0,1fr)}
+.page-thesis .analysis-actionbar{display:none}
+.page-thesis .analysis-card{min-width:0}
+@media(max-width:650px){
+  .journey-home{gap:16px}
+  .journey-heading{align-items:flex-start}
+  .journey-heading .dashboard-section-action{white-space:nowrap;font-size:12px;min-height:44px}
+  .journey-classes{gap:6px}
+  .journey-market-facts{gap:8px}
+  .journey-market-facts span{font-size:11px;word-break:keep-all}
+  .journey-explore-filters{flex-wrap:wrap}
+  .journey-explore-filters select{max-width:200px;font-size:16px}
+  .journey-insight h2 small{display:block;margin-left:0}
+  .page-analysis .analysis-hub-head{padding-block:8px}
+  .page-analysis .analysis-hub-copy h2{font-size:22px}
+  .page-analysis .analysis-list-copy em{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .page-thesis .sheet-table{table-layout:fixed}
+  .page-thesis .sheet-table input,.page-thesis .sheet-table textarea,.page-thesis .sheet-table select{max-width:100%;min-width:0;font-size:16px}
+}

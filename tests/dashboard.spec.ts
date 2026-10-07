@@ -1,3 +1,4 @@
+import {openSignal,openPage,pickFirstStock} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:i%2?'Electronic Technology':'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[i%2?'KOSPI200':'S&P 500'],price:100+i,rs_rank:99-i%4,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,rs_5d:.01,rs_20d:.02,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
 const etfs=Array.from({length:7},(_,i)=>({...rows[0],id:'etf-'+i,ticker:'ETF'+i,market:'US',name:'검증 ETF '+i,asset_class:'ETF',sector:'Information Technology',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립',rs_1m:i===6?null:i/100,rs_3m:i===6?null:i/100,rs_6m:null,rs_12m:null,high_52w_distance:i===6?null:-.02*i}))
@@ -8,25 +9,18 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  // Unified Home: one leadership decision surface replaces the duplicate Focus roster/additional view.
-  await expect(page.locator('.leadership-decision')).toBeVisible();
-  await expect(page.locator('.leadership-pulse')).toBeVisible();
-  await expect(page.locator('.focus-summary-main')).toHaveCount(0);
-  await expect(page.locator('.leadership-pulse-stats')).toHaveCount(0);
-  await expect(page.locator('.focus-class-strip button')).toHaveCount(3);
-  await expect(page.locator('.focus-class-strip button').first()).toContainText('Core Leaders');
-  await expect(page.locator('.focus-roster')).toHaveCount(0);
-  await expect(page.locator('.leader-detail')).toHaveCount(0);
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
+  // Sector and ETF tools remain in the secondary Market Signal workspace.
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
   if(view.touch){
     await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
     await expect(page.locator('.mobile-sector-list')).toBeVisible();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
-    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','섹터','분석','관심']);
+    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['홈','탐색','Thesis','추적']);
     if(view.width<=650){
-      await expect(page.locator('.dashboard-toolbar input')).toBeHidden();
+      await expect(page.locator('.toolbar input')).toBeVisible();
       await expect(page.locator('.topbar p')).toBeHidden();
     }
   }else{
@@ -126,7 +120,8 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
     route.fulfill({json:{rows:rows.map(r=>({...r,rs_5d:calls===1?null:'0.11'}))}});
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   await page.locator('.drill-sheet .stock-row').first().click();
   const rs=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'상대강도'})});
@@ -143,7 +138,8 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   const qqq={...etf,id:'etf-qqq',ticker:'QQQ',name:'QQQ ETF',rs_1m:.2,rs_3m:.2,ibd_rs_estimate:92,ibd_rs_as_of:'2026-09-28',leader_tt:true,leadership_class:'주도 후보',stage:'▲ 돌파 매수권',verdict:'★ 우선 분석',action_guide:'52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인'};
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   // Dashboard ETF summary is secondary and collapsed until requested.
   await page.locator('.dashboard-explore > summary').click();
   const top=page.locator('.dashboard-etf-panel .stock-row').first();
@@ -158,7 +154,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.drill-sheet .leadership-section .snapshot-section-head .pill')).toHaveText('해당 없음');
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
-  await page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'}).click();
+  await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click();
   // SPY is neutral, so switch to the full analysis list.
   await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
@@ -188,7 +184,8 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     const page=await context.newPage();
     await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:data}}));
     await page.goto('http://127.0.0.1:4173/peppercorn/');
-    await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+    await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
     const panel=page.locator('.dashboard-etf-industry-panel');
     // ETF exploration is deliberately secondary: hidden by default, then revealed in one disclosure.
     const explore=page.locator('.dashboard-explore');
@@ -241,7 +238,8 @@ test('failed live load can be retried from the demo state',async({page})=>{
     calls<=2?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   await expect.poll(()=>calls,{timeout:10000}).toBe(2);
   await expect(page.getByRole('button',{name:'시장 데이터 새로고침'})).toContainText('Demo / Local');
   await page.getByRole('button',{name:'시장 데이터 새로고침'}).click();
@@ -269,7 +267,8 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   const kr={...rows[1],id:'etf-kr',ticker:'069500',market:'KR',name:'Samsung KODEX 200 Securities ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립'};
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,kr]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   await page.locator('.dashboard-explore > summary').click();
   const row=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(row.locator('.stock-id b')).toHaveText('KODEX 200');
@@ -281,7 +280,8 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
   await page.setViewportSize({width:1440,height:900});
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.goto('http://127.0.0.1:4173/peppercorn/');
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
+  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await openSignal(page);
   const align=(loc:any)=>loc.evaluateAll((es:Element[])=>[...new Set(es.map(e=>getComputedStyle(e).textAlign))]);
   const sector=page.locator('.dashboard-sector-panel .sector-metrics-table');
   expect(await align(sector.locator('th'))).toEqual(['left']);

@@ -144,7 +144,7 @@ function SheetInput({ f, value, onCommit }: { f: SheetField; value: unknown; onC
 }
 
 /** Vertical input sheet: rows are analysis items; columns are my input, the filed value and the input's check. */
-export function AnalysisSheet({ row, record, onCreate, onChange }: { row: LeaderRow; record?: EditableRow; onCreate: () => void; onChange: (field: string, value: string | number | boolean | null) => void }) {
+export function AnalysisSheet({ row, record, onCreate, onChange }: { row: Pick<LeaderRow,'name'>; record?: EditableRow; onCreate: () => void; onChange: (field: string, value: string | number | boolean | null) => void }) {
   if (!record) return <div className="analysis-sheet empty-sheet">
     <p>{row.name}의 분석 기록이 아직 없습니다.</p>
     <button className="primary-action" type="button" onClick={onCreate}>분석 기록 만들기</button>

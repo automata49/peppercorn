@@ -4,8 +4,11 @@ import { AppIcon, type AppIconName } from './AppIcon'
 import { FolioWordmark } from './FolioWordmark'
 
 const pages:[string,AppIconName,string][]=[
-  ['dashboard','home','Dashboard'],
-  ['analysis','analysis','종목 분석'],
+  ['dashboard','home','홈'],
+  ['analysis','search','탐색'],
+  ['thesis','journal','Thesis'],
+  ['tracking','watchlist','추적'],
+  ['signal','sectors','시장 신호'],
   ['temperature','temperature','시장 온도계'],
   ['watchlist','watchlist','Watchlist'],
   ['portfolio','portfolio','Portfolio'],
@@ -15,8 +18,9 @@ const pages:[string,AppIconName,string][]=[
   ['settings','settings','Settings']
 ]
 const pageGroups=[
-  ['핵심',['dashboard','analysis','temperature','watchlist']],
-  ['기록',['portfolio','journal']],
+  ['핵심',['dashboard','analysis','thesis','tracking']],
+  ['시장',['signal','temperature']],
+  ['추적 도구',['watchlist','portfolio','journal']],
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 
@@ -89,12 +93,6 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
   </section>)}</nav>
 
-  const goDashboardSection=(selector:string)=>{
-    setPage('dashboard')
-    setOpen(false)
-    window.setTimeout(()=>document.querySelector(selector)?.scrollIntoView({behavior:'smooth',block:'start'}),80)
-  }
-
   return <>
     <aside className="sidebar">
       <div className="brand folio-brand"><FolioBrand/></div>
@@ -117,9 +115,9 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
       <button className={page==='dashboard'?'active':''} onClick={()=>setPage('dashboard')}><AppIcon name="home"/><b>홈</b></button>
-      <button onClick={()=>goDashboardSection('.dashboard-sector-panel')}><AppIcon name="sectors"/><b>섹터</b></button>
-      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="analysis"/><b>분석</b></button>
-      <button className={page==='watchlist'?'active':''} onClick={()=>setPage('watchlist')}><AppIcon name="watchlist"/><b>관심</b></button>
+      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="search"/><b>탐색</b></button>
+      <button className={page==='thesis'?'active':''} onClick={()=>setPage('thesis')}><AppIcon name="journal"/><b>Thesis</b></button>
+      <button className={['tracking','watchlist','portfolio','journal'].includes(page)?'active':''} onClick={()=>setPage('tracking')}><AppIcon name="watchlist"/><b>추적</b></button>
     </nav>
 
     <Dialog open={open} onOpenChange={setOpen}>

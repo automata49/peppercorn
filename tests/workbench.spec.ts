@@ -1,3 +1,4 @@
+import {backToExplore,openPage,pickFirstStock} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {choseong,matchScore,searchRows} from '../src/lib/search'
 import {fundamentalChecks,quadrant,swingChecks} from '../src/lib/checkup'
@@ -49,12 +50,12 @@ async function open(page:Page){
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  const side=page.locator('.sidebar nav').getByRole('button',{name:'종목 분석'})
+  const side=page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true})
   if(await side.isVisible())return side.click()
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true})
   if(await bottom.isVisible())return bottom.click()
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'종목 분석'}).click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'탐색',exact:true}).click()
 }
 
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
@@ -64,18 +65,20 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await open(page)
   const search=page.getByRole('combobox',{name:'종목 검색'})
   await search.fill('ㅈㅇㅆ')
-  await expect(page.getByRole('option')).toHaveCount(1)
+  await expect(page.locator('.stock-search-results [role=option]')).toHaveCount(1)
   await search.press('Enter')
   const card=page.locator('.analysis-body')
   await expect(card.locator('.hero-name')).toContainText('지엔씨에너지')
-  await expect(page.locator('.recent-stocks button')).toHaveText(['지엔씨에너지'])
   await expect(card.locator('.folio-insight')).toBeVisible()
+  await backToExplore(page)
+  await expect(page.locator('.recent-stocks button')).toHaveText(['지엔씨에너지'])
   // Enter picks the best match (ticker prefix).
   await search.fill('ok')
   await search.press('Enter')
   await expect(card.locator('.hero-name')).toContainText('Oklo')
+  await backToExplore(page)
   await search.fill('대덕')
-  await page.getByRole('option').first().click()
+  await page.locator('.stock-search-results [role=option]').first().click()
   await expect(card.locator('.hero-name')).toContainText('대덕전자')
   const detailTabs=card.locator('.analysis-detail-tabs')
   await expect(detailTabs.getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
@@ -108,7 +111,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(sheet.locator('tbody tr').filter({hasText:'ROE'}).locator('.mark-dot')).toHaveAttribute('aria-label','미달')
   // Compare two stocks.
   await card.getByRole('button',{name:'비교에 추가'}).click()
-  await search.fill('OKLO');await search.press('Enter')
+  await backToExplore(page);await search.fill('OKLO');await search.press('Enter');await detailTabs.getByRole('tab',{name:'Thesis'}).click()
   await card.getByRole('button',{name:'비교에 추가'}).click()
   await detailTabs.getByRole('tab',{name:'Overview'}).click()
   const compare=card.locator('.compare-view')
@@ -138,10 +141,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await expect(side.locator('.nav-label')).toHaveText(['Dashboard','종목 분석','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
+    await expect(side.locator('.nav-label')).toHaveText(['홈','탐색','Thesis','추적','시장 신호','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
   }
-  if(await side.isVisible())await side.getByRole('button',{name:'종목 분석'}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'분석'}).click()
+  if(await side.isVisible())await side.getByRole('button',{name:'탐색',exact:true}).click()
+  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
   await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
   const body=page.locator('.analysis-body')
   await expect(body.locator('.hero-meta')).toHaveText('KR · 353200 · KOSPI · Semiconductors')
@@ -172,10 +175,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await bar.getByRole('button',{name:'관심 추가'}).click()
   await expect(bar.getByRole('button',{name:'관심 등록됨'})).toBeDisabled()
   await bar.getByRole('button',{name:'Thesis 쓰기'}).click()
-  await expect(detailTabs.getByRole('tab',{name:'Thesis'})).toHaveAttribute('aria-selected','true')
+  await expect(page.locator('.page-thesis')).toBeVisible()
   const panel=body.locator('.analysis-judgement')
   await expect(panel.locator('.sheet-table')).toBeVisible()
-  await expect(bar.getByRole('button',{name:'Thesis 보기'})).toBeVisible()
+  await page.getByRole('button',{name:'종목 상세 →'}).click()
   await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-watchlist')||'[]').map((r:any)=>r.ticker))).toContain('353200')
   await detailTabs.getByRole('tab',{name:'Overview'}).click()
   await body.locator('.peer-strip button').first().click()

@@ -47,35 +47,28 @@ Hard rules:
 
 ## Home information architecture
 
-Compact Dashboard primary flow:
+User decision 2026-10-07 supersedes the former representative-leader hero Home.
 
-1. Folio xx brand + menu.
-2. Total / KR / US.
-3. One representative leader.
-4. Large price + current selected-period return.
-5. One large daily-close chart.
-6. 1D / 1W / 1M / 3M / 1Y / ALL.
-7. Alternate Focus leaders as small chips.
-8. RS rank / industry rank / 52W-high distance.
-9. One restrained **Leadership Pulse** that summarizes 핵심 / 후보 / 전환 without duplicating the stock list.
-10. Three class buttons open their existing quick classified lists.
-11. One explicit **분석 허브** path owns deep stock selection and analysis.
-12. 주도 섹터 → 시장 온도계 → ETF / market exploration.
+1. Supplied Folio brand + market selection.
+2. Factual MA50/MA200 breadth and weekly advance/decline context; no new regime score.
+3. Four class navigation buttons: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
+4. At most five stocks from the unchanged Focus funnel, with daily price and explicitly labeled 20D return.
+5. One deterministic Folio Insight sentence; no live generative-AI claim.
+6. Existing supplied Typography / Photography artwork as secondary identity imagery.
 
-The former separate Focus roster and “추가 보기 · 모멘텀 / 현재가” disclosure are removed from Home. The first screen answers: *where is leadership, how is the representative leader behaving, and what should I inspect next?*
+Market Signal owns sector summaries, heatmaps, Howard Marks temperature and ETF exploration. Home contains no representative-leader chart or duplicated list/summary layers.
 
 ## Analysis experience
 
-Folio uses one linear analysis journey inspired by Robinhood's content-first simplicity, without copying its trade UI:
+- Primary navigation: 홈 / 탐색 / Thesis / 추적.
+- Explore: one market/search/scope/sector/lens-filter list. Preserve four daily classes, all-stock and Position scopes. No separate hidden focus roster.
+- Selecting a stock opens Detail; the list is replaced, not stacked above the chart. Return to list preserves filters. Primary Explore navigation clears hidden global query/sector state.
+- Detail preserves the existing PriceRsChart and Overview / Analysis / Financials / Thesis depth. These retain their existing evidence and semantics.
+- Thesis workspace uses existing analysis records and exact record identity for editing multiple dates of the same ticker. The editable records grid remains progressively disclosed.
+- Tracking groups the existing Watchlist / Portfolio / Journal editors without changing their stored fields, auto enrichment or sync.
+- Folio Insight remains deterministic structured signal synthesis. My Thesis remains the user's own judgement.
 
-1. **Leadership scope:** 핵심 / 후보 / 전환 / 전체 / Position.
-2. **Stock selection:** one persistent, readable list under search; no second hidden “목록에서 고르기” layer.
-3. **Price momentum:** the existing `PriceRsChart` composition and interaction stay intact. Identity changes are limited to B typography, surfaces, rules and restrained accent use.
-4. **Depth tabs:** Overview / Analysis / Financials / Thesis replace nested disclosures. Overview owns the structured Folio Insight and essential stats; Analysis owns leadership/Swing evidence; Financials owns filed Position fundamentals; Thesis owns the user's own judgement and record.
-5. **Folio Insight:** is currently deterministic structured signal synthesis from loaded price/RS/filing data. It may look editorial and thesis-led, but must not be presented as a live generative-AI opinion until a provider passes the analyst contract/evals.
-6. **My Thesis:** remains the user's judgement/record area and stays separate from automated evidence.
-
-The 3D treatment is deliberately limited to the CSS-only Leadership Pulse: a shallow perspective ring that visualizes class counts. The ring and the three Core / Watch / Turnaround navigation cards are one decision surface; do not duplicate the same counts in a second summary block. It is presentation-only and never changes or implies an investment score.
+Existing supplied artwork and the Level-0 visual baseline remain authoritative. The generated structural mockup is not a replacement identity source.
 
 ## Mobile / iPad visual rule
 

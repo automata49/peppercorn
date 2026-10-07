@@ -34,22 +34,11 @@ for(const view of views){
     expect(parseFloat(await brand.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
 
     const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
-    const line=page.locator('.spotlight-line')
-    await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(17, 17, 19)')
-    expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
-
-    const period=page.locator('.spotlight-periods button.on')
-    expect(parseFloat(await period.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await period.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
-
-    const evidence=page.locator('.spotlight-evidence')
-    expect(parseFloat(await evidence.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-
-    const sector=page.locator('.mobile-sector-list .decision-row').first()
-    await expect(sector).toBeVisible()
-    expect(parseFloat(await sector.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await sector.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
+    await expect(page.locator('.journey-today .decision-row').first()).toBeVisible()
+    await expect(page.locator('.leader-spotlight,.dashboard-sector-panel')).toHaveCount(0)
+    const row=page.locator('.journey-today .decision-row').first()
+    expect(parseFloat(await row.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+    expect(await row.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
 
     const bottomActive=page.locator('.mobile-bottom-nav button.active')
     await expect(bottomActive).toBeVisible()
