@@ -75,7 +75,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
 
     await expect(page.locator('.journey-today')).toBeVisible()
     await expect(page.locator('.leader-spotlight')).toHaveCount(0)
-    await expect(page.locator('.journey-classes button')).toHaveCount(4)
+    await expect(page.getByRole('group',{name:'분류'}).getByRole('button')).toHaveText(['대형주','중소형주','ETF','전체'])
+    await expect(page.locator('.journey-classes button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
 
     if(view.compact){
       await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
@@ -95,6 +96,33 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await context.close()
   })
 }
+
+test('Light theme keeps one Folio visual system across every product workspace',async({browser})=>{
+  const context=await browser.newContext({viewport:{width:1440,height:900},colorScheme:'light',reducedMotion:'reduce'})
+  const page=await context.newPage()
+  await boot(page)
+  const destinations=[
+    ['홈','dashboard'],['탐색','analysis'],['Thesis','thesis'],['추적','tracking'],
+    ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
+    ['Portfolio','portfolio'],['Journal','journal'],['Leaderboard','leaderboard'],
+    ['Universe','universe'],['Settings','settings']
+  ] as const
+  const nav=page.locator('.sidebar nav')
+  for(const [label,key] of destinations){
+    await nav.getByRole('button',{name:label,exact:true}).click()
+    const main=page.locator('.app-main.page-'+key)
+    await expect(main).toBeVisible()
+    const signature=await main.evaluate(e=>{
+      const s=getComputedStyle(e)
+      return {background:s.backgroundColor,color:s.color}
+    })
+    expect(signature.background).toBe('rgb(244, 241, 236)')
+    expect(signature.color).toBe('rgb(17, 17, 19)')
+    const content=main.locator('.content')
+    expect(await content.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
+  }
+  await context.close()
+})
 
 test('launch is Folio-only and keeps the exact B hero',async({page})=>{
   await page.setViewportSize({width:390,height:844})
