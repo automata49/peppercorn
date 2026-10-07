@@ -1,3 +1,7 @@
+## Orientation-aware launch framing — 2026-10-08
+
+User requested the loading hero to adapt automatically when the device rotates. The approved 9:16 Folio hero remains unchanged. Portrait phone uses full-viewport cover; landscape phone uses the complete portrait artwork at full viewport height; iPad portrait/landscape use separate 92/94dvh framing; touch iPad Pro landscape uses 88dvh; desktop remains 86dvh with a 90dvh portrait-display rule. CSS orientation queries handle rotation without JavaScript or duplicated assets. Brand regression now includes a 844×390 phone-landscape viewport in addition to 390×844, 834×1194, 1194×834, 1366×1024 and 1440×900. No investment/data logic changed.
+
 ## Responsive launch sizing — 2026-10-08
 
 User requested device-specific loading-page sizing without changing the approved Folio artwork. The supplied 9:16 launch asset remains the only launch image and no duplicate wordmark/caption is overlaid. iPhone now fills the full dynamic viewport with a centered cover crop; iPad keeps the complete 9:16 composition at about 90dvh; touch iPad Pro uses about 88dvh; desktop uses about 86dvh. The same GSAP reveal/progress/fade sequence remains. Brand regression coverage now measures the launch frame on phone, iPad and desktop. No investment/data logic changed.
