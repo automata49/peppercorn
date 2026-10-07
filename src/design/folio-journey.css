@@ -317,10 +317,35 @@
   border-color:var(--folio-line)!important;
 }
 .journey-market-facts>div{
+  display:grid;
+  align-content:start;
+  gap:4px;
+  min-width:0;
   padding:14px 0;
   border-top:1px solid var(--folio-line);
 }
-.journey-market-facts strong{color:var(--folio-ink)!important}
+.journey-kicker{
+  display:block;
+  margin-bottom:2px;
+  color:var(--folio-coral);
+  font-size:9px;
+  line-height:14px;
+  font-weight:750;
+  letter-spacing:.16em;
+}
+.journey-market-facts strong{
+  min-width:0;
+  overflow:hidden;
+  color:var(--folio-ink)!important;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.journey-market-facts small{
+  min-height:14px;
+  color:var(--folio-muted);
+  font-size:10px;
+  line-height:14px;
+}
 .journey-classes button{
   position:relative;
   overflow:hidden;
