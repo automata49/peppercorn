@@ -2844,22 +2844,45 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
   .folio-motif-panel img{object-fit:contain!important}
 }
-@media(max-width:1279px){
+/* Launch sizing follows both viewport class and orientation. The same approved
+   9:16 artwork is used everywhere; only framing changes. */
+@media(max-width:1279px) and (orientation:portrait){
   .launch-editorial-frame{
     width:auto!important;
-    height:min(90dvh,1080px)!important;
+    height:min(92dvh,1120px)!important;
     max-width:92vw!important;
-    max-height:1080px!important;
+    max-height:1120px!important;
     aspect-ratio:9/16!important;
   }
 }
-@media(min-width:1280px) and (max-width:1500px) and (hover:none){
+@media(max-width:1279px) and (orientation:landscape){
+  .launch-editorial-frame{
+    width:auto!important;
+    height:min(94dvh,860px)!important;
+    max-width:92vw!important;
+    max-height:860px!important;
+    aspect-ratio:9/16!important;
+  }
+}
+@media(min-width:1280px) and (max-width:1500px) and (hover:none) and (orientation:portrait){
+  .launch-editorial-frame{
+    height:min(90dvh,1100px)!important;
+    max-height:1100px!important;
+  }
+}
+@media(min-width:1280px) and (max-width:1500px) and (hover:none) and (orientation:landscape){
   .launch-editorial-frame{
     height:min(88dvh,940px)!important;
     max-height:940px!important;
   }
 }
-@media(max-width:650px){
+@media(min-width:1280px) and (orientation:portrait){
+  .launch-editorial-frame{
+    height:min(90dvh,1100px)!important;
+    max-height:1100px!important;
+  }
+}
+@media(max-width:650px) and (orientation:portrait){
   .launch-editorial-frame{
     width:100vw!important;
     height:100dvh!important;
@@ -2869,6 +2892,19 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   }
   .launch-b-hero{
     object-fit:cover!important;
+    object-position:center center!important;
+  }
+}
+@media(max-height:650px) and (orientation:landscape){
+  .launch-editorial-frame{
+    width:auto!important;
+    height:100dvh!important;
+    max-width:92vw!important;
+    max-height:100dvh!important;
+    aspect-ratio:9/16!important;
+  }
+  .launch-b-hero{
+    object-fit:contain!important;
     object-position:center center!important;
   }
   .page-shell-dashboard .folio-identity-interlude img,
