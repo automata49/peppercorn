@@ -34,11 +34,11 @@ export function valuation(row: LeaderRow, position: PositionRow | undefined) {
 
 export function PositionPanel({ row, position, status }: { row: LeaderRow; position?: PositionRow; status: 'live' | 'unavailable' | 'loading' }) {
   if (row.asset_class !== 'Equity') {
-    return <section className="position-panel"><PanelHead /><p className="position-empty">ETF 등 주식 외 자산은 Position 분석 대상이 아닙니다.</p></section>
+    return <section className="position-panel"><PanelHead /><p className="position-empty">ETF 등 주식 외 자산은 공시 펀더멘털 분석 대상이 아닙니다.</p></section>
   }
   if (!position) {
-    const why = status === 'loading' ? 'Position 데이터를 불러오는 중입니다.'
-      : status === 'unavailable' ? 'Position 데이터를 불러오지 못했습니다. 잠시 후 다시 시도하세요.'
+    const why = status === 'loading' ? '공시 펀더멘털 데이터를 불러오는 중입니다.'
+      : status === 'unavailable' ? '공시 펀더멘털 데이터를 불러오지 못했습니다. 잠시 후 다시 시도하세요.'
       : '아직 적재되지 않은 종목입니다. 매주 월요일 대시보드 주도 종목을 수집합니다.'
     return <section className="position-panel"><PanelHead /><p className="position-empty">{why}</p><Evidence /></section>
   }
@@ -81,7 +81,7 @@ export function PositionPanel({ row, position, status }: { row: LeaderRow; posit
 
 function PanelHead({ status, source }: { status?: PositionRow['status']; source?: string }) {
   return <div className="snapshot-section-head position-head">
-    <div><span>P</span><h3>공시 스냅샷 · 라벨</h3></div>
+    <div><span>F</span><h3>공시 펀더멘털 · 라벨</h3></div>
     <div>{source && <small>{source}</small>}{status && <em className={'position-status ' + status}>{STATUS_TEXT[status]}</em>}</div>
   </div>
 }
