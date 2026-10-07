@@ -92,7 +92,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(card.locator('.checkup-quadrant b')).toHaveText('Swing 강함 × 펀더멘털 양호')
   await expect(card.locator('.analysis-main .analysis-part')).toHaveText('Swing · 모멘텀')
   await detailTabs.getByRole('tab',{name:'Financials'}).click()
-  await expect(card.locator('.analysis-main .analysis-part')).toHaveText('Financial Snapshot · Position')
+  await expect(card.locator('.analysis-main .analysis-part')).toHaveText('Financial Snapshot · 공시 펀더멘털')
   await detailTabs.getByRole('tab',{name:'Thesis'}).click()
   // Vertical sheet: create, enter a value as a percentage, see it stored and judged.
   await card.getByRole('button',{name:'분석 기록 만들기'}).click()
