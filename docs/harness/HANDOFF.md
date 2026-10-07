@@ -1,3 +1,7 @@
+## Responsive launch sizing — 2026-10-08
+
+User requested device-specific loading-page sizing without changing the approved Folio artwork. The supplied 9:16 launch asset remains the only launch image and no duplicate wordmark/caption is overlaid. iPhone now fills the full dynamic viewport with a centered cover crop; iPad keeps the complete 9:16 composition at about 90dvh; touch iPad Pro uses about 88dvh; desktop uses about 86dvh. The same GSAP reveal/progress/fade sequence remains. Brand regression coverage now measures the launch frame on phone, iPad and desktop. No investment/data logic changed.
+
 ## 2026-10-07 — Name-first KR cards and responsive tracking glass
 
 - User request at 20:17 KST: KR instrument names first; remove initials ahead of every stock/ETF; increase card typography and adapt across phone/iPad/desktop orientation; apply Liquid Glass to Tracking's 관심종목 / 보유종목 / 투자일지.
