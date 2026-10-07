@@ -419,3 +419,59 @@
   .page-analysis .analysis-hub-copy h2,
   .page-thesis .journey-heading h2{font-size:28px}
 }
+
+/* PRODUCT IDENTITY COMPATIBILITY — keep prior mobile hierarchy/touch invariants.
+   Identity changes colour/type/rules, not the flat primary-surface model. */
+@media(max-width:650px){
+  html,body,#root,.shell,.app-main,.app-main .content{
+    max-width:100%;
+  }
+  html,body{
+    overflow-x:clip;
+  }
+  .app-main,
+  .app-main .content,
+  .journey-home,
+  .stock-size-filter,
+  .analysis-page{
+    min-width:0;
+  }
+
+  .page-signal .dashboard-sector-panel,
+  .page-signal .temp-card,
+  .page-signal .dashboard-explore,
+  .analysis-main>.analysis-price-momentum{
+    border-left:0!important;
+    border-right:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  .page-signal .dashboard-sector-panel,
+  .page-signal .temp-card{
+    border-top:0!important;
+    border-bottom:1px solid var(--folio-line)!important;
+  }
+  .page-signal .dashboard-explore{
+    border:0!important;
+    border-bottom:1px solid var(--folio-line)!important;
+  }
+  .analysis-main>.analysis-price-momentum{
+    background:var(--folio-paper)!important;
+  }
+
+  .stock-size-filter,
+  .stock-size-tabs,
+  .journey-classes,
+  .journey-market,
+  .journey-today,
+  .journey-insight{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+  }
+  .stock-size-tabs button,
+  .journey-classes button{
+    min-width:0;
+    overflow:hidden;
+  }
+}
