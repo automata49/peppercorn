@@ -124,7 +124,7 @@ test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',as
   const homeNames=await page.locator('.journey-today .stock-trend-copy>b').allTextContents();
   expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'섹터>ETF',exact:true})).toBeVisible();
+  await expect(page.locator('.signal-journey-heading h2')).toHaveText('섹터>ETF');
   const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
   expect(signalNames).toEqual(homeNames);
 });
