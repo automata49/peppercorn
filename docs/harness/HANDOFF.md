@@ -1,3 +1,11 @@
+## 2026-10-07 — Name-first KR cards and responsive tracking glass
+
+- User request at 20:17 KST: KR instrument names first; remove initials ahead of every stock/ETF; increase card typography and adapt across phone/iPad/desktop orientation; apply Liquid Glass to Tracking's 관심종목 / 보유종목 / 투자일지.
+- Shared StockTrendList removes initials structurally. KR primary=name, secondary=ticker (including ETF); US primary=ticker, secondary=name. Explicit name/ticker classes preserve Home/Market Signal ETF parity tests without relying on hierarchy. Prices, history, returns, classification and ranking unchanged.
+- Level-0 stock name/price/meta tokens scale 20–24 / 18–22 / 13–15px. Available-width container query reflows narrow cards with trends below, preserves readable name wrapping and currency values, and keeps unknown history explicit. Workspace/catalog stock summary typography shares these tokens.
+- Tracking tabs share leadership's borderless 24px Liquid Glass, active coral tint/theme ink, focus outline and 8px spacing. Persistence and all workspace editors unchanged.
+- STOCK-CARDS-2 / TRACKING-GLASS-1 recorded in contracts/design/canonical skills and adapters synced. Validation: harness:check, build, diff check pass; focused 26/26; identity 30/30; final full Playwright 176/176 (2.9m). Ten added cases cover KR/US/ETF content, no avatar, larger fonts, contained row geometry, Tracking tab interaction/glass and both orientations for 320/390 phones, iPad, iPad Pro and desktop in Light/Dark. Actual rendered phone screenshot inspected.
+
 ## 2026-10-07 — Borderless leadership Liquid Glass
 
 - User screenshots/request at 18:58 KST: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 must use consistent borderless rounded Liquid Glass.

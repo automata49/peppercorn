@@ -121,7 +121,7 @@ test('Home ETF preview and 시장 신호 summary use the exact same ranked pool'
   });
   await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
-  const homeNames=await page.locator('.journey-today .stock-trend-copy>.decision-eyebrow').allTextContents();
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>.stock-trend-name').allTextContents();
   expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
   await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호');
@@ -138,7 +138,7 @@ test('Home ETF Top 5 matches 시장 신호 ETF Top 5 exactly',async({page})=>{
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.journey-home')).toBeVisible()
   await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
-  const homeNames=await page.locator('.journey-today .stock-trend-copy>.decision-eyebrow').allTextContents()
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>.stock-trend-name').allTextContents()
   expect(homeNames).toHaveLength(5)
   await openSignal(page)
   const signalNames=await page.locator('.dashboard-etf-panel .stock-row .stock-id b').allTextContents()

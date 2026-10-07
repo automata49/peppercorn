@@ -187,3 +187,7 @@ assert(pebbleCss.includes('.journey-today')&&pebbleCss.includes('.journey-classe
 assert(journeyCss.includes('FLAT-METRICS-1')&&journeyCss.includes('--folio-surface:var(--folio-paper)'),'Nested metrics must remain unboxed on the common paper base.');
 
 assert(pebbleCss.includes('LEADERSHIP-GLASS-2')&&pebbleCss.includes('border-radius:24px!important')&&pebbleCss.includes('content:none!important'),'Leadership glass must be borderless rounded rectangles without edge decorations.');
+
+const stockCard=readFileSync('src/components/StockTrendList.tsx','utf8');
+assert(!stockCard.includes('stock-avatar')&&stockCard.includes('stock-trend-name'),'STOCK-CARDS-2 removes initials and preserves explicit instrument names.');
+assert(pebbleCss.includes('.journey-tracking-tabs button[aria-selected=true]')&&journeyCss.includes('@container stock-list'),'Tracking must share glass and stock cards must adapt to available width.');
