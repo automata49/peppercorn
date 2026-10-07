@@ -51,7 +51,7 @@ test('stock detail links to Finviz for US tickers and no longer to the Google Sh
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
  await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
  const list=page.locator('.stock-list')
- await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click()
+ const scope=page.locator('.analysis-scope');const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click()
  const finviz=page.locator('.external-links').first().getByRole('link',{name:'Finviz ↗'})
  await list.locator('> button').filter({hasText:'MU'}).click()
  await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis',exact:true}).click()
