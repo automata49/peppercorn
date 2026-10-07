@@ -188,7 +188,6 @@
 }
 
 /* Shared editorial tabs: classification, detail, thesis/tracking all use the same language. */
-.stock-size-tabs,
 .analysis-scope,
 .journey-tracking-tabs,
 .analysis-detail-tabs{
@@ -196,7 +195,6 @@
   background:transparent!important;
   box-shadow:none!important;
 }
-.stock-size-tabs button,
 .analysis-scope button,
 .journey-tracking-tabs button,
 .analysis-detail-tabs button{
@@ -208,18 +206,87 @@
   border-radius:0!important;
   box-shadow:none!important;
 }
-.stock-size-tabs button.on,
+
+/* Sunset Editorial pebble glass — equities stay one family; ETF is visibly separate. */
+.stock-size-tabs{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:max-content;
+  max-width:100%;
+  padding:3px;
+}
+.stock-size-equities{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+.stock-size-tabs button{
+  position:relative;
+  isolation:isolate;
+  min-height:44px;
+  padding:9px 15px;
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--folio-ink) 11%,transparent)!important;
+  color:var(--folio-muted)!important;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb,var(--folio-surface) 78%,transparent),
+      color-mix(in srgb,var(--folio-paper) 56%,transparent) 62%,
+      color-mix(in srgb,var(--folio-surface-2) 38%,transparent))!important;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb,#fff 68%,transparent),
+    inset -1px -1px 0 color-mix(in srgb,var(--folio-plum) 6%,transparent),
+    0 7px 18px rgba(84,38,95,.07)!important;
+  backdrop-filter:blur(18px) saturate(1.22);
+  -webkit-backdrop-filter:blur(18px) saturate(1.22);
+  border-radius:52% 48% 54% 46% / 46% 55% 45% 54%!important;
+}
+.stock-size-equities button:nth-child(2){border-radius:47% 53% 45% 55% / 55% 46% 54% 45%!important}
+.stock-size-equities button:nth-child(3){border-radius:55% 45% 49% 51% / 48% 54% 46% 52%!important}
+.stock-size-etf{border-radius:46% 54% 52% 48% / 54% 46% 55% 45%!important}
+.stock-size-tabs button::before{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:2px 6px auto 8px;
+  height:42%;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.48),rgba(255,255,255,0));
+  opacity:.72;
+  pointer-events:none;
+}
+.stock-size-divider{
+  flex:none;
+  color:color-mix(in srgb,var(--folio-muted) 54%,transparent);
+  font-size:18px;
+  font-weight:320;
+  transform:rotate(8deg);
+  user-select:none;
+}
 .analysis-scope button.on,
-.stock-size-tabs button[aria-pressed="true"],
 .analysis-scope button[aria-pressed="true"],
 .journey-tracking-tabs button[aria-selected="true"],
 .analysis-detail-tabs button[aria-selected="true"]{
   color:var(--folio-ink)!important;
   font-weight:650;
 }
-.stock-size-tabs button.on::after,
+.stock-size-tabs button.on,
+.stock-size-tabs button[aria-pressed="true"]{
+  color:var(--folio-ink)!important;
+  border-color:color-mix(in srgb,var(--folio-coral) 28%,var(--folio-line))!important;
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb,var(--folio-surface) 74%,rgba(255,255,255,.22)),
+      color-mix(in srgb,var(--folio-sunset-soft) 64%,var(--folio-surface)) 72%)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.72),
+    inset 0 -1px 0 rgba(84,38,95,.08),
+    0 10px 24px rgba(84,38,95,.12)!important;
+  font-weight:680;
+}
 .analysis-scope button.on::after,
-.stock-size-tabs button[aria-pressed="true"]::after,
 .analysis-scope button[aria-pressed="true"]::after,
 .journey-tracking-tabs button[aria-selected="true"]::after,
 .analysis-detail-tabs button[aria-selected="true"]::after{
@@ -414,8 +481,11 @@
 @media(max-width:650px){
   .app-main .topbar::after{left:var(--folio-ds-gutter-phone)}
   .app-main .content{padding-left:var(--folio-ds-gutter-phone)!important;padding-right:var(--folio-ds-gutter-phone)!important}
-  .stock-size-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
-  .stock-size-tabs button{padding-inline:6px;font-size:12px}
+  .stock-size-tabs{display:flex;gap:7px;width:100%;padding-inline:0}
+  .stock-size-equities{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:1}
+  .stock-size-tabs button{padding-inline:9px;font-size:12px}
+  .stock-size-etf{flex:0 0 auto;min-width:58px}
+  .stock-size-divider{font-size:16px}
   .analysis-scope{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
   .analysis-scope button{font-size:12px}
   .journey-tracking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
