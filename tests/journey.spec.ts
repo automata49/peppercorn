@@ -36,9 +36,12 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  await page.getByRole('tab',{name:'보유종목',exact:true}).click();await expect(page.locator('.workspace-mobile-summary:visible,.workspace-grid-panel:visible').first()).toBeVisible()
  await nav(page,'Thesis');await expect(conclusion).toHaveValue('성장 동력 확인 후 추적')
  await nav(page,'탐색');await expect(page.locator('.analysis-finder')).toBeVisible();await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
- await page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true}).click()
+ const leadershipScope=page.locator('.analysis-scope')
+ const activeScope=leadershipScope.locator('button[aria-pressed="true"]')
+ if(await activeScope.count())await activeScope.first().click()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(rows.length)
- for(const control of await page.locator('.analysis-scope button').all()){expect((await control.boundingBox())!.height).toBeGreaterThanOrEqual(44)}
+ await expect(leadershipScope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
+ for(const control of await leadershipScope.locator('button').all()){expect((await control.boundingBox())!.height).toBeGreaterThanOrEqual(44)}
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  await page.screenshot({path:`test-results/journey-explore-${width}.png`,fullPage:true})
  await page.locator('.analysis-idea-list > button').first().click();await page.getByRole('button',{name:'← 탐색 목록'}).click()
