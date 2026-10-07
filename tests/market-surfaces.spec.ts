@@ -1,9 +1,25 @@
-import {test,expect} from '@playwright/test'
+import {test,expect,type Locator} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {heatColor} from '../src/lib/marketColors'
 import {openPage,backToExplore} from './journey-helpers'
 const rows=(['KR','US'] as const).flatMap(m=>[.1,-.1,0].map((v,i)=>({...demoRows[0],id:m+'-'+i,market:m,ticker:m+['UP','DOWN','ZERO'][i],name:m+' '+['상승','하락','보합'][i],asset_class:'Equity',leadership_class:'핵심 주도',rs_rank:99-i,return_20d:v,return_50d:v,high_52w_distance:-.1,market_cap:1e10,traded_value_20d:1e8})))
 const rgb=(hex:string)=>'rgb('+hex.slice(1).match(/../g)!.map(h=>parseInt(h,16)).join(', ')+')'
+async function checkLeadership(button:Locator){
+ await expect(button).toHaveCSS('border-radius','24px')
+ for(const edge of ['top','right','bottom','left'])await expect(button).toHaveCSS(`border-${edge}-width`,'0px')
+ await expect(button).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
+ expect(await button.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+ const geometry=await button.evaluate(e=>{
+  const box=e.getBoundingClientRect();const label=e.querySelector('span')||e
+  const range=document.createRange();range.selectNodeContents(label);const text=range.getBoundingClientRect()
+  return {height:box.height,left:text.left-box.left,right:box.right-text.right,
+   before:getComputedStyle(e,'::before').content,after:getComputedStyle(e,'::after').content}
+ })
+ expect(geometry.height).toBeGreaterThanOrEqual(44)
+ expect(geometry.left).toBeGreaterThanOrEqual(12)
+ expect(geometry.right).toBeGreaterThanOrEqual(12)
+ expect(geometry.before).toBe('none');expect(geometry.after).toBe('none')
+}
 test('signed heatmap colours use the instrument market, zero/missing remain neutral',()=>{
  expect(heatColor(.1,[.02,.06],'KR').bg).toBe('#b3261e');expect(heatColor(-.1,[.02,.06],'KR').bg).toBe('#1c5cab')
  expect(heatColor(.1,[.02,.06],'US').bg).toBe('#196b42');expect(heatColor(-.1,[.02,.06],'US').bg).toBe('#b3261e')
@@ -25,9 +41,28 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
   expect(parseFloat(await el.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(20)
   }
  }
+ for(const button of await page.locator('.journey-classes button').all())await checkLeadership(button)
  if(width===390)await page.screenshot({path:`test-results/market-pebble-${theme}.png`})
  await openPage(page,'탐색')
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(6)
+ await expect(page.locator('.analysis-scope')).toHaveCSS('border-top-width','0px')
+ await expect(page.locator('.analysis-scope')).toHaveCSS('gap','8px')
+ for(const button of await page.locator('.analysis-scope button').all()){
+  await checkLeadership(button)
+  if(await button.getAttribute('aria-pressed')==='true')await button.click()
+  await expect(button).toHaveAttribute('aria-pressed','false')
+  await button.click()
+  await expect(button).toHaveAttribute('aria-pressed','true')
+  await checkLeadership(button)
+  const ink=await button.evaluate(e=>{
+   const probe=document.createElement('span');probe.style.color='var(--folio-ink)';e.append(probe)
+   const expected=getComputedStyle(probe).color;probe.remove();return expected
+  })
+  await expect(button).toHaveCSS('color',ink)
+  if(width===390&&await button.textContent()==='핵심 주도')await page.screenshot({path:`test-results/leadership-selected-${theme}.png`})
+  await button.click();await expect(button).toHaveAttribute('aria-pressed','false')
+ }
+ if(width===390)await page.screenshot({path:`test-results/leadership-explore-${theme}.png`})
  const colors=theme==='dark'?{KR:['#ff8580','#78b4ff'],US:['#72d5a2','#ff8580']}:{KR:['#b3261e','#1c5cab'],US:['#196b42','#b3261e']}
  for(const m of ['KR','US'] as const){
   for(const [i,name] of ['UP','DOWN'].entries()){
