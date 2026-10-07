@@ -1135,12 +1135,12 @@ export default function App(){
         {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 보기</button>}
       </section>
       <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} disabled={stockSize==='etf'} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
-      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 섹터 > ETF를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
+      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 섹터>ETF를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
   }else if(page==='signal'){
     content=<div className="discovery-home">{filters}
-      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>섹터 <em>›</em> ETF</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
+      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>섹터&gt;ETF</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
         <div className="dashboard-left-column">
@@ -1451,7 +1451,7 @@ export default function App(){
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
-  const pageTitle:Record<string,string>={signal:'섹터 > ETF',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={signal:'섹터>ETF',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
