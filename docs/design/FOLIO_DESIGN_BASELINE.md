@@ -99,7 +99,7 @@ B is editorial, not bubbly-fintech.
 
 ## 7. Image baseline
 
-- Loading keeps the supplied **9:16** portrait hero. Placement is device-aware without changing the artwork: iPhone uses a full-viewport crop, iPad uses a centered ~90dvh portrait treatment, touch iPad Pro uses ~88dvh, and desktop uses a centered ~86dvh editorial poster.
+- Loading keeps the supplied **9:16** portrait hero. Placement responds to both screen class and orientation without changing the artwork: iPhone portrait fills the viewport with a centered crop; phone landscape shows the complete 9:16 poster at full viewport height; iPad portrait uses ~92dvh, iPad landscape ~94dvh, touch iPad Pro landscape ~88dvh, and desktop uses ~86dvh (or ~90dvh on portrait-oriented desktop displays). Rotation must reflow through CSS media queries with no image distortion.
 - B motif is secondary. On phone it stays **108–122px** high.
 - C photography treatment is secondary editorial imagery, not the primary UI language.
 - Imagery never pushes the first analytical decision below the fold merely for decoration.
