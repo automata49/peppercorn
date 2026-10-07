@@ -79,7 +79,7 @@ Desktop, mobile and iPad all use **Folio Sunset Editorial + Pebble Liquid Glass*
 
 ## Visual Identity cleanup lock
 
-The active product identity is **Folio xx / Sunset Editorial B only**. Peppercorn may remain a repository or company/project name, but it is not a second visible brand in the app shell or launch screen.
+The active product identity is **Folio xx / Sunset Editorial + Pebble Liquid Glass only**. Peppercorn may remain a repository or company/project name, but it is not a second visible brand in the app shell or launch screen.
 
 - Active visual assets are limited to the user-supplied wordmark derivatives, user-supplied black app-icon derivatives, supplied 9:16 launch hero, supplied Typography poster and supplied Photography treatment.
 - Superseded punch-card, generic `folio-icon-*`, generated `folio-identity-*`, old `folio-app-icon-*`, legacy wordmark and generic `icon-*` assets must not remain in deployable source/root locations.
