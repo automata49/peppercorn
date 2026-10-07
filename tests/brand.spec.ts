@@ -27,11 +27,19 @@ for(const view of views){
   await expect(hero).toHaveAttribute('src','./folio-brand-launch.webp?v=u2')
   await expect(launch.locator('.launch-editorial-caption')).toBeHidden()
   await expect(launch.locator('.launch-footer')).toBeHidden()
+  const frame=await launch.locator('.launch-editorial-frame').boundingBox()
+  expect(frame).not.toBeNull()
   if(view.name==='phone'){
-    const frame=await launch.locator('.launch-editorial-frame').boundingBox()
-    expect(frame).not.toBeNull()
-    expect(frame!.width/frame!.height).toBeGreaterThan(.55)
-    expect(frame!.width/frame!.height).toBeLessThan(.575)
+    expect(frame!.width).toBeGreaterThanOrEqual(view.width-1)
+    expect(frame!.height).toBeGreaterThanOrEqual(view.height-1)
+    expect(Math.abs(frame!.x)).toBeLessThanOrEqual(1)
+    expect(Math.abs(frame!.y)).toBeLessThanOrEqual(1)
+  }else{
+    const ratio=frame!.width/frame!.height
+    expect(ratio).toBeGreaterThan(.55)
+    expect(ratio).toBeLessThan(.575)
+    expect(frame!.height).toBeGreaterThanOrEqual(view.height*.80)
+    expect(frame!.height).toBeLessThanOrEqual(view.height*.92)
     expect(frame!.x).toBeGreaterThanOrEqual(0)
     expect(frame!.y).toBeGreaterThanOrEqual(0)
   }
