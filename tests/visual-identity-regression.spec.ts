@@ -105,7 +105,7 @@ test('Light theme keeps one Folio visual system across every product workspace',
   await boot(page)
   const destinations=[
     ['홈','dashboard'],['탐색','analysis'],['Thesis','thesis'],['추적','tracking'],
-    ['섹터 › ETF','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
+    ['섹터 > ETF','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
     ['Portfolio','portfolio'],['Journal','journal'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
