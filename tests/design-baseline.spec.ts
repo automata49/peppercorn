@@ -48,7 +48,9 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   expect(brandBox!.x).toBeLessThanOrEqual(16.5)
 
   const word=brand.locator('.folio-wordmark-image-light')
+  const darkWord=brand.locator('.folio-wordmark-image-dark')
   await expect(word).toBeVisible()
+  await expect(darkWord).toBeHidden()
   const wordmarkMetrics=await word.evaluate((img:any)=>({ratio:img.naturalWidth/img.naturalHeight,height:img.getBoundingClientRect().height}))
   expect(wordmarkMetrics.height).toBeCloseTo(25,1)
   expect(wordmarkMetrics.ratio).toBeGreaterThanOrEqual(3.9)
