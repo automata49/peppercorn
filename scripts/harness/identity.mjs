@@ -174,5 +174,7 @@ assert.equal(pkg.scripts?.['test:identity'],'playwright test tests/design-baseli
 for(const width of [390,834,1366,1440])assert(visualRegression.includes(`width:${width}`),`Missing canonical visual-regression viewport: ${width}px`);
 assert.equal(claudePlugin.version,'1.2.0');
 assert.equal(codexPlugin.version,'1.2.0');
+assert(claudePlugin.description.includes('Folio Sunset Editorial + Pebble Liquid Glass'),'Claude plugin description must carry the current Sunset Pebble identity.');
+assert(codexPlugin.description.includes('Folio Sunset Editorial + Pebble Liquid Glass'),'Codex plugin description must carry the current Sunset Pebble identity.');
 
 console.log('Folio Sunset Editorial + Pebble Liquid Glass identity invariants passed.');
