@@ -9,7 +9,7 @@
   --folio-black:#0b0b0d;
   --folio-white:#fff;
   --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
+  --folio-surface:#efe9e3;
   --folio-surface-2:#e8ded4;
   --folio-ink:#111113;
   --folio-muted:#77716f;
@@ -2880,7 +2880,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
    stay light. Dark editorial surfaces belong only to Dark/System-dark mode. */
 :root[data-theme="light"] .leadership-overview{
   --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
+  --folio-surface:#efe9e3;
   --folio-surface-2:#e8ded4;
   --folio-ink:#111113;
   --folio-muted:#77716f;
@@ -2943,7 +2943,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 }
 :root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button{
   border-color:var(--folio-line)!important;
-  background:rgba(255,255,255,.56)!important;
+  background:color-mix(in srgb,var(--folio-surface) 86%,transparent)!important;
   color:var(--folio-ink)!important;
 }
 :root[data-theme="light"] .leadership-overview .leadership-class-nav.focus-class-strip button:hover{
@@ -2953,7 +2953,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 
 :root[data-theme="light"] .analysis-page{
   --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
+  --folio-surface:#efe9e3;
   --folio-surface-2:#e8ded4;
   --folio-ink:#111113;
   --folio-muted:#77716f;
@@ -3039,7 +3039,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 :root[data-theme="light"] .analysis-scope button.on{background:var(--folio-ink)!important;color:var(--folio-paper)!important}
 :root[data-theme="light"] .analysis-price-momentum{
   --folio-paper:#f4f1ec;
-  --folio-surface:#ffffff;
+  --folio-surface:#efe9e3;
   --folio-ink:#111113;
   --folio-muted:#77716f;
   --folio-line:rgba(17,17,19,.12);
@@ -3072,7 +3072,7 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 :root[data-theme="light"] .analysis-page .analysis-sheet td{
   border-color:var(--folio-line)!important;
 }
-:root[data-theme="light"] .folio-insight-grid>div{background:rgba(255,255,255,.56)}
+:root[data-theme="light"] .folio-insight-grid>div{background:color-mix(in srgb,var(--folio-surface) 88%,transparent)}
 :root[data-theme="light"] .analysis-actionbar{
   border-color:var(--folio-line)!important;
   background:rgba(244,241,236,.94)!important;
