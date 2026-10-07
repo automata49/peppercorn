@@ -1113,12 +1113,19 @@ export default function App(){
     const todayRows=(stockSize==='etf'?etfPreview:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
     const sizePool=sizedRows(stockRows)
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
+    const homeSector=buildSectors(marketRows).slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)[0]??null
+    const homeEtf=rankedEtfRows[0]??null
+    const openMarketSignal=()=>{setPage('signal');window.scrollTo({top:0,behavior:'instant'})}
     content=<div className="journey-home">
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
-      <section className="journey-market" aria-label="시장 상태">
-        <div className="journey-heading"><h2>오늘의 시장</h2><button className="dashboard-section-action" onClick={()=>exploreClass('core')}>전체 보기 →</button></div>
-        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market}</p>
-        <div className="journey-market-facts"><div><span>MA50 위 비율</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>MA200 위 비율</span><strong>{ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>상승 / 하락 · 1W</span><strong>{declineCount?advanceDeclineRatio.toFixed(1)+' : 1':advanceCount?'상승만':'—'}</strong></div></div>
+      <section className="journey-market" aria-label="시장 신호 요약">
+        <div className="journey-heading"><div><span className="journey-kicker">MARKET SIGNAL</span><h2>오늘의 시장</h2></div><button className="dashboard-section-action" onClick={openMarketSignal}>전체 보기 →</button></div>
+        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market} · 시장 폭 → 섹터 → ETF 요약</p>
+        <div className="journey-market-facts">
+          <div><span>시장 폭 · MA50 위</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong><small>{ma200Rows.length?'MA200 '+(ma200Breadth*100).toFixed(0)+'%':''}</small></div>
+          <div><span>주도 섹터</span><strong>{homeSector?sectorName(homeSector.market,homeSector.sector):'—'}</strong><small>{homeSector&&homeSector.medRank!=null?'RS '+Math.round(homeSector.medRank)+' · 주도 '+(homeSector.core+homeSector.candidate):''}</small></div>
+          <div><span>ETF RS 1위</span><strong>{homeEtf?(homeEtf.name||homeEtf.ticker):'—'}</strong><small>{homeEtf?.etf_rs_rank!=null?'RS '+Math.round(homeEtf.etf_rs_rank)+' · '+homeEtf.market:''}</small></div>
+        </div>
       </section>
       {sizeControl}
       <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} disabled={stockSize==='etf'} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
