@@ -59,11 +59,12 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.getByRole('heading',{name:'주도 종목',exact:true})).toBeVisible()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
  const scope=page.getByRole('group',{name:'주도 분류'})
  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
- for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});if(await button.getAttribute('aria-pressed')!=='true')await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(count)}
- await scope.getByRole('button',{name:'조정 중',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
+ // Category and leadership are independent axes: changing size/asset category preserves the active leadership class.
+ await expect(page.locator('.analysis-idea-list > button')).toHaveCount(6)
+ await scope.getByRole('button',{name:'핵심 주도',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
+ for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(count);await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)}
  await expect(page.locator('.analysis-idea-list svg[role=img]')).toHaveCount(20)
  await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(18)
  await page.locator('.analysis-idea-list > button').first().click();await expect(page.locator('.analysis-price-momentum')).toBeVisible();await page.getByRole('button',{name:'← 탐색 목록'}).click()
@@ -100,7 +101,9 @@ test('ETF is a first-class classification and does not use equity leadership cla
  await boot(page,[...rows,...etfs]);await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →'}).click()
  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
- await expect(page.getByRole('group',{name:'주도 분류'}).getByRole('button')).toBeDisabled()
+ const leadershipButtons=page.getByRole('group',{name:'주도 분류'}).getByRole('button')
+ await expect(leadershipButtons).toHaveCount(4)
+ for(const button of await leadershipButtons.all())await expect(button).toBeDisabled()
  await expect(page.locator('.analysis-idea-list .stock-trend-tags i')).toHaveText(['ETF','ETF'])
 })
 
