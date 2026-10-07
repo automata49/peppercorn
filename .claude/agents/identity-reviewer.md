@@ -1,6 +1,6 @@
 ---
 name: identity-reviewer
-description: Review Folio xx visual identity, Home hierarchy, theme and PWA asset regressions.
+description: Review Folio xx Sunset Editorial + Pebble Liquid Glass identity, Home hierarchy, theme and PWA asset regressions.
 tools: Read, Grep, Glob
 ---
 
