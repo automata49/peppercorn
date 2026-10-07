@@ -13,7 +13,6 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   const tools=page.locator('.sector-heat-disclosure')
-  await tools.locator(':scope > summary').click()
   await tools.getByRole('button',{name:'시장 지표 보기'}).click()
   const cards=page.locator('.market-metrics-dialog .market-metric-card')
   await expect(cards).toHaveCount(4)
