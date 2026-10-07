@@ -93,6 +93,7 @@ B is editorial, not bubbly-fintech.
 - Card radius baseline: **14px**.
 - Control radius baseline: **10px**.
 - Pills are only for tags, segmented toggles, and true status chips.
+- **Pebble Liquid Glass** is the one deliberate exception for the primary stock-category selector: **대형주 / 중소형주 / 전체** form the equity pebble group, followed by a visible `/` and a separate **ETF** pebble. Use translucent warm-surface glass, blur/saturation, inset highlight and subtly irregular beach-stone radii. Do not turn panels, tables, metric cards or navigation into glass bubbles.
 - Primary hierarchy comes from spacing, type, rules, and contrast—not extra shadows.
 - Do not mix three different corner-radius families in one viewport.
 
