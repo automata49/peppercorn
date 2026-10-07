@@ -41,7 +41,7 @@ test('dashboard temperature stays compact before the first record',async({page})
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[row]}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await openSignal(page)
   const card=page.locator('.temp-card')
   await expect(card).toHaveClass(/empty/)
@@ -59,7 +59,7 @@ for(const view of views){
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   // A prior entry on an earlier date: the new entry starts from its marks and shows what moved.
   await page.addInitScript(()=>{if(!localStorage.getItem('peppercorn-temperature'))localStorage.setItem('peppercorn-temperature',JSON.stringify([{date:'2026-09-19',marks:{economy:1,rates:3,spreads:1},evidence:{},version:'marks-temperature-1'}]))})
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
   await openSignal(page)

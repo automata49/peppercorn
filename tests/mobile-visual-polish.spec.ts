@@ -5,7 +5,7 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
@@ -38,7 +38,7 @@ for(const width of [390,430]){
     const sectorRow=page.locator('.journey-today .decision-row').first()
     await boxAtLeast(sectorRow,160,76)
     expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
-    expect(parseFloat(await sectorRow.locator('.decision-main > small:not(.decision-eyebrow)').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
+    expect(parseFloat(await sectorRow.locator('.stock-trend-tags small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
     await nav.getByRole('button',{name:'추적'}).click()
     const tickerInput=page.locator('.ticker-entry input').first()

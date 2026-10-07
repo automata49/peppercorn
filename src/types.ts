@@ -42,6 +42,7 @@ export type LeaderRow = {
   rs_200d?: number | null
   rs_rank: number | null
   etf_rs_rank?: number | null
+  market_cap?: number | null
   traded_value_20d?: number | null
   ibd_rs_estimate?: number | null
   ibd_rs_as_of?: string | null

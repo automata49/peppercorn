@@ -8,7 +8,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const page=await context.newPage();
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   // Sector and ETF tools remain in the secondary Market Signal workspace.
@@ -119,7 +119,7 @@ test('RS bands refresh in an already open stock detail',async({page})=>{
     calls++;
     route.fulfill({json:{rows:rows.map(r=>({...r,rs_5d:calls===1?null:'0.11'}))}});
   });
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
@@ -137,7 +137,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   const qqq={...etf,id:'etf-qqq',ticker:'QQQ',name:'QQQ ETF',rs_1m:.2,rs_3m:.2,ibd_rs_estimate:92,ibd_rs_as_of:'2026-09-28',leader_tt:true,leadership_class:'주도 후보',stage:'▲ 돌파 매수권',verdict:'★ 우선 분석',action_guide:'52주 고점(피벗) 돌파와 거래량 ≥1.4배를 함께 확인'};
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[qqq,etf]}}));
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   // Dashboard ETF summary is secondary and collapsed until requested.
@@ -183,7 +183,7 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch});
     const page=await context.newPage();
     await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:data}}));
-    await page.goto('http://127.0.0.1:4173/peppercorn/');
+    await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
     await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
     const panel=page.locator('.dashboard-etf-industry-panel');
@@ -237,7 +237,7 @@ test('failed live load can be retried from the demo state',async({page})=>{
     // The initial load and its one automatic retry fail; the manual retry succeeds.
     calls<=2?route.fulfill({status:503,body:'unavailable'}):route.fulfill({json:{rows}});
   });
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   await expect.poll(()=>calls,{timeout:10000}).toBe(2);
@@ -254,7 +254,7 @@ test('a stalled live response releases the refresh controls',async({page})=>{
     calls++;
     if(calls>1)void route.fulfill({json:{rows}});
   });
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   test.setTimeout(60_000);
   const refresh=page.getByRole('button',{name:'시장 데이터 새로고침'});
   // The first request stalls and aborts after 25 s; the automatic retry 4 s later succeeds.
@@ -266,7 +266,7 @@ test('a stalled live response releases the refresh controls',async({page})=>{
 test('KR ETFs show their Korean name in the dashboard ETF summary and detail',async({page})=>{
   const kr={...rows[1],id:'etf-kr',ticker:'069500',market:'KR',name:'Samsung KODEX 200 Securities ETF',asset_class:'ETF',rs_rank:null,ibd_rs_estimate:null,leader_tt:false,leadership_class:'중립'};
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,kr]}}));
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   await page.locator('.dashboard-explore > summary').click();
@@ -279,7 +279,7 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
 test('table headers are left-aligned and numeric cells right-aligned',async({page})=>{
   await page.setViewportSize({width:1440,height:900});
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
-  await page.goto('http://127.0.0.1:4173/peppercorn/');
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
   const align=(loc:any)=>loc.evaluateAll((es:Element[])=>[...new Set(es.map(e=>getComputedStyle(e).textAlign))]);

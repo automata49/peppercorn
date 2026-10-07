@@ -13,7 +13,7 @@ test('Google button sends a PKCE request and the returned code signs in',async({
   let exchange:any=null,authorize:URL|null=null
   await page.route('**/auth/v1/authorize?*',route=>{authorize=new URL(route.request().url());return route.fulfill({status:302,headers:{location:APP+'?code=test-code-123'}})})
   await page.route('**/functions/v1/auth',route=>{exchange=route.request().postDataJSON();return route.fulfill({json:{access_token:'a.b.c',refresh_token:'r',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'u1',email:'owner@example.com'}}})})
-  await page.goto(APP)
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP)
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await page.locator('.top-actions').getByRole('button',{name:'로그인',exact:true}).click()
   await page.getByRole('button',{name:'Google 계정으로 로그인'}).click()
@@ -38,7 +38,7 @@ test('an unlinked Google account is refused with a reason',async({page})=>{
   await base(page)
   await page.addInitScript(()=>sessionStorage.setItem('peppercorn-pkce-verifier','x'.repeat(64)))
   await page.route('**/functions/v1/auth',route=>route.fulfill({status:403,json:{error:'google_not_linked'}}))
-  await page.goto(APP+'?code=other')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP+'?code=other')
   await expect(page.locator('.auth-error')).toContainText('등록된 계정과 연결되어 있지 않습니다')
   await expect(page).toHaveURL(APP)
   expect(await page.evaluate(()=>localStorage.getItem('peppercorn-session'))).toBeNull()
@@ -48,7 +48,7 @@ test('a Google error in the redirect is shown without a request',async({page})=>
   await base(page)
   let calls=0
   await page.route('**/functions/v1/auth',route=>{calls++;return route.fulfill({json:{}})})
-  await page.goto(APP+'?error=access_denied&error_description=Signups+not+allowed+for+this+instance')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP+'?error=access_denied&error_description=Signups+not+allowed+for+this+instance')
   await expect(page.locator('.auth-error')).toContainText('등록된 계정과 연결되어 있지 않습니다')
   await expect(page).toHaveURL(APP)
   expect(calls).toBe(0)

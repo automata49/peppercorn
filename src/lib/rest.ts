@@ -10,7 +10,7 @@ const numericFields = [
   'rs_1w','rs_1m','rs_3m','rs_6m','rs_12m','rs_rank','ibd_rs_estimate',
   'rs_5d','rs_20d','rs_50d','rs_120d','rs_200d',
   'high_52w_distance','volume_ratio','adr20_pct','rsi14','atr_multiple',
-  'ma50','ma200','traded_value_20d'
+  'ma50','ma200','traded_value_20d','market_cap'
 ] as const
 
 const textFields = [

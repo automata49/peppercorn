@@ -10,7 +10,7 @@ async function setup(page:Page,snapshot:{status:number;age_h?:number}){
   await page.route('**/data/leaderboard.json',route=>{calls.snapshot++
     if(snapshot.status!==200)return route.fulfill({status:snapshot.status,body:'not found'})
     return route.fulfill({json:{published_at:new Date(Date.now()-(snapshot.age_h??1)*3600_000).toISOString(),rows:[row('SNAP')]}})})
-  await page.goto('/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
   return calls

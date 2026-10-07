@@ -7,6 +7,9 @@ import { FolioWordmark } from './components/FolioWordmark'
 import { AppIcon } from './components/AppIcon'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
+import { StockTrendList } from './components/StockTrendList'
+import { StockSizeFilter } from './components/StockSizeFilter'
+import { stockSizes,filterStockSize,readStockSize,STOCK_SIZE_STORAGE,type StockSize } from './lib/stockSize'
 import { DecisionList } from './components/DecisionList'
 import { PeriodToggle } from './components/PeriodToggle'
 import { PriceRsChart } from './components/PriceRsChart'
@@ -695,6 +698,8 @@ export default function App(){
   const sourceRef=useRef<'demo'|'supabase'>('demo')
   const lastLoadRef=useRef(0)
   const [market,setMarket]=useState<'ALL'|Market>('ALL')
+  const [stockSize,setStockSize]=useState<StockSize>(readStockSize)
+  const changeStockSize=(value:StockSize)=>{setStockSize(value);try{localStorage.setItem(STOCK_SIZE_STORAGE,value)}catch{}}
   const [query,setQuery]=useState('')
   const [sector,setSector]=useState<string|null>(null)
   const [leaderMkt,setLeaderMkt]=useState<MarketFilter>('ALL')
@@ -890,6 +895,9 @@ export default function App(){
   const updateJournal=(rows:EditableRow[])=>{setJournal(rows);void syncRows('journal',rows)}
   const updateTemperature=(rows:TempEntry[])=>{setTempEntries(rows);if(!session||tempCloudRef.current)void syncRows('temperature',rows as unknown as EditableRow[]);else setSyncState('error')}
 
+  const sizes=useMemo(()=>stockSizes(leaders),[leaders])
+  const sizedRows=(rows:LeaderRow[])=>stockSize==='all'?rows:filterStockSize(rows,stockSize,sizes)
+  const sizeControl=<StockSizeFilter value={stockSize} onChange={changeStockSize} market={market} sizes={sizes}/>
   const marketRows=useMemo(()=>leaders.filter(r=>market==='ALL'||r.market===market),[leaders,market])
   const visible=useMemo(()=>{
     const q=query.trim().toLowerCase()
@@ -1100,21 +1108,25 @@ export default function App(){
 
   let content
   if(page==='dashboard'){
-    const todayRows=focusRows.slice(0,5)
+    const todayRows=focusLeaderRows(sizedRows(focusBase),market).slice(0,5)
+    const sizePool=sizedRows(stockRows)
+    const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
     content=<div className="journey-home">
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
       <section className="journey-market" aria-label="시장 상태">
-        <div className="journey-heading"><h2>오늘의 시장</h2><button className="dashboard-section-action" onClick={()=>setPage('signal')}>시장 신호 보기 →</button></div>
+        <div className="journey-heading"><h2>오늘의 시장</h2><button className="dashboard-section-action" onClick={()=>exploreClass('core')}>전체 보기 →</button></div>
         <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market}</p>
         <div className="journey-market-facts"><div><span>MA50 위 비율</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>MA200 위 비율</span><strong>{ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'}</strong></div><div><span>상승 / 하락 · 1W</span><strong>{declineCount?advanceDeclineRatio.toFixed(1)+' : 1':advanceCount?'상승만':'—'}</strong></div></div>
       </section>
-      <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',leadCount],['candidates','주도 후보',candidateCount],['turns','강세 전환',turnCount],['corrections','조정 중',correctionCount]] as const).map(([key,label,count])=><button key={key} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
+      {sizeControl}
+      <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
       <section className="journey-today" aria-label="오늘 볼 종목">
         <div className="journey-heading"><h2>오늘 볼 종목</h2><button className="dashboard-section-action" onClick={()=>exploreClass('all')}>전체 탐색 →</button></div>
         <p className="note">일간 종가 · 20D 등락 · 최대 5종목{lensFilter.growthOnly&&flagFile?' · 실적 성장 필터 적용':''}</p>
-        <DecisionList items={todayRows.map(r=>({key:r.id,data:r,title:r.name||r.ticker,eyebrow:r.market+' · '+r.ticker,meta:`${leadership(r)} · RS ${r.rs_rank==null?'—':Math.round(r.rs_rank)} · ${r.industry||r.sector||'업종 미확인'}`,value:num(r.price),subvalue:'20D '+pct(r.return_20d),valueTone:(r.return_20d??0)>0?'positive':(r.return_20d??0)<0?'negative':undefined,ariaLabel:r.name+' 종목 상세 보기'}))} onSelect={openAnalysisStock} emptyLabel="현재 필터에 맞는 종목이 없습니다. 탐색에서 범위나 필터를 확인하세요."/>
+        <StockTrendList rows={todayRows} onSelect={openAnalysisStock} getClass={leadership} emptyLabel="이 규모에서 선별된 종목이 없습니다. 전체 규모나 탐색 필터를 확인하세요."/>
+        {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 규모 보기</button>}
       </section>
-      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{todayRows.length?`현재 시장의 핵심 주도는 ${leadCount}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.'}</p></section>
+      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{todayRows.length?`선택한 규모의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.'}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
   }else if(page==='signal'){
@@ -1271,7 +1283,7 @@ export default function App(){
       </ProgressiveDisclosure></>
   }else if(page==='analysis'||page==='thesis'){
     const analysisClass={'core':'핵심 주도','candidates':'주도 후보','turns':'강세 전환'} as const
-    const scoped=marketRows.filter(r=>{
+    const scoped=sizedRows(marketRows).filter(r=>{
       if(analysisScope==='all')return true
       if(analysisScope==='position')return position.rows.has(positionKey(r.market,r.ticker))
       if(analysisScope==='corrections')return isCorrection(r)
@@ -1295,18 +1307,16 @@ export default function App(){
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');setPage('thesis');window.scrollTo({top:0,behavior:'instant'})}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     content=<><div className="analysis-page">
-      {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>주도 종목 탐색</h2><p>종목을 고르고 투자 근거를 확인하세요.</p></div></section>
+      {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>주도 종목</h2><p>종목을 고르고 투자 근거를 확인하세요.</p></div></section>
       <div className="analysis-finder">
         <MarketSegment label="탐색" value={market} onChange={setMarket}/>
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
+        {sizeControl}
         <div className="analysis-browse">
           <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['core','핵심'],['candidates','후보'],['turns','전환'],['corrections','조정'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
           <div className="journey-explore-filters"><label>섹터<select aria-label="탐색 섹터" value={sector||''} onChange={e=>setSector(e.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.map(g=><option key={g.key} value={g.key}>{g.market+' · '+sectorName(g.market,g.sector)}</option>)}</select></label><span>{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 · RS 순 · 일간 종가</span></div>
           <LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/>
-          <div className="stock-list analysis-idea-list" aria-label="분석 종목 목록">{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).map(r=><button key={r.id} className={selected?.id===r.id?'on':''} onClick={()=>pickStock(r)}>
-            <span className="analysis-list-copy"><b>{r.name||r.ticker}</b><small>{r.market} · {r.ticker}{position.rows.has(positionKey(r.market,r.ticker))&&<i className="position-dot" title="Position 데이터 있음">P</i>}</small><em>{leadership(r)} · RS {r.rs_rank==null?'—':Math.round(r.rs_rank)} · {r.industry}</em><StockBadges row={r}/></span>
-            <span className="analysis-list-signal"><b>{num(r.price)}</b><small>20D {pct(r.return_20d)}</small></span>
-          </button>)}{!lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length&&<p className="empty">선택한 범위와 필터에 맞는 종목이 없습니다.</p>}</div>
+          <StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={r=>isCorrection(r)?'조정 중':leadership(r)} className="stock-list analysis-idea-list"/>
         </div>
       </div></>}
       {page==='analysis'&&analysisDetail&&<button className="secondary-action journey-back" onClick={()=>setAnalysisDetail(false)}>← 탐색 목록</button>}

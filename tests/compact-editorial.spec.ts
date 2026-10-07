@@ -26,7 +26,7 @@ for(const view of views){
         ['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]
       ]]))}})
     })
-    await page.goto('/peppercorn/')
+    await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/')
 
     const brand=page.locator('.page-shell-dashboard .mobile-brandbar')
     await expect(brand).toBeVisible()
