@@ -138,7 +138,7 @@ test('Home ETF Top 5 matches 섹터>ETF ETF Top 5 exactly',async({page})=>{
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.journey-home')).toBeVisible()
   await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
-  const homeNames=await page.locator('.journey-today .stock-trend-copy>b').allTextContents()
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>.decision-eyebrow').allTextContents()
   expect(homeNames).toHaveLength(5)
   await openSignal(page)
   const signalNames=await page.locator('.dashboard-etf-panel .stock-row .stock-id b').allTextContents()
@@ -224,7 +224,12 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     await expect(explore).toBeVisible();
     await expect(panel).toBeVisible();
     const heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
-    expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
+    if(view.width>=1100){
+      expect(Math.abs(etfBox.y-heatBox.y)).toBeLessThan(4);
+      expect(etfBox.x).toBeGreaterThan(heatBox.x+heatBox.width-1);
+    }else{
+      expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
+    }
     // One map per market; broad-market and valueless industries have no tile; KR labels are Korean.
     await expect(panel.locator('.etf-heat-market-head b')).toHaveText(['KR','US']);
     const us=panel.locator('.etf-heat-market').nth(1),kr=panel.locator('.etf-heat-market').nth(0);
