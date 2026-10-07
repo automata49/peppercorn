@@ -40,5 +40,5 @@ test('desktop keeps the contextual header subtitle',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   await expect(page.locator('.topbar p')).toBeVisible()
-  await expect(page.locator('.topbar p')).toContainText('Sector')
+  await expect(page.locator('.topbar p')).toHaveText('Discover → Judge → Thesis → Track')
 })
