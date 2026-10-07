@@ -76,7 +76,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(page.locator('.journey-today')).toBeVisible()
     await expect(page.locator('.leader-spotlight')).toHaveCount(0)
     await expect(page.getByRole('group',{name:'분류'}).getByRole('button')).toHaveText(['대형주','중소형주','ETF','전체'])
-    await expect(page.locator('.journey-classes button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
+    await expect(page.locator('.journey-classes button span')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
 
     if(view.compact){
       await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
