@@ -2979,8 +2979,6 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
   :root:not([data-theme]) .folio-wordmark-image-light{display:none}
   :root:not([data-theme]) .folio-wordmark-image-dark{display:block}
 }
-.page-shell-analysis .mobile-brandbar .folio-wordmark-image-light{display:none}
-.page-shell-analysis .mobile-brandbar .folio-wordmark-image-dark{display:block}
 
 .launch-overlay,.launch-screen{background:#0b0b0d!important}
 .launch-screen{
