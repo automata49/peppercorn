@@ -641,3 +641,14 @@ Implementation:
 - Product-facing Position wording was removed from Explore and Financials headings/copy while the underlying filing snapshot pipeline and stored data remain unchanged.
 - `folio-journey.css` adds one token-driven product identity layer for all workspaces; canonical identity/harness docs and every generated Folio identity skill copy were updated. `scripts/harness/identity.mjs` now prevents reintroduction of the old category labels, Position Explore scope, or missing all-page identity layer.
 - Regression coverage now locks the exact category/leadership labels, ETF classification behavior, and Light-theme surface signature across all sidebar workspaces.
+
+## Warm Sunset Editorial surface normalization — 2026-10-07
+
+User reported that the current Visual Identity was not reaching Home and several secondary workspaces, which still showed legacy pure-white UI. Stock Detail remains the reference for the product surface language.
+
+Changes:
+- Light structural surface is now warm editorial `#EFE9E3` between Paper `#F4F1EC` and Warm Sand `#E8DED4`; pure white is no longer the default panel/card/input/dialog fill.
+- The Detail-style restrained sunset radial field is applied to every `.content` workspace instead of flattening the app to plain paper.
+- Legacy exact `background:#fff` structural fills in `src/styles.css` were normalized to the Folio surface token; translucent white shell bars were converted to theme-aware Paper mixes. Semantic gain/loss colours and white foreground text were not changed.
+- Light Analysis/Leadership local surface tokens and translucent light cards use the same warm surface so Detail, Home, Signal, Thesis, Tracking, grids, dialogs and settings read as one system.
+- Level-0 baseline, identity doc, shared contract, harness and visual regression now forbid a pure-white structural surface regression.
