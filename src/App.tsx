@@ -1,3 +1,4 @@
+import {heatColor,HEAT_MISSING} from './lib/marketColors'
 import { CHART_SESSIONS } from './lib/rsChart'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import gsap from 'gsap'
@@ -336,13 +337,8 @@ function useColumnWidth(key:string,initial:number,min:number,max:number){
 
 const etfRankTitle=`ETF끼리만 비교한 시장별 순위(${ETF_RS_RANK_VERSION}) · 주식 RS 순위와 별도`
 
-// Diverging red(+)/gray/blue(−) scale for median benchmark-relative RS, matching the app's up-red/down-blue convention.
-// Steps are lightness-matched per arm (relative luminance .11/.31 blue vs .11/.31 red); ink on light, white on dark (≥4.9:1).
+// Market-specific diverging colours; thresholds and data meaning are unchanged.
 const HEAT_THRESHOLDS:Record<EtfHeatPeriod,[number,number]>={'5D':[.01,.03],'20D':[.02,.06],'50D':[.03,.10],'120D':[.05,.15],'200D':[.07,.20],'52W':[.10,.30]}
-const HEAT_MISSING={bg:'#e4e7eb',ink:'#5d6b7c'}
-const heatColor=(value:number|null,[t1,t2]:[number,number])=>value==null?HEAT_MISSING
-  :value>=t2?{bg:'#b3261e',ink:'#ffffff'}:value>=t1?{bg:'#e8766d',ink:'#202938'}
-  :value<=-t2?{bg:'#1c5cab',ink:'#ffffff'}:value<=-t1?{bg:'#5598e7',ink:'#202938'}:{bg:'#f0efec',ink:'#202938'}
 const pctLabel=(v:number)=>`${v>0?'+':''}${Math.round(v*100)}%`
 const tradedLabel=(market:string,value:number)=>market==='KR'
   ?(value>=1e12?`${(value/1e12).toFixed(1)}조원`:value>=1e8?`${Math.round(value/1e8).toLocaleString('ko-KR')}억원`:`${Math.round(value/1e4).toLocaleString('ko-KR')}만원`)
@@ -360,7 +356,7 @@ function EtfIndustryTreemap({market,groups,period,onSelect}:{market:string;group
     <div className="etf-heat-market-head"><b>{market}</b><span>ETF 20일 평균 거래대금 합계 {tradedLabel(market,total)}</span></div>
     <div ref={ref} className="etf-heat-map" style={{height}} role="list" aria-label={`${market} ETF 주도 산업 히트맵`}>
       {rects.map(({item:g,x,y,w,h})=>{
-        const name=etfIndustryLabel(g.market,g.industry),value=g.medRs[period],color=heatColor(value,HEAT_THRESHOLDS[period])
+        const name=etfIndustryLabel(g.market,g.industry),value=g.medRs[period],color=heatColor(value,HEAT_THRESHOLDS[period],market)
         const tip=`${name} · RS ${period} 중앙값 ${value==null?'—':pctLabel(value)} · 20일 평균 거래대금 ${tradedLabel(g.market,g.tradedValue)} · ETF ${g.n}개(거래대금 ${g.valued}개) · RS 순위 중앙값 ${g.medRank==null?'—':Math.round(g.medRank)} · TT 통과 ${g.ttPass} · 최상위 ${g.leader}`
         return <button key={g.key} type="button" role="listitem" className="etf-heat-tile" title={tip} aria-label={tip} onClick={()=>onSelect(g)}
           style={{left:x+1,top:y+1,width:Math.max(0,w-2),height:Math.max(0,h-2),background:color.bg,color:color.ink}}>
@@ -380,12 +376,12 @@ function EtfIndustryHeatmap({groups,markets,period,onSelect}:{groups:EtfIndustry
   if(!sized.length)return <p className="empty">거래대금이 집계된 산업 ETF가 없습니다.</p>
   return <>
     {markets.map(m=>{const list=sized.filter(g=>g.market===m);return list.length?<EtfIndustryTreemap key={m} market={m} groups={list} period={period} onSelect={onSelect}/>:null})}
-    <div className="etf-heat-legend" aria-label={`색상 범례: RS ${period} 중앙값`}>
-      <span>RS {period} 중앙값</span>
-      {keys.map(k=><span key={k.label} className="etf-heat-key"><i style={{background:heatColor(k.v,HEAT_THRESHOLDS[period]).bg}}/>{k.label}</span>)}
+    {markets.map(m=><div key={m} className="etf-heat-legend" data-market={m} aria-label={`${m} 색상 범례: RS ${period} 중앙값`}>
+      <span>{m} · RS {period} 중앙값</span>
+      {keys.map(k=><span key={k.label} className="etf-heat-key"><i style={{background:heatColor(k.v,HEAT_THRESHOLDS[period],m).bg}}/>{k.label}</span>)}
       <span className="etf-heat-key"><i style={{background:HEAT_MISSING.bg}}/>데이터 없음</span>
       {missing>0&&<span>· 거래대금 없는 산업 {missing}개 제외</span>}
-    </div>
+    </div>)}
   </>
 }
 
@@ -413,7 +409,7 @@ function StockRows({rows,onSelect,label='종목',nameWidth,onResizeStart}:{rows:
   const [ownWidth,startOwnResize]=useColumnWidth(STOCK_NAME_WIDTH_KEY,STOCK_NAME_DEFAULT_WIDTH,STOCK_NAME_MIN_WIDTH,STOCK_NAME_MAX_WIDTH)
   const width=nameWidth??ownWidth
   const live=useLiveQuotes(rows)
-  return <div className="stock-rows" style={{'--stock-name-width':`${width}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">{label}<button type="button" className="stock-column-resizer" aria-label={`${label} 열 너비 조절`} title={`드래그하여 ${label} 열 너비 조절`} onPointerDown={onResizeStart??startOwnResize}/></span><span>현재가</span><span>현재가 등락</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" onClick={()=>onSelect(r)}>
+  return <div className="stock-rows" style={{'--stock-name-width':`${width}px`} as CSSProperties}><div className="stock-rows-head"><span className="stock-name-head">{label}<button type="button" className="stock-column-resizer" aria-label={`${label} 열 너비 조절`} title={`드래그하여 ${label} 열 너비 조절`} onPointerDown={onResizeStart??startOwnResize}/></span><span>현재가</span><span>현재가 등락</span><span>단계</span><span>RS 순위</span><span>IBD식 RS</span>{tradingPeriods.map(period=><span key={'rs'+period}>RS {period}</span>)}{tradingPeriods.map(period=><span key={'return'+period}>등락 {period}</span>)}<span>52W 고점 대비</span></div>{rows.map(r=><button key={r.id} className="stock-row" data-market={r.market} onClick={()=>onSelect(r)}>
     <div className="stock-id" title={`${r.name} · ${r.ticker}`}><b>{r.name}</b><small>{r.market} · {r.ticker} · {r.industry}{r.group_rank!=null&&<span className="group-rank-mini" title={groupRankTitle(r)}> · 업종 {r.group_rank}위</span>}</small><StockBadges row={r}/></div>{(q=><><span className={'stock-price'+(q?' live-price':'')} title={q?liveQuoteTitle(q):'일간 종가 기준'}>{num(q?.price??r.price)}</span>{(c=><span className={'live-change'+(c!=null&&c>0?' pos':c!=null&&c<0?' neg':'')} title={q?'전일 종가 대비 실시간 등락':'실시간 시세 없음'}>{pct(c)}</span>)(liveChange(q))}</>)(live(r))}<ValuePill tone={stageTone(r.stage)}>{stageLabel(r.stage)}</ValuePill>{(rank=><strong className={(rank??0)>=90?'rank rank-top':(rank??0)>=70?'rank rank-high':'rank'} title={r.asset_class==='ETF'?etfRankTitle:undefined}>{rank??'—'}</strong>)(r.asset_class==='ETF'?r.etf_rs_rank:r.rs_rank)}<strong className={(r.ibd_rs_estimate??0)>=90?'rank rank-top':(r.ibd_rs_estimate??0)>=80?'rank rank-high':'rank'} title={ibdTitle(r)}>{r.ibd_rs_estimate??'—'}</strong>
     {[...rsTradingValues(r),...returnTradingValues(r),r.high_52w_distance].map((value,i)=><span key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</span>)}
   </button>)}{!rows.length&&<div className="empty">선택한 범위에 해당 종목이 없습니다.</div>}</div>
@@ -454,7 +450,7 @@ function LineChart({series,yTitle,activePeriod,onPick,xLabels}:{series:LineSerie
     <ul className="line-legend">{series.map((s,k)=>{const end=[...s.values].reverse().find(v=>v!=null)
       const last=daily?(end==null?null:end/100-1):activePeriod?s.values[RS_CHART_PERIODS.findIndex(([p])=>p===activePeriod)]:null
       const body=<><i style={{color:LINE_COLORS[k%LINE_COLORS.length]}}/><b>{s.label}</b>{s.sub&&<small>{s.sub}</small>}<em className={last==null?'':last>0?'pos':last<0?'neg':''}>{daily||activePeriod?pct(last):''}</em></>
-      return <li key={s.key}>{onPick?<button type="button" onClick={()=>onPick(s.key)} aria-label={`${s.label} 상세 보기`}>{body}</button>:<span>{body}</span>}</li>})}</ul>
+      return <li key={s.key} data-market={s.market}>{onPick?<button type="button" onClick={()=>onPick(s.key)} aria-label={`${s.label} 상세 보기`}>{body}</button>:<span>{body}</span>}</li>})}</ul>
   </div>
 }
 
@@ -466,7 +462,7 @@ function MomentumLines({rows,period,onSelect,sub,unit}:{rows:LeaderRow[];period:
   const hist=usePriceHistory(top.map(x=>x.row.id),top.length>0)
   const lines=top.map(({row})=>({row,r:rebased(hist.get(row.id),CHART_SESSIONS[period])}))
   const dates=lines.reduce<string[]>((best,l)=>l.r&&l.r.dates.length>best.length?l.r.dates:best,[])
-  const series=lines.filter(l=>l.r).map(({row,r})=>({key:row.id,label:row.name,sub:sub(row),values:dates.map(d=>{const i=r!.dates.indexOf(d);return i<0?null:r!.values[i]})}))
+  const series=lines.filter(l=>l.r).map(({row,r})=>({market:row.market,key:row.id,label:row.name,sub:sub(row),values:dates.map(d=>{const i=r!.dates.indexOf(d);return i<0?null:r!.values[i]})}))
   const short=lines.filter(l=>l.r&&!l.r.complete).length
   return <>
     {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
@@ -512,7 +508,7 @@ const SectorHeatmap=memo(function SectorHeatmap({rows,market,sector,onSelect}:{r
     <div className="rs-chart-head"><span>섹터 · 등락 {period} 중앙값 <small>타일 크기=20일 평균 거래대금</small></span><PeriodToggle label="섹터" period={period} onPeriod={setPeriod}/></div>
     <div ref={ref}>{markets.map(m=><div key={m} className="etf-heat-market"><div className="etf-heat-market-head"><b>{m}</b><span>{byCount[m]?`섹터 ${valued.filter(g=>g.first.market===m).length}개 · 거래대금 미집계로 종목 수 기준`:`20일 평균 거래대금 합계 ${tradedLabel(m,valued.filter(g=>g.first.market===m).reduce((a,g)=>a+g.traded,0))}`}</span></div><div className="etf-heat-map" style={{height}} role="list" aria-label={`${m} 섹터 히트맵`}>
       {(width?squarify(valued.filter(g=>g.first.market===m&&(byCount[m]||g.traded>0)),g=>byCount[m]?g.n:g.traded,width,height):[]).map(({item:g,x,y,w,h})=>{
-        const name=sectorName(g.first.market,g.first.sector),c=heatColor(g.value,HEAT_THRESHOLDS[period])
+        const name=sectorName(g.first.market,g.first.sector),c=heatColor(g.value,HEAT_THRESHOLDS[period],m)
         const tip=`${name} · 등락 ${period} 중앙값 ${g.value==null?'—':pct(g.value)} · 주식 ${g.n}${g.traded>0?` · 20일 평균 거래대금 ${tradedLabel(g.first.market,g.traded)}`:''}`
         return <button key={g.key} type="button" role="listitem" className="etf-heat-tile" title={tip} aria-label={tip} onClick={()=>onSelect(g.key)}
           style={{left:x+1,top:y+1,width:Math.max(0,w-2),height:Math.max(0,h-2),background:c.bg,color:c.ink}}>
@@ -521,7 +517,7 @@ const SectorHeatmap=memo(function SectorHeatmap({rows,market,sector,onSelect}:{r
         </button>
       })}
     </div></div>)}</div>
-    <p className="rs-chart-note">빨강 ≥ {pctLabel(t1)} · 진한 빨강 ≥ {pctLabel(t2)} · 파랑 ≤ {pctLabel(-t1)} · 회색 = 값 없음 · 타일을 누르면 섹터 종목을 봅니다</p>
+    <p className="rs-chart-note">KR 상승=빨강 / 하락=파랑 · US 상승=녹색 / 하락=빨강 · 연한 색 ≥ {pctLabel(t1)} / 진한 색 ≥ {pctLabel(t2)} (음수 대칭) · 회색=값 없음 · 타일을 누르면 섹터 종목을 봅니다</p>
   </div>
 })
 
@@ -578,7 +574,7 @@ function AnalysisHero({row}:{row:LeaderRow}){
   const change=liveChange(q)
   const diff=q&&q.previous_close?q.price-q.previous_close:null
   const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
-  return <section className="analysis-hero">
+  return <section className="analysis-hero" data-market={row.market}>
     <p className="hero-meta">{row.market} · {row.ticker} · {row.exchange||row.market} · {row.industry||'분류 확인'}</p>
     <h2 className="hero-name">{row.name}</h2>
     <div className={'hero-price'+(q?' live-price':'')}>{priceText(row,q?.price??row.price)}</div>
@@ -603,13 +599,13 @@ function KeyStats({row,filed}:{row:LeaderRow;filed?:PositionRow}){
     ['20일 평균 거래대금',tradedText(row,row.traded_value_20d),''],
     ['PER (공시 EPS)',pe==null?'—':pe.toFixed(1)+'배',''],
   ]
-  return <div className="key-stats">{items.map(([label,value,tone])=><div key={label}><span>{label}</span><b className={tone}>{value}</b></div>)}</div>
+  return <div className="key-stats" data-market={row.market}>{items.map(([label,value,tone])=><div key={label}><span>{label}</span><b className={tone}>{value}</b></div>)}</div>
 }
 function PeerStrip({row,rows,onPick}:{row:LeaderRow;rows:LeaderRow[];onPick:(r:LeaderRow)=>void}){
   const peers=rows.filter(r=>r.market===row.market&&r.asset_class===row.asset_class&&r.industry&&r.industry===row.industry&&r.id!==row.id)
     .sort((a,b)=>Number(LEADING_CLASSES.has(leadership(b)))-Number(LEADING_CLASSES.has(leadership(a)))||(b.rs_rank??b.etf_rs_rank??0)-(a.rs_rank??a.etf_rs_rank??0)).slice(0,8)
   if(!peers.length)return <p className="empty">같은 산업에 다른 종목이 없습니다.</p>
-  return <div className="peer-strip">{peers.map(r=><button key={r.id} type="button" onClick={()=>onPick(r)}>
+  return <div className="peer-strip">{peers.map(r=><button key={r.id} data-market={r.market} type="button" onClick={()=>onPick(r)}>
     <b>{r.name}</b><span>{r.ticker} · {leadership(r)}</span><em className={signTone(r.return_3m)}>{pct(r.return_3m)} <small>3개월</small></em>
   </button>)}</div>
 }
@@ -621,7 +617,7 @@ function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:Lea
   const rsItems=tradingPeriods.map((period,i)=>[period,rsTradingValues(row)[i]] as const)
   const retItems=tradingPeriods.map((period,i)=>[period,returnTradingValues(row)[i]] as const)
   const liveQuote=useLiveQuotes([row],1)(row)
-  return <div className="stock-snapshot">
+  return <div className="stock-snapshot" data-market={row.market}>
     <div className="external-links drill-animate">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
@@ -906,7 +902,7 @@ export default function App(){
   const byMkt=(m:MarketFilter)=>m==='ALL'?leaders:leaders.filter(r=>r.market===m)
   const leaderRows=useMemo(()=>byMkt(leaderMkt),[leaders,leaderMkt])
   const sectorRows=useMemo(()=>byMkt(sectorMkt),[leaders,sectorMkt])
-  // ETF-PARITY-1: Home ETF and Sector > ETF consume the exact same global market pool.
+  // ETF-PARITY-1: Home ETF and Market Signal consume the exact same global market pool.
   const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])
   const stockRows=marketRows.filter(r=>r.asset_class==='Equity')
   const leaderStocks=leaderRows.filter(r=>r.asset_class==='Equity')
@@ -1135,12 +1131,12 @@ export default function App(){
         {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 보기</button>}
       </section>
       <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} disabled={stockSize==='etf'} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
-      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 섹터>ETF를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 섹터>ETF와 탐색 필터를 먼저 확인하세요.')}</p></section>
+      <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 시장 신호를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
   }else if(page==='signal'){
     content=<div className="discovery-home">{filters}
-      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>섹터&gt;ETF</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
+      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>시장 신호</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
         <div className="dashboard-left-column">
@@ -1152,7 +1148,7 @@ export default function App(){
             </div>
           </div>
           <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table focus-sector-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>주도</th><th>등락 20D</th><th>등락 50D</th><th>52W 근접</th></tr></thead><tbody>
-            {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+            {dashboardTopSectors.map(g=><tr key={g.key} data-market={g.market} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
               <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 주도 {g.core}</small></td>
@@ -1335,29 +1331,29 @@ export default function App(){
       {archived&&record&&<section className="analysis-card"><h3>{String(record.name||record.ticker)}</h3><p className="note">현재 유니버스에 없는 보관 기록입니다. 시장 데이터 없이 기존 투자 근거를 편집할 수 있습니다.</p><AnalysisSheet row={{name:String(record.name||record.ticker)}} record={record} onCreate={()=>{}} onChange={(field,value)=>updateAnalysisField(record,field,value)}/></section>}
       {selected&&!archived&&(page==='analysis'?analysisDetail:!!record)?<div className="analysis-body">
         <div className="analysis-main analysis-card">
-          {page==='analysis'&&<section className="analysis-block analysis-price-momentum"><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>}
+          {page==='analysis'&&<section className="analysis-block analysis-price-momentum" data-market={selected.market}><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>}
           {page==='thesis'&&<div className="journey-heading"><h3>{selected.name} · {selected.ticker}</h3><button className="dashboard-section-action" onClick={()=>openAnalysisStock(selected)}>종목 상세 →</button></div>}
           {page==='analysis'&&<nav className="analysis-detail-tabs" role="tablist" aria-label="종목 분석 영역">
             {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
           </nav>}
           <div className="analysis-secondary">
-            {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body">
+            {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)}/></section>
               <section className="analysis-block"><h3 className="block-title">Essential Stats</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
               <section className="analysis-block"><h3 className="block-title">Same Industry</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
               {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">Compare <small>{compareRows.length}/4</small></h3><CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
             </div>}
-            {page==='analysis'&&analysisSection==='analysis'&&<div className="analysis-secondary-body">
+            {page==='analysis'&&analysisSection==='analysis'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
               <section className="analysis-block"><h3 className="analysis-part">Swing · 모멘텀</h3>
                 <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
                 <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
               </section>
             </div>}
-            {page==='analysis'&&analysisSection==='financials'&&<div className="analysis-secondary-body">
+            {page==='analysis'&&analysisSection==='financials'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block"><h3 className="analysis-part">Financial Snapshot · 공시 펀더멘털</h3><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
             </div>}
-            {(page==='thesis'||analysisSection==='thesis')&&<div className="analysis-secondary-body">
+            {(page==='thesis'||analysisSection==='thesis')&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
                 <div className="thesis-head"><div><span>MY THESIS</span><h3>내 분석</h3></div><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
                 <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
@@ -1451,7 +1447,7 @@ export default function App(){
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
-  const pageTitle:Record<string,string>={signal:'섹터>ETF',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={signal:'시장 신호',thesis:'Thesis',tracking:'추적',dashboard:'홈',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'탐색',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
@@ -1487,7 +1483,7 @@ export default function App(){
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
-        {rankedSectorRows.map(g=><tr key={g.key} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+        {rankedSectorRows.map(g=><tr key={g.key} data-market={g.market} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
           <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
           <td>{g.n}</td>
@@ -1555,5 +1551,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Discover → Judge → Thesis → Track</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'&&<nav className="journey-tracking-tabs" role="tablist" aria-label="추적 영역">{([['watchlist','관심종목'],['portfolio','보유종목'],['journal','투자일지']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={trackingTab===key} onClick={()=>setTrackingTab(key)}>{label}</button>)}</nav>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u2" alt="Folio xx visual"/></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div data-market={market} className={'shell page-shell-'+page}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Discover → Judge → Thesis → Track</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'&&<nav className="journey-tracking-tabs" role="tablist" aria-label="추적 영역">{([['watchlist','관심종목'],['portfolio','보유종목'],['journal','투자일지']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={trackingTab===key} onClick={()=>setTrackingTab(key)}>{label}</button>)}</nav>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u2" alt="Folio xx visual"/></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
 }

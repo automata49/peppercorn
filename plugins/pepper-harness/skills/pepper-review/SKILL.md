@@ -12,9 +12,9 @@ For Folio identity work explicitly check:
 - exact supplied artwork is used for light/dark wordmark, installed icon, launch hero, Typography and Photography treatment;
 - Paper `#F4F1EC` / warm Surface `#EFE9E3` / Warm Sand `#E8DED4` remain the Light hierarchy and generic pure-white chrome does not return;
 - Pebble Liquid Glass stays restricted to the primary category selector: **대형주 / 중소형주 / 전체 / ETF**, with the first three grouped, a visible `/`, and ETF separate;
-- Home **오늘의 시장** summarizes market breadth → leading sector → ETF RS leader and `전체 보기 →` opens **섹터>ETF**;
+- Home **오늘의 시장** summarizes market breadth → leading sector → ETF RS leader and `전체 보기 →` opens **시장 신호**;
 - Home **오늘의 주도주** appears above **핵심 주도 / 주도 후보 / 강세 전환 / 조정 중**;
-- **섹터>ETF** keeps the sector heatmap, ETF industry map and ETF summary open by default, and Home ETF matches the same global market pool / `etf_rs_rank` order;
+- **시장 신호** keeps the sector heatmap, ETF industry map and ETF summary open by default, and Home ETF matches the same global market pool / `etf_rs_rank` order;
 - C appears only as photography treatment; Inter/Neue-Grotesk editorial typography is preserved;
 - System/Light/Dark still work;
 - no stale punch-card, generic `folio-identity-*`, generic icon generator or Robinhood visual cloning is active;
@@ -23,3 +23,6 @@ For Folio identity work explicitly check:
 Run relevant gates. Identity changes require `npm run harness:check`, `npm run build`, `npm run test:identity` and the relevant/full browser suite before approval. Return severity, file, reproduction and evidence. Update the handoff with exact commands, outcomes and remaining work; never overwrite another writer.
 
 Resolve paths from the Peppercorn repository root. If installed as a plugin outside Peppercorn, locate the repository first; do not apply its policies to another project.
+
+
+- MARKET-COLORS-1 / FLAT-METRICS-1 / PEBBLE-REGIONS-1 (user decision 2026-10-07): The secondary destination is **시장 신호**, retaining expanded sector → ETF content and Home's existing full-view link. KR signed changes use red gains / blue losses; US uses green gains / red losses. The nearest instrument/sector market owns colours, including mixed-market rows, daily/live returns, detail, grids and market-specific heatmap legends; zero/missing stays neutral. Colours are display-only and never alter ranking, classification or pass/fail status. Major regions (including 오늘의 주도주) and all four leadership controls share Pebble Liquid Glass: translucent paper-based fill, blur/saturation, inset highlight and beach-stone radii. Nested numerical metrics stay unboxed; non-gradient surfaces share the same theme paper base. This supersedes the prior selector-only glass restriction and flat major-region styling.

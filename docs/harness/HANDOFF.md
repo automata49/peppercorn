@@ -1,3 +1,11 @@
+## 2026-10-07 — Market colours and shared Pebble regions
+
+- User authority: rename the secondary destination to 시장 신호; retain expanded sector/ETF content. All major regions, including 오늘의 주도주, and 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 controls now share Pebble Liquid Glass. This supersedes selector-only glass guidance.
+- Inner metrics, including portal market dialogs, are unboxed; non-gradient surfaces use the theme paper base. Canonical user-supplied identity assets remain unchanged.
+- KR gains/losses are red/blue; US green/red. Instrument market propagates through mixed lists, detail, charts, tables, positions and heatmaps; unknown market is neutral. Display-only: investment algorithms, ranking and thresholds unchanged.
+- CONTRACT, design baseline, identity and canonical skills updated; adapters synced. Harness validates naming, regions, metrics and colour scope. Prefix order preserves actual browser backdrop blur after minification. Market controls retain 44px touch targets.
+- Read-only journey review: no blockers. Final validation: harness:check and build pass; identity 30/30; full Playwright 166/166 (2.7m), including all four controls, actual backdrop blur, portal metrics, KR/US gains/losses and 390/834/1366/1440 light/dark checks.
+
 ## 2026-10-07 — Stock trends and persisted size filter
 
 - User request: keep the supplied Folio identity and existing app, apply the attached ticker/name + mini-trend + price row structure; 오늘의 시장 → 전체 보기 → 주도 종목 with 핵심 / 후보 / 전환 / 조정, default 대형주 and optional 중소형주.

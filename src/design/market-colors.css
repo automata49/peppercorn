@@ -1,0 +1,17 @@
+/* MARKET-COLORS-1: nearest instrument/sector market owns signed display colours.
+   Mixed or unknown aggregate markets are neutral. Stage / pass-fail colours stay separate. */
+:root,[data-market="ALL"],[data-market="UNKNOWN"],.market-unknown{--market-gain:var(--folio-muted);--market-loss:var(--folio-muted)}
+[data-market="KR"],.market-KR{--market-gain:#b3261e;--market-loss:#1c5cab}
+[data-market="US"],.market-US{--market-gain:#196b42;--market-loss:#b3261e}
+:root[data-theme="dark"] [data-market="KR"],:root[data-theme="dark"] .market-KR{--market-gain:#ff8580;--market-loss:#78b4ff}
+:root[data-theme="dark"] [data-market="US"],:root[data-theme="dark"] .market-US{--market-gain:#72d5a2;--market-loss:#ff8580}
+body :is(.pos,.positive,.cell-up){color:var(--market-gain)!important}
+body :is(.neg,.negative,.cell-down){color:var(--market-loss)!important}
+body :is(.pos,.positive) :is(b,strong,small,em){color:var(--market-gain)!important}
+body :is(.neg,.negative) :is(b,strong,small,em){color:var(--market-loss)!important}
+.ag-row :is(.cell-up,.cell-down){background:transparent!important}
+
+@media(prefers-color-scheme:dark){
+ :root:not([data-theme]) [data-market="KR"],:root:not([data-theme]) .market-KR{--market-gain:#ff8580;--market-loss:#78b4ff}
+ :root:not([data-theme]) [data-market="US"],:root:not([data-theme]) .market-US{--market-gain:#72d5a2;--market-loss:#ff8580}
+}

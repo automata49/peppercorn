@@ -8,7 +8,7 @@ const pages:[string,AppIconName,string][]=[
   ['analysis','search','탐색'],
   ['thesis','journal','Thesis'],
   ['tracking','watchlist','추적'],
-  ['signal','sectors','섹터>ETF'],
+  ['signal','sectors','시장 신호'],
   ['temperature','temperature','시장 온도계'],
   ['watchlist','watchlist','Watchlist'],
   ['portfolio','portfolio','Portfolio'],

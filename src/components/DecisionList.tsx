@@ -2,6 +2,7 @@ export type DecisionTone = 'green'|'blue'|'amber'|'gray'|'positive'|'negative'
 
 export type DecisionItem<T> = {
   key: string
+  market?: string
   data: T
   rank?: string|number
   eyebrow?: string
@@ -31,6 +32,7 @@ export function DecisionList<T>({
   return <div className={('decision-list '+className).trim()} role="list">
     {items.map(item=><button
       key={item.key}
+      data-market={item.market || (item.data as {market?:string})?.market || 'UNKNOWN'}
       type="button"
       role="listitem"
       className={('decision-row '+rowClassName).trim()}

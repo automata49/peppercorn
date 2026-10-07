@@ -79,7 +79,7 @@ export const PriceRsChart=memo(function PriceRsChart({row,rows}:{row:LeaderRow;r
   const hist=usePriceHistory(bench?[row.id,bench.id]:[row.id],true)
   const data=priceRs(hist.get(row.id),bench&&hist.get(bench.id),CHART_SESSIONS[period])
   const [ref,width]=useElementWidth<HTMLDivElement>()
-  return <div className="peer-line price-rs" title={PRICE_RS_VERSION}>
+  return <div data-market={row.market} className="peer-line price-rs" title={PRICE_RS_VERSION}>
     <PeriodToggle label="가격 모멘텀" period={period} onPeriod={setPeriod}/>
     {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
       :!data?<p className="empty">{hist.status==='loading'||hist.status==='idle'?'일별 가격을 불러오는 중…':'일별 가격 이력이 없습니다.'}</p>

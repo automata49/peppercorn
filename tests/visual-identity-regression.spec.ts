@@ -83,8 +83,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await expect(category.locator('.stock-size-divider')).toHaveText('/')
     await expect(category.locator(':scope > .stock-size-etf')).toHaveText('ETF')
     const pebble=category.getByRole('button',{name:'대형주',exact:true})
-    // Headless Chromium can report backdrop-filter as "none" even when the author rule is present;
-    // the harness source gate owns blur/saturation, while runtime verifies the rendered glass material.
+    // Prefix order preserves both declarations after CSS minification.
+    await expect(pebble).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
     expect(await pebble.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
     expect(await pebble.evaluate(e=>getComputedStyle(e).boxShadow)).toContain('inset')
     expect(await pebble.evaluate(e=>getComputedStyle(e,'::before').backgroundImage)).toContain('linear-gradient')
@@ -120,7 +120,7 @@ test('Light theme keeps one Folio visual system across every product workspace',
   await boot(page)
   const destinations=[
     ['홈','dashboard'],['탐색','analysis'],['Thesis','thesis'],['추적','tracking'],
-    ['섹터>ETF','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
+    ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
     ['Portfolio','portfolio'],['Journal','journal'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
