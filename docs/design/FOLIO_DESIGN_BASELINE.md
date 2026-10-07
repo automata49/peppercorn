@@ -99,7 +99,7 @@ B is editorial, not bubbly-fintech.
 
 ## 7. Image baseline
 
-- Launch B hero keeps **508:235** composition; no portrait crop.
+- Loading keeps the supplied **9:16** portrait hero. Placement is device-aware without changing the artwork: iPhone uses a full-viewport crop, iPad uses a centered ~90dvh portrait treatment, touch iPad Pro uses ~88dvh, and desktop uses a centered ~86dvh editorial poster.
 - B motif is secondary. On phone it stays **108–122px** high.
 - C photography treatment is secondary editorial imagery, not the primary UI language.
 - Imagery never pushes the first analytical decision below the fold merely for decoration.
