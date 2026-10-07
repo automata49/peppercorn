@@ -52,7 +52,7 @@ User decision 2026-10-07 supersedes the former representative-leader hero Home.
 1. Supplied Folio brand + market selection.
 2. Factual MA50/MA200 breadth and weekly advance/decline context; no new regime score.
 3. Four class navigation buttons: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
-4. At most five stocks from the unchanged Focus funnel, with daily price and explicitly labeled 20D return.
+4. At most five stocks from the unchanged Focus funnel within the selected size pool, with ticker/name, actual 20-session mini trend, daily price and explicitly labeled 20D return. Default size = large; market_cap when >=90% covered per market, otherwise the labelled 20-day trading-value proxy (upper10%, ties included). Unknown size only in all.
 5. One deterministic Folio Insight sentence; no live generative-AI claim.
 6. Existing supplied Typography / Photography artwork as secondary identity imagery.
 
@@ -61,7 +61,7 @@ Market Signal owns sector summaries, heatmaps, Howard Marks temperature and ETF 
 ## Analysis experience
 
 - Primary navigation: 홈 / 탐색 / Thesis / 추적.
-- Explore: one market/search/scope/sector/lens-filter list. Preserve four daily classes, all-stock and Position scopes. No separate hidden focus roster.
+- Explore: one market/search/scope/sector/size/lens-filter list, with 20-row progressive pages and mini trends loaded in batches of at most 10 IDs. Preserve four daily classes, all-stock and Position scopes. No separate hidden focus roster.
 - Selecting a stock opens Detail; the list is replaced, not stacked above the chart. Return to list preserves filters. Primary Explore navigation clears hidden global query/sector state.
 - Detail preserves the existing PriceRsChart and Overview / Analysis / Financials / Thesis depth. These retain their existing evidence and semantics.
 - Thesis workspace uses existing analysis records and exact record identity for editing multiple dates of the same ticker. The editable records grid remains progressively disclosed.

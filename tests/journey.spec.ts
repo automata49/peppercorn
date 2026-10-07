@@ -8,7 +8,7 @@ async function boot(page:Page){
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>{const ids=new URL(r.request().url()).searchParams.get('ids')?.split(',')||[];return r.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]]]))}})})
- await page.goto('/peppercorn/')
+ await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/')
  await expect(page.locator('.journey-today .decision-row').first()).toBeVisible()
 }
 async function nav(page:Page,label:string){const side=page.locator('.sidebar nav').getByRole('button',{name:label,exact:true});if(await side.isVisible())await side.click();else await page.locator('.mobile-bottom-nav').getByRole('button',{name:label,exact:true}).click()}

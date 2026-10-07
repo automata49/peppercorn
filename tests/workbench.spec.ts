@@ -48,7 +48,7 @@ async function open(page:Page){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true})
   if(await side.isVisible())return side.click()
@@ -137,7 +137,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:peers.map(r=>({...r,traded_value_20d:r.id==='a'?1.6e11:null}))}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){

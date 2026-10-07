@@ -1,3 +1,13 @@
+## 2026-10-07 — Stock trends and persisted size filter
+
+- User request: keep the supplied Folio identity and existing app, apply the attached ticker/name + mini-trend + price row structure; 오늘의 시장 → 전체 보기 → 주도 종목 with 핵심 / 후보 / 전환 / 조정, default 대형주 and optional 중소형주.
+- Home and Explore now share `StockTrendList` and `StockSizeFilter`. Actual daily-close mini trends use the latest 21 closes; missing/short/gapped history is explicitly labelled. Price is daily and return is explicitly 20D. Corporate logo data is unavailable, so neutral initials are used rather than invented corporate artwork. Detail PriceRsChart, classifications, ranking and investment algorithms are unchanged.
+- `stockSize.ts` builds a full Equity-universe partition separately for KR/US before classification, sector or growth filters. Comprehensive positive finite market_cap coverage (>=90%) wins; otherwise 20-day average traded value is an explicitly labelled capitalization proxy. Upper 10% by the chosen measure, including cutoff ties, is the display large group; other known rows are small. Unknown values only appear in All. This is a relative universe partition, not an exchange-defined capitalization threshold. ETF rows are excluded from size classification and retain prior access in all-size/all-scope Explore and search.
+- Read-only current leaderboard check: US 2633 equities, 0 with cap / 2627 with trading value; KR 595 equities, 0 with cap / 588 with trading value. Current production therefore uses the trading-value proxy. No schema, market classification or backend change.
+- Size selection persists in `folio-stock-size`, defaults to large, and is shared between Home and Explore. Twenty rows per reveal; public price-history batches stay <=10 IDs. Shared pending requests are deduplicated and cache invalidation rejects stale generations.
+- Existing legacy fixtures have no size inputs and explicitly seed All without overriding a stored choice; the new clean-context tests cover default Large, all four categories, persistence, cap/turnover/unknown/ties, four viewport widths, 45-row paging and delayed-response invalidation.
+- Read-only journey reviewer reports no blockers. Validation: `npm run harness:check` and `npm run build` pass; identity suite 29/29; final complete Playwright suite 152/152 (3.0m), including the 10 new stock-trend/size tests and 390 / 834 / 1366 / 1440 viewport checks. No canonical identity asset changed.
+
 ## 2026-10-07 — User-supplied identity assets replace reconstructed artwork
 
 The seven image files attached by the user are now the visual pixel source of truth. The prior vector/procedural approximation path is superseded.

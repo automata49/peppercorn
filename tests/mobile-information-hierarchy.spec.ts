@@ -25,7 +25,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
   await page.addInitScript(row=>localStorage.setItem('peppercorn-journal',JSON.stringify([row])),journalRow)
-  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
   // Dashboard: decision list first, dense search/table second.
