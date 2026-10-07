@@ -77,8 +77,20 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
 
     await expect(page.locator('.journey-today')).toBeVisible()
     await expect(page.locator('.leader-spotlight')).toHaveCount(0)
-    await expect(page.getByRole('group',{name:'분류'}).getByRole('button')).toHaveText(['대형주','중소형주','전체','ETF'])
+    const category=page.getByRole('group',{name:'분류'})
+    await expect(category.getByRole('button')).toHaveText(['대형주','중소형주','전체','ETF'])
+    await expect(category.locator('.stock-size-equities button')).toHaveCount(3)
+    await expect(category.locator('.stock-size-divider')).toHaveText('/')
+    await expect(category.locator(':scope > .stock-size-etf')).toHaveText('ETF')
+    const pebble=category.getByRole('button',{name:'대형주',exact:true})
+    expect(await pebble.evaluate(e=>getComputedStyle(e).backdropFilter)).toContain('blur(18px)')
+    expect(await pebble.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+    expect(parseFloat(await pebble.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(20)
     await expect(page.locator('.journey-classes button span')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
+    const todayBox=await page.locator('.journey-today').boundingBox()
+    const classesBox=await page.locator('.journey-classes').boundingBox()
+    expect(todayBox).not.toBeNull();expect(classesBox).not.toBeNull()
+    expect(todayBox!.y).toBeLessThan(classesBox!.y)
 
     if(view.compact){
       await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
