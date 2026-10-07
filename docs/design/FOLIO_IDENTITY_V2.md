@@ -41,7 +41,7 @@ Hard rules:
 - Do not reconstruct the wordmark, xx, hero, typography poster or photography from code, SVG geometry, generated text, or a new image-generation pass.
 - Do not bring back `FolioMark.tsx`, the generated motif SVG, the old launch hero, or the old photography asset as active sources.
 - Typography inside the app UI remains Inter / Neue-Grotesk style grotesk; the supplied typography poster is imagery, not a replacement for functional UI text.
-- Palette remains Ink Black `#0B0B0D`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`.
+- Palette remains Ink Black `#0B0B0D`, Paper `#F4F1EC`, warm structural Surface `#EFE9E3`, Warm Sand `#E8DED4`, Plum `#54265F`, Magenta `#A34F78`, Coral `#F06A45`, Amber `#F5A24A`. Pure white must not become the default Light product surface.
 - Semantic gain/loss colours remain functional and independent from the brand palette.
 - Robinhood is benchmarked only for product hierarchy, simplicity, familiar navigation and progressive disclosure. Its branding, colours and trade-entry UI are not Folio identity.
 
