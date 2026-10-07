@@ -1148,7 +1148,7 @@ export default function App(){
             {dashboardTopSectors.map(g=><tr key={g.key} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
               <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
-              <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 {g.core}</small></td>
+              <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 주도 {g.core}</small></td>
               <td className={g.medRet20d!=null&&g.medRet20d>0?'pos':g.medRet20d!=null&&g.medRet20d<0?'neg':''}>{pct(g.medRet20d)}</td>
               <td className={g.medRet50d!=null&&g.medRet50d>0?'pos':g.medRet50d!=null&&g.medRet50d<0?'neg':''}>{pct(g.medRet50d)}</td>
               <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
@@ -1164,7 +1164,7 @@ export default function App(){
               eyebrow:g.market,
               title:sectorLabel(g),
               meta:`RS ${g.medRank==null?'—':Math.round(g.medRank)} · 주도 ${g.core+g.candidate}`,
-              badge:g.core>0?`핵심 ${g.core}`:g.verdict,
+              badge:g.core>0?`핵심 주도 ${g.core}`:g.verdict,
               badgeTone:g.core>0?'green':'gray',
               value:pct(g.medRet20d),
               subvalue:`50D ${pct(g.medRet50d)}`,
