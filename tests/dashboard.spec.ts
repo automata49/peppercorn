@@ -129,6 +129,22 @@ test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',as
   expect(signalNames).toEqual(homeNames);
 });
 
+test('Home ETF Top 5 matches 섹터>ETF ETF Top 5 exactly',async({page})=>{
+  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
+  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}))
+  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
+  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
+  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all')})
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await expect(page.locator('.journey-home')).toBeVisible()
+  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
+  const homeNames=await page.locator('.journey-today .stock-trend-copy>b').allTextContents()
+  expect(homeNames).toHaveLength(5)
+  await openSignal(page)
+  const signalNames=await page.locator('.dashboard-etf-panel .stock-row .stock-id b').allTextContents()
+  expect(signalNames.slice(0,5)).toEqual(homeNames)
+})
+
 test('RS bands refresh in an already open stock detail',async({page})=>{
   let calls=0;
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
