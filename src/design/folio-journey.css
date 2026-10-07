@@ -82,3 +82,340 @@
 .stock-trend-row .negative{color:var(--blue)!important}
 .stock-trend-more{min-height:44px;margin-block:16px}
 @media(max-width:430px){.stock-trend-list .stock-trend-row,.journey-home .stock-trend-row,.page-analysis .stock-trend-list>button{grid-template-columns:24px minmax(0,1fr) 64px minmax(75px,auto)!important;gap:8px}.stock-avatar{width:24px;height:28px;font-size:10px}.stock-trend-tags{gap:4px}.stock-trend-list .stock-trend-price>b{font-size:13px}}
+
+/* =========================================================
+   PRODUCT VISUAL IDENTITY — 2026-10-07
+   One Sunset Editorial system across Home / Explore / Detail / Thesis / Tracking
+   and every secondary workspace. Layout and investing logic stay unchanged.
+   ========================================================= */
+.app-main{
+  background:var(--folio-paper)!important;
+  color:var(--folio-ink)!important;
+}
+.app-main .content{
+  background:var(--folio-paper)!important;
+  color:var(--folio-ink)!important;
+}
+.app-main .topbar{
+  position:sticky;
+  background:color-mix(in srgb,var(--folio-paper) 92%,transparent)!important;
+  border-bottom:1px solid var(--folio-line)!important;
+  box-shadow:none!important;
+  backdrop-filter:blur(18px)!important;
+}
+.app-main .topbar::after{
+  content:"";
+  position:absolute;
+  left:var(--folio-ds-gutter-desktop);
+  bottom:-1px;
+  width:58px;
+  height:2px;
+  background:var(--folio-sunset);
+  pointer-events:none;
+}
+.app-main .topbar-title h1,
+.app-main .journey-heading h2,
+.app-main .journey-heading h3,
+.app-main .analysis-hub-copy h2,
+.app-main .panel h2,
+.app-main .panel h3{
+  font-family:var(--folio-display);
+  color:var(--folio-ink)!important;
+  letter-spacing:-.045em;
+}
+.app-main .topbar-title h1{font-weight:620}
+.app-main .topbar-title p,
+.app-main .panel-head p,
+.app-main .note,
+.app-main .page-note,
+.app-main .journey-source,
+.app-main .classification-meta{
+  color:var(--folio-muted)!important;
+}
+.app-main .panel,
+.app-main .page-note,
+.app-main .ticker-entry,
+.app-main .workspace-grid-panel,
+.app-main .catalog-grid-panel,
+.app-main .legacy-research,
+.app-main .dashboard-explore,
+.app-main .temp-card{
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+  border-color:var(--folio-line)!important;
+  box-shadow:none!important;
+}
+.app-main .panel,
+.app-main .workspace-grid-panel,
+.app-main .catalog-grid-panel{
+  border-radius:var(--folio-ds-card-radius)!important;
+}
+.app-main .page-note,
+.app-main .ticker-entry{
+  border-radius:var(--folio-ds-control-radius)!important;
+}
+.app-main input,
+.app-main select,
+.app-main textarea{
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+  border-color:var(--folio-line)!important;
+}
+.app-main input:focus,
+.app-main select:focus,
+.app-main textarea:focus{
+  border-color:var(--folio-line-strong)!important;
+  box-shadow:0 0 0 2px color-mix(in srgb,var(--folio-coral) 14%,transparent)!important;
+  outline:0;
+}
+.app-main .secondary-action,
+.app-main .dashboard-section-action,
+.app-main .text-button,
+.app-main .panel-head button{
+  background:transparent!important;
+  color:var(--folio-ink)!important;
+  border-color:var(--folio-line)!important;
+  box-shadow:none!important;
+}
+.app-main .secondary-action:hover,
+.app-main .dashboard-section-action:hover,
+.app-main .text-button:hover,
+.app-main .panel-head button:hover{
+  background:var(--folio-surface-2)!important;
+}
+
+/* Shared editorial tabs: classification, detail, thesis/tracking all use the same language. */
+.stock-size-tabs,
+.analysis-scope,
+.journey-tracking-tabs,
+.analysis-detail-tabs{
+  border-color:var(--folio-line)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.stock-size-tabs button,
+.analysis-scope button,
+.journey-tracking-tabs button,
+.analysis-detail-tabs button{
+  position:relative;
+  min-height:44px;
+  background:transparent!important;
+  color:var(--folio-muted)!important;
+  border-color:var(--folio-line)!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.stock-size-tabs button.on,
+.analysis-scope button.on,
+.stock-size-tabs button[aria-pressed="true"],
+.analysis-scope button[aria-pressed="true"],
+.journey-tracking-tabs button[aria-selected="true"],
+.analysis-detail-tabs button[aria-selected="true"]{
+  color:var(--folio-ink)!important;
+  font-weight:650;
+}
+.stock-size-tabs button.on::after,
+.analysis-scope button.on::after,
+.stock-size-tabs button[aria-pressed="true"]::after,
+.analysis-scope button[aria-pressed="true"]::after,
+.journey-tracking-tabs button[aria-selected="true"]::after,
+.analysis-detail-tabs button[aria-selected="true"]::after{
+  content:"";
+  position:absolute;
+  left:22%;
+  right:22%;
+  bottom:-1px;
+  height:2px;
+  background:var(--folio-sunset);
+}
+.analysis-scope button:disabled{
+  opacity:.34;
+  cursor:not-allowed;
+}
+.stock-size-basis{
+  border-bottom:1px solid var(--folio-line);
+  padding-bottom:8px;
+}
+
+/* Home and Market Signal: restrained editorial cards, no competing visual system. */
+.journey-market,
+.journey-today,
+.journey-insight,
+.page-signal .dashboard-sector-only,
+.page-signal .dashboard-explore,
+.page-signal .temp-card{
+  border-color:var(--folio-line)!important;
+}
+.journey-market-facts>div{
+  padding:14px 0;
+  border-top:1px solid var(--folio-line);
+}
+.journey-market-facts strong{color:var(--folio-ink)!important}
+.journey-classes button{
+  position:relative;
+  overflow:hidden;
+  background:var(--folio-surface)!important;
+  border-color:var(--folio-line)!important;
+  color:var(--folio-ink)!important;
+  box-shadow:none!important;
+}
+.journey-classes button::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:2px;
+  background:var(--folio-plum);
+}
+.journey-classes button:nth-child(2)::before{background:var(--folio-magenta)}
+.journey-classes button:nth-child(3)::before{background:var(--folio-coral)}
+.journey-classes button:nth-child(4)::before{background:var(--folio-amber)}
+.journey-classes button span{color:var(--folio-muted)}
+.journey-classes button b{color:var(--folio-ink)}
+
+/* Explore + stock detail */
+.page-analysis .analysis-page,
+.page-thesis .analysis-page{
+  color:var(--folio-ink)!important;
+}
+.page-analysis .analysis-hub-head,
+.page-thesis .journey-theses{
+  border-color:var(--folio-line)!important;
+}
+.page-analysis .analysis-hub-copy h2,
+.page-thesis .journey-heading h2{
+  font-size:clamp(30px,4vw,46px);
+  font-weight:560;
+  letter-spacing:-.06em;
+}
+.page-analysis .analysis-hub-copy p{color:var(--folio-muted)!important}
+.page-analysis .analysis-browse,
+.page-analysis .analysis-finder{
+  border-color:var(--folio-line)!important;
+}
+.page-analysis .analysis-secondary-body>.analysis-block,
+.page-thesis .analysis-secondary-body>.analysis-block,
+.page-thesis .analysis-card,
+.page-analysis .analysis-card{
+  border-color:var(--folio-line)!important;
+  color:var(--folio-ink)!important;
+}
+.page-analysis .analysis-secondary-body>.analysis-block,
+.page-thesis .analysis-secondary-body>.analysis-block{
+  background:var(--folio-surface)!important;
+}
+.page-analysis .analysis-price-momentum,
+.page-thesis .analysis-judgement{
+  border-color:var(--folio-line)!important;
+}
+.page-analysis .position-panel,
+.page-thesis .position-panel,
+.page-analysis .checkup-card,
+.page-thesis .checkup-card,
+.page-analysis .position-label-card,
+.page-thesis .position-label-card{
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+  border-color:var(--folio-line)!important;
+}
+.page-analysis .position-note,
+.page-analysis .position-empty,
+.page-thesis .analysis-mine,
+.page-thesis .position-note{color:var(--folio-muted)!important}
+
+/* Thesis is editorial writing first, table second. */
+.page-thesis .journey-theses{
+  padding:8px 0 24px;
+  border-bottom:1px solid var(--folio-line);
+}
+.page-thesis .analysis-judgement{
+  background:
+    linear-gradient(135deg,color-mix(in srgb,var(--folio-plum) 5%,transparent),color-mix(in srgb,var(--folio-coral) 4%,transparent)),
+    var(--folio-surface)!important;
+}
+.page-thesis .thesis-head>div:first-child>span{
+  color:var(--folio-coral)!important;
+  letter-spacing:.16em;
+}
+.page-thesis .records-anchor{
+  margin-top:24px;
+  padding-top:24px;
+  border-top:1px solid var(--folio-line);
+}
+
+/* Tracking + underlying Watchlist / Portfolio / Journal workspaces */
+.page-tracking .journey-tracking-tabs{
+  border-bottom:1px solid var(--folio-line)!important;
+  margin-bottom:20px;
+}
+.page-tracking .workspace-note,
+.page-watchlist .workspace-note,
+.page-portfolio .workspace-note,
+.page-journal .workspace-note{
+  border-left:2px solid var(--folio-coral)!important;
+}
+.page-tracking .workspace-mobile-summary,
+.page-watchlist .workspace-mobile-summary,
+.page-portfolio .workspace-mobile-summary,
+.page-journal .workspace-mobile-summary{
+  border-top:1px solid var(--folio-line);
+  border-bottom:1px solid var(--folio-line);
+}
+
+/* Catalog / temperature / settings inherit the same Folio surface treatment. */
+.page-leaderboard .page-guide,
+.page-universe .page-guide,
+.page-temperature .temp-card,
+.page-settings .settings-grid>.panel{
+  border-color:var(--folio-line)!important;
+  background:var(--folio-surface)!important;
+}
+.page-settings .setting{
+  border-color:var(--folio-line)!important;
+  color:var(--folio-muted)!important;
+}
+.page-settings .setting b{color:var(--folio-ink)!important}
+.page-temperature .market-temperature,
+.page-temperature .legacy-research{
+  color:var(--folio-ink)!important;
+}
+
+/* Tables and list rows stay editorial instead of reverting to the legacy blue UI. */
+.app-main .industry-table th,
+.app-main .stock-rows-head,
+.app-main .compact-industry-table thead th{
+  background:var(--folio-surface-2)!important;
+  color:var(--folio-muted)!important;
+  border-color:var(--folio-line)!important;
+}
+.app-main .industry-table td,
+.app-main .stock-row,
+.app-main .decision-row,
+.app-main .sheet-table td,
+.app-main .sheet-table th{
+  border-color:var(--folio-line)!important;
+}
+.app-main .stock-row,
+.app-main .stock-row .stock-id,
+.app-main .decision-row{
+  background:var(--folio-surface)!important;
+  color:var(--folio-ink)!important;
+}
+.app-main .stock-row:hover,
+.app-main .decision-row:hover{
+  background:color-mix(in srgb,var(--folio-surface-2) 66%,var(--folio-surface))!important;
+}
+
+@media(max-width:1279px){
+  .app-main .topbar::after{left:var(--folio-ds-gutter-tablet)}
+}
+@media(max-width:650px){
+  .app-main .topbar::after{left:var(--folio-ds-gutter-phone)}
+  .app-main .content{padding-left:var(--folio-ds-gutter-phone)!important;padding-right:var(--folio-ds-gutter-phone)!important}
+  .stock-size-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+  .stock-size-tabs button{padding-inline:6px;font-size:12px}
+  .analysis-scope{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:100%!important}
+  .analysis-scope button{font-size:12px}
+  .journey-tracking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  .page-analysis .analysis-hub-copy h2,
+  .page-thesis .journey-heading h2{font-size:28px}
+}
