@@ -114,6 +114,9 @@ assert(baselineCss.includes('.folio-wordmark-image')&&baselineCss.includes('heig
 assert(css.includes('.folio-wordmark-image-light')&&css.includes('.folio-wordmark-image-dark'),'Light/dark supplied wordmark switching is missing.');
 assert(css.includes('display:inline-grid!important')&&css.includes('grid-area:1 / 1!important'),'Wordmark variants must share one grid cell so they can never render side-by-side.');
 assert(css.includes(':root[data-theme="light"] .leadership-overview')&&css.includes(':root[data-theme="light"] .analysis-page'),'Light theme must explicitly keep Leadership and Analysis surfaces light.');
+assert(css.includes('--folio-surface:#efe9e3;'),'Light structural surface must remain the warm Sunset Editorial surface, not pure white.');
+assert(!css.includes('--folio-surface:#ffffff;'),'Pure-white light surface token must not return.');
+assert(journeyCss.includes('radial-gradient(circle at 94% 4%,rgba(240,106,69,.055)')&&journeyCss.includes('radial-gradient(circle at 75% 10%,rgba(84,38,95,.045)'),'Every workspace must keep the restrained Detail-style sunset field.');
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact functional icons must consume baseline tokens.');
 assert(!/OPTICAL LOCK V[4-9]|QUALITY PASS V[3-9]/.test(css),'Do not append new quality-pass override generations.');
 
