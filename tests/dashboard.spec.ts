@@ -155,8 +155,8 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click();
-  // SPY is neutral, so switch to the full analysis list.
-  await page.locator('.analysis-browse').getByRole('tab',{name:'전체'}).click();
+  // ETF is a first-class Explore classification and ignores equity leadership tabs.
+  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
   await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click();
