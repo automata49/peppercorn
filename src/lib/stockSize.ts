@@ -1,5 +1,5 @@
 import type {LeaderRow,Market} from '../types'
-export type StockSize='large'|'small'|'all'
+export type StockSize='large'|'small'|'etf'|'all'
 export type SizeBasis='market_cap'|'traded_value_20d'|null
 export const SIZE_TOP_SHARE=.10
 export const CAP_COVERAGE_MIN=.90
@@ -20,8 +20,10 @@ export function stockSizes(rows:LeaderRow[]):Record<Market,MarketSize>{
  return out
 }
 export function filterStockSize(rows:LeaderRow[],size:StockSize,sizes:Record<Market,MarketSize>){
- return rows.filter(r=>r.asset_class==='Equity'&&(size==='all'||(sizes[r.market].known.has(r.id)&&(size==='large'?sizes[r.market].large.has(r.id):!sizes[r.market].large.has(r.id)))))
+ if(size==='all')return rows
+ if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')
+ return rows.filter(r=>r.asset_class==='Equity'&&sizes[r.market].known.has(r.id)&&(size==='large'?sizes[r.market].large.has(r.id):!sizes[r.market].large.has(r.id)))
 }
 export function readStockSize():StockSize{
- try{const value=localStorage.getItem(STOCK_SIZE_STORAGE);return value==='all'||value==='small'?value:'large'}catch{return 'large'}
+ try{const value=localStorage.getItem(STOCK_SIZE_STORAGE);return value==='all'||value==='small'||value==='etf'?value:'large'}catch{return 'large'}
 }
