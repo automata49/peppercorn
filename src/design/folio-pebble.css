@@ -20,7 +20,7 @@ html body .shell .app-main :is(.journey-market,.journey-today,.journey-insight,.
   gap:8px!important;border:0!important;background:transparent!important;
   border-radius:0!important;overflow:visible;box-shadow:none!important;
 }
-:root body .shell .app-main :is(.journey-classes button,.analysis-scope button){
+:root body .shell .app-main :is(.journey-classes button,.analysis-scope button,.journey-tracking-tabs button){
   background:var(--folio-pebble-fill)!important;
   border:0!important;
   border-radius:24px!important;
@@ -30,13 +30,15 @@ html body .shell .app-main :is(.journey-market,.journey-today,.journey-insight,.
   backdrop-filter:blur(18px) saturate(1.22)!important;
   padding:16px!important;min-width:0;min-height:48px;
 }
-:root body .shell .app-main :is(.journey-classes button,.analysis-scope button)::before,
-:root body .shell .app-main :is(.journey-classes button,.analysis-scope button)::after{content:none!important}
-:root body .shell .app-main .analysis-scope button[aria-pressed=true]{
+:root body .shell .app-main :is(.journey-classes button,.analysis-scope button,.journey-tracking-tabs button)::before,
+:root body .shell .app-main :is(.journey-classes button,.analysis-scope button,.journey-tracking-tabs button)::after{content:none!important}
+:root body .shell .app-main :is(.analysis-scope button[aria-pressed=true],.journey-tracking-tabs button[aria-selected=true]){
   background:linear-gradient(145deg,color-mix(in srgb,var(--folio-paper) 78%,transparent),color-mix(in srgb,var(--folio-coral) 14%,var(--folio-paper)))!important;
   color:var(--folio-ink)!important;font-weight:680;
 }
-:root body .shell .app-main :is(.journey-classes button,.analysis-scope button):focus-visible{outline:2px solid var(--folio-coral);outline-offset:3px}
+:root body .shell .app-main :is(.journey-classes button,.analysis-scope button,.journey-tracking-tabs button):focus-visible{outline:2px solid var(--folio-coral);outline-offset:3px}
+:root body .shell .app-main .journey-tracking-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+:root body .shell .app-main .journey-tracking-tabs button{padding:12px!important;font-size:clamp(14px,calc(12px + .5vw),18px);word-break:keep-all}
 html body .shell .app-main :is(.stock-row,.stock-row .stock-id,.decision-row,.dashboard-explore-expanded .panel,.analysis-finder .analysis-browse){background:transparent!important}
 html body .shell .app-main :is(.analysis-card,.dashboard-explore-body,.dashboard-sector-only){background:transparent!important;border:0!important;box-shadow:none!important}
 html body :is(.drill-dialog,.etf-summary-dialog,.sector-summary-dialog){background:var(--folio-pebble-fill)!important;-webkit-backdrop-filter:blur(18px) saturate(1.22)!important;backdrop-filter:blur(18px) saturate(1.22)!important}

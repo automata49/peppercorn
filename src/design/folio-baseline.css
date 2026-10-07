@@ -3,6 +3,9 @@
    it must not redefine them locally without an explicit documented exception. */
 :root{
   --folio-ds-unit:4px;
+  --folio-stock-name:clamp(20px,calc(15px + 1.2vw),24px);
+  --folio-stock-price:clamp(18px,calc(14px + 1vw),22px);
+  --folio-stock-meta:clamp(13px,calc(11px + .5vw),15px);
   --folio-ds-space-1:4px;
   --folio-ds-space-2:8px;
   --folio-ds-space-3:12px;
