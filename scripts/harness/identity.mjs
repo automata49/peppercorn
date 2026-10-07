@@ -135,11 +135,11 @@ assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product 
 assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
 assert(contract.includes('Folio Sunset Editorial + Pebble Liquid Glass')&&design.includes('Pebble Liquid Glass')&&baseline.includes('Pebble Liquid Glass'),'Harness docs must brand the current system as Sunset Editorial + Pebble Liquid Glass.');
 assert(journeyCss.includes('Sunset Editorial pebble glass')&&journeyCss.includes('backdrop-filter:blur(18px) saturate(1.22)')&&journeyCss.includes('border-radius:52% 48% 54% 46% / 46% 55% 45% 54%'),'Pebble Liquid Glass geometry/material contract drifted.');
-assert(sidebar.includes("['signal','sectors','섹터 › ETF']"),'The former Market Signal destination must remain branded 섹터 › ETF.');
-assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&!app.includes('etfMkt'),'Home ETF and 섹터 › ETF must share one global market pool without an independent ETF market state.');
+assert(sidebar.includes("['signal','sectors','섹터>ETF']"),'The former Market Signal destination must remain branded 섹터>ETF.');
+assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&!app.includes('etfMkt'),'Home ETF and 섹터>ETF must share one global market pool without an independent ETF market state.');
 assert(app.includes('dashboard-explore dashboard-explore-expanded')&&!app.includes('<details className="dashboard-explore"'),'Core ETF exploration must remain expanded, not hidden in a disclosure.');
 assert(app.includes('sector-heat-disclosure signal-expanded-block')&&!app.includes('<details className="dashboard-disclosure sector-heat-disclosure"'),'Core sector map must remain expanded, not hidden in a disclosure.');
-assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약'),'Home 오늘의 시장 must summarize the full market-signal path and its 전체 보기 must open 섹터 › ETF.');
+assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약'),'Home 오늘의 시장 must summarize the full market-signal path and its 전체 보기 must open 섹터>ETF.');
 assert(app.includes('aria-label="오늘의 주도주"')&&app.includes('<h2>오늘의 주도주</h2>'),'Home leader preview must use the canonical 오늘의 주도주 title.');
 assert(app.indexOf('className="journey-today"')<app.indexOf('className="journey-classes"'),'오늘의 주도주 must appear above the four leadership-class buttons.');
 for(const selector of ['.page-analysis','.page-thesis','.page-tracking','.page-leaderboard','.page-universe','.page-temperature','.page-settings']){
