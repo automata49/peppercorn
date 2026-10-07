@@ -71,16 +71,14 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await openSignal(page)
 
   const sectorDisclosure=page.locator('.sector-heat-disclosure')
-  await expect(sectorDisclosure).not.toHaveAttribute('open','')
-  await sectorDisclosure.locator(':scope > summary').click()
+  await expect(sectorDisclosure).toBeVisible()
   const sectorChart=page.locator('.dashboard-sector-panel .sector-heat')
   await expect(sectorChart.locator('.etf-heat-tile')).toHaveCount(2)
   const sectorAnchor=view.touch?page.locator('.mobile-sector-list'):page.locator('.dashboard-sector-panel .dashboard-sector-table')
   expect((await sectorChart.boundingBox())!.y).toBeGreaterThan((await sectorAnchor.boundingBox())!.y)
 
-  const explore=page.locator('.dashboard-explore')
-  await expect(explore).not.toHaveAttribute('open','')
-  await explore.locator(':scope > summary').click()
+  const explore=page.locator('.dashboard-explore-expanded')
+  await expect(explore).toBeVisible()
   const etfChart=page.locator('.dashboard-etf-panel .rs-chart')
   await expect(etfChart.locator('.line-legend b')).toHaveCount(3)
   expect((await etfChart.boundingBox())!.y).toBeLessThan((await page.locator('.dashboard-etf-panel .stock-rows').boundingBox())!.y)
@@ -213,7 +211,6 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await openSignal(page)
   // Section toggles: the sector section switches to KR without touching 주도 종목; the global toggle resets all.
   const sectorPanel=page.locator('.dashboard-sector-panel')
-  await sectorPanel.locator('.sector-heat-disclosure > summary').click()
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['KR','US'])
   // VALUE-2: US tiles sized by summed trading value (Health Technology 15e9 vs Technology 5e9); KR has none yet → member count.
   await expect(sectorPanel.locator('.etf-heat-market-head span').nth(1)).toContainText('20일 평균 거래대금 합계')
@@ -228,7 +225,6 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(sectorPanel.locator('.section-market button.on')).toHaveText('US')
   await expect(sectorPanel.locator('.etf-heat-market-head b')).toHaveText(['US'])
   // RS line: 50D default, last close 159 vs base 109 against flat SPY.
-  await page.locator('.dashboard-explore > summary').click()
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   await openLeaderTools(page)
