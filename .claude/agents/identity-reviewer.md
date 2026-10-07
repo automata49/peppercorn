@@ -13,9 +13,9 @@ Check that:
 - Home identity imagery uses `folio-brand-typography.webp` and `folio-brand-photography.webp`;
 - the supplied glossy/light icon references remain available while the black icon stays the installed default;
 - Pebble Liquid Glass stays restricted to the stock-category selector, with **대형주 / 중소형주 / 전체 / ETF** and a visible `/` before ETF;
-- Home **오늘의 시장** summarizes market breadth → leading sector → ETF RS leader and its 전체 보기 opens **섹터 › ETF**;
+- Home **오늘의 시장** summarizes market breadth → leading sector → ETF RS leader and its 전체 보기 opens **섹터>ETF**;
 - **오늘의 주도주** renders above the four leadership buttons;
-- Home ETF and 섹터 › ETF share the same global-market ETF pool/ranking, and the core sector/ETF blocks are expanded by default;
+- Home ETF and 섹터>ETF share the same global-market ETF pool/ranking, and the core sector/ETF blocks are expanded by default;
 - Robinhood influence stays structural rather than visual-brand copying;
 - Analysis Hub remains the single deep path (scope → list → unchanged price momentum → Overview / Analysis / Financials / Thesis);
 - System/Light/Dark, semantic finance colours and all investment rules stay unchanged;
