@@ -51,7 +51,7 @@ test('mini trend uses actual closes, labels incomplete periods and preserves gap
 for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large → whole list → categories → size persistence`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440});const page=await context.newPage();const batches=await boot(page)
  const category=page.getByRole('group',{name:'분류'})
- await expect(category.getByRole('button')).toHaveText(['대형주','중소형주','ETF','전체'])
+ await expect(category.getByRole('button')).toHaveText(['대형주','중소형주','전체','ETF'])
  await expect(category.getByRole('button',{name:'대형주',exact:true})).toHaveAttribute('aria-pressed','true')
  await expect(page.locator('.journey-today .stock-trend-row')).toHaveCount(2)
  await expect(page.locator('.journey-today svg[role=img]').first()).toBeVisible()
