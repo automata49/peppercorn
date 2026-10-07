@@ -126,12 +126,22 @@ for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(side
 
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep structured Folio Insight.');
-assert(stockSizeFilter.includes("[['large','대형주'],['small','중소형주'],['etf','ETF'],['all','전체']]"),'Explore category labels must be exactly 대형주 / 중소형주 / ETF / 전체.');
+assert(stockSizeFilter.includes("STOCK_CATEGORY_LABELS=[['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']]"),'Explore category order must remain 대형주 / 중소형주 / 전체 / ETF.');
+assert(stockSizeFilter.includes('stock-size-equities')&&stockSizeFilter.includes('stock-size-divider')&&stockSizeFilter.includes('stock-size-etf'),'Category control must keep equities grouped, a visible divider, and a separate ETF pebble.');
 assert(stockSize.includes("export type StockSize='large'|'small'|'etf'|'all'")&&stockSize.includes("if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')"),'ETF must remain a first-class Explore category.');
 assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']]"),'Equity leadership labels must be exactly 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.');
 assert(!app.includes("['position','Position']"),'Position must not return as an Explore category.');
 assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product label must not return.');
 assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
+assert(contract.includes('Folio Sunset Editorial + Pebble Liquid Glass')&&design.includes('Pebble Liquid Glass')&&baseline.includes('Pebble Liquid Glass'),'Harness docs must brand the current system as Sunset Editorial + Pebble Liquid Glass.');
+assert(journeyCss.includes('Sunset Editorial pebble glass')&&journeyCss.includes('backdrop-filter:blur(18px) saturate(1.22)')&&journeyCss.includes('border-radius:52% 48% 54% 46% / 46% 55% 45% 54%'),'Pebble Liquid Glass geometry/material contract drifted.');
+assert(sidebar.includes("['signal','sectors','섹터 › ETF']"),'The former Market Signal destination must remain branded 섹터 › ETF.');
+assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&!app.includes('etfMkt'),'Home ETF and 섹터 › ETF must share one global market pool without an independent ETF market state.');
+assert(app.includes('dashboard-explore dashboard-explore-expanded')&&!app.includes('<details className="dashboard-explore"'),'Core ETF exploration must remain expanded, not hidden in a disclosure.');
+assert(app.includes('sector-heat-disclosure signal-expanded-block')&&!app.includes('<details className="dashboard-disclosure sector-heat-disclosure"'),'Core sector map must remain expanded, not hidden in a disclosure.');
+assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약'),'Home 오늘의 시장 must summarize the full market-signal path and its 전체 보기 must open 섹터 › ETF.');
+assert(app.includes('aria-label="오늘의 주도주"')&&app.includes('<h2>오늘의 주도주</h2>'),'Home leader preview must use the canonical 오늘의 주도주 title.');
+assert(app.indexOf('className="journey-today"')<app.indexOf('className="journey-classes"'),'오늘의 주도주 must appear above the four leadership-class buttons.');
 for(const selector of ['.page-analysis','.page-thesis','.page-tracking','.page-leaderboard','.page-universe','.page-temperature','.page-settings']){
   assert(journeyCss.includes(selector),`All-page Folio identity coverage missing ${selector}`);
 }
@@ -165,4 +175,4 @@ for(const width of [390,834,1366,1440])assert(visualRegression.includes(`width:$
 assert.equal(claudePlugin.version,'1.2.0');
 assert.equal(codexPlugin.version,'1.2.0');
 
-console.log('Folio user-supplied identity invariants passed.');
+console.log('Folio Sunset Editorial + Pebble Liquid Glass identity invariants passed.');
