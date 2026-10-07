@@ -16,7 +16,11 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440})
  const page=await context.newPage();await boot(page)
  await expect(page.locator('.journey-classes button')).toHaveCount(4)
+ await expect(page.getByRole('heading',{name:'오늘의 주도주',exact:true})).toBeVisible()
  expect(await page.locator('.journey-today .decision-row').count()).toBeLessThanOrEqual(5)
+ const todayBox=(await page.locator('.journey-today').boundingBox())!
+ const classesBox=(await page.locator('.journey-classes').boundingBox())!
+ expect(todayBox.y).toBeLessThan(classesBox.y)
  await expect(page.locator('.leader-spotlight,.dashboard-sector-panel')).toHaveCount(0)
  const brand=width===1440?page.locator('.sidebar .folio-wordmark-system'):page.locator('.mobile-brandbar .folio-wordmark-system')
  await expect(brand.locator('.folio-wordmark-image:visible')).toHaveCount(1)
