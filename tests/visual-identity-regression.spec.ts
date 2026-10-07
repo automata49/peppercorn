@@ -41,6 +41,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
         ink:s.getPropertyValue('--folio-ink').trim(),
         black:s.getPropertyValue('--folio-black').trim(),
         sand:s.getPropertyValue('--folio-warm-sand').trim(),
+        surface:s.getPropertyValue('--folio-surface').trim(),
       }
     })
     expect(rootVars).toEqual({
@@ -48,6 +49,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       ink:'#111113',
       black:'#0b0b0d',
       sand:'#e8ded4',
+      surface:'#efe9e3',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
@@ -120,6 +122,11 @@ test('Light theme keeps one Folio visual system across every product workspace',
     expect(signature.color).toBe('rgb(17, 17, 19)')
     const content=main.locator('.content')
     expect(await content.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
+    expect(await content.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('radial-gradient')
+    const structural=main.locator('.panel,.page-note,.workspace-grid-panel,.catalog-grid-panel,.temp-card,.ticker-entry').filter({visible:true})
+    for(const node of await structural.all()){
+      expect(await node.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgb(255, 255, 255)')
+    }
   }
   await context.close()
 })
