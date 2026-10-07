@@ -75,10 +75,10 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
 
     const leader=page.locator('.leadership-overview')
     await expect(leader).toBeVisible()
-    expect(await leader.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(11, 11, 13)')
+    expect(await leader.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
     const line=page.locator('.spotlight-line')
     await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(247, 244, 241)')
+    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(17, 17, 19)')
     expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
 
     const period=page.locator('.spotlight-periods button.on')
@@ -92,7 +92,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
-    expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(11, 11, 13)')
+    expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
     await expect(analysis.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
     await expect(analysis.locator('.folio-insight')).toBeVisible()
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
