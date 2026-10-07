@@ -16,7 +16,7 @@ async function boot(page:any){
 }
 
 for(const view of views){
- test(view.name+' keeps exact Sunset Editorial B identity from launch through Home',async({browser})=>{
+ test(view.name+' keeps exact Sunset Editorial + Pebble Liquid Glass identity from launch through Home',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch,colorScheme:'light'})
   const page=await context.newPage()
   await boot(page)
