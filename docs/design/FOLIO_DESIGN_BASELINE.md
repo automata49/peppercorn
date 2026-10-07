@@ -88,7 +88,8 @@ Do not paste Unicode icons, emoji, arbitrary SVGs, or a second icon library into
 B is editorial, not bubbly-fintech.
 
 - Light is first-run default.
-- Paper: `#F4F1EC`; Ink: `#111113`; deep black: `#0B0B0D`.
+- Paper: `#F4F1EC`; structural light surface: `#EFE9E3`; Warm Sand: `#E8DED4`; Ink: `#111113`; deep black: `#0B0B0D`.
+- Pure white is **not** a default panel/card/input/dialog fill. In Light, product surfaces use Paper → warm Surface → Warm Sand hierarchy; white is reserved for deliberate high-contrast details or supplied artwork.
 - Card radius baseline: **14px**.
 - Control radius baseline: **10px**.
 - Pills are only for tags, segmented toggles, and true status chips.
