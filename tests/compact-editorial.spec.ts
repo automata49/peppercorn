@@ -36,7 +36,7 @@ for(const view of views){
     const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
     const line=page.locator('.spotlight-line')
     await expect(line).toBeVisible()
-    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(247, 244, 241)')
+    expect(await line.evaluate(e=>getComputedStyle(e).stroke)).toBe('rgb(17, 17, 19)')
     expect(parseFloat(await page.locator('.spotlight-area').evaluate(e=>getComputedStyle(e).opacity))).toBeLessThanOrEqual(.05)
 
     const period=page.locator('.spotlight-periods button.on')
