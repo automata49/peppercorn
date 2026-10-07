@@ -34,13 +34,13 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(etfRows.first().locator('strong').nth(0)).toHaveText('99');
   await expect(etfRows.first().locator('strong').nth(1)).toHaveText('—');
   await expect(etfRows.first().locator('span').last()).toHaveText('-10.0%');
-  // Secondary market tools are progressively disclosed; the primary header keeps only the full-list action.
+  // Sector and ETF analysis are laid out openly; no disclosure step hides market tools.
   await expect(page.locator('.dashboard-section.market-internals')).toHaveCount(0);
   const sectorActions=page.locator('.dashboard-sector-panel .sector-actions button');
   await expect(sectorActions).toHaveText(['전체 보기 →']);
   const sectorTools=page.locator('.sector-heat-disclosure');
-  await expect(sectorTools).not.toHaveAttribute('open','');
-  await sectorTools.locator(':scope > summary').click();
+  await expect(sectorTools).toBeVisible();
+  await expect(sectorTools.getByRole('heading',{name:'시장 지표 · 섹터 히트맵'})).toBeVisible();
   await sectorTools.getByRole('button',{name:'시장 지표 보기'}).click();
   const metrics=page.locator('.market-metrics-dialog');
   await expect(metrics.getByRole('heading',{name:'시장 지표'})).toBeVisible();
@@ -56,9 +56,8 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.keyboard.press('Escape');
   await expect(metrics).toHaveCount(0);
   await expect(page.locator('.ui-dialog-overlay')).toHaveCount(0);
-  const explore=page.locator('.dashboard-explore');
-  await expect(explore).not.toHaveAttribute('open','');
-  await explore.locator(':scope > summary').click();
+  const explore=page.locator('.dashboard-explore-expanded');
+  await expect(explore).toBeVisible();
   await expect(etfPanel).toBeVisible();
   const sectorHead=page.locator('.dashboard-sector-panel .sector-name-head'),etfHead=etfPanel.locator('.stock-name-head');
   if(!view.touch){
@@ -140,8 +139,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
-  // Dashboard ETF summary is secondary and collapsed until requested.
-  await page.locator('.dashboard-explore > summary').click();
+  // ETF summary is always visible on the Sector › ETF page.
   const top=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(top.locator('.stock-id b')).toHaveText('QQQ ETF');
   await expect(top.locator('strong').nth(0)).toHaveText('99');
@@ -187,11 +185,9 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
     const panel=page.locator('.dashboard-etf-industry-panel');
-    // ETF exploration is deliberately secondary: hidden by default, then revealed in one disclosure.
-    const explore=page.locator('.dashboard-explore');
-    await expect(explore).not.toHaveAttribute('open','');
-    await expect(panel).not.toBeVisible();
-    await explore.locator(':scope > summary').click();
+    // ETF exploration is fully expanded directly below the sector map.
+    const explore=page.locator('.dashboard-explore-expanded');
+    await expect(explore).toBeVisible();
     await expect(panel).toBeVisible();
     const heatBox=(await panel.boundingBox())!,etfBox=(await page.locator('.dashboard-etf-panel').boundingBox())!;
     expect(etfBox.y).toBeGreaterThan(heatBox.y+heatBox.height-1);
@@ -269,7 +265,6 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openSignal(page);
-  await page.locator('.dashboard-explore > summary').click();
   const row=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(row.locator('.stock-id b')).toHaveText('KODEX 200');
   await row.click();
@@ -291,7 +286,6 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
   for(const panel of ['.drill-sheet','.dashboard-etf-panel']){
     if(panel==='.dashboard-etf-panel'){
       await page.keyboard.press('Escape');await expect(page.locator('.drill-sheet')).toHaveCount(0);
-      await page.locator('.dashboard-explore > summary').click();
     }
     const rows=page.locator(panel+' .stock-rows');
     expect(await align(rows.locator('.stock-rows-head > span'))).toEqual(['left']);
