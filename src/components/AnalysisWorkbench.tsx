@@ -75,7 +75,7 @@ export function CheckupSummary({ row, position, leadership }: { row: LeaderRow; 
         {dots(fund.items)}
         <p className="checkup-count">{fund.usable ? `통과 ${f.pass} · 중립 ${f.neutral} · 미달 ${f.fail}` : fund.reason}</p>
         <details><summary>항목 보기</summary><CheckList items={fund.items} />
-          <p className="checkup-note">{fund.usable ? fund.reason + ' · 공시 사실에 기존 자동 판정 기준을 대어 본 참고 표시이며 Position 라벨이 아닙니다.' : 'Position 라벨과 별개인 참고 표시입니다.'}</p></details>
+          <p className="checkup-note">{fund.usable ? fund.reason + ' · 공시 사실에 기존 자동 판정 기준을 대어 본 참고 표시이며 별도 장기 라벨과는 분리됩니다.' : '공시 참고 표시이며 투자 판단 라벨과는 별개입니다.'}</p></details>
       </article>
     </div>
     <p className="checkup-quadrant"><b>{quadText}</b><span>두 축은 서로 다른 기준이며 하나의 점수로 합치지 않습니다.</span></p>
