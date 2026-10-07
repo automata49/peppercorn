@@ -1179,17 +1179,6 @@ export default function App(){
         </div>
       </section>
 
-      <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
-
-      <section className="folio-identity-interlude" aria-label="Folio visual identity">
-        <figure className="folio-motif-panel">
-          <img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself. A wider perspective for a brighter tomorrow." loading="lazy"/>
-        </figure>
-        <figure className="folio-photo-panel" aria-hidden="true">
-          <img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/>
-        </figure>
-      </section>
-
       <section className="dashboard-explore dashboard-explore-expanded" aria-label="ETF 시장 탐색">
         <div className="signal-expanded-head signal-etf-head"><div><span>ETF MAP</span><h2>ETF</h2><p>홈과 동일한 {`${market==='ALL'?'전체 시장':market} ETF RS 순위`}를 이어서 봅니다.</p></div></div>
         <div className="dashboard-explore-body">
@@ -1210,6 +1199,18 @@ export default function App(){
           </section>
         </div>
       </section>
+
+      <TemperatureCard entries={tempEntries} onOpen={()=>setPage('temperature')}/>
+
+      <section className="folio-identity-interlude" aria-label="Folio visual identity">
+        <figure className="folio-motif-panel">
+          <img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself. A wider perspective for a brighter tomorrow." loading="lazy"/>
+        </figure>
+        <figure className="folio-photo-panel" aria-hidden="true">
+          <img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/>
+        </figure>
+      </section>
+
     </div>
   }else if(page==='leaderboard'){
     const lbEquities=leaders.filter(r=>r.asset_class==='Equity'),lbEtfs=leaders.length-lbEquities.length
