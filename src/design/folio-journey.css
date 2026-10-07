@@ -239,8 +239,8 @@
     inset 0 1px 0 color-mix(in srgb,#fff 68%,transparent),
     inset -1px -1px 0 color-mix(in srgb,var(--folio-plum) 6%,transparent),
     0 7px 18px rgba(84,38,95,.07)!important;
-  backdrop-filter:blur(18px) saturate(1.22);
-  -webkit-backdrop-filter:blur(18px) saturate(1.22);
+  backdrop-filter:blur(18px) saturate(1.22)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.22)!important;
   border-radius:52% 48% 54% 46% / 46% 55% 45% 54%!important;
 }
 .stock-size-equities button:nth-child(2){border-radius:47% 53% 45% 55% / 55% 46% 54% 45%!important}
