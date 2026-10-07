@@ -1115,7 +1115,7 @@ export default function App(){
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
     const homeSector=buildSectors(marketRows).slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)[0]??null
     const homeEtf=rankedEtfRows[0]??null
-    const openMarketSignal=()=>{setPage('signal');window.scrollTo({top:0,behavior:'instant'})}
+    const openMarketSignal=()=>{setSector(null);setSectorMkt(market);setPage('signal');window.scrollTo({top:0,behavior:'instant'})}
     content=<div className="journey-home">
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
       <section className="journey-market" aria-label="시장 신호 요약">
