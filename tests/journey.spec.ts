@@ -45,7 +45,7 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  await page.screenshot({path:`test-results/journey-explore-${width}.png`,fullPage:true})
  await page.locator('.analysis-idea-list > button').first().click();await page.getByRole('button',{name:'← 탐색 목록'}).click()
- await expect(page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true})).toHaveAttribute('aria-selected','true')
+ await expect(page.locator('.analysis-scope button[aria-pressed="true"]')).toHaveCount(0)
  await context.close()
 })
 test('Thesis opens and edits the selected dated record, retaining both versions after reload',async({page})=>{
@@ -69,7 +69,7 @@ test('archived Thesis remains editable without fabricating market data',async({p
  await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
 })
 test('Explore market change clears the prior market sector',async({page})=>{
- await boot(page);await nav(page,'탐색');await page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true}).click()
+ await boot(page);await nav(page,'탐색');{const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
  await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'US',exact:true}).click()
  const sector=page.getByRole('combobox',{name:'탐색 섹터'});await sector.selectOption({index:1})
  await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'KR',exact:true}).click();await expect(sector).toHaveValue('')
@@ -82,6 +82,6 @@ test('Explore ignores hidden catalog search after external stock detail',async({
  await page.getByPlaceholder('Ticker · 종목 · 산업 · 섹터 검색').fill(rows[0].ticker)
  await page.locator('.catalog-mobile-summary .decision-row').first().click()
  await page.getByRole('button',{name:'← 탐색 목록'}).click()
- await page.locator('.analysis-scope').getByRole('tab',{name:'전체',exact:true}).click()
+ {const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(rows.length)
 })
