@@ -123,9 +123,9 @@ test('Light theme keeps one Folio visual system across every product workspace',
     const content=main.locator('.content')
     expect(await content.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
     expect(await content.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('radial-gradient')
-    const structural=main.locator('.panel,.page-note,.workspace-grid-panel,.catalog-grid-panel,.temp-card,.ticker-entry').filter({visible:true})
+    const structural=main.locator('.panel,.page-note,.workspace-grid-panel,.catalog-grid-panel,.temp-card,.ticker-entry')
     for(const node of await structural.all()){
-      expect(await node.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgb(255, 255, 255)')
+      if(await node.isVisible())expect(await node.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgb(255, 255, 255)')
     }
   }
   await context.close()
