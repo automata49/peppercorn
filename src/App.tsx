@@ -1201,7 +1201,7 @@ export default function App(){
               <div><h2>ETF 요약</h2><p>홈 ETF와 동일한 ETF 전용 RS 순위 Top 5</p></div>
               <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
             </div>
-            <EtfRsChart rows={etfRows} onSelect={chartOpenEtf}/>
+            <EtfRsChart rows={rankedEtfRows.slice(0,5)} onSelect={chartOpenEtf}/>
             <StockRows label="ETF" rows={rankedEtfRows.slice(0,5)} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/>
           </section>
         </div>
