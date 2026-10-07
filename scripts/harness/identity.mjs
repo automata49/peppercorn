@@ -16,6 +16,9 @@ const required=[
   'docs/design/FOLIO_DESIGN_BASELINE.md',
   'src/design/folio-baseline.css',
   'src/design/folio-identity.css',
+  'src/design/folio-journey.css',
+  'src/components/StockSizeFilter.tsx',
+  'src/lib/stockSize.ts',
   'tests/design-baseline.spec.ts',
   'tests/brand.spec.ts',
   'tests/theme-system.spec.ts',
@@ -48,6 +51,9 @@ const design=read('docs/design/FOLIO_IDENTITY_V2.md');
 const baseline=read('docs/design/FOLIO_DESIGN_BASELINE.md');
 const baselineCss=read('src/design/folio-baseline.css');
 const css=read('src/design/folio-identity.css');
+const journeyCss=read('src/design/folio-journey.css');
+const stockSizeFilter=read('src/components/StockSizeFilter.tsx');
+const stockSize=read('src/lib/stockSize.ts');
 const app=read('src/App.tsx');
 const sidebar=read('src/components/Sidebar.tsx');
 const wordmark=read('src/components/FolioWordmark.tsx');
@@ -68,7 +74,7 @@ assert(contract.includes('2026-10-07 supplied-asset lock'),'CONTRACT must lock t
 assert(design.includes('seven identity files supplied by the user on 2026-10-07'),'Identity doc must name the supplied asset set as source of truth.');
 assert(baseline.includes('seven user-supplied identity files approved on **2026-10-07**'),'Level-0 baseline must defer brand pixels to the supplied files.');
 assert(css.includes('USER-SUPPLIED IDENTITY ASSET LOCK — 2026-10-07'),'Supplied-asset CSS lock is missing.');
-assert(mainEntry.includes("import './design/folio-baseline.css'")&&mainEntry.includes("import './design/folio-identity.css'"),'Baseline and identity stylesheets must both load.');
+assert(mainEntry.includes("import './design/folio-baseline.css'")&&mainEntry.includes("import './design/folio-identity.css'")&&mainEntry.includes("import './design/folio-journey.css'"),'Baseline, identity and journey stylesheets must all load.');
 
 assert(!existsSync('src/components/FolioMark.tsx'),'Retired FolioMark.tsx must not return after supplied wordmark approval.');
 for(const file of [
@@ -117,6 +123,16 @@ for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(side
 
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
 assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep structured Folio Insight.');
+assert(stockSizeFilter.includes("[['large','대형주'],['small','중소형주'],['etf','ETF'],['all','전체']]"),'Explore category labels must be exactly 대형주 / 중소형주 / ETF / 전체.');
+assert(stockSize.includes("export type StockSize='large'|'small'|'etf'|'all'")&&stockSize.includes("if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')"),'ETF must remain a first-class Explore category.');
+assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']]"),'Equity leadership labels must be exactly 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.');
+assert(!app.includes("['position','Position']"),'Position must not return as an Explore category.');
+assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product label must not return.');
+assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
+for(const selector of ['.page-analysis','.page-thesis','.page-tracking','.page-leaderboard','.page-universe','.page-temperature','.page-settings']){
+  assert(journeyCss.includes(selector),`All-page Folio identity coverage missing ${selector}`);
+}
+
 
 const expectedIcons=[
   './folio-b-icon-192.png?v=u2',
