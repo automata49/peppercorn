@@ -61,7 +61,7 @@ Market Signal owns sector summaries, heatmaps, Howard Marks temperature and ETF 
 ## Analysis experience
 
 - Primary navigation: 홈 / 탐색 / Thesis / 추적.
-- Explore: one market/search/scope/sector/size/lens-filter list, with 20-row progressive pages and mini trends loaded in batches of at most 10 IDs. Preserve four daily classes, all-stock and Position scopes. No separate hidden focus roster.
+- Explore: one market/search/category/leadership/sector/lens-filter list, with 20-row progressive pages and mini trends loaded in batches of at most 10 IDs. The primary category control is exactly **대형주 / 중소형주 / ETF / 전체**. The equity leadership control is exactly **핵심 주도 / 주도 후보 / 강세 전환 / 조정 중**; it is disabled for ETF. Position is not a visible Explore category or product label. No separate hidden focus roster.
 - Selecting a stock opens Detail; the list is replaced, not stacked above the chart. Return to list preserves filters. Primary Explore navigation clears hidden global query/sector state.
 - Detail preserves the existing PriceRsChart and Overview / Analysis / Financials / Thesis depth. These retain their existing evidence and semantics.
 - Thesis workspace uses existing analysis records and exact record identity for editing multiple dates of the same ticker. The editable records grid remains progressively disclosed.
@@ -72,7 +72,7 @@ Existing supplied artwork and the Level-0 visual baseline remain authoritative. 
 
 ## Mobile / iPad visual rule
 
-Desktop, mobile and iPad all use B/Sunset Editorial. The selected appearance governs the entire product surface: **Light keeps the shell, Leadership Overview and Analysis light**, while Dark/System-dark may use the approved near-black focal investing treatment. Compact layouts keep the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop, with restrained sunset accents, text-led tabs, editorial evidence columns and list-like sector rows. Rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
+Desktop, mobile and iPad all use B/Sunset Editorial. The selected appearance governs the **entire product surface**: Home, Explore, Detail, Thesis, Tracking, Market Signal, Temperature, Watchlist, Portfolio, Journal, Leaderboard, Universe, Settings and dialogs all consume the same Folio paper/surface/ink/rule/type/sunset tokens. Light stays light end-to-end; Dark/System-dark may use the approved near-black focal treatment. Compact layouts keep the same wordmark, app-icon family, typography, palette discipline and motif logic as desktop, with restrained sunset accents, text-led tabs, editorial evidence columns and list-like rows. Legacy blue/white workspace styling, rounded-card accumulation, glowing gradients, chromatic navigation and C's flowing-wave UI are prohibited. C remains photography treatment only.
 
 ## Visual Identity cleanup lock
 
