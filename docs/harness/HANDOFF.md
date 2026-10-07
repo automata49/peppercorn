@@ -627,3 +627,17 @@ Explore presents one market/scope/sector/lens list; selecting a stock replaces t
 Validation: npm run harness:check, npm run build, npm run test:identity -- --workers=4 (29 passed), full Playwright browser suite --workers=6 (142 passed), git diff --check. Inspected phone Home and tested journeys at 390 / 834 / 1366 / 1440px. Read-only identity/UI reviewer found no remaining source blockers. Chromium emulation only; physical iOS Safari was not tested. Existing large-bundle build advisory remains. Earlier failures came from obsolete navigation assertions and were migrated; the final stable full run passed.
 
 Delivery: branch codex/folio-discovery-journey, submitted for review via PR. Production publishing remains the existing main-branch Deploy web app workflow; this change does not itself deploy production.
+
+## Canonical classifications + all-page Folio identity — 2026-10-07
+
+User decision:
+- Primary category is exactly **대형주 / 중소형주 / ETF / 전체**. Large remains the persisted default. Large/small use market cap when coverage is sufficient, otherwise the existing labelled 20-day traded-value fallback. ETF is a separate asset class; 전체 includes equities and ETFs.
+- Equity leadership naming is exactly **핵심 주도 / 주도 후보 / 강세 전환 / 조정 중** everywhere. The former abbreviated labels and the Explore **Position** category are removed. The legacy Position name may remain only as an internal data-pipeline/type identifier; Financials is presented as 공시 펀더멘털.
+- The supplied Folio Sunset Editorial Visual Identity now governs every product page and section: Home, Explore, Detail, Thesis, Tracking, Market Signal, Temperature, Watchlist, Portfolio, Journal, Leaderboard, Universe, Settings, dialogs and editable/grid surfaces. Light stays light end-to-end; no separate legacy blue/white workspace system is allowed.
+
+Implementation:
+- `StockSize` now includes `etf`; `StockSizeFilter` renders the four canonical category buttons. ETF does not participate in equity size partitioning or leadership classes. Home shows a useful ETF preview using the existing same-market ETF RS rank and disables equity leadership buttons while ETF is selected.
+- Explore has only the four canonical equity leadership buttons. Clicking an active leadership button clears that filter; there is no redundant all/Position leadership tab because **전체** belongs to the category axis.
+- Product-facing Position wording was removed from Explore and Financials headings/copy while the underlying filing snapshot pipeline and stored data remain unchanged.
+- `folio-journey.css` adds one token-driven product identity layer for all workspaces; canonical identity/harness docs and every generated Folio identity skill copy were updated. `scripts/harness/identity.mjs` now prevents reintroduction of the old category labels, Position Explore scope, or missing all-page identity layer.
+- Regression coverage now locks the exact category/leadership labels, ETF classification behavior, and Light-theme surface signature across all sidebar workspaces.
