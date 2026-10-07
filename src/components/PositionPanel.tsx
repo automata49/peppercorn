@@ -34,13 +34,13 @@ export function valuation(row: LeaderRow, position: PositionRow | undefined) {
 
 export function PositionPanel({ row, position, status }: { row: LeaderRow; position?: PositionRow; status: 'live' | 'unavailable' | 'loading' }) {
   if (row.asset_class !== 'Equity') {
-    return <section className="position-panel"><PanelHead /><p className="position-empty">ETF 등 주식 외 자산은 공시 펀더멘털 분석 대상이 아닙니다.</p></section>
+    return <section className="position-panel" data-market={row.market}><PanelHead /><p className="position-empty">ETF 등 주식 외 자산은 공시 펀더멘털 분석 대상이 아닙니다.</p></section>
   }
   if (!position) {
     const why = status === 'loading' ? '공시 펀더멘털 데이터를 불러오는 중입니다.'
       : status === 'unavailable' ? '공시 펀더멘털 데이터를 불러오지 못했습니다. 잠시 후 다시 시도하세요.'
       : '아직 적재되지 않은 종목입니다. 매주 월요일 대시보드 주도 종목을 수집합니다.'
-    return <section className="position-panel"><PanelHead /><p className="position-empty">{why}</p><Evidence /></section>
+    return <section className="position-panel" data-market={row.market}><PanelHead /><p className="position-empty">{why}</p><Evidence /></section>
   }
   const m = position.metrics
   const { pe, peg } = valuation(row, position)
@@ -60,7 +60,7 @@ export function PositionPanel({ row, position, status }: { row: LeaderRow; posit
     ['PER (현재가/EPS)', ratio(pe)],
     ['PEG', peg == null ? '—' : peg.toFixed(2)],
   ]
-  return <section className="position-panel">
+  return <section className="position-panel" data-market={row.market}>
     <PanelHead status={position.status} source={`${row.market === 'KR' ? 'DART' : 'SEC'} 공시 · 기준 분기 ${m.as_of ?? position.as_of} · 수집 ${position.computed_at.slice(0, 10)}`} />
     {position.status === 'check_failed' && <div className="position-alert"><b>데이터 검사 실패</b><span>라벨을 표시하지 않습니다. 실패 항목: {position.failed_checks.map(c => c[0]).join(', ') || '—'}</span></div>}
     <div className="position-labels">{SECTIONS.map(key => {

@@ -10,33 +10,33 @@ async function boot(page:any){
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
-test('phone primary sections use flat surfaces instead of nested cards',async({browser})=>{
+test('phone major regions use Pebble glass while metrics remain unboxed',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   await boot(page)
 
   const focus=page.locator('.journey-market').first()
   await expect(focus).toBeVisible()
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
   await openSignal(page)
   for(const selector of ['.dashboard-sector-panel','.temp-card']){
     const node=page.locator(selector).first()
     await expect(node).toBeVisible()
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
-    expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+    expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toContain('inset')
   }
 
   const explore=page.locator('.dashboard-explore')
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
   await pickFirstStock(page)
   const primary=page.locator('.analysis-main > .analysis-price-momentum')
   await expect(primary).toHaveCount(1)
-  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
   await page.locator('.analysis-card').getByRole('tab',{name:'Overview'}).click()
   const detailBlocks=page.locator('.analysis-secondary-body > .analysis-block')
   await expect(detailBlocks).toHaveCount(3)
@@ -48,15 +48,15 @@ test('phone primary sections use flat surfaces instead of nested cards',async({b
   await context.close()
 })
 
-test('desktop focal leader and analysis keep the same flat editorial hierarchy',async({page})=>{
+test('desktop major regions share Pebble glass',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const focus=page.locator('.journey-market')
-  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
   await pickFirstStock(page)
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 })

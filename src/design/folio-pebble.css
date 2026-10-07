@@ -1,0 +1,33 @@
+/* PEBBLE-REGIONS-1: shared glass for major regions and leadership controls.
+   Values and table rows remain unboxed on the same paper base. */
+:root{
+  --folio-pebble-fill:linear-gradient(145deg,color-mix(in srgb,var(--folio-paper) 78%,transparent),color-mix(in srgb,var(--folio-paper) 56%,transparent) 62%,color-mix(in srgb,var(--folio-paper) 38%,transparent));
+  --folio-pebble-shadow:inset 0 1px 0 color-mix(in srgb,#fff 45%,transparent),inset -1px -1px 0 color-mix(in srgb,var(--folio-plum) 6%,transparent),0 7px 18px rgba(84,38,95,.07);
+}
+html body .shell .app-main :is(.journey-market,.journey-today,.journey-insight,.panel,.analysis-hub-head,.analysis-finder,.analysis-block,.analysis-judgement,.journey-theses,.workspace-mobile-summary,.page-guide,.temp-card,.signal-expanded-block,.dashboard-explore-expanded){
+  background:var(--folio-pebble-fill)!important;
+  border:1px solid var(--folio-line)!important;
+  border-radius:28px 24px 30px 26px / 26px 30px 24px 28px!important;
+  box-shadow:var(--folio-pebble-shadow)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.22)!important;
+  backdrop-filter:blur(18px) saturate(1.22)!important;
+  padding:clamp(16px,2.2vw,24px)!important;
+  min-width:0;
+}
+html body .shell .app-main :is(.journey-classes button,.analysis-scope button){
+  background:var(--folio-pebble-fill)!important;
+  border:1px solid var(--folio-line)!important;
+  border-radius:52% 48% 54% 46% / 46% 55% 45% 54%!important;
+  box-shadow:var(--folio-pebble-shadow)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(1.22)!important;
+  backdrop-filter:blur(18px) saturate(1.22)!important;
+  padding:12px 8px!important;
+}
+html body .shell .app-main :is(.journey-classes button,.analysis-scope button):nth-child(2n){border-radius:47% 53% 45% 55% / 55% 46% 54% 45%!important}
+html body .shell .app-main .analysis-scope button[aria-pressed=true]{border-color:var(--folio-coral)!important;color:var(--folio-ink)!important}
+html body .shell .app-main :is(.stock-row,.stock-row .stock-id,.decision-row,.dashboard-explore-expanded .panel,.analysis-finder .analysis-browse){background:transparent!important}
+html body .shell .app-main :is(.analysis-card,.dashboard-explore-body,.dashboard-sector-only){background:transparent!important;border:0!important;box-shadow:none!important}
+html body :is(.drill-dialog,.etf-summary-dialog,.sector-summary-dialog){background:var(--folio-pebble-fill)!important;-webkit-backdrop-filter:blur(18px) saturate(1.22)!important;backdrop-filter:blur(18px) saturate(1.22)!important}
+@media(max-width:650px){.journey-classes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Preserve accessible market controls inside padded glass regions. */
+html body .shell .app-main .section-market button{min-width:44px;min-height:44px}

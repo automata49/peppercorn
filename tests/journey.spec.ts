@@ -61,7 +61,7 @@ test('Home Today market summarizes the Sector ETF signal and opens the full sign
  await expect(market).toContainText('ETF RS 1위')
  await market.getByRole('button',{name:'전체 보기 →',exact:true}).click()
  await expect(page.locator('.page-signal')).toBeVisible()
- await expect(page.locator('.signal-journey-heading').getByRole('heading',{name:'섹터>ETF',exact:true})).toBeVisible()
+ await expect(page.locator('.signal-journey-heading').getByRole('heading',{name:'시장 신호',exact:true})).toBeVisible()
  await expect(page.locator('.sector-heat-disclosure')).toBeVisible()
  await expect(page.locator('.dashboard-explore-expanded')).toBeVisible()
 })

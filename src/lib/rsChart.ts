@@ -8,7 +8,7 @@ export const RS_CHART_PERIODS=ETF_HEAT_PERIODS
 export type RsChartPeriod=EtfHeatPeriod
 export const CHART_SESSIONS:Record<RsChartPeriod,number>={'5D':5,'20D':20,'50D':50,'120D':120,'200D':200,'52W':252}
 export type ChartKind='rs'|'return'
-export type LineSeries={key:string;label:string;sub?:string;values:(number|null)[];n?:number;highlight?:boolean}
+export type LineSeries={market?:string;key:string;label:string;sub?:string;values:(number|null)[];n?:number;highlight?:boolean}
 
 const PERIODS=ETF_HEAT_PERIODS.map(([p])=>p)
 const RS_FIELD=Object.fromEntries(ETF_HEAT_PERIODS) as Record<RsChartPeriod,typeof ETF_HEAT_PERIODS[number][1]>
@@ -44,8 +44,8 @@ export function groupSeries(rows:LeaderRow[],keyOf:(row:LeaderRow)=>string){
 export function peerSeries(row:LeaderRow,all:LeaderRow[],kind:ChartKind):LineSeries[]{
   const peers=all.filter(r=>r.market===row.market&&r.asset_class===row.asset_class)
   const unit=row.asset_class==='ETF'?'ETF':'주식'
-  const out:LineSeries[]=[{key:'self',label:row.asset_class==='ETF'?'이 ETF':'이 종목',values:seriesOf(row,kind),highlight:true}]
-  const add=(key:string,label:string,list:LeaderRow[])=>out.push({key,label,sub:`${unit} ${list.length}`,values:medianSeries(list,kind),n:list.length})
+  const out:LineSeries[]=[{market:row.market,key:'self',label:row.asset_class==='ETF'?'이 ETF':'이 종목',values:seriesOf(row,kind),highlight:true}]
+  const add=(key:string,label:string,list:LeaderRow[])=>out.push({market:row.market,key,label,sub:`${unit} ${list.length}`,values:medianSeries(list,kind),n:list.length})
   if(row.industry)add('industry','산업 중앙값',peers.filter(r=>r.industry===row.industry))
   if(row.asset_class!=='ETF'&&row.sector)add('sector','섹터 중앙값',peers.filter(r=>r.sector===row.sector))
   add('market',`${row.market} 중앙값`,peers)

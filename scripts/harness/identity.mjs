@@ -135,11 +135,11 @@ assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product 
 assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
 assert(contract.includes('Folio Sunset Editorial + Pebble Liquid Glass')&&design.includes('Pebble Liquid Glass')&&baseline.includes('Pebble Liquid Glass'),'Harness docs must brand the current system as Sunset Editorial + Pebble Liquid Glass.');
 assert(journeyCss.includes('Sunset Editorial pebble glass')&&journeyCss.includes('backdrop-filter:blur(18px) saturate(1.22)')&&journeyCss.includes('border-radius:52% 48% 54% 46% / 46% 55% 45% 54%'),'Pebble Liquid Glass geometry/material contract drifted.');
-assert(sidebar.includes("['signal','sectors','섹터>ETF']"),'The former Market Signal destination must remain branded 섹터>ETF.');
-assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&app.includes('<EtfRsChart rows={rankedEtfRows.slice(0,5)}')&&!app.includes('etfMkt'),'Home ETF and 섹터>ETF chart/list must share the same global-market ranked Top 5 without an independent ETF market state.');
+assert(sidebar.includes("['signal','sectors','시장 신호']"),'The former Market Signal destination must remain named 시장 신호.');
+assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&app.includes('<EtfRsChart rows={rankedEtfRows.slice(0,5)}')&&!app.includes('etfMkt'),'Home ETF and 시장 신호 chart/list must share the same global-market ranked Top 5 without an independent ETF market state.');
 assert(app.includes('dashboard-explore dashboard-explore-expanded')&&!app.includes('<details className="dashboard-explore"'),'Core ETF exploration must remain expanded, not hidden in a disclosure.');
 assert(app.includes('sector-heat-disclosure signal-expanded-block')&&!app.includes('<details className="dashboard-disclosure sector-heat-disclosure"'),'Core sector map must remain expanded, not hidden in a disclosure.');
-assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약')&&app.includes("setSectorMkt(market);setPage('signal')"),'Home 오늘의 시장 must summarize the full market-signal path, reset the sector page to the same global market, and its 전체 보기 must open 섹터>ETF.');
+assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약')&&app.includes("setSectorMkt(market);setPage('signal')"),'Home 오늘의 시장 must summarize the full market-signal path, reset the sector page to the same global market, and its 전체 보기 must open 시장 신호.');
 assert(app.includes('aria-label="오늘의 주도주"')&&app.includes('<h2>오늘의 주도주</h2>'),'Home leader preview must use the canonical 오늘의 주도주 title.');
 assert(app.indexOf('className="journey-today"')<app.indexOf('className="journey-classes"'),'오늘의 주도주 must appear above the four leadership-class buttons.');
 for(const selector of ['.page-analysis','.page-thesis','.page-tracking','.page-leaderboard','.page-universe','.page-temperature','.page-settings']){
@@ -178,3 +178,10 @@ assert(claudePlugin.description.includes('Folio Sunset Editorial + Pebble Liquid
 assert(codexPlugin.description.includes('Folio Sunset Editorial + Pebble Liquid Glass'),'Codex plugin description must carry the current Sunset Pebble identity.');
 
 console.log('Folio Sunset Editorial + Pebble Liquid Glass identity invariants passed.');
+
+const marketCss=readFileSync('src/design/market-colors.css','utf8');
+const pebbleCss=readFileSync('src/design/folio-pebble.css','utf8');
+assert(marketCss.includes('[data-market="KR"]')&&marketCss.includes('[data-market="US"]')&&marketCss.includes('--market-gain:#196b42;--market-loss:#b3261e'),'MARKET-COLORS-1 must preserve market-specific signed colours.');
+assert(app.includes('data-market={r.market}')&&app.includes('data-market={g.market}'),'Mixed-market stock and sector rows must carry their own market.');
+assert(pebbleCss.includes('.journey-today')&&pebbleCss.includes('.journey-classes button')&&pebbleCss.includes('.analysis-scope button')&&pebbleCss.includes('backdrop-filter:blur(18px) saturate(1.22)'),'PEBBLE-REGIONS-1 must cover major regions and leadership controls.');
+assert(journeyCss.includes('FLAT-METRICS-1')&&journeyCss.includes('--folio-surface:var(--folio-paper)'),'Nested metrics must remain unboxed on the common paper base.');

@@ -32,5 +32,5 @@ export function GridTable({rows,columns,editable=false,onChange,height=560}:Prop
     if(!onChange)return
     const next:any[]=[];event.api.forEachNode(n=>{if(n.data)next.push(n.data)});onChange(next)
   }
-  return <AgGridProvider modules={[AllCommunityModule]}><div style={{height,width:'100%'}}><AgGridReact theme={gridTheme} rowData={rows} columnDefs={columns} defaultColDef={defaults} pagination paginationPageSize={50} animateRows onCellValueChanged={changed}/></div></AgGridProvider>
+  return <AgGridProvider modules={[AllCommunityModule]}><div style={{height,width:'100%'}}><AgGridReact theme={gridTheme} rowData={rows} getRowClass={p=>p.data?.market==='KR'?'market-KR':p.data?.market==='US'?'market-US':'market-unknown'} columnDefs={columns} defaultColDef={defaults} pagination paginationPageSize={50} animateRows onCellValueChanged={changed}/></div></AgGridProvider>
 }

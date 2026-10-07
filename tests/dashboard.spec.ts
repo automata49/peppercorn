@@ -111,7 +111,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  })
 }
 
-test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',async({page})=>{
+test('Home ETF preview and 시장 신호 summary use the exact same ranked pool',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.addInitScript(()=>{
@@ -124,12 +124,12 @@ test('Home ETF preview and 섹터>ETF summary use the exact same ranked pool',as
   const homeNames=await page.locator('.journey-today .stock-trend-copy>.decision-eyebrow').allTextContents();
   expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
-  await expect(page.locator('.signal-journey-heading h2')).toHaveText('섹터>ETF');
+  await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호');
   const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
   expect(signalNames).toEqual(homeNames);
 });
 
-test('Home ETF Top 5 matches 섹터>ETF ETF Top 5 exactly',async({page})=>{
+test('Home ETF Top 5 matches 시장 신호 ETF Top 5 exactly',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
@@ -235,7 +235,7 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     const us=panel.locator('.etf-heat-market').nth(1),kr=panel.locator('.etf-heat-market').nth(0);
     await expect(us.locator('.etf-heat-tile')).toHaveCount(3);
     await expect(kr.locator('.etf-heat-tile b')).toHaveText(['반도체','조선']);
-    await expect(panel.locator('.etf-heat-legend')).toContainText('거래대금 없는 산업 1개 제외');
+    await expect(panel.locator('.etf-heat-legend').first()).toContainText('거래대금 없는 산업 1개 제외');
     // Area ∝ trading value within each market (US: 8e8 / 2e8 / 1e8 of 1.1e9).
     const map=(await us.locator('.etf-heat-map').boundingBox())!;
     const areas=await us.locator('.etf-heat-tile').evaluateAll(es=>es.map(e=>{const r=e.getBoundingClientRect();return {t:e.getAttribute('title')!.split(' · ')[0],a:(r.width+2)*(r.height+2)}}));
@@ -244,13 +244,13 @@ test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS
     expect(Math.abs(share['Biotechnology']-1/11)).toBeLessThan(.02);
     // 20D colours: US Semis median +6% ≥ 6% → strong red; Biotech −7% → strong blue; A&D +3% → light red.
     const tile=(scope:any,name:string)=>scope.locator('.etf-heat-tile').filter({has:page.locator('b',{hasText:name})});
-    await expect(tile(us,'Semiconductors')).toHaveCSS('background-color',rgb('#b3261e'));
-    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#1c5cab'));
-    await expect(tile(us,'Aerospace & Defense')).toHaveCSS('background-color',rgb('#e8766d'));
+    await expect(tile(us,'Semiconductors')).toHaveCSS('background-color',rgb('#196b42'));
+    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#b3261e'));
+    await expect(tile(us,'Aerospace & Defense')).toHaveCSS('background-color',rgb('#63b38b'));
     await expect(tile(us,'Semiconductors').locator('strong')).toHaveText('+6%');
     // Switching the period recolours: 5D Biotech +4% ≥ 3% → strong red.
     await panel.getByRole('button',{name:'5D',exact:true}).click();
-    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#b3261e'));
+    await expect(tile(us,'Biotechnology')).toHaveCSS('background-color',rgb('#196b42'));
     await expect(tile(us,'Biotechnology').locator('strong')).toHaveText('+4%');
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
     await tile(kr,'반도체').click();
