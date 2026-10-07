@@ -86,6 +86,7 @@ const leadership=(r:LeaderRow)=>{
   return '중립'
 }
 const isCorrection=(r:LeaderRow)=>String(r.stage||'').includes('조정 중')
+const displayClass=(r:LeaderRow)=>r.asset_class==='ETF'?'ETF':isCorrection(r)?'조정 중':leadership(r)
 type SummaryTab='core'|'candidates'|'turns'|'corrections'|'bigcap'
 const summaryTabNames:Record<SummaryTab,string>={core:'핵심 주도',candidates:'주도 후보',turns:'강세 전환',corrections:'조정 중',bigcap:'대형 주도주'}
 const LEADER_VIEW_KEY='peppercorn-leader-view-v1'
@@ -724,7 +725,7 @@ export default function App(){
   const flagFile=useStockFlags()
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
-  const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|'all'|'position'>('core')
+  const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|null>('core')
   const [analysisSection,setAnalysisSection]=useState<'overview'|'analysis'|'financials'|'thesis'>('overview')
   const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
@@ -896,7 +897,7 @@ export default function App(){
   const updateTemperature=(rows:TempEntry[])=>{setTempEntries(rows);if(!session||tempCloudRef.current)void syncRows('temperature',rows as unknown as EditableRow[]);else setSyncState('error')}
 
   const sizes=useMemo(()=>stockSizes(leaders),[leaders])
-  const sizedRows=(rows:LeaderRow[])=>stockSize==='all'?rows:filterStockSize(rows,stockSize,sizes)
+  const sizedRows=(rows:LeaderRow[])=>filterStockSize(rows,stockSize,sizes)
   const sizeControl=<StockSizeFilter value={stockSize} onChange={changeStockSize} market={market} sizes={sizes}/>
   const marketRows=useMemo(()=>leaders.filter(r=>market==='ALL'||r.market===market),[leaders,market])
   const visible=useMemo(()=>{
@@ -1121,10 +1122,10 @@ export default function App(){
       {sizeControl}
       <nav className="journey-classes" aria-label="리더십 분류">{([['core','핵심 주도',classCounts.core],['candidates','주도 후보',classCounts.candidates],['turns','강세 전환',classCounts.turns],['corrections','조정 중',classCounts.corrections]] as const).map(([key,label,count])=><button key={key} onClick={()=>exploreClass(key)}><span>{label}</span><b>{count}</b></button>)}</nav>
       <section className="journey-today" aria-label="오늘 볼 종목">
-        <div className="journey-heading"><h2>오늘 볼 종목</h2><button className="dashboard-section-action" onClick={()=>exploreClass('all')}>전체 탐색 →</button></div>
+        <div className="journey-heading"><h2>오늘 볼 종목</h2><button className="dashboard-section-action" onClick={()=>exploreClass(null)}>전체 탐색 →</button></div>
         <p className="note">일간 종가 · 20D 등락 · 최대 5종목{lensFilter.growthOnly&&flagFile?' · 실적 성장 필터 적용':''}</p>
-        <StockTrendList rows={todayRows} onSelect={openAnalysisStock} getClass={leadership} emptyLabel="이 규모에서 선별된 종목이 없습니다. 전체 규모나 탐색 필터를 확인하세요."/>
-        {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 규모 보기</button>}
+        <StockTrendList rows={todayRows} onSelect={openAnalysisStock} getClass={displayClass} emptyLabel="이 분류에서 선별된 종목이 없습니다. 전체 또는 탐색 필터를 확인하세요."/>
+        {!todayRows.length&&<button className="secondary-action" onClick={()=>changeStockSize('all')}>전체 보기</button>}
       </section>
       <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{todayRows.length?`선택한 규모의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.'}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
@@ -1284,8 +1285,9 @@ export default function App(){
   }else if(page==='analysis'||page==='thesis'){
     const analysisClass={'core':'핵심 주도','candidates':'주도 후보','turns':'강세 전환'} as const
     const scoped=sizedRows(marketRows).filter(r=>{
-      if(analysisScope==='all')return true
-      if(analysisScope==='position')return position.rows.has(positionKey(r.market,r.ticker))
+      if(stockSize==='etf')return r.asset_class==='ETF'
+      if(analysisScope===null)return true
+      if(r.asset_class!=='Equity')return false
       if(analysisScope==='corrections')return isCorrection(r)
       return leadership(r)===analysisClass[analysisScope]
     })
@@ -1313,10 +1315,10 @@ export default function App(){
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
         {sizeControl}
         <div className="analysis-browse">
-          <div className="mini-segment analysis-scope" role="tablist" aria-label="종목 범위">{([['core','핵심'],['candidates','후보'],['turns','전환'],['corrections','조정'],['all','전체'],['position','Position']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(key)}>{label}</button>)}</div>
+          <div className="mini-segment analysis-scope" role="group" aria-label="주도 분류">{([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" aria-pressed={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(current=>current===key?null:key)} disabled={stockSize==='etf'}>{label}</button>)}</div>
           <div className="journey-explore-filters"><label>섹터<select aria-label="탐색 섹터" value={sector||''} onChange={e=>setSector(e.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.map(g=><option key={g.key} value={g.key}>{g.market+' · '+sectorName(g.market,g.sector)}</option>)}</select></label><span>{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 · RS 순 · 일간 종가</span></div>
           <LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/>
-          <StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={r=>isCorrection(r)?'조정 중':leadership(r)} className="stock-list analysis-idea-list"/>
+          <StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list"/>
         </div>
       </div></>}
       {page==='analysis'&&analysisDetail&&<button className="secondary-action journey-back" onClick={()=>setAnalysisDetail(false)}>← 탐색 목록</button>}
@@ -1344,7 +1346,7 @@ export default function App(){
               </section>
             </div>}
             {page==='analysis'&&analysisSection==='financials'&&<div className="analysis-secondary-body">
-              <section className="analysis-block"><h3 className="analysis-part">Financial Snapshot · Position</h3><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
+              <section className="analysis-block"><h3 className="analysis-part">Financial Snapshot · 공시 펀더멘털</h3><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
             </div>}
             {(page==='thesis'||analysisSection==='thesis')&&<div className="analysis-secondary-body">
               <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
@@ -1544,5 +1546,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Sector → Stock · Leadership & Risk Workspace</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'&&<nav className="journey-tracking-tabs" role="tablist" aria-label="추적 영역">{([['watchlist','관심종목'],['portfolio','보유종목'],['journal','투자일지']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={trackingTab===key} onClick={()=>setTrackingTab(key)}>{label}</button>)}</nav>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u2" alt="Folio xx visual"/></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div className={'shell page-shell-'+page}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>Discover → Judge → Thesis → Track</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'&&<nav className="journey-tracking-tabs" role="tablist" aria-label="추적 영역">{([['watchlist','관심종목'],['portfolio','보유종목'],['journal','투자일지']] as const).map(([key,label])=><button key={key} role="tab" aria-selected={trackingTab===key} onClick={()=>setTrackingTab(key)}>{label}</button>)}</nav>}{content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u2" alt="Folio xx visual"/></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
 }
