@@ -9,7 +9,7 @@ Hard rules:
 - The seven identity files supplied by the user on 2026-10-07 are the pixel source of truth. Do not reconstruct or regenerate them from the older concept board.
 - Wordmark must use `public/folio-brand-wordmark-light.webp` / `public/folio-brand-wordmark-dark.webp` through `FolioWordmark`. Do not restore live `Folio` + `FolioMark.tsx`, plain-text xx, or newly generated lettering.
 - Primary installed-app icons `folio-b-icon-*` are static size derivatives of `public/folio-brand-icon-black.webp`. `scripts/generate-b-app-icons.mjs` is verification-only and must not draw a new mark. The supplied glossy/light icon files are approved reference variants.
-- Loading uses the supplied portrait `public/folio-brand-launch.webp` at **9:16** with restrained GSAP reveal/pan only. It already contains Folio branding, so no second caption/footer wordmark may overlay it.
+- Loading uses `public/folio-brand-launch.webp` for portrait and `public/folio-brand-launch-landscape.webp` for landscape screens >=700 CSS px. The wide artwork's legacy left-side copy is masked and replaced only with the current canonical `FolioWordmark` plus restrained brand copy; never expose the retired embedded wordmark/xx. GSAP remains reveal/pan/progress only.
 - Home identity imagery uses the supplied `public/folio-brand-typography.webp` and `public/folio-brand-photography.webp`; the former generated motif SVG and old C photography file are retired.
 - Typography in functional UI follows Inter / Neue-Grotesk editorial proportions: clean grotesk, regular large numerals, tight display tracking, restrained uppercase metadata.
 - Light is the first-run/default appearance. System and Dark remain explicit user selections; OS dark preference must not silently override a fresh Folio session.
