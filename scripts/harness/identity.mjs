@@ -3,6 +3,7 @@ import {existsSync,readFileSync,statSync} from 'node:fs';
 
 const supplied=[
   'public/folio-brand-launch.webp',
+  'public/folio-brand-launch-landscape.webp',
   'public/folio-brand-typography.webp',
   'public/folio-brand-photography.webp',
   'public/folio-brand-wordmark-light.webp',
@@ -93,7 +94,7 @@ assert(!wordmark.includes('FolioMark')&&!wordmark.includes('folio-wordmark-text'
 assert(sidebar.includes("import { FolioWordmark } from './FolioWordmark'")&&sidebar.includes('<FolioWordmark/>'),'Sidebar must consume canonical FolioWordmark.');
 assert(authModal.includes('<FolioWordmark className="auth-wordmark"/>')&&installApp.includes('<FolioWordmark className="install-wordmark"/>')&&mainEntry.includes('<FolioWordmark className="fatal-wordmark"/>'),'All brand surfaces must consume canonical FolioWordmark.');
 
-for(const asset of ['folio-brand-launch.webp?v=u2','folio-brand-typography.webp?v=u2','folio-brand-photography.webp?v=u2']){
+for(const asset of ['folio-brand-launch.webp?v=u3','folio-brand-launch-landscape.webp?v=u3','folio-brand-typography.webp?v=u2','folio-brand-photography.webp?v=u2']){
   assert(app.includes(asset),`App supplied identity placement missing ${asset}`);
 }
 assert(!app.includes('launch-editorial-caption')&&!app.includes('<footer className="launch-footer"'),'Supplied launch hero must not be duplicated by caption/footer branding.');
