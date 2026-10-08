@@ -25,7 +25,7 @@ The seven user-supplied identity files approved on **2026-10-07** supersede reco
 - App/home-screen icons are static derivatives of the supplied near-black app-icon artwork. `scripts/generate-b-app-icons.mjs` is verification-only and must never procedurally redraw the mark.
 - Installed icons are full square before the platform mask; iOS/Android own final corner masking.
 - The supplied icon's centered negative diamond, pale left stroke and Plum/Magenta/Coral/Amber transition must remain visually intact.
-- Loading uses the supplied **9:16** portrait hero. Do not revert to the former 508:235 landscape composition.
+- Loading has two approved orientation sources: supplied **9:16** portrait `folio-brand-launch.webp` and approved wide B composition `folio-brand-launch-landscape.webp` for landscape screens >=700 CSS px. The retired `folio-b-launch-hero.webp` path must not return; the wide image is used only through the new canonical path with its legacy left copy masked.
 - Home identity imagery uses the supplied Typography and Photography files; the former generated motif SVG is retired.
 
 ## 3. Grid and alignment
