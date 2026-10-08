@@ -1,3 +1,9 @@
+## Wide launch asset selection — 2026-10-08
+
+User confirmed that landscape iPad and desktop should choose a landscape-sized Folio image rather than scaling the portrait poster. The repository did not contain every image generated during the chat; it contained the canonical active set only. The approved horizontal Sunset Editorial hero from the earlier B identity board has now been restored under a new active path, `public/folio-brand-launch-landscape.webp`, while the retired path `folio-b-launch-hero.webp` remains absent.
+
+Runtime selection now uses a `<picture>`: portrait screens use `folio-brand-launch.webp`; landscape screens at >=700 CSS px use the wide hero. Its old embedded left-side wordmark/copy is covered by a black identity mask and replaced with the current canonical `FolioWordmark`, so the newest xx geometry remains consistent. iPad landscape, iPad Pro landscape, phone landscape and desktop therefore use a true wide composition instead of a narrow portrait poster. No investment/data logic changed.
+
 ## Orientation-aware launch framing — 2026-10-08
 
 User requested the loading hero to adapt automatically when the device rotates. The approved 9:16 Folio hero remains unchanged. Portrait phone uses full-viewport cover; landscape phone uses the complete portrait artwork at full viewport height; iPad portrait/landscape use separate 92/94dvh framing; touch iPad Pro landscape uses 88dvh; desktop remains 86dvh with a 90dvh portrait-display rule. CSS orientation queries handle rotation without JavaScript or duplicated assets. Brand regression now includes a 844×390 phone-landscape viewport in addition to 390×844, 834×1194, 1194×834, 1366×1024 and 1440×900. No investment/data logic changed.
