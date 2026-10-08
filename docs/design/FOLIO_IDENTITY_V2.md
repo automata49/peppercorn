@@ -30,7 +30,7 @@ Official references:
 The **seven identity files supplied by the user on 2026-10-07** are the current source of truth. They supersede prior reconstructed/vector approximations of the B board while preserving the same Sunset Editorial direction.
 
 Canonical supplied assets:
-- **Loading hero:** `public/folio-brand-launch.webp` — supplied 9:16 portrait/sunset Folio artwork. It already contains the wordmark and brand copy, so the loading UI must not overlay a second caption or footer logo.
+- **Loading heroes:** `public/folio-brand-launch.webp` is the supplied 9:16 portrait/sunset Folio artwork. `public/folio-brand-launch-landscape.webp` is the approved wide Sunset Editorial composition for landscape iPad/phone and desktop. Portrait keeps its embedded branding; the wide composition masks its legacy left-side copy and overlays only the current canonical `FolioWordmark` plus restrained brand copy, preventing xx/wordmark drift.
 - **Installed icon source:** `public/folio-brand-icon-black.webp` — supplied near-black icon. `folio-b-icon-180/192/512/512-maskable.png` are static size derivatives only; do not redraw or reinterpret the xx.
 - **Wordmark:** `public/folio-brand-wordmark-light.webp` and `public/folio-brand-wordmark-dark.webp`, derived only for transparent/light-dark surface use from the supplied wordmark file. `FolioWordmark` displays these assets directly.
 - **Typography:** `public/folio-brand-typography.webp` — supplied “Know The Market. Know Yourself.” poster.
@@ -83,7 +83,7 @@ The active product identity is **Folio xx / Sunset Editorial + Pebble Liquid Gla
 
 - Active visual assets are limited to the user-supplied wordmark derivatives, user-supplied black app-icon derivatives, supplied 9:16 launch hero, supplied Typography poster and supplied Photography treatment.
 - Superseded punch-card, generic `folio-icon-*`, generated `folio-identity-*`, old `folio-app-icon-*`, legacy wordmark and generic `icon-*` assets must not remain in deployable source/root locations.
-- Loading is the supplied 9:16 hero itself; no secondary Folio footer/caption, `logo.webp`, “Peppercorn Capital”, or internal “Sunset Editorial” label may be overlaid.
+- Loading is responsive by orientation: portrait uses the supplied 9:16 hero; landscape >=700 CSS px uses the approved wide hero. No secondary footer, `logo.webp`, “Peppercorn Capital”, or internal “Sunset Editorial” label may be overlaid; the only landscape text overlay is the canonical Folio wordmark/brand copy that replaces the masked legacy copy inside the wide artwork.
 - Identity CSS must not keep raster mark switching, screenshot wordmarks or alternate launch compositions underneath the B Exact Lock.
 - Canonical visual-regression widths are **390 / 834 / 1366 / 1440 CSS px**. `npm run test:visual-identity` and `npm run test:identity` must pass before identity-related work is approved.
 
