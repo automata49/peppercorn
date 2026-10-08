@@ -9,7 +9,7 @@ Read `docs/harness/CONTRACT.md`, `docs/harness/HANDOFF.md`, `docs/design/FOLIO_D
 Check that:
 - `FolioWordmark` uses `folio-brand-wordmark-light.webp` / `folio-brand-wordmark-dark.webp`, with no live `FolioMark.tsx` reconstruction;
 - installed metadata uses only `folio-b-icon-180/192/512/512-maskable.png`, derived from `folio-brand-icon-black.webp`;
-- loading uses `folio-brand-launch.webp` at 9:16 and does not overlay a duplicate caption/footer;
+- loading uses `folio-brand-launch.webp` in portrait and `folio-brand-launch-landscape.webp` in landscape >=700 CSS px; the wide asset masks its legacy left copy and shows only the canonical Folio wordmark/brand copy;
 - Home identity imagery uses `folio-brand-typography.webp` and `folio-brand-photography.webp`;
 - the supplied glossy/light icon references remain available while the black icon stays the installed default;
 - Pebble Liquid Glass stays restricted to the stock-category selector, with **대형주 / 중소형주 / 전체 / ETF** and a visible `/` before ETF;
