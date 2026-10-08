@@ -25,12 +25,19 @@ for(const view of views){
   const launch=page.locator('.launch-overlay')
   const hero=launch.getByRole('img',{name:'Folio xx visual'})
   await expect(hero).toBeVisible()
-  await expect(hero).toHaveAttribute('src','./folio-brand-launch.webp?v=u2')
+  const useLandscape=view.width>view.height&&view.width>=700
+  await expect.poll(async()=>hero.evaluate((el:any)=>el.currentSrc)).toContain(useLandscape?'folio-brand-launch-landscape.webp?v=u3':'folio-brand-launch.webp?v=u3')
   await expect(launch.locator('.launch-editorial-caption')).toBeHidden()
   await expect(launch.locator('.launch-footer')).toBeHidden()
   const frame=await launch.locator('.launch-editorial-frame').boundingBox()
   expect(frame).not.toBeNull()
-  if(view.name==='phone'){
+  if(useLandscape){
+    const ratio=frame!.width/frame!.height
+    expect(ratio).toBeGreaterThan(2.12)
+    expect(ratio).toBeLessThan(2.20)
+    expect(frame!.width).toBeGreaterThanOrEqual(view.width*.82)
+    await expect(launch.locator('.launch-landscape-lockup')).toBeVisible()
+  }else if(view.name==='phone'){
     expect(frame!.width).toBeGreaterThanOrEqual(view.width-1)
     expect(frame!.height).toBeGreaterThanOrEqual(view.height-1)
     expect(Math.abs(frame!.x)).toBeLessThanOrEqual(1)
