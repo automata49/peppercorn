@@ -1,3 +1,7 @@
+## Wide launch final verification trigger — 2026-10-08
+
+The market-refresh workflow deployed the same source head successfully but cancelled the earlier push-triggered UI suite through the shared Pages concurrency group. This follow-up commit intentionally triggers one clean push validation after that deployment completed, so the responsive portrait/landscape launch change receives the full harness/build/UI gate.
+
 ## Wide launch asset selection — 2026-10-08
 
 User confirmed that landscape iPad and desktop should choose a landscape-sized Folio image rather than scaling the portrait poster. The repository did not contain every image generated during the chat; it contained the canonical active set only. The approved horizontal Sunset Editorial hero from the earlier B identity board has now been restored under a new active path, `public/folio-brand-launch-landscape.webp`, while the retired path `folio-b-launch-hero.webp` remains absent.
