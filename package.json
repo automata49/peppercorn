@@ -16,7 +16,8 @@
     "test:identity": "playwright test tests/design-baseline.spec.ts tests/brand.spec.ts tests/theme-system.spec.ts tests/compact-editorial.spec.ts tests/compact-titlebar.spec.ts tests/discovery.spec.ts tests/visual-identity-regression.spec.ts",
     "test:ui": "playwright test",
     "verify": "npm run harness:check && npm run test:position-db && npm run test:etf-rs && npm run test:universe-db && npm run test:temperature-db && npm run build && npm run test:identity && npm run test:ui",
-    "test:visual-identity": "playwright test tests/visual-identity-regression.spec.ts"
+    "test:visual-identity": "playwright test tests/visual-identity-regression.spec.ts",
+    "test:four-screens": "playwright test tests/four-screen-visual.spec.ts --update-snapshots=none"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "1.1.23",

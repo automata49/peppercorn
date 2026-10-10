@@ -3,6 +3,10 @@ name: pepper-ui
 description: Use for Pepper responsive layout, typography, navigation, tables, Dashboard, stock dialog and visual-regression changes.
 ---
 
+## FOUR-SCREENS-1 — current review authority (2026-10-10)
+
+Read `docs/design/FOLIO_SCREEN_ACCEPTANCE.md` and `docs/harness/UI_REVIEW.md` for Today/Discover/Journal/Journey work. Primary navigation is **오늘 / 발견 / 저널 / 여정**; older analytical Home placement applies to **시장 요약** only. Preserve the approved Motion home. Screen completion requires the acceptance IDs, not just passing current-screen screenshots. Run `npm run test:four-screens` in addition to the existing gates; report the explicitly open product gaps. Notebook Paper/glass and analytical major-region/leadership glass follow their current contracts, not the historical selector-only restriction.
+
 Read the UI/formatting sections in `docs/harness/CONTRACT.md`. For Folio brand/Home/theme/loading/PWA work also read `docs/design/FOLIO_IDENTITY_V2.md` and use the `folio-identity` skill.
 
 Locate the existing shared component and CSS tokens before editing. Reuse shared primitives such as `StockRows`, `DecisionList`, disclosures, navigation icons and table tokens. Preserve data/calculation contracts while changing presentation.
@@ -10,7 +14,7 @@ Locate the existing shared component and CSS tokens before editing. Reuse shared
 Responsive / identity contract:
 - **Folio Sunset Editorial + Pebble Liquid Glass** is the current visual system on desktop, mobile and iPad. Supplied B identity artwork remains pixel-authoritative; compact layouts may change density and navigation placement but not identity.
 - Use the committed B wordmark/icon/launch/motif artwork instead of recreating them with text, CSS X geometry or generic gradients.
-- Dashboard hierarchy is brand → Total/KR/US → **오늘의 시장** signal summary → category selector → **오늘의 주도주** → leadership classes → Insight. `오늘의 시장 > 전체 보기` opens **시장 신호**. The Market Signal page keeps sector and ETF core analysis expanded.
+- Retained **시장 요약** (`dashboard`) hierarchy is brand → Total/KR/US → **오늘의 시장** signal summary → category selector → **오늘의 주도주** → leadership classes → Insight. `오늘의 시장 > 전체 보기` opens **시장 신호**. The Market Signal page keeps sector and ETF core analysis expanded.
 - Touch targets, no-horizontal-overflow and System/Light/Dark behavior are acceptance criteria. Progressive disclosure remains for secondary/dense editors, but must not hide the core sector heatmap or ETF analysis on 시장 신호.
 - Pebble Liquid Glass is shared by major regions and primary classification controls: **대형주 / 중소형주 / 전체 / ETF**, with a visible `/` before ETF. Keep translucent warm glass, blur/saturation, inset highlight and irregular beach-stone radii; Keep nested numerical metrics and table rows unboxed.
 - C is photography treatment only through the committed C photography asset; it is not chrome for cards/navigation and its flowing-wave motif is not a Folio UI motif.

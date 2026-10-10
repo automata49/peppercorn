@@ -1,5 +1,9 @@
 # Pepper engineering contract
 
+## FOUR-SCREENS-1 — current review authority (2026-10-10)
+
+Read `docs/design/FOLIO_SCREEN_ACCEPTANCE.md` and `docs/harness/UI_REVIEW.md` for Today/Discover/Journal/Journey work. Primary navigation is **오늘 / 발견 / 저널 / 여정**; older analytical Home placement applies to **시장 요약** only. Preserve the approved Motion home. Screen completion requires the acceptance IDs, not just passing current-screen screenshots. Run `npm run test:four-screens` in addition to the existing gates; report the explicitly open product gaps. Notebook Paper/glass and analytical major-region/leadership glass follow their current contracts, not the historical selector-only restriction.
+
 This is the single source of project rules for Claude Code and Codex. User instructions take precedence. Read the affected source before editing; live source wins over historical chat descriptions.
 
 ## UI and formatting
