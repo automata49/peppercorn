@@ -17,9 +17,9 @@ Canonical skills are in `harness/skills`; `npm run harness:sync` generates `.cla
 
 ## Folio identity gate
 
-The authoritative visual rule is **Folio Sunset Editorial + Pebble Liquid Glass**, anchored by the seven identity files supplied by the user on 2026-10-07. `docs/design/FOLIO_DESIGN_BASELINE.md` remains Level-0 for layout/touch/type roles, while brand pixels come from the supplied files. `FolioWordmark` displays the supplied light/dark wordmark derivatives; `folio-b-icon-*` are static size derivatives of the supplied black icon; loading uses the 9:16 portrait hero in portrait and the approved wide hero in landscape >=700 CSS px; Home identity imagery uses the supplied Typography and Photography assets. Procedural redraws of the wordmark/xx/hero are prohibited. Robinhood remains a benchmark for hierarchy, simplicity and interaction economy, not copied branding or trade-entry UI. Pebble Liquid Glass is intentionally narrow: the stock-category selector only, with equity categories grouped before a visible `/` and ETF separated. Core **섹터>ETF** analysis stays expanded.
+The authoritative visual rule is **Folio Sunset Editorial + Pebble Liquid Glass**, anchored by the seven identity files supplied by the user on 2026-10-07. `docs/design/FOLIO_DESIGN_BASELINE.md` remains Level-0 for layout/touch/type roles, while brand pixels come from the supplied files. `FolioWordmark` displays the supplied light/dark wordmark derivatives; `folio-b-icon-*` are static size derivatives of the supplied black icon; loading uses the 9:16 portrait hero in portrait and the approved wide hero in landscape >=700 CSS px; Home identity imagery uses the supplied Typography and Photography assets. Procedural redraws of the wordmark/xx/hero are prohibited. Robinhood remains a benchmark for hierarchy, simplicity and interaction economy, not copied branding or trade-entry UI. Pebble Liquid Glass covers analytical major regions and leadership/tracking controls; notebook reading content stays on Paper, with glass for interactive controls and transient surfaces. The category selector keeps equities grouped before a visible `/` and ETF separated. Core **시장 신호** sector → ETF analysis stays expanded.
 
-`scripts/harness/identity.mjs` is part of `npm run harness:check`. It verifies the design/contract files exist, exact B artwork files are committed, the exact-B CSS lock and Inter/Neue-Grotesk stack are present, the superseded Robinhood override and generic icon generator remain removed, theme modes stay present, and PWA/deploy references use only `folio-b-icon-*`. It also requires the supplied launch/typography/photography assets, warm editorial surfaces, the Pebble Liquid Glass category control, Home → 섹터>ETF signal navigation, ETF parity and the always-expanded sector/ETF core flow. These source checks do not replace browser tests.
+`scripts/harness/identity.mjs` is part of `npm run harness:check`. It verifies the design/contract files exist, exact B artwork files are committed, the exact-B CSS lock and Inter/Neue-Grotesk stack are present, the superseded Robinhood override and generic icon generator remain removed, theme modes stay present, and PWA/deploy references use only `folio-b-icon-*`. It also requires the supplied launch/typography/photography assets, warm editorial surfaces, the Pebble Liquid Glass category control, 시장 요약 → 시장 신호 navigation, ETF parity and the always-expanded sector/ETF core flow. These source checks do not replace browser tests.
 
 `npm run test:identity` runs the focused identity suite: launch/brand/PWA metadata, System/Light/Dark, compact B styling and compact titlebar behavior. The full `npm run test:ui` remains required before merge because identity changes can regress navigation, dialogs, sector exploration, charts and workspaces outside the focused suite.
 
@@ -33,7 +33,7 @@ For Position Growth, read `POSITION_GROWTH.md` before changing collection, valua
 
 Default division: Claude plans/refactors, Codex implements/tests, then the other reviews only the diff and acceptance criteria. Reverse when useful. Avoid two simultaneous writers on the same branch/files. Reviewer definitions are in `.claude/agents` (Markdown) and `.codex/agents` (TOML); model selection inherits the user's client configuration, with no hard-coded paid model.
 
-For identity/UI changes, the read-only reviewers must check Sunset Editorial + Pebble Liquid Glass consistency across desktop/mobile/iPad, System/Light/Dark, PWA asset references, Home signal summary, 섹터>ETF expansion/parity, semantic gain/loss colours, touch/overflow behavior and unchanged investment/ranking rules.
+For identity/UI changes, the read-only reviewers must check Sunset Editorial + Pebble Liquid Glass consistency across desktop/mobile/iPad, System/Light/Dark, PWA asset references, four-screen acceptance and open gaps, 시장 요약 signal summary, 시장 신호 expansion/parity, semantic gain/loss colours, touch/overflow behavior and unchanged investment/ranking rules.
 
 ## Hooks and permissions
 
@@ -62,3 +62,7 @@ UI tests use synthetic market responses and never write to production. They insp
 - https://code.claude.com/docs/en/plugins-reference
 
 Do not assume a feature's availability merely from the comparison table; verify installed client versions and hook trust.
+
+## Current UI review
+
+Read `docs/harness/UI_REVIEW.md` and `docs/design/FOLIO_SCREEN_ACCEPTANCE.md` for the current four-screen authority and explicit open gaps. `npm run test:four-screens` compares committed Light/Dark PNGs at 390/834/1366/1440; passing current-screen regression is not full concept acceptance.

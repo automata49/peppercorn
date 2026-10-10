@@ -1,4 +1,9 @@
 # Peppercorn — Codex
+
+## FOUR-SCREENS-1 — current review authority (2026-10-10)
+
+Read `docs/design/FOLIO_SCREEN_ACCEPTANCE.md` and `docs/harness/UI_REVIEW.md` for Today/Discover/Journal/Journey work. Primary navigation is **오늘 / 발견 / 저널 / 여정**; older analytical Home placement applies to **시장 요약** only. Preserve the approved Motion home. Screen completion requires the acceptance IDs, not just passing current-screen screenshots. Run `npm run test:four-screens` in addition to the existing gates; report the explicitly open product gaps. Notebook Paper/glass and analytical major-region/leadership glass follow their current contracts, not the historical selector-only restriction.
+
 Read `docs/harness/CONTRACT.md` before work and `docs/harness/HANDOFF.md` before continuing a task. Those shared documents govern UI, formatting, analysis and Pepper AI Analyst.
 
 For Folio brand, Home, responsive UI, theme, loading or PWA work, read `docs/design/FOLIO_DESIGN_BASELINE.md` first, then `docs/design/FOLIO_IDENTITY_V2.md`, and use both `folio-identity` and `pepper-ui` from `.agents/skills/`. Current visual contract: **Folio Sunset Editorial + Pebble Liquid Glass** on desktop, mobile and iPad. Supplied B wordmark/icon/launch/typography artwork remains pixel-authoritative; C remains photography treatment only. Warm Paper/Surface/Sand replaces generic white chrome, and Pebble Liquid Glass covers major regions and leadership controls as well as the grouped stock-category selector (**대형주 / 중소형주 / 전체 / ETF**, with `/` before ETF). Robinhood is an information-architecture benchmark, never a visual clone. Preserve investment classification and ranking; market-specific display colours follow MARKET-COLORS-1.

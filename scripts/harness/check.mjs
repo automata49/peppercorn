@@ -10,3 +10,4 @@ for(const c of cases)assert.equal(validateAnalyst(c.output,c.context).ok,c.expec
 console.log(`${cases.length} offline Analyst contract cases passed (no live model invoked).`);
 await import('./position-cases.mjs');
 await import('./identity.mjs');
+await import('./screens.mjs');

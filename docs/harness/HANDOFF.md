@@ -1,3 +1,17 @@
+## FOUR-SCREENS-1 — attached concept acceptance and regression gate — 2026-10-10
+
+Scope: establish screen-by-screen completion criteria, reconcile stale reviewer instructions and compare actual Today/Discover/Journal/Journey PNGs. The attached concept is retained byte-for-byte in docs/design/references. The approved Motion Today home and supplied brand assets remain authoritative.
+
+Current authority: docs/design/FOLIO_SCREEN_ACCEPTANCE.md and docs/harness/UI_REVIEW.md. Claude/Codex reviewers share the same read-only procedure; canonical identity/UI/review skills and generated adapters route to it. Earlier analytical Home placement belongs to **시장 요약** only; the secondary destination is **시장 신호**. Current-screen PNGs are regression-only and must not be cited as concept acceptance.
+
+Open product requirements: TODAY-1 invitation hierarchy, DISCOVER-1/2 topic/signal tabs and sourced editorial topic cover, JOURNAL-2 separate hypothesis/counter-evidence fields and collage, JOURNEY-1 concept tab grouping, JOURNEY-2 dated direct judgement comparison and asset-flow disclosure. No application code, ranking, market colours, storage schema or production assets changed in this task.
+
+Validation: `npm run harness:check`, `npm run build` and `git diff --check` passed; reviewer TOML/workflow YAML parsed and three canonical skills validated. `npm run test:identity -- --workers=4` passed 31/31. Final `CI=1 npm run test:four-screens -- --repeat-each=3` passed 24/24 (32 PNG comparisons repeated three times, no updates); final sequential `npm run test:ui` passed 195/195 with the configured two workers. Read-only UI acceptance review found no remaining blockers.
+
+Baselines cover 32 visually inspected Light/Dark current viewport renders at 390×844 / 834×1194 / 1366×1024 / 1440×900, fixed Seoul timezone/date, local entries with photo/ink/revision and deterministic static/live market routes. Initial full-page capture exposed Chromium device-metric / pointer-media instability on the touch 1366 Today screen. Final capture keeps the actual fixed viewport, mobile/touch emulation and taps on phone/tablet, mouse input on desktop, and asserts pointer/hover media; deeper/scrolling flows retain behavioral coverage. Missing or wrongly sized PNGs fail the harness; CI compares without updating. Physical Safari/Apple Pencil remains unverified.
+
+PR #125 CI initially rejected all eight Today comparisons because the local host lacked Chromium's complete Linux font dependencies. Adding the CI dependency `fonts-wqy-zenhei` reproduced seven CI Today images exactly and the eighth within nine raw pixels; Noto/Liberation alone had passed the earlier preflight but did not reproduce CJK fallback. Regenerated and visually reviewed all 32 PNGs in that environment, then repeated CI-mode comparisons 24/24 without updates. Preflight now also requires WenQuanYi Zen Hei, and browser CI jobs are pinned to Ubuntu 24.04. The original small pixel tolerance is unchanged; PR CI reruns the complete gates on the corrected baselines.
+
 ## Wide launch final verification trigger — 2026-10-08
 
 The market-refresh workflow deployed the same source head successfully but cancelled the earlier push-triggered UI suite through the shared Pages concurrency group. This follow-up commit intentionally triggers one clean push validation after that deployment completed, so the responsive portrait/landscape launch change receives the full harness/build/UI gate.
