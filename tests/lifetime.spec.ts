@@ -29,7 +29,7 @@ for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, rev
  await openPage(page,'저널');await page.getByRole('tab',{name:'일상',exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(page.getByRole('tab',{name:'투자',exact:true})).toHaveAttribute('data-state','active')
  await page.getByRole('tab',{name:'전체',exact:true}).click();await page.getByRole('button',{name:'기다림도 하나의 결정 기록 열기'}).click();await page.getByText('이전 생각 1개',{exact:true}).click();await expect(page.locator('.journal-revision')).toContainText('반대 증거도 확인한다.')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
- await page.screenshot({path:`test-results/lifetime-editor-${width}.png`,fullPage:true});await page.getByRole('button',{name:'기록 닫기'}).click()
+ await page.screenshot({path:`test-results/lifetime-editor-${width}.png`,fullPage:true});await page.getByRole('button',{name:'기록 닫기'}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
  await openPage(page,'여정');await expect(page.locator('.journal-timeline')).toContainText('생각의 변화 1회')
  await context.close()
 })
