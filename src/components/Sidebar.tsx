@@ -4,23 +4,26 @@ import { AppIcon, type AppIconName } from './AppIcon'
 import { FolioWordmark } from './FolioWordmark'
 
 const pages:[string,AppIconName,string][]=[
-  ['dashboard','home','홈'],
-  ['analysis','search','탐색'],
+  ['today','home','오늘'],
+  ['analysis','search','발견'],
+  ['notebook','journal','저널'],
+  ['tracking','watchlist','여정'],
   ['thesis','journal','Thesis'],
-  ['tracking','watchlist','추적'],
+  ['dashboard','analysis','시장 요약'],
   ['signal','sectors','시장 신호'],
   ['temperature','temperature','시장 온도계'],
   ['watchlist','watchlist','Watchlist'],
   ['portfolio','portfolio','Portfolio'],
-  ['journal','journal','Journal'],
+  ['journal','journal','매매 기록'],
+  ['research','journal','리서치 노트'],
   ['leaderboard','leaderboard','Leaderboard'],
   ['universe','universe','Universe'],
   ['settings','settings','Settings']
 ]
 const pageGroups=[
-  ['핵심',['dashboard','analysis','thesis','tracking']],
-  ['시장',['signal','temperature']],
-  ['추적 도구',['watchlist','portfolio','journal']],
+  ['핵심',['today','analysis','notebook','tracking']],
+  ['시장',['dashboard','signal','temperature']],
+  ['기록과 추적',['thesis','research','watchlist','portfolio','journal']],
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 
@@ -104,7 +107,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     </aside>
 
     <div className="mobile-brandbar">
-      <button className="mobile-brand-home" onClick={()=>setPage('dashboard')} aria-label="Dashboard로 이동">
+      <button className="mobile-brand-home" onClick={()=>setPage('today')} aria-label="오늘로 이동">
         <span className="folio-brand"><FolioBrand/></span>
       </button>
       <div className="mobile-brand-actions">
@@ -114,10 +117,10 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     </div>
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
-      <button className={page==='dashboard'?'active':''} onClick={()=>setPage('dashboard')}><AppIcon name="home"/><b>홈</b></button>
-      <button className={page==='analysis'?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="search"/><b>탐색</b></button>
-      <button className={page==='thesis'?'active':''} onClick={()=>setPage('thesis')}><AppIcon name="journal"/><b>Thesis</b></button>
-      <button className={['tracking','watchlist','portfolio','journal'].includes(page)?'active':''} onClick={()=>setPage('tracking')}><AppIcon name="watchlist"/><b>추적</b></button>
+      <button className={page==='today'?'active':''} onClick={()=>setPage('today')}><AppIcon name="home"/><b>오늘</b></button>
+      <button className={['analysis','dashboard','signal','temperature','leaderboard','universe'].includes(page)?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="search"/><b>발견</b></button>
+      <button className={['notebook','thesis','research','journal'].includes(page)?'active':''} onClick={()=>setPage('notebook')}><AppIcon name="journal"/><b>저널</b></button>
+      <button className={['tracking','watchlist','portfolio'].includes(page)?'active':''} onClick={()=>setPage('tracking')}><AppIcon name="watchlist"/><b>여정</b></button>
     </nav>
 
     <Dialog open={open} onOpenChange={setOpen}>

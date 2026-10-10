@@ -68,7 +68,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openLeaderTools(page)
   const sheet=page.locator('.drill-sheet')
@@ -109,7 +109,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
   // The choice is remembered on this device.
-  await page.reload()
+  await page.reload();await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openLeaderTools(page)
   await page.locator('.drill-sheet .summary-tabs button',{hasText:'대형 주도주'}).click()

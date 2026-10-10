@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 
 const views=[
@@ -52,7 +53,7 @@ for(const view of views){
     expect(frame!.y).toBeGreaterThanOrEqual(0)
   }
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
-  await expect(launch).toHaveCount(0,{timeout:15000})
+  await expect(launch).toHaveCount(0,{timeout:15000});await openPage(page,'시장 요약')
 
   if(view.compact){
     const homeBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
@@ -104,7 +105,7 @@ for(const view of views){
 }
 
 test('home-screen metadata uses exact B icon assets',async({page,request})=>{
- await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
  const touch=await page.locator('link[rel="apple-touch-icon"]').getAttribute('href')
  expect(touch).toBe('./folio-b-icon-180.png?v=u2')
  const manifest=await (await request.get('manifest.webmanifest')).json()
@@ -138,7 +139,7 @@ test('user supplied wordmark, hero, typography and photography assets are deploy
 })
 
 test('B app icon keeps the approved board-scale xx and negative diamond',async({page})=>{
- await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
  const box=await page.evaluate(async()=>{
    const img=new Image()
    img.src='./folio-b-icon-512.png'
@@ -171,7 +172,7 @@ test('B app icon keeps the approved board-scale xx and negative diamond',async({
 
 test('share metadata carries Folio xx and the B icon',async({page,request})=>{
  const description='모멘텀·성장·가치 전략으로 시장 주도주를 찾고 포트폴리오까지 관리하는 투자 분석 플랫폼'
- await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
  const meta=(sel:string)=>page.locator(sel).getAttribute('content')
  expect(await meta('meta[property="og:title"]')).toBe('Folio xx')
  expect(await meta('meta[property="og:description"]')).toBe(description)

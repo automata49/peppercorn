@@ -14,7 +14,7 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:Object.fromEntries(rows.map(row=>[row.id,Array.from({length:21},(_,i)=>['2026-09-'+String(i+1).padStart(2,'0'),100+i])]))}}))
- await page.setViewportSize({width,height});await page.goto('/peppercorn/')
+ await page.setViewportSize({width,height});await page.goto('/peppercorn/');await openPage(page,'시장 요약')
  for(const [w,h] of [[width,height],[height,width]]){
   await page.setViewportSize({width:w,height:h});await openPage(page,'탐색')
   const core=page.locator('.analysis-scope button').first()
@@ -36,7 +36,7 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
   const tabs=page.getByRole('tablist',{name:'추적 영역'})
   await expect(tabs).toHaveCSS('border-bottom-width','0px')
   await expect(tabs).toHaveCSS('gap','8px')
-  for(const name of ['관심종목','보유종목','투자일지']){
+  for(const name of ['회고','관심종목','보유종목','투자일지']){
    const tab=tabs.getByRole('tab',{name});await tab.click()
    await expect(tab).toHaveAttribute('aria-selected','true')
    await expect(tab).toHaveCSS('border-top-width','0px')

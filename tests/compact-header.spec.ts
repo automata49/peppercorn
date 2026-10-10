@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -5,7 +6,7 @@ async function boot(page:any,calls:{n:number}){
   await page.route('**/functions/v1/leaderboard?*',route=>{calls.n++;return route.fulfill({json:{rows:demoRows}})})
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 

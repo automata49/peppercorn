@@ -8,6 +8,7 @@ import './design/folio-identity.css'
 import './design/folio-journey.css'
 import './design/folio-pebble.css'
 import './design/market-colors.css'
+import './design/lifetime.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {
   state:{error:Error|null}={error:null}

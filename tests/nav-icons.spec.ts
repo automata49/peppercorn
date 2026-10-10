@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -5,7 +6,7 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
@@ -22,12 +23,12 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
 
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
   const drawer=page.locator('.menu-drawer')
-  await expect(drawer.locator('nav button')).toHaveCount(12)
-  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(12)
+  await expect(drawer.locator('nav button')).toHaveCount(15)
+  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(15)
   await expect(drawer.locator('.menu-drawer-close > svg.app-icon')).toHaveCount(1)
 
-  await drawer.getByRole('button',{name:'탐색',exact:true}).click()
-  await expect(bottom.getByRole('button',{name:'탐색',exact:true})).toHaveClass(/active/)
+  await drawer.getByRole('button',{name:'발견',exact:true}).click()
+  await expect(bottom.getByRole('button',{name:'발견',exact:true})).toHaveClass(/active/)
   await context.close()
 })
 
@@ -35,8 +36,8 @@ test('desktop sidebar uses the same line icon system',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
   const side=page.locator('.sidebar nav')
-  await expect(side.locator('button')).toHaveCount(12)
-  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(12)
+  await expect(side.locator('button')).toHaveCount(15)
+  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(15)
 
   const active=side.locator('button.active .app-icon').first()
   const inactive=side.locator('button:not(.active) .app-icon').first()

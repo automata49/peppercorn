@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 test.use({viewport:{width:1440,height:900}})
 // LEADERBOARD-STATIC-1: scheduled loads read data/leaderboard.json; stale or missing snapshots and manual refresh use the function.
@@ -10,9 +11,9 @@ async function setup(page:Page,snapshot:{status:number;age_h?:number}){
   await page.route('**/data/leaderboard.json',route=>{calls.snapshot++
     if(snapshot.status!==200)return route.fulfill({status:snapshot.status,body:'not found'})
     return route.fulfill({json:{published_at:new Date(Date.now()-(snapshot.age_h??1)*3600_000).toISOString(),rows:[row('SNAP')]}})})
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
   return calls
 }
 test('fresh snapshot is used without calling the live function',async({page})=>{
