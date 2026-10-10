@@ -25,7 +25,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
   await page.addInitScript(row=>localStorage.setItem('peppercorn-journal',JSON.stringify([row])),journalRow)
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 
   // Dashboard: decision list first, dense search/table second.
@@ -35,7 +35,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await noHorizontalOverflow(page)
 
   // Analysis: one explicit decision path; Overview is primary and records stay secondary.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   await expect(page.locator('.analysis-hub-head')).toBeVisible()
   await pickFirstStock(page)
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
@@ -45,7 +45,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await noHorizontalOverflow(page)
 
   // Watchlist / Portfolio / Journal: compact decision rows first, editable grids closed.
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'추적'}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'여정'}).click();await page.getByRole('tab',{name:'관심종목',exact:true}).click()
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
@@ -55,7 +55,7 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  await openDrawerPage(page,'Journal')
+  await openDrawerPage(page,'매매 기록')
   await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
   await expect(page.locator('.workspace-mobile-summary .decision-row')).toHaveCount(1)
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')

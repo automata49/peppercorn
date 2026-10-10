@@ -192,3 +192,9 @@ assert(pebbleCss.includes('LEADERSHIP-GLASS-2')&&pebbleCss.includes('border-radi
 const stockCard=readFileSync('src/components/StockTrendList.tsx','utf8');
 assert(!stockCard.includes('stock-avatar')&&stockCard.includes('stock-trend-name'),'STOCK-CARDS-2 removes initials and preserves explicit instrument names.');
 assert(pebbleCss.includes('.journey-tracking-tabs button[aria-selected=true]')&&journeyCss.includes('@container stock-list'),'Tracking must share glass and stock cards must adapt to available width.');
+
+// LIFETIME-JOURNEY-1 retains analytics in Market Summary while making personal pages primary.
+assert(app.includes("useState('today')")&&app.includes('<LifetimeJournal'),'Today must open the personal journal workspace.');
+for(const label of ["['today','home','오늘']","['analysis','search','발견']","['notebook','journal','저널']","['tracking','watchlist','여정']"])assert(sidebar.includes(label),'Lifetime primary destination missing: '+label);
+assert(mainEntry.includes("import './design/lifetime.css'"),'Lifetime component styles must load.');
+for(const dependency of ['motion','@tiptap/react','@tiptap/starter-kit','lightweight-charts','@radix-ui/react-tabs','@radix-ui/react-slot','class-variance-authority'])assert(pkg.dependencies[dependency],'Missing approved UI dependency '+dependency);

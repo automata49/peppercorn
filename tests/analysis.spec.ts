@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {backToExplore,pickFirstStock} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[],price:100,rs_rank:99-i,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:i<10?'핵심 주도':'중립',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,rs_5d:.01,rs_20d:.02,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06,ma50:90,ma200:80,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
@@ -8,12 +9,12 @@ const position=[
   {market:'KR',ticker:'TEST1',as_of:'2026-06-30',status:'check_failed',rules_version:'uncalibrated',methods:{fcf:'KR-FCF-PPE-2',roic:'KR-ROIC-1'},failed_checks:[['분기 연속성 (최근 16분기)','공백 1곳']],metrics:metrics({eps_ttm:null,debt_ratio:null}),labels:noLabels,label_reasons:{},computed_at:'2026-09-30T02:00:00Z'},
 ]
 async function openAnalysis(page:Page){
-  const side=page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true})
+  const side=page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true})
   if(await side.isVisible()){await side.click();return}
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
   if(await bottom.isVisible()){await bottom.click();return}
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()
 }
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' stock analysis shows Analysis, Financials and Thesis',async({browser})=>{
@@ -21,7 +22,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const page=await context.newPage()
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openAnalysis(page)
   const browse=page.locator('.analysis-browse')
@@ -61,7 +62,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
 test('stock analysis survives a failed fundamentals load',async({page})=>{
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({status:502,json:{error:'read_failed'}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openAnalysis(page)
   await pickFirstStock(page)

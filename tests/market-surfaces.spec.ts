@@ -34,7 +34,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>{const ids=new URL(r.request().url()).searchParams.get('ids')!.split(',');return r.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,Array.from({length:21},(_,i)=>['2026-09-'+String(i+1).padStart(2,'0'),id.endsWith('-1')?120-i:100+i])]))}})})
- await page.goto('/peppercorn/');await expect(page.locator('.journey-home')).toBeVisible()
+ await page.goto('/peppercorn/');await openPage(page,'시장 요약');await expect(page.locator('.journey-home')).toBeVisible()
  for(const selector of ['.journey-market','.journey-today','.journey-insight','.journey-classes button']){
   for(const el of await page.locator(selector).all()){await expect(el).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
   expect(await el.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')

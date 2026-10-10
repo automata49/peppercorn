@@ -48,14 +48,14 @@ async function open(page:Page){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  const side=page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true})
+  const side=page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true})
   if(await side.isVisible())return side.click()
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true})
+  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
   if(await bottom.isVisible())return bottom.click()
   await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()
 }
 
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
@@ -137,14 +137,14 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:peers.map(r=>({...r,traded_value_20d:r.id==='a'?1.6e11:null}))}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:position}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await expect(side.locator('.nav-label')).toHaveText(['홈','탐색','Thesis','추적','시장 신호','시장 온도계','Watchlist','Portfolio','Journal','Leaderboard','Universe','Settings'])
+    await expect(side.locator('.nav-label')).toHaveText(['오늘','발견','저널','여정','Thesis','시장 요약','시장 신호','시장 온도계','Watchlist','Portfolio','매매 기록','리서치 노트','Leaderboard','Universe','Settings'])
   }
-  if(await side.isVisible())await side.getByRole('button',{name:'탐색',exact:true}).click()
-  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
+  if(await side.isVisible())await side.getByRole('button',{name:'발견',exact:true}).click()
+  else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
   const body=page.locator('.analysis-body')
   await expect(body.locator('.hero-meta')).toHaveText('KR · 353200 · KOSPI · Semiconductors')

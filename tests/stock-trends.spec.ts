@@ -15,7 +15,7 @@ async function boot(page:Page,data:LeaderRow[]=rows,{missing=false,beforeHistory
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',async r=>{const ids=new URL(r.request().url()).searchParams.get('ids')!.split(',');batches.push(ids);const n=batches.length;await beforeHistory(n);return r.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,missing?[]:dates.map((d,i)=>[d,historyValue(n,i)])]))}})})
- await page.goto('/peppercorn/');await expect(page.locator('.journey-home')).toBeVisible()
+ await page.goto('/peppercorn/');await openPage(page,'시장 요약');await expect(page.locator('.journey-home')).toBeVisible()
  return batches
 }
 test('size uses full per-market Equity universe, prefers comprehensive cap and includes cutoff ties',()=>{
@@ -57,7 +57,7 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.locator('.journey-today .stock-trend-row')).toHaveCount(2)
  await expect(page.locator('.journey-today svg[role=img]').first()).toBeVisible()
  await openPage(page,'탐색')
- await expect(page.getByRole('heading',{name:'주도 종목',exact:true})).toBeVisible()
+ await expect(page.getByRole('heading',{name:'오늘의 주도주',exact:true})).toBeVisible()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
  const scope=page.getByRole('group',{name:'주도 분류'})
@@ -74,7 +74,7 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  const target=await page.getByRole('button',{name:'대형주',exact:true}).boundingBox();expect(target!.height).toBeGreaterThanOrEqual(44)
  expect(batches.every(ids=>ids.length<=10)).toBe(true)
- await page.reload();await expect(page.getByRole('button',{name:'중소형주',exact:true})).toHaveAttribute('aria-pressed','true');await context.close()
+ await page.reload();await openPage(page,'시장 요약');await expect(page.getByRole('button',{name:'중소형주',exact:true})).toHaveAttribute('aria-pressed','true');await context.close()
 })
 test('fallback basis and empty history are explicit, unknown size only appears in all',async({page})=>{
  const data=rows.map(r=>({...r,market_cap:null,traded_value_20d:r.id.endsWith('-0')?null:r.traded_value_20d}))

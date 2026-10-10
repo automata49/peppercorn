@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -11,7 +12,7 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
@@ -36,7 +37,7 @@ for(const view of views){
 
     await boxAtLeast(page.locator(view.menu),44,44)
     const nav=page.locator('.mobile-bottom-nav')
-    await boxAtLeast(nav.getByRole('button',{name:'홈'}),44,52)
+    await boxAtLeast(nav.getByRole('button',{name:'오늘'}),44,52)
     expect(parseFloat(await nav.locator('b').first().evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(11)
 
     await page.locator(view.menu).click()

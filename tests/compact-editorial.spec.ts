@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 
@@ -26,14 +27,13 @@ for(const view of views){
         ['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]
       ]]))}})
     })
-    await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/')
+    await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/');await openPage(page,'시장 요약')
 
     const brand=page.locator('.page-shell-dashboard .mobile-brandbar')
     await expect(brand).toBeVisible()
     expect(await brand.evaluate(e=>getComputedStyle(e).backdropFilter)).toBe('none')
     expect(parseFloat(await brand.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
 
-    const bodyColor=await page.locator('body').evaluate(e=>getComputedStyle(e).color)
     await expect(page.locator('.journey-today .decision-row').first()).toBeVisible()
     await expect(page.locator('.leader-spotlight,.dashboard-sector-panel')).toHaveCount(0)
     const row=page.locator('.journey-today .decision-row').first()
@@ -42,7 +42,7 @@ for(const view of views){
 
     const bottomActive=page.locator('.mobile-bottom-nav button.active')
     await expect(bottomActive).toBeVisible()
-    expect(await bottomActive.evaluate(e=>getComputedStyle(e).color)).toBe(bodyColor)
+    await expect.poll(()=>page.evaluate(()=>{const active=document.querySelector('.mobile-bottom-nav button.active');return !!active&&getComputedStyle(active).color===getComputedStyle(document.body).color})).toBe(true)
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
     await context.close()
   })

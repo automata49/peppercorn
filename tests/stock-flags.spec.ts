@@ -51,7 +51,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
   // This spec checks badges; the default-on growth filter (GROWTH-FILTER-1) is covered in leader-lens.spec.ts.
   await page.addInitScript(()=>localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({growthOnly:false})))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   // US sector shows under its GICS name only.
   await openSignal(page)
@@ -76,7 +76,7 @@ test('without the flags file the app shows no badges and still works',async({pag
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/data/stock-flags.json',route=>route.fulfill({status:404,body:'not found'}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await openLeaderTools(page)
   await expect(page.locator('.drill-sheet .stock-row').filter({hasText:'Kodiak'}).first()).toBeVisible()

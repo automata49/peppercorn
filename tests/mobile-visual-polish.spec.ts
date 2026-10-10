@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -5,7 +6,7 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
@@ -24,7 +25,7 @@ for(const width of [390,430]){
 
     await boxAtLeast(page.locator('.mobile-brand-menu'),44,44)
     const nav=page.locator('.mobile-bottom-nav')
-    await boxAtLeast(nav.getByRole('button',{name:'홈'}),44,52)
+    await boxAtLeast(nav.getByRole('button',{name:'오늘'}),44,52)
     expect(parseFloat(await nav.locator('b').first().evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(11)
 
     const marketButton=page.locator('.journey-home .section-market button').first()
@@ -40,7 +41,7 @@ for(const width of [390,430]){
     expect(parseFloat(await sectorRow.locator('.decision-eyebrow').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
     expect(parseFloat(await sectorRow.locator('.stock-trend-tags small').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(10)
 
-    await nav.getByRole('button',{name:'추적'}).click()
+    await nav.getByRole('button',{name:'여정'}).click();await page.getByRole('tab',{name:'관심종목',exact:true}).click()
     const tickerInput=page.locator('.ticker-entry input').first()
     await boxAtLeast(tickerInput,120,44)
     expect(parseFloat(await tickerInput.evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16)

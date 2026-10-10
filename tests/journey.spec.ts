@@ -8,10 +8,10 @@ async function boot(page:Page){
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>{const ids=new URL(r.request().url()).searchParams.get('ids')?.split(',')||[];return r.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]]]))}})})
- await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/')
+ await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/peppercorn/');await openPage(page,'시장 요약')
  await expect(page.locator('.journey-today .decision-row').first()).toBeVisible()
 }
-async function nav(page:Page,label:string){const side=page.locator('.sidebar nav').getByRole('button',{name:label,exact:true});if(await side.isVisible())await side.click();else await page.locator('.mobile-bottom-nav').getByRole('button',{name:label,exact:true}).click()}
+async function nav(page:Page,label:string){await openPage(page,label)}
 for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail → thesis → tracking, identity and overflow`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440})
  const page=await context.newPage();await boot(page)
@@ -36,7 +36,7 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  const conclusion=page.getByRole('textbox',{name:'내 결론',exact:true})
  await conclusion.fill('성장 동력 확인 후 추적');await conclusion.blur()
  await nav(page,'추적')
- await expect(page.getByRole('tablist',{name:'추적 영역'}).getByRole('tab')).toHaveText(['관심종목','보유종목','투자일지'])
+ await expect(page.getByRole('tablist',{name:'추적 영역'}).getByRole('tab')).toHaveText(['회고','관심종목','보유종목','투자일지'])
  await page.getByRole('tab',{name:'보유종목',exact:true}).click();await expect(page.locator('.workspace-mobile-summary:visible,.workspace-grid-panel:visible').first()).toBeVisible()
  await nav(page,'Thesis');await expect(conclusion).toHaveValue('성장 동력 확인 후 추적')
  await nav(page,'탐색');await expect(page.locator('.analysis-finder')).toBeVisible();await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
@@ -74,7 +74,7 @@ test('Thesis opens and edits the selected dated record, retaining both versions 
  const input=page.getByRole('textbox',{name:'내 결론',exact:true});await expect(input).toHaveValue('older thesis')
  await input.fill('edited older thesis');await input.blur()
  await page.locator('.journey-theses .decision-row').filter({hasText:'2026-10-01'}).click();await expect(input).toHaveValue('newer thesis')
- await page.reload();await nav(page,'Thesis');await page.locator('.journey-theses .decision-row').filter({hasText:'2026-09-01'}).click();await expect(input).toHaveValue('edited older thesis')
+ await page.reload();await openPage(page,'시장 요약');await nav(page,'Thesis');await page.locator('.journey-theses .decision-row').filter({hasText:'2026-09-01'}).click();await expect(input).toHaveValue('edited older thesis')
 })
 
 test('archived Thesis remains editable without fabricating market data',async({page})=>{

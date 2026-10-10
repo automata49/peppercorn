@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 
@@ -19,7 +20,7 @@ async function boot(page:any){
       ['2026-09-28',100],['2026-09-29',104],['2026-09-30',102],['2026-10-01',108]
     ]]))}})
   })
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
 }
 
 for(const view of VISUAL_IDENTITY_VIEWPORTS){
@@ -96,9 +97,9 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     expect(todayBox!.y).toBeLessThan(classesBox!.y)
 
     if(view.compact){
-      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
+      await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
     }else{
-      await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
+      await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
     }
     const scope=page.locator('.analysis-scope')
     const active=scope.locator('button[aria-pressed="true"]')
@@ -119,9 +120,9 @@ test('Light theme keeps one Folio visual system across every product workspace',
   const page=await context.newPage()
   await boot(page)
   const destinations=[
-    ['홈','dashboard'],['탐색','analysis'],['Thesis','thesis'],['추적','tracking'],
+    ['시장 요약','dashboard'],['발견','analysis'],['Thesis','thesis'],['여정','tracking'],
     ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
-    ['Portfolio','portfolio'],['Journal','journal'],['Leaderboard','leaderboard'],
+    ['Portfolio','portfolio'],['매매 기록','journal'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
   const nav=page.locator('.sidebar nav')

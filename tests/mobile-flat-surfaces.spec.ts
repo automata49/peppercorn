@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {openSignal,pickFirstStock} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
@@ -6,7 +7,7 @@ async function boot(page:any){
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:demoRows}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
+  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
 }
 
@@ -31,7 +32,7 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
   expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
   expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
-  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   await pickFirstStock(page)
   const primary=page.locator('.analysis-main > .analysis-price-momentum')
   await expect(primary).toHaveCount(1)
@@ -54,7 +55,7 @@ test('desktop major regions share Pebble glass',async({page})=>{
   const focus=page.locator('.journey-market')
   expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
-  await page.locator('.sidebar nav').getByRole('button',{name:'탐색',exact:true}).click()
+  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
   await pickFirstStock(page)
   const block=page.locator('.analysis-main > .analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
