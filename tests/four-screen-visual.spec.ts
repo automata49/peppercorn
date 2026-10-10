@@ -30,6 +30,8 @@ test.beforeAll(() => {
   // Fail rather than produce tofu/fallback-font snapshots on an unprepared host.
   expect(execFileSync('fc-match', ['-f', '%{family}', 'Noto Sans CJK KR'], {encoding: 'utf8'})).toContain('Noto Sans CJK KR')
   expect(execFileSync('fc-match', ['-f', '%{family}', 'Arial'], {encoding: 'utf8'})).toContain('Liberation Sans')
+  // Chromium's Linux CJK fallback comes from this browser dependency even with Noto installed.
+  expect(execFileSync('fc-match', ['-f', '%{family}', 'WenQuanYi Zen Hei'], {encoding: 'utf8'})).toContain('WenQuanYi Zen Hei')
   if (process.env.CI) expect(test.info().config.updateSnapshots).not.toMatch(/all|changed/)
 })
 

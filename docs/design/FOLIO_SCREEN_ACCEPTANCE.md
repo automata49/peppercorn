@@ -31,7 +31,7 @@ Decision: **2026-10-10 / FOUR-SCREENS-1**. This is the current completion contra
 
 The test uses `toHaveScreenshot`, checks every image has decoded and waits for fonts/market readiness. It preserves content, navigation and styling in the comparison. Do not mask the entire screen or auto-update screenshots in CI. A missing snapshot fails CI.
 
-Generate candidates locally with `npm run test:four-screens -- --update-snapshots=all`, inspect each changed Light/Dark screen, then rerun without updates. Use the repository's pinned Playwright Chromium on Linux with Noto CJK and Liberation fonts (CI's browser dependencies and `fonts-noto-cjk`). Font preflight fails if either family is missing. Commit reviewed PNGs alongside the change. Snapshot thresholds are small raster tolerances, not permission to change hierarchy. Report open IDs whenever claiming four-screen completion.
+Generate candidates locally with `npm run test:four-screens -- --update-snapshots=all`, inspect each changed Light/Dark screen, then rerun without updates. Use the repository's pinned Playwright Chromium on **Ubuntu 24.04** (the pinned browser CI runner): install the **complete browser dependencies** with `npx playwright install --with-deps chromium`, then `fonts-noto-cjk`. Font preflight requires Noto CJK, Liberation Sans and **WenQuanYi Zen Hei** (`fonts-wqy-zenhei`, included in Chromium's Linux dependencies). Noto alone does not reproduce Chromium's current CJK fallback. Commit reviewed PNGs alongside the change. Snapshot thresholds are small raster tolerances, not permission to change hierarchy. Report open IDs whenever claiming four-screen completion.
 
 ## Definition of done
 
