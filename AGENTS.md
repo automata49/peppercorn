@@ -1,5 +1,9 @@
 # Peppercorn — Codex
 
+## WORDMARK-LAUNCH-1 — user direction (2026-10-11)
+Launch shows only the canonical theme-aware FolioWordmark centered on theme paper for 2000ms, then dismisses. No hero, tagline or progress bar. This supersedes all older hero-launch requirements; supplied artwork files remain available for other uses. Session-seen behavior is preserved.
+
+
 ## SOURCE-NEWS-1 — automatic editorial connection (2026-10-11)
 
 Today consumes a bounded static source feed produced after existing market refresh: explicitly registered public issuer RSS. Client checks source/issuer, date/expiry, model schema and photo attribution before use. Ranking, storage, private Thesis and financial calculations are unchanged. Valid licensed issuer-related photography is the exception to the older decorative-only cover rule; missing/failed photos keep the supplied Folio image. Brand/wordmark/launch artwork stays authoritative. Original article photos require reviewed reuse permission; related Commons images are explicitly distinguished and credited. AI output is a grounded **draft**, not verified analysis. Key absence/provider failure uses source titles and is disclosed. See `docs/LEADER_SOURCE_PIPELINE.md` for scope, quotas, exact source/rights gates and Actions-secret setup. Live model execution/semantic quality and publisher-photo permissions remain open until evidenced; offline tests do not prove activation.

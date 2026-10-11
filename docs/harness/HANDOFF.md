@@ -1,5 +1,9 @@
 ## SOURCE-NEWS-1 implementation — 2026-10-11
 
+## WORDMARK-LAUNCH-1 — user direction (2026-10-11)
+Launch shows only the canonical theme-aware FolioWordmark centered on theme paper for 2000ms, then dismisses. No hero, tagline or progress bar. This supersedes all older hero-launch requirements; supplied artwork files remain available for other uses. Session-seen behavior is preserved.
+
+
 Today now independently consumes an atomic public editorial manifest produced after the existing leaderboard publication/market refresh. Six explicit issuer RSS sources (AAPL, NVDA, KR 000660/005930, AMD, DELL) are supported; unsupported leaders retain the previous fallback. No ranking, analysis, storage/sync or private Thesis/Journal data is changed. Crawling checks reviewed HTTPS hosts, public destinations and robots at every redirect; the documented Commons query API is separate. Dates are timezone-aware, source age is bounded to 14 days and cache to 48 hours; retaining a prior observation never renews its expiry. Collection failure cannot block existing app deployment.
 
 The server-only Gemini 2.5 Flash-Lite adapter requires bounded structured output and an exact source ID/evidence fragment, rejects unsupported numeric tokens/instructions and exposes a draft label. There was no provider key in this environment and **no live AI call**. Configure Actions secret GEMINI_API_KEY using a free-tier-eligible project, then evaluate live Korean summary quality. No secret is exposed to Vite or private user records sent to a model. Related Commons photos require issuer-specific filename terms, raster type, creator/license/source page and repeat client validation. AMD military-acronym matches are excluded. Original OG photos are conditional on an explicitly reviewed permission record; none is registered yet, so originals remain open. Missing/failed photos retain supplied Folio art and correct attribution state.

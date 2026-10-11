@@ -99,3 +99,7 @@
 @media(max-width:650px){
   body{word-break:keep-all}
 }
+
+/* WORDMARK-LAUNCH-1: canonical artwork only, displayed for two seconds. */
+.launch-overlay.launch-wordmark-only{display:grid;place-items:center;background:var(--folio-paper);padding:24px}
+.launch-wordmark-only .launch-wordmark{width:clamp(180px,32vw,320px);max-width:80vw;height:auto}

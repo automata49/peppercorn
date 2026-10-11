@@ -147,16 +147,16 @@ test('Light theme keeps one Folio visual system across every product workspace',
   await context.close()
 })
 
-test('launch is Folio-only and keeps the exact B hero',async({page})=>{
+test('launch shows only the canonical Folio wordmark',async({page})=>{
   await page.setViewportSize({width:390,height:844})
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/')
   const launch=page.locator('.launch-overlay')
-  const launchHero=launch.getByRole('img',{name:'Folio xx visual'})
-  await expect(launchHero).toBeVisible()
-  await expect.poll(async()=>launchHero.evaluate((el:any)=>el.currentSrc)).toContain('folio-brand-launch')
-  await expect(launch).not.toContainText('SUNSET EDITORIAL')
+  await expect(launch.getByRole('img',{name:'Folio xx',exact:true})).toBeVisible()
+  await expect(launch.locator('.launch-b-hero,.launch-progress')).toHaveCount(0)
+  await expect(launch).toHaveCount(0,{timeout:3000})
+
   await expect(launch.locator('.launch-footer')).toBeHidden()
-  await expect(launch).not.toContainText('Peppercorn Capital')
+
 })
