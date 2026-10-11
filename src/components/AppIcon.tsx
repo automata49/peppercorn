@@ -13,6 +13,7 @@ export type AppIconName =
   | 'close'
   | 'refresh'
   | 'search'
+  | 'arrow'
 
 const common={
   fill:'none',
@@ -25,6 +26,7 @@ const common={
 export function AppIcon({name,size=20,className=''}:{name:AppIconName;size?:number;className?:string}){
   const body=(()=>{
     switch(name){
+      case 'arrow': return <><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>
       case 'home': return <><path d="M4 10.5 12 4l8 6.5"/><path d="M6.5 9.5V20h11V9.5"/><path d="M10 20v-5h4v5"/></>
       case 'analysis': return <><path d="M5 19V12"/><path d="M12 19V5"/><path d="M19 19V9"/><path d="M3.5 19.5h17"/></>
       case 'temperature': return <><path d="M12 3a8 8 0 1 0 8 8"/><path d="M12 11l5-4"/><circle cx="12" cy="11" r="1.7"/></>

@@ -57,7 +57,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     return r.fulfill({json: {series: Object.fromEntries(ids.map(id => [id, series]))}})
   })
   await page.goto('/peppercorn/')
-  await expect(page.getByRole('button', {name: '첫 페이지 쓰기'})).toBeEnabled()
+  await expect(page.getByRole('heading', {name: '오늘의 주도주', exact:true})).toBeVisible()
   await page.evaluate(async records => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open('folio-lifetime-journal', 1)
@@ -72,7 +72,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     })
   }, entries)
   await page.reload()
-  await expect(page.getByRole('button', {name: '바다 앞에서 생각한 긴 시간 기록 열기'})).toBeVisible()
+  await expect(page.locator('.leader-cover').first()).toBeVisible()
   await expect(page.locator('.source.supabase')).toHaveCount(1)
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
 }
@@ -119,7 +119,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
     for (const screen of screens) {
       await openScreen(page, screen.label, view.touch)
       await expect(page.locator(screen.selector)).toBeVisible()
-      if (screen.name === 'today') await expect(page.locator('.today-story')).toHaveCount(4)
+      if (screen.name === 'today') {expect(await page.locator('.leader-cover').count()).toBeGreaterThan(0);expect(await page.locator('.leader-cover').count()).toBeLessThanOrEqual(5)}
       if (screen.name === 'discover') {
         const active = page.locator('.analysis-scope button[aria-pressed=true]')
         if (await active.count()) { if (view.touch) await active.tap(); else await active.click() }

@@ -1,3 +1,13 @@
+## LEADER-EDITORIAL-1 implementation — 2026-10-11
+
+Today is now an App Store editorial view of at most five existing Market Summary leaders. Both destinations share the exact selection/order expression; global market/category, ranking, price/RS calculations, storage/sync and Journal/Journey remain unchanged. Cards use the current Folio-token shadcn controls and Motion shared frame/image/title, with Radix dialog, Escape, focus/scroll restoration, and a direct existing-analysis entry. Obra is a reference for component principles; its Figma file was not imported.
+
+Saved Research is matched only by explicit market+ticker, a valid HTTP(S) source and fact. Rejected observations including legacy verified:false are excluded; old/unknown dates, verification and user interpretation are disclosed in detail. Missing sources and demo prices have explicit states. The approved photo remains decorative and is labelled as such. Crawler, AI provider and rights-cleared source photography remain open; no live AI was invoked. Prior JOURNEY-2 historical flows and physical Safari/Pencil evidence remain open.
+
+Read-only UI review found a legacy verification issue; it was fixed with a regression and re-reviewed with no remaining source blocker. Production build and harness passed. Four-screen references updated only the eight Today PNGs; the other 24 remain byte-for-byte unchanged. Manual review covered all eight home references and phone expanded / tablet dark views. Full UI: 214/214 passed (9.7 minutes, two workers), including identity and 8/8 four-screen comparisons with snapshot updates disabled. Offline database contract gates passed Position 93, ETF RS 47, universe 22 and temperature 16. New card cases cover four widths × Light/Dark, source isolation, stale/missing/rejected sources, selection parity, empty state, analysis/Journal entry, reduced motion and one ordinary spring open/reverse keyboard smoke.
+
+Design reference: https://github.com/automata49/ConnectToGitHubRepository/pull/1 shares the component with clearly labelled demo data; TypeScript/build and three-width interaction smoke passed. This task prepares PRs, without merging or deploying.
+
 ## Production module shipping repair — 2026-10-11
 
 PR #126 merged the magazine pages at `923c0f38855213696da89c0627e333e1b147850e`; Deploy web app run `38103919320` succeeded. Live validation confirmed the new four-link navigation, but opening Today's editor reached the error boundary (`removeChild`). The deployed HTML imported `app.js?v=SHA` while lazy editor/chart chunks imported `./app.js`, executing the boot entry under two ESM identities. The earlier browser gates ran before this deployment-only rewrite and did not catch it.

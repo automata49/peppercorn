@@ -1,5 +1,14 @@
 # Current Folio UI review procedure
 
+## LEADER-EDITORIAL-1 — latest user direction (2026-10-11)
+
+Today now centers **오늘의 주도주**: at most five stocks/ETFs from the unchanged Market Summary selection, in the same order and global market/category. This supersedes the older requirement for four personal/question/market/journey covers on Today only. The original personal collection/editors remain in Journal and Journey. Motion keeps shared frame/image/title expansion, reverse transition, focus restoration, scroll preservation and reduced motion. Primary navigation and supplied brand assets are unchanged.
+
+Use existing Folio-token shadcn Button/Slot/CVA and Radix Dialog primitives; Obra Community is a component-system reference, not imported artwork or a copied Figma file. Today controls use 20px radii and covers 24px; other pages keep their existing baseline. Cards show instrument/class, one source-backed saved Research title or existing action guide, and provenance. Research requires explicit matching market+ticker, HTTP(S) source and a fact; rejected observations are excluded. Unknown/stale date, verification and fact/user interpretation remain explicit in detail. Approved decorative photography is labelled separately as **Folio 이미지 · 원문 사진 아님**.
+
+Open: automated crawling, a validated AI provider and rights-cleared source imagery are not connected. No live-AI or automatically sourced-photo claim. Missing research has an explicit state; demo market data is labelled. Ranking, financial calculation, workspace save/sync, journal revisions/backups and identity are unchanged. Validate home/expanded cards at 390/834/1366/1440 Light/Dark and keep four-screen comparisons for other destinations.
+
+
 Use for read-only identity, responsive UI and completion review. Read CONTRACT, the current HANDOFF entry, FOLIO_DESIGN_BASELINE, FOLIO_IDENTITY_V2, FOLIO_LIFETIME_UI and **docs/design/FOLIO_SCREEN_ACCEPTANCE.md**. The latter owns four-screen completion and explicitly lists open gaps.
 
 1. Verify primary **오늘 / 발견 / 저널 / 여정**. Today keeps the approved Motion covers and accessible reverse transition. Earlier analytical Home placement belongs to **시장 요약** only. **시장 신호** retains expanded sector → ETF analysis and the shared ranked ETF pool.
