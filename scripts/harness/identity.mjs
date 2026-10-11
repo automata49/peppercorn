@@ -137,7 +137,7 @@ assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page F
 assert(contract.includes('Folio Sunset Editorial + Pebble Liquid Glass')&&design.includes('Pebble Liquid Glass')&&baseline.includes('Pebble Liquid Glass'),'Harness docs must brand the current system as Sunset Editorial + Pebble Liquid Glass.');
 assert(journeyCss.includes('Sunset Editorial pebble glass')&&journeyCss.includes('backdrop-filter:blur(18px) saturate(1.22)')&&journeyCss.includes('border-radius:52% 48% 54% 46% / 46% 55% 45% 54%'),'Pebble Liquid Glass geometry/material contract drifted.');
 assert(sidebar.includes("['signal','sectors','시장 신호']"),'The former Market Signal destination must remain named 시장 신호.');
-assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes('const etfPreview=rankedEtfRows')&&app.includes('<EtfRsChart rows={rankedEtfRows.slice(0,5)}')&&!app.includes('etfMkt'),'Home ETF and 시장 신호 chart/list must share the same global-market ranked Top 5 without an independent ETF market state.');
+assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes("const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:")&&app.includes('const todayRows=todayLeaderRows')&&app.includes('<EtfRsChart rows={rankedEtfRows.slice(0,5)}')&&!app.includes('etfMkt'),'Home ETF and 시장 신호 chart/list must share the same global-market ranked Top 5 without an independent ETF market state.');
 assert(app.includes('dashboard-explore dashboard-explore-expanded')&&!app.includes('<details className="dashboard-explore"'),'Core ETF exploration must remain expanded, not hidden in a disclosure.');
 assert(app.includes('sector-heat-disclosure signal-expanded-block')&&!app.includes('<details className="dashboard-disclosure sector-heat-disclosure"'),'Core sector map must remain expanded, not hidden in a disclosure.');
 assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약')&&app.includes("setSectorMkt(market);setPage('signal')"),'Home 오늘의 시장 must summarize the full market-signal path, reset the sector page to the same global market, and its 전체 보기 must open 시장 신호.');
@@ -194,7 +194,7 @@ assert(!stockCard.includes('stock-avatar')&&stockCard.includes('stock-trend-name
 assert(pebbleCss.includes('.journey-tracking-tabs button[aria-selected=true]')&&journeyCss.includes('@container stock-list'),'Tracking must share glass and stock cards must adapt to available width.');
 
 // LIFETIME-JOURNEY-1 retains analytics in Market Summary while making personal pages primary.
-assert(app.includes("useState('today')")&&app.includes('<LifetimeJournal'),'Today must open the personal journal workspace.');
+assert(app.includes("useState('today')")&&app.includes('<TodayLeaders')&&app.includes('<LifetimeJournal'),'Today must open leader cards while retaining the personal journal workspace.');
 for(const label of ["['today','home','오늘']","['analysis','search','발견']","['notebook','journal','저널']","['tracking','watchlist','여정']"])assert(sidebar.includes(label),'Lifetime primary destination missing: '+label);
 assert(mainEntry.includes("import './design/lifetime.css'"),'Lifetime component styles must load.');
 for(const dependency of ['motion','@tiptap/react','@tiptap/starter-kit','lightweight-charts','@radix-ui/react-tabs','@radix-ui/react-slot','class-variance-authority'])assert(pkg.dependencies[dependency],'Missing approved UI dependency '+dependency);

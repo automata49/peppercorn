@@ -16,14 +16,14 @@ async function setup(page:Page,holdings:unknown[]=[holding],missingPrices=false)
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:{}}}))
  await page.goto('/peppercorn/')
- await expect(page.getByRole('button',{name:'첫 페이지 쓰기',exact:true})).toBeEnabled()
+ await expect(page.getByRole('heading',{name:'오늘의 주도주',exact:true})).toBeVisible()
 }
 
 for(const width of [390,834,1366,1440])test(`document pages ${width}: source tabs, structured revision, collage and journey`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440})
  test.setTimeout(60000)
  const page=await context.newPage();await setup(page)
- await expect(page.locator('.today-heading')).toContainText('어떤 생각이 남았나요?')
+ await expect(page.locator('.leader-home-heading')).toContainText('오늘의 주도주')
  await openPage(page,'발견')
  await expect(page.getByRole('heading',{name:'변화하는 세상을 읽다',exact:true})).toBeVisible()
  await expect(page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')).toHaveText(['종목','주제','시장 신호'])

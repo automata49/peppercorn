@@ -24,7 +24,7 @@ for(const entryMode of ['canonical','cached-app-url','historical-alias'])test(`p
  await page.route('**/functions/v1/quotes?*',route=>route.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',route=>{const ids=new URL(route.request().url()).searchParams.get('ids')!.split(',');return route.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[['2026-10-01',100],['2026-10-02',105],['2026-10-05',102]]]))}})})
  await page.goto('/peppercorn/')
- await page.getByRole('button',{name:'첫 페이지 쓰기',exact:true}).click()
+ await openPage(page,'저널');await page.getByRole('button',{name:'새 페이지',exact:true}).click()
  await expect(page.getByRole('textbox',{name:'기록 제목'})).toBeVisible()
  await page.getByRole('button',{name:'기록 닫기',exact:true}).click()
  await expect(page.getByRole('dialog')).toHaveCount(0)

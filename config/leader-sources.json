@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "market": "US",
+      "ticker": "AAPL",
+      "publisher": "Apple Newsroom",
+      "feed": "https://www.apple.com/newsroom/rss-feed.rss",
+      "image_query": "intitle:\"Apple Park\"",
+      "image_terms": [
+        "Apple Park"
+      ]
+    },
+    {
+      "market": "US",
+      "ticker": "NVDA",
+      "publisher": "NVIDIA Newsroom",
+      "feed": "https://nvidianews.nvidia.com/releases.xml",
+      "image_query": "intitle:Nvidia headquarters",
+      "image_terms": [
+        "Nvidia headquarters",
+        "Nvidia campus"
+      ]
+    },
+    {
+      "market": "KR",
+      "ticker": "000660",
+      "publisher": "SK hynix Newsroom",
+      "feed": "https://news.skhynix.com/feed/",
+      "image_query": "intitle:Hynix",
+      "image_terms": [
+        "Hynix"
+      ]
+    },
+    {
+      "market": "KR",
+      "ticker": "005930",
+      "publisher": "Samsung Global Newsroom",
+      "feed": "https://news.samsung.com/global/feed",
+      "image_query": "intitle:Samsung headquarters",
+      "image_terms": [
+        "Samsung"
+      ]
+    },
+    {
+      "market": "US",
+      "ticker": "AMD",
+      "publisher": "AMD Investor Relations",
+      "feed": "https://ir.amd.com/news-events/press-releases/rss",
+      "image_query": "intitle:AMD headquarters",
+      "image_terms": [
+        "AMD headquarters",
+        "Advanced Micro Devices"
+      ]
+    },
+    {
+      "market": "US",
+      "ticker": "DELL",
+      "publisher": "Dell Investor Relations",
+      "feed": "https://investors.delltechnologies.com/rss/news-releases.xml",
+      "image_query": "intitle:Dell headquarters",
+      "image_terms": [
+        "Dell"
+      ]
+    }
+  ]
+}
