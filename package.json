@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/generate-b-app-icons.mjs && vite",
-    "build": "node scripts/generate-b-app-icons.mjs && tsc --noEmit && vite build",
+    "build": "node scripts/generate-b-app-icons.mjs && tsc --noEmit && vite build && node scripts/version-browser-assets.mjs",
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",
     "harness:check": "node scripts/harness/check.mjs",
