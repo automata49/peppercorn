@@ -1,3 +1,11 @@
+## Production module shipping repair — 2026-10-11
+
+PR #126 merged the magazine pages at `923c0f38855213696da89c0627e333e1b147850e`; Deploy web app run `38103919320` succeeded. Live validation confirmed the new four-link navigation, but opening Today's editor reached the error boundary (`removeChild`). The deployed HTML imported `app.js?v=SHA` while lazy editor/chart chunks imported `./app.js`, executing the boot entry under two ESM identities. The earlier browser gates ran before this deployment-only rewrite and did not catch it.
+
+The repair uses Vite's native hashed canonical entry without a query. Every build emits a small `app.js` compatibility re-export, so the existing historical bundle aliases also resolve to that same canonical module. CSS and service-worker revisions now come from the build helper; compiled JS and sourcemaps are preserved. Three regression cases exercise canonical HTML, a cached versioned `app.js` URL and a historical alias, opening both the editor and actual-close chart and requiring one canonical module URL, one shell and no React errors.
+
+Fresh canonical Ubuntu checks passed: build/harness/diff, three module regressions, identity 31/31 and four-screen comparisons 8/8 (32 PNGs, no updates). Two helper reruns preserved every dist-file SHA. The prior full UI 202/202 and backend gates remain recorded below; the repair PR's complete CI and subsequent deployment must pass before claiming final publication. Final live verification must check default HTML/CSS/worker revision, canonical asset hashes, all four pages in phone/desktop Light/Dark, and the previously cached app profile. Historical asset-flow data and physical Safari/Pencil evidence remain unavailable.
+
 ## App shipping preparation — 2026-10-11
 
 The user explicitly authorized committing, pushing, creating a PR, merging after verification and confirming the actual GitHub Pages app. Branch `codex/folio-magazine-pages` integrates latest `origin/main` (`a6fe1321f84ebb38f4a7a9b91db1bd1225384dda`); a second fetch after validation confirmed no upstream changes. The full current working-tree change is the documented page implementation plus MAGAZINE-1 simplification below.
