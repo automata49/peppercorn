@@ -23,9 +23,9 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  const tickers=await cards.evaluateAll(elements=>elements.map(e=>e.getAttribute('data-ticker')))
  const card=page.getByRole('button',{name:'SK하이닉스 관련 변화 열기'});await card.scrollIntoViewIfNeeded();await card.focus();const scroll=await page.evaluate(()=>scrollY)
  await page.keyboard.press('Enter');await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByRole('button',{name:'카드 닫기'})).toBeFocused()
- await expect(page.getByRole('link',{name:/원문 보기/})).toHaveAttribute('href','https://www.skhynix.com/')
+ await expect(page.getByRole('link',{name:/내 리서치 원문/})).toHaveAttribute('href','https://www.skhynix.com/')
  await expect(page.getByRole('dialog')).toContainText('오래된 자료');await expect(page.getByRole('dialog')).toContainText('미검증');await expect(page.getByRole('dialog')).toContainText('나의 해석')
- await expect(page.getByRole('dialog')).not.toContainText('연결되면 안 되는 관찰');await expect(page.getByRole('dialog')).toContainText('자동 수집·AI 요약 연결 전')
+ await expect(page.getByRole('dialog')).not.toContainText('연결되면 안 되는 관찰');await expect(page.getByRole('dialog')).toContainText('자동 수집 자료 없음')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  await page.screenshot({path:`test-results/leader-expanded-${width}-${theme}.png`})
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);await expect(card).toBeFocused();expect(Math.abs(await page.evaluate(()=>scrollY)-scroll)).toBeLessThan(3)
@@ -37,7 +37,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  await context.close()
 })
 test('missing source and journal navigation remain honest',async({page})=>{
- await boot(page,rows,[]);await page.getByRole('button',{name:'SK하이닉스 관련 변화 열기'}).click();await expect(page.getByRole('dialog')).toContainText('연결된 출처 자료가 없습니다.');await expect(page.getByRole('link',{name:/원문 보기/})).toHaveCount(0)
+ await boot(page,rows,[]);await page.getByRole('button',{name:'SK하이닉스 관련 변화 열기'}).click();await expect(page.getByRole('dialog')).toContainText('연결된 출처 자료가 없습니다.');await expect(page.getByRole('link',{name:/내 리서치 원문/})).toHaveCount(0)
  await page.keyboard.press('Escape');await page.getByRole('button',{name:'저널에 기록',exact:true}).click();await expect(page.locator('.lifetime-journal')).toBeVisible()
 })
 test('no leadership candidates has an empty state rather than invented cards',async({page})=>{

@@ -25,6 +25,7 @@ jobs:
       - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2' 'pandas==2.3.2' 'numpy==2.3.3'
       - run: python -m pytest -q analysis/fundamentals
       - run: python -m pytest -q analysis/tests
+      - run: python -m unittest analysis.test_leader_insights
       - run: npm run harness:check
       - run: npm run test:position-db
       - run: npm run test:etf-rs

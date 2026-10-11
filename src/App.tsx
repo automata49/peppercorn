@@ -1,4 +1,5 @@
 import { TodayLeaders } from './components/TodayLeaders'
+import { loadLeaderInsights, type InsightsFeed } from './lib/leaderInsights'
 import { LifetimeJournal } from './components/LifetimeJournal'
 import { DiscoveryTopics } from './components/DiscoveryTopics'
 import { PortfolioDisclosure } from './components/PortfolioDisclosure'
@@ -695,6 +696,7 @@ export default function App(){
   const workspacePage=page==='tracking'?trackingTab:page
   const [menuOpen,setMenuOpen]=useState(false)
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
+  const [leaderInsights,setLeaderInsights]=useState<InsightsFeed|null>(null)
   const [source,setSource]=useState<'demo'|'supabase'>('demo')
   const [refreshing,setRefreshing]=useState(false)
   const [loadError,setLoadError]=useState('')
@@ -786,6 +788,8 @@ export default function App(){
       sourceRef.current=result.source
       const rows=withGroupRanks(normalizeUsSectors(withEtfRanks(applyKrEtfNames(result.rows))))
       setLeaders(rows);setSource(result.source)
+      // Editorial failure/latency must never block market data or alter its selection.
+      void loadLeaderInsights().then(setLeaderInsights)
       const matching=(row:LeaderRow|null)=>rows.find(r=>r.market===row?.market&&r.ticker===row?.ticker)
       setSelected(previous=>matching(previous)??rows[0]??null)
       setDrillStock(previous=>previous?matching(previous)??null:null)
@@ -1114,7 +1118,7 @@ export default function App(){
   let content:ReactNode
   const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
   if(page==='today'){
-    content=<TodayLeaders rows={todayLeaderRows} research={research} market={market} source={source} onMarket={setMarket} getClass={displayClass} onSelect={openAnalysisStock} onDiscover={()=>navigatePage('analysis')} onJournal={()=>navigatePage('notebook')}/>
+    content=<TodayLeaders rows={todayLeaderRows} research={research} insights={leaderInsights} market={market} source={source} onMarket={setMarket} getClass={displayClass} onSelect={openAnalysisStock} onDiscover={()=>navigatePage('analysis')} onJournal={()=>navigatePage('notebook')}/>
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
     content=<LifetimeJournal key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
