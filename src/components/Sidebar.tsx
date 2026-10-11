@@ -90,7 +90,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
   const pageButton=([id,icon,label]:[string,AppIconName,string])=><button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
     <span className="nav-icon"><AppIcon name={icon}/></span><span className="nav-label">{label}</span>
   </button>
-  const navigation=<nav aria-label="주 메뉴">{pages.map(pageButton)}</nav>
+  const navigation=<nav aria-label="주 메뉴">{pages.slice(0,4).map(pageButton)}</nav>
   const drawerNavigation=<nav className="menu-nav" aria-label="주 메뉴">{pageGroups.map(([title,ids])=><section className="menu-nav-group" key={title}>
     <h3>{title}</h3>
     {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
@@ -100,6 +100,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     <aside className="sidebar">
       <div className="brand folio-brand"><FolioBrand/></div>
       {navigation}
+      <button className="sidebar-tools" onClick={()=>setOpen(true)} aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/>도구 및 설정</button>
       <div className="side-foot">
         <ThemeControl value={theme} onChange={setTheme}/>
         <div className="side-foot-meta">Investment Workspace <b>v0.1</b></div>

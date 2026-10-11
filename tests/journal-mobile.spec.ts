@@ -44,7 +44,7 @@ test('phone Journal shows recent decisions before the full edit grid',async({bro
 test('desktop Journal keeps the full editable grid open',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await page.locator('.sidebar nav').getByRole('button',{name:'매매 기록'}).click()
+  await openPage(page,'매매 기록')
   await expect(page.locator('.workspace-mobile-summary')).toBeHidden()
   const table=page.locator('.workspace-table-disclosure')
   await expect(table).toHaveAttribute('open','')

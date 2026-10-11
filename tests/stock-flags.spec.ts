@@ -85,7 +85,7 @@ test('without the flags file the app shows no badges and still works',async({pag
   await page.keyboard.press('Escape')
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await side.getByRole('button',{name:'Leaderboard'}).click()
+    await openPage(page,'Leaderboard')
     // Columns are virtualized: scroll right until the group rank column renders.
     const header=page.locator('.ag-header-cell[col-id="group_rank"]')
     for(let x=0;x<4000&&!(await header.count());x+=300)await page.locator('.ag-body-horizontal-scroll-viewport').evaluate((e,left)=>{e.scrollLeft=left},x)

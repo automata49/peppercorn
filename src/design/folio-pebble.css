@@ -5,13 +5,13 @@
   --folio-pebble-shadow:inset 0 1px 0 color-mix(in srgb,#fff 45%,transparent),inset -1px -1px 0 color-mix(in srgb,var(--folio-plum) 6%,transparent),0 7px 18px rgba(84,38,95,.07);
 }
 html body .shell .app-main :is(.journey-market,.journey-today,.journey-insight,.panel,.analysis-hub-head,.analysis-finder,.analysis-block,.analysis-judgement,.journey-theses,.workspace-mobile-summary,.page-guide,.temp-card,.signal-expanded-block,.dashboard-explore-expanded){
-  background:var(--folio-pebble-fill)!important;
-  border:1px solid var(--folio-line)!important;
-  border-radius:28px 24px 30px 26px / 26px 30px 24px 28px!important;
-  box-shadow:var(--folio-pebble-shadow)!important;
-  -webkit-backdrop-filter:blur(18px) saturate(1.22)!important;
-  backdrop-filter:blur(18px) saturate(1.22)!important;
-  padding:clamp(16px,2.2vw,24px)!important;
+  background:var(--folio-region-fill,var(--folio-pebble-fill))!important;
+  border:var(--folio-region-border,1px solid var(--folio-line))!important;
+  border-radius:var(--folio-region-radius,28px 24px 30px 26px / 26px 30px 24px 28px)!important;
+  box-shadow:var(--folio-region-shadow,var(--folio-pebble-shadow))!important;
+  -webkit-backdrop-filter:var(--folio-region-filter,blur(18px) saturate(1.22))!important;
+  backdrop-filter:var(--folio-region-filter,blur(18px) saturate(1.22))!important;
+  padding:var(--folio-region-padding,clamp(16px,2.2vw,24px))!important;
   min-width:0;
 }
 /* LEADERSHIP-GLASS-2: borderless rounded rectangles, not cropped oval pebbles. */

@@ -43,7 +43,7 @@ test('phone Watchlist and Portfolio use summary-first progressive disclosure',as
 test('desktop keeps workspace grids open and hides the mobile summary',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await page.locator('.sidebar nav').getByRole('button',{name:'Watchlist'}).click()
+  await openPage(page,'Watchlist')
   await expect(page.locator('.workspace-mobile-summary')).toBeHidden()
   const disclosure=page.locator('.workspace-table-disclosure')
   await expect(disclosure).toHaveAttribute('open','')

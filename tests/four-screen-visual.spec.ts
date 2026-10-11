@@ -4,7 +4,7 @@ import { test, expect, type Page } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 import { blankSnapshot, questions, type JournalEntry } from '../src/lib/lifetimeJournal'
 
-// Regression-only current renders. Open concept IDs remain in FOLIO_SCREEN_ACCEPTANCE.md.
+// Regression renders of the documented page structure. Open data/device IDs remain in FOLIO_SCREEN_ACCEPTANCE.md.
 // Use the same pinned Linux Chromium/Noto CJK environment to review baseline candidates.
 const views = [
   { name: 'phone-390', width: 390, height: 844, touch: true },
@@ -19,10 +19,11 @@ const screens = [
   { name: 'journey', label: '여정', selector: '.journal-timeline' },
 ] as const
 const photo = 'data:image/webp;base64,' + readFileSync('public/folio-brand-photography.webp').toString('base64')
+const secondPhoto = 'data:image/webp;base64,' + readFileSync('public/folio-brand-typography.webp').toString('base64')
 const base = blankSnapshot()
 const entries: JournalEntry[] = [
-  { ...base, id: 'visual-life', title: '바다 앞에서 생각한 긴 시간', kind: 'life', text: '관찰과 해석을 나누자. 오늘의 작은 발견을 남긴다.', photo, createdAt: '2026-10-09T10:42:00Z', updatedAt: '2026-10-09T10:42:00Z', revisions: [] },
-  { ...base, id: 'visual-investment', title: 'AI 인프라 · 투자 근거', kind: 'investment', ticker: 'US:NVDA', question: questions[2], answer: '좋은 기업도 가격과 반대 증거를 함께 확인한다.', text: '수요 증가와 실제 현금 흐름을 비교한다.', ink: [[{x: 50,y: 80},{x: 210,y: 150},{x: 450,y: 90}]], createdAt: '2026-07-01T09:00:00Z', updatedAt: '2026-10-08T09:00:00Z', revisions: [{ at: '2026-07-01T09:00:00Z', snapshot: { ...base, title: 'AI 인프라 · 투자 근거', kind: 'investment', answer: '처음에는 수요 증가만 관찰했다.' } }] },
+  { ...base, id: 'visual-life', ticker: 'US:AAPL', title: '바다 앞에서 생각한 긴 시간', kind: 'life', text: '관찰과 해석을 나누자. 오늘의 작은 발견을 남긴다.', photo, photos: [photo, secondPhoto], createdAt: '2026-10-09T10:42:00Z', updatedAt: '2026-10-09T10:42:00Z', revisions: [] },
+  { ...base, id: 'visual-investment', title: 'AI 인프라 · 투자 근거', kind: 'investment', ticker: 'US:NVDA', question: questions[2], answer: '좋은 기업도 가격과 반대 증거를 함께 확인한다.', hypothesis: '수요와 현금 흐름을 함께 확인한다.', counterEvidence: '관찰한 수요가 실제 실적과 다를 수 있다.', text: '수요 증가와 실제 현금 흐름을 비교한다.', ink: [[{x: 50,y: 80},{x: 210,y: 150},{x: 450,y: 90}]], createdAt: '2026-07-01T09:00:00Z', updatedAt: '2026-10-08T09:00:00Z', revisions: [{ at: '2026-07-01T09:00:00Z', snapshot: { ...base, title: 'AI 인프라 · 투자 근거', kind: 'investment', answer: '처음에는 수요 증가만 관찰했다.', hypothesis: '처음 남긴 가설을 다시 확인한다.', counterEvidence: '반대 증거는 아직 기록하지 않았다.' } }] },
   { ...base, id: 'visual-patience', title: '기다림도 하나의 결정이었다', text: '당장의 움직임보다 처음 남긴 판단을 다시 읽는다.', createdAt: '2025-10-01T09:00:00Z', updatedAt: '2025-10-01T09:00:00Z', revisions: [] },
 ]
 
@@ -41,6 +42,8 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     sessionStorage.setItem('peppercorn-intro-seen', '1')
     localStorage.setItem('folio-theme', theme)
     localStorage.setItem('folio-stock-size', 'all')
+    localStorage.setItem('peppercorn-research', JSON.stringify([{id:'visual-source', date:'2026-10-01', title:'공시를 읽으며 남긴 질문', fact:'테스트 기록 · 원문에서 확인할 항목을 메모했다.', interpretation:'테스트 기록 · 실제 실적과 비교해 볼 생각이다.', source:'https://www.apple.com/newsroom/', verification:'미검증', market:'US', ticker:'AAPL'}]))
+    localStorage.setItem('peppercorn-portfolio', JSON.stringify([{id:'visual-holding',market:'US',ticker:'AAPL',name:'Apple',shares:2,avg_price:100,currency:'USD'}]))
   }, theme)
   // Ignore published static snapshots/flags as well as external live responses.
   await page.route('**/data/leaderboard.json*', r => r.fulfill({status: 404, body: ''}))
@@ -91,6 +94,17 @@ async function rendered(page: Page) {
   })
   await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.locator('.demo-banner')).toHaveCount(0)
+  const brandbar = page.locator('.mobile-brandbar')
+  if (await brandbar.isVisible()) {
+    const bar = (await brandbar.boundingBox())!
+    for (const button of await brandbar.locator('.mobile-brand-actions button').all()) {
+      const box = (await button.boundingBox())!
+      expect(box.width).toBeGreaterThanOrEqual(44)
+      expect(box.height).toBeGreaterThanOrEqual(44)
+      expect(box.y).toBeGreaterThanOrEqual(bar.y)
+      expect(box.y + box.height).toBeLessThanOrEqual(bar.y + bar.height + 1)
+    }
+  }
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true)
 }
 
@@ -117,7 +131,9 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         await expect(page.locator('.journal-gallery > button')).toHaveCount(3)
       }
       if (screen.name === 'journey') {
-        await expect(page.locator('.journal-timeline > article')).toHaveCount(3)
+        await expect(page.locator('.journal-timeline > article')).toHaveCount(1)
+        await expect(page.locator('.journal-timeline')).not.toContainText('바다 앞에서 생각한 긴 시간')
+        await expect(page.locator('.journal-story')).toHaveCount(0)
         await expect(page.locator('.journal-timeline')).toContainText('생각의 변화 1회')
       }
       await page.evaluate(() => window.scrollTo(0, 0))

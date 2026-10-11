@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { JSONContent } from '@tiptap/react'
 export type InkPoint={x:number;y:number}
 export type InkStroke=InkPoint[]
-export type EntrySnapshot={title:string;body:JSONContent;text:string;question:string;answer:string;photo?:string;ink:InkStroke[];kind:'life'|'investment';ticker:string;reviewDate:string;place:string;expense:string;currency:string}
+export type EntrySnapshot={title:string;body:JSONContent;text:string;question:string;answer:string;hypothesis?:string;counterEvidence?:string;photo?:string;photos?:string[];ink:InkStroke[];kind:'life'|'investment';ticker:string;reviewDate:string;place:string;expense:string;currency:string}
 export type JournalEntry=EntrySnapshot&{id:string;createdAt:string;updatedAt:string;revisions:{at:string;snapshot:EntrySnapshot}[]}
 export const questions=[
  '오늘 새롭게 발견한 것은 무엇인가요?',
@@ -12,8 +12,9 @@ export const questions=[
  '다른 결과는 무엇이며, 각각 얼마나 가능할까요?',
  '결과를 보기 전에도 좋은 결정이었다고 평가할 수 있나요?'
 ]
-export const blankSnapshot=():EntrySnapshot=>({title:'',body:{type:'doc',content:[{type:'paragraph'}]},text:'',question:questions[0],answer:'',ink:[],kind:'life',ticker:'',reviewDate:'',place:'',expense:'',currency:'KRW'})
-export const snapshot=(e:EntrySnapshot):EntrySnapshot=>({title:e.title,body:e.body,text:e.text,question:e.question,answer:e.answer,photo:e.photo,ink:e.ink,kind:e.kind,ticker:e.ticker,reviewDate:e.reviewDate,place:e.place,expense:e.expense,currency:e.currency})
+export const blankSnapshot=():EntrySnapshot=>({title:'',body:{type:'doc',content:[{type:'paragraph'}]},text:'',question:questions[0],answer:'',hypothesis:'',counterEvidence:'',photos:[],ink:[],kind:'life',ticker:'',reviewDate:'',place:'',expense:'',currency:'KRW'})
+export const snapshot=(e:EntrySnapshot):EntrySnapshot=>({title:e.title,body:e.body,text:e.text,question:e.question,answer:e.answer,hypothesis:e.hypothesis||'',counterEvidence:e.counterEvidence||'',photo:e.photo,photos:e.photos||[],ink:e.ink,kind:e.kind,ticker:e.ticker,reviewDate:e.reviewDate,place:e.place,expense:e.expense,currency:e.currency})
+export const entryPhotos=(e:EntrySnapshot):string[]=>e.photos?.length?e.photos:e.photo?[e.photo]:[]
 let database:Promise<IDBDatabase>|undefined
 function db(){
  return database??=new Promise<IDBDatabase>((resolve,reject)=>{
@@ -70,8 +71,8 @@ export function parseNotebook(text:string):JournalEntry[]{
  const data=JSON.parse(text)
  if(data.format!=='folio-journal'||data.version!==1||!Array.isArray(data.entries)||data.entries.length>1000)throw Error('Folio 저널 백업 파일을 선택하세요.')
  const clean=(e:any):EntrySnapshot=>{
-  if(!e||typeof e.title!=='string'||!Array.isArray(e.ink)||(e.photo&&!validPhoto(e.photo)))throw Error('기록 형식을 확인할 수 없습니다.')
-  return {title:e.title,body:cleanDocument(e.body),text:String(e.text||''),question:String(e.question||''),answer:String(e.answer||''),photo:validPhoto(e.photo)?e.photo:undefined,ink:e.ink.map((s:any)=>Array.isArray(s)?s.filter((p:any)=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1000&&p.y>=0&&p.y<=400).map((p:any)=>({x:p.x,y:p.y})):[]),kind:e.kind==='investment'?'investment':'life',ticker:String(e.ticker||''),reviewDate:/^\d{4}-\d{2}-\d{2}$/.test(e.reviewDate||'')?e.reviewDate:'',place:String(e.place||''),expense:String(e.expense||''),currency:['KRW','USD','EUR'].includes(e.currency)?e.currency:'KRW'}
+  if(!e||typeof e.title!=='string'||!Array.isArray(e.ink)||(e.photo&&!validPhoto(e.photo))||(e.photos!=null&&(!Array.isArray(e.photos)||e.photos.length>4||!e.photos.every(validPhoto))))throw Error('기록 형식을 확인할 수 없습니다.')
+  return {title:e.title,body:cleanDocument(e.body),text:String(e.text||''),question:String(e.question||''),answer:String(e.answer||''),hypothesis:String(e.hypothesis||''),counterEvidence:String(e.counterEvidence||''),photos:e.photos||[],photo:validPhoto(e.photo)?e.photo:undefined,ink:e.ink.map((s:any)=>Array.isArray(s)?s.filter((p:any)=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1000&&p.y>=0&&p.y<=400).map((p:any)=>({x:p.x,y:p.y})):[]),kind:e.kind==='investment'?'investment':'life',ticker:String(e.ticker||''),reviewDate:/^\d{4}-\d{2}-\d{2}$/.test(e.reviewDate||'')?e.reviewDate:'',place:String(e.place||''),expense:String(e.expense||''),currency:['KRW','USD','EUR'].includes(e.currency)?e.currency:'KRW'}
  }
  return data.entries.map((e:any)=>{
   if(typeof e.id!=='string'||!Number.isFinite(Date.parse(e.createdAt))||!Number.isFinite(Date.parse(e.updatedAt)))throw Error('기록 날짜 또는 식별자를 확인할 수 없습니다.')

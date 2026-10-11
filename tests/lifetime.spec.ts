@@ -11,14 +11,14 @@ async function setup(page:Page){
  await page.goto('/peppercorn/')
  await expect(page.getByRole('button',{name:'첫 페이지 쓰기'})).toBeEnabled()
 }
-async function compose(page:Page,title:string){await page.getByRole('textbox',{name:'기록 제목'}).fill(title);await page.getByRole('textbox',{name:'기록 본문'}).fill('관찰: 수요가 늘었다. 해석과 증거는 구분한다.');await page.getByLabel('질문에 대한 나의 답').fill('반대 증거도 확인한다.')}
+async function compose(page:Page,title:string){const questions=page.locator('.journal-questions');if(await questions.getAttribute('open')===null)await questions.locator(':scope>summary').click();await page.getByRole('textbox',{name:'기록 제목'}).fill(title);await page.getByRole('textbox',{name:'기록 본문'}).fill('관찰: 수요가 늘었다. 해석과 증거는 구분한다.');await page.getByLabel('질문에 대한 나의 답').fill('반대 증거도 확인한다.')}
 for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, revisit, revise and keyboard tabs`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440});const page=await context.newPage();await setup(page)
  await expect(page.locator('.journey-today')).toHaveCount(0)
  if(width<1440){await expect(page.locator('.mobile-brandbar')).toBeVisible();expect(await page.locator('.mobile-brandbar .folio-wordmark-system>img:visible').count()).toBe(1)}
  await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정'])
  await page.getByRole('button',{name:'첫 페이지 쓰기'}).click();await compose(page,'기다림도 하나의 결정')
- await page.getByRole('button',{name:'필기 시작',exact:true}).click()
+ await page.getByText('손글씨 추가',{exact:true}).click();await page.getByRole('button',{name:'필기 시작',exact:true}).click()
  await page.getByRole('img',{name:'손글씨 입력 영역'}).scrollIntoViewIfNeeded();const box=(await page.getByRole('img',{name:'손글씨 입력 영역'}).boundingBox())!;await page.mouse.move(box.x+30,box.y+30);await page.mouse.down();await page.mouse.move(box.x+100,box.y+60,{steps:4});await page.mouse.up()
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
  await expect(page.getByRole('button',{name:'기다림도 하나의 결정 기록 열기'})).toBeVisible();await expect(page.locator('.ink-preview')).toBeVisible()
@@ -30,7 +30,7 @@ for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, rev
  await page.getByRole('tab',{name:'전체',exact:true}).click();await page.getByRole('button',{name:'기다림도 하나의 결정 기록 열기'}).click();await page.getByText('이전 생각 1개',{exact:true}).click();await expect(page.locator('.journal-revision')).toContainText('반대 증거도 확인한다.')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  await page.screenshot({path:`test-results/lifetime-editor-${width}.png`,fullPage:true});await page.getByRole('button',{name:'기록 닫기'}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
- await openPage(page,'여정');await expect(page.locator('.journal-timeline')).toContainText('생각의 변화 1회')
+ await openPage(page,'여정');await expect(page.locator('.journal-timeline>article')).toHaveCount(0);await expect(page.locator('.journey-review')).toContainText('아직 돌아볼 투자 기록이 없습니다.')
  await context.close()
 })
 test('backup round trips long answers, ink and more than 100 revisions',()=>{

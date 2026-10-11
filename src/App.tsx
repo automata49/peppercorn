@@ -1,9 +1,11 @@
 import { LifetimeJournal } from './components/LifetimeJournal'
+import { DiscoveryTopics } from './components/DiscoveryTopics'
+import { PortfolioDisclosure } from './components/PortfolioDisclosure'
 import { useLifetimeJournal } from './lib/lifetimeJournal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import {heatColor,HEAT_MISSING} from './lib/marketColors'
 import { CHART_SESSIONS } from './lib/rsChart'
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import gsap from 'gsap'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
@@ -217,7 +219,7 @@ const watchCols:ColDef<EditableRow>[]=[
 const portfolioCols:ColDef<EditableRow>[]=[
   {field:'market',headerName:'시장',width:78,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:95,flex:0},
   {field:'name',headerName:'종목명',minWidth:140},{field:'industry',headerName:'산업',editable:false,minWidth:150},{field:'sector',headerName:'섹터',editable:false,minWidth:130},
-  {field:'account',headerName:'계좌'},{field:'shares',headerName:'수량'},{field:'avg_price',headerName:'평단'},{field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
+  {field:'account',headerName:'계좌'},{field:'currency',headerName:'원가 통화',...selectEditor(['KRW','USD','EUR'])},{field:'shares',headerName:'수량'},{field:'avg_price',headerName:'평단'},{field:'current_price',headerName:'현재가(자동)',editable:false,valueFormatter:p=>num(p.value)},
   {field:'stop_price',headerName:'Stop'},{field:'thesis',headerName:'투자 가설',minWidth:300}
 ]
 const researchCols:ColDef<EditableRow>[]=[
@@ -686,8 +688,9 @@ export default function App(){
   })
   const [page,setPage]=useState('today')
   const [analysisDetail,setAnalysisDetail]=useState(false)
+  const [discoverTab,setDiscoverTab]=useState<'topics'|'stocks'|'signal'>('stocks')
   const [selectedRecordId,setSelectedRecordId]=useState<string|null>(null)
-  const [trackingTab,setTrackingTab]=useState<'review'|'watchlist'|'portfolio'|'journal'>('review')
+  const [trackingTab,setTrackingTab]=useState<'review'|'watchlist'|'portfolio'>('review')
   const workspacePage=page==='tracking'?trackingTab:page
   const [menuOpen,setMenuOpen]=useState(false)
   const [leaders,setLeaders]=useState<LeaderRow[]>([])
@@ -1107,9 +1110,9 @@ export default function App(){
     window.scrollTo({top:0,behavior:'instant'})
   }
 
-  let content
+  let content:ReactNode
   if(page==='today'||page==='notebook'||(page==='tracking'&&trackingTab==='review')){
-    content=<LifetimeJournal key={(session?.user.id||'guest')+page} mode={page==='today'?'today':page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage}/>
+    content=<LifetimeJournal key={(session?.user.id||'guest')+page} mode={page==='today'?'today':page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
     content=<><h2>리서치 노트</h2><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={600}/></>
   }else if(page==='dashboard'){
@@ -1142,7 +1145,7 @@ export default function App(){
       <section className="journey-insight" aria-label="Folio Insight"><h2>Folio Insight <small>규칙 기반 요약</small></h2><p>{stockSize==='etf'?(todayRows.length?`ETF 분류에서는 같은 시장 ETF끼리의 RS 순위로 ${todayRows[0].name}부터 확인합니다.`:'선별된 ETF가 없습니다. 시장 신호를 확인하세요.'):(todayRows.length?`선택한 분류의 핵심 주도는 ${classCounts.core}종목입니다. 기존 선별 순서에 따라 ${todayRows[0].name}부터 투자 근거를 확인하세요.`:'선별된 종목이 없습니다. 시장 신호와 탐색 필터를 먼저 확인하세요.')}</p></section>
       <section className="folio-identity-interlude" aria-label="Folio visual identity"><figure className="folio-motif-panel"><img src="./folio-brand-typography.webp?v=u2" alt="Know the Market. Know Yourself." loading="lazy"/></figure><figure className="folio-photo-panel" aria-hidden="true"><img src="./folio-brand-photography.webp?v=u2" alt="" loading="lazy"/></figure></section>
     </div>
-  }else if(page==='signal'){
+  }else if(page==='signal'||(page==='analysis'&&!analysisDetail&&discoverTab==='signal')){
     content=<div className="discovery-home">{filters}
       <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>시장 신호</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
 
@@ -1322,7 +1325,7 @@ export default function App(){
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');setPage('thesis');window.scrollTo({top:0,behavior:'instant'})}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     content=<><div className="analysis-page">
-      {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>오늘의 주도주</h2><p>변화하는 세상에서 기업을 발견하고, 나의 판단을 기록하세요.</p><button className="dashboard-section-action" onClick={()=>navigatePage('signal')}>시장 신호 →</button></div></section>
+      {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>오늘의 주도주</h2><p>변화하는 세상에서 기업을 발견하고, 나의 판단을 기록하세요.</p><button className="dashboard-section-action" onClick={()=>setDiscoverTab('signal')}>시장 신호 →</button></div></section>
       <div className="analysis-finder">
         <MarketSegment label="탐색" value={market} onChange={setMarket}/>
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
@@ -1455,6 +1458,11 @@ export default function App(){
       <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 최초 등록'}</button></div></div>
   }
 
+  if(page==='analysis'&&!analysisDetail){
+    if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}/>
+    content=<section className="discovery-workspace"><header className="lifetime-heading discovery-heading"><div><span className="journey-kicker">DISCOVER</span><h2>변화하는 세상을 읽다</h2><p>기업을 발견하고, 나의 관점으로 남기는 시간.</p></div><img src={`${import.meta.env.BASE_URL}folio-brand-photography.webp`} alt=""/></header><Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}><TabsList aria-label="발견 영역"><TabsTrigger value="stocks">종목</TabsTrigger><TabsTrigger value="topics">주제</TabsTrigger><TabsTrigger value="signal">시장 신호</TabsTrigger></TabsList>{(['stocks','topics','signal'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&content}</TabsContent>)}</Tabs></section>
+  }
+  const trackingContent=<section className="journey-workspace"><header className="lifetime-heading"><span className="journey-kicker">A LIFETIME IN PAGES</span><h2>그때의 나,<br/>지금의 나</h2><p>남겨둔 판단과 지금의 변화를 읽습니다.</p></header><Tabs value={trackingTab} onValueChange={value=>setTrackingTab(value as typeof trackingTab)}><TabsList className="journey-magazine-tabs" aria-label="여정 영역">{([['review','회고'],['watchlist','관심종목'],['portfolio','보유종목']] as const).map(([key,label])=><TabsTrigger key={key} value={key}>{label}</TabsTrigger>)}</TabsList>{(['review','watchlist','portfolio'] as const).map(tab=><TabsContent key={tab} value={tab}>{trackingTab===tab&&content}</TabsContent>)}</Tabs></section>
   const pageTitle:Record<string,string>={today:'오늘',notebook:'저널',research:'리서치 노트',signal:'시장 신호',thesis:'Thesis',tracking:'여정',dashboard:'시장 요약',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'발견',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
@@ -1559,5 +1567,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div data-market={market} className={'shell page-shell-'+page}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?<Tabs value={trackingTab} onValueChange={v=>setTrackingTab(v as typeof trackingTab)}><TabsList className="journey-tracking-tabs" aria-label="추적 영역">{([['review','회고'],['watchlist','관심종목'],['portfolio','보유종목'],['journal','투자일지']] as const).map(([key,label])=><TabsTrigger key={key} value={key} aria-selected={trackingTab===key}>{label}</TabsTrigger>)}</TabsList><TabsContent value={trackingTab}>{content}</TabsContent></Tabs>:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><picture className="launch-picture"><source media="(orientation: landscape) and (min-width: 700px)" srcSet="./folio-brand-launch-landscape.webp?v=u3"/><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u3" alt="Folio xx visual"/></picture><div className="launch-landscape-mask" aria-hidden="true"/><div className="launch-landscape-lockup"><FolioWordmark className="launch-landscape-wordmark"/><span>STRUCTURED FREEDOM</span><i/><p>A wider perspective<br/>for a brighter tomorrow.</p></div></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div data-market={market} className={'shell page-shell-'+page+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><picture className="launch-picture"><source media="(orientation: landscape) and (min-width: 700px)" srcSet="./folio-brand-launch-landscape.webp?v=u3"/><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u3" alt="Folio xx visual"/></picture><div className="launch-landscape-mask" aria-hidden="true"/><div className="launch-landscape-lockup"><FolioWordmark className="launch-landscape-wordmark"/><span>STRUCTURED FREEDOM</span><i/><p>A wider perspective<br/>for a brighter tomorrow.</p></div></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
 }
