@@ -99,12 +99,14 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  }
 })
 
-test('user supplied wordmark, hero, typography and photography assets are deployable',async({request})=>{
+test('wordmark, brand and lifestyle photography assets are deployable',async({request})=>{
  for(const asset of [
   'folio-brand-launch.webp',
   'folio-brand-launch-landscape.webp',
   'folio-brand-typography.webp',
   'folio-brand-photography.webp',
+  'folio-lifestyle-journal.webp',
+  'folio-lifestyle-journey.webp',
   'folio-brand-wordmark-light.webp',
   'folio-brand-wordmark-dark.webp',
   'folio-brand-icon-black.webp',
