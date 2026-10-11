@@ -47,14 +47,14 @@ test('desktop Leaderboard and Universe keep full grids open',async({page})=>{
   await boot(page)
   const side=page.locator('.sidebar nav')
 
-  await side.getByRole('button',{name:'Leaderboard'}).click()
+  await openPage(page,'Leaderboard')
   await expect(page.locator('.catalog-mobile-summary')).toBeHidden()
   let disclosure=page.locator('.catalog-table-disclosure')
   await expect(disclosure).toHaveAttribute('open','')
   await expect(disclosure.locator(':scope > summary')).toBeHidden()
   await expect(disclosure.locator('.ag-root')).toBeVisible()
 
-  await side.getByRole('button',{name:'Universe'}).click()
+  await openPage(page,'Universe')
   await expect(page.locator('.catalog-mobile-summary')).toBeHidden()
   disclosure=page.locator('.catalog-table-disclosure')
   await expect(disclosure).toHaveAttribute('open','')

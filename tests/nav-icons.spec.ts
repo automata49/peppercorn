@@ -35,9 +35,13 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
 test('desktop sidebar uses the same line icon system',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
+  await openPage(page,'오늘')
+  const tools=page.locator('.sidebar-tools')
+  const contrast=await tools.evaluate(e=>{const luminance=(color:string)=>{const c=color.match(/[\d.]+/g)!.slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return .2126*c[0]+.7152*c[1]+.0722*c[2]};const ink=luminance(getComputedStyle(e).color),paper=luminance(getComputedStyle(e.closest('.sidebar')!).backgroundColor);return (Math.max(ink,paper)+.05)/(Math.min(ink,paper)+.05)})
+  expect(contrast).toBeGreaterThanOrEqual(4.5)
   const side=page.locator('.sidebar nav')
-  await expect(side.locator('button')).toHaveCount(15)
-  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(15)
+  await expect(side.locator('button')).toHaveCount(4)
+  await expect(side.locator('button .nav-icon > svg.app-icon')).toHaveCount(4)
 
   const active=side.locator('button.active .app-icon').first()
   const inactive=side.locator('button:not(.active) .app-icon').first()

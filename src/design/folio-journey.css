@@ -486,6 +486,8 @@
 }
 
 /* Explore + stock detail */
+.magazine-shell .page-analysis .analysis-page{background:transparent!important;border:0;border-radius:0;padding:0;max-width:none}
+
 .page-analysis .analysis-page,
 .page-thesis .analysis-page{
   color:var(--folio-ink)!important;
@@ -496,8 +498,8 @@
 }
 .page-analysis .analysis-hub-copy h2,
 .page-thesis .journey-heading h2{
-  font-size:clamp(30px,4vw,46px);
-  font-weight:560;
+  font-size:clamp(24px,2.4vw,32px)!important;
+  font-weight:450!important;
   letter-spacing:-.06em;
 }
 .page-analysis .analysis-hub-copy p{color:var(--folio-muted)!important}

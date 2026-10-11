@@ -141,7 +141,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav')
   if(await side.isVisible()){
-    await expect(side.locator('.nav-label')).toHaveText(['오늘','발견','저널','여정','Thesis','시장 요약','시장 신호','시장 온도계','Watchlist','Portfolio','매매 기록','리서치 노트','Leaderboard','Universe','Settings'])
+    await expect(side.locator('.nav-label')).toHaveText(['오늘','발견','저널','여정'])
   }
   if(await side.isVisible())await side.getByRole('button',{name:'발견',exact:true}).click()
   else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
@@ -188,9 +188,9 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // Page guides for Leaderboard and Universe.
   await page.evaluate(()=>window.scrollTo(0,0))
   if(await side.isVisible()){
-    await side.getByRole('button',{name:'Leaderboard'}).click()
+    await openPage(page,'Leaderboard')
     await expect(page.locator('.page-guide')).toContainText('주식 17개 · ETF 1개')
-    await side.getByRole('button',{name:'Universe'}).click()
+    await openPage(page,'Universe')
     await expect(page.locator('.page-guide')).toContainText('미국 7개 · 한국 10개')
     await expect(page.locator('.page-guide')).toContainText('1,000억원')
   }

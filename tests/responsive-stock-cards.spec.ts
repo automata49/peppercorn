@@ -7,7 +7,7 @@ const rows=[
  {...demoRows[0],id:'KR:379810',market:'KR',ticker:'379810',name:'KODEX 미국나스닥100TR',price:175000,asset_class:'ETF',etf_rs_rank:99,market_cap:1e10}
 ]
 const screens=[['phone',390,844],['small-phone',320,568],['ipad',834,1194],['ipad-pro',1024,1366],['desktop',1440,900]] as const
-for(const [device,width,height] of screens)for(const theme of ['light','dark'])test(`${device} ${theme}: readable KR/US/ETF cards and glass tracking across orientations`,async({page})=>{
+for(const [device,width,height] of screens)for(const theme of ['light','dark'])test(`${device} ${theme}: readable KR/US/ETF cards and single-level tracking across orientations`,async({page})=>{
  await page.addInitScript(t=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-theme',t);localStorage.setItem('folio-stock-size','all')},theme)
  await page.route('**/data/leaderboard.json',r=>r.fulfill({status:404,body:''}))
  await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows}}))
@@ -33,16 +33,17 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
   if(device==='phone'&&w===width&&theme==='light')await page.screenshot({path:'test-results/stock-cards-phone.png',fullPage:true})
   await openPage(page,'추적')
-  const tabs=page.getByRole('tablist',{name:'추적 영역'})
-  await expect(tabs).toHaveCSS('border-bottom-width','0px')
-  await expect(tabs).toHaveCSS('gap','8px')
-  for(const name of ['회고','관심종목','보유종목','투자일지']){
+  await expect(page.getByRole('tablist',{name:'여정 영역'}).getByRole('tab')).toHaveText(['회고','관심종목','보유종목'])
+  const tabs=page.getByRole('tablist',{name:'여정 영역'})
+  await expect(tabs).toHaveCSS('border-bottom-width','1px')
+  expect(parseFloat(await tabs.evaluate(e=>getComputedStyle(e).gap))).toBeGreaterThanOrEqual(20)
+  for(const name of ['회고','관심종목','보유종목']){
    const tab=tabs.getByRole('tab',{name});await tab.click()
    await expect(tab).toHaveAttribute('aria-selected','true')
    await expect(tab).toHaveCSS('border-top-width','0px')
-   await expect(tab).toHaveCSS('border-radius','24px')
-   await expect(tab).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
-   expect(await tab.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+   await expect(tab).toHaveCSS('border-radius','0px')
+   await expect(tab).toHaveCSS('backdrop-filter','none')
+   await expect(tab).toHaveCSS('background-image','none')
    expect((await tab.boundingBox())!.height).toBeGreaterThanOrEqual(44)
   }
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)

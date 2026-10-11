@@ -1,13 +1,13 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import { Button } from './ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { AppIcon } from './AppIcon'
 import { InkPreview } from './InkPad'
-import { downloadNotebook, parseNotebook, questions, type JournalEntry } from '../lib/lifetimeJournal'
+import { downloadNotebook, entryPhotos, parseNotebook, questions, type JournalEntry, type EntrySnapshot } from '../lib/lifetimeJournal'
 const JournalEditor = lazy(() => import('./JournalEditor'))
-type Props = { mode: 'today' | 'journal' | 'journey'; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; navigate: (p: string) => void }
+type Props = { mode: 'today' | 'journal' | 'journey'; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; navigate: (p: string) => void; assetFlow?:ReactNode }
 type Story = { key: string; title: string; kicker: string; caption: string; tone: 'photo' | 'paper' | 'type' | 'sunset'; image?: string; entry?: JournalEntry; action: 'edit' | 'market' | 'journey'; label: string }
 const day = (value: string) => new Date(value).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 const brandPhoto = `${import.meta.env.BASE_URL}folio-brand-photography.webp`
@@ -26,10 +26,15 @@ function StoryCover({ story, expanded = false }: { story: Story; expanded?: bool
  </>
 }
 
-export function LifetimeJournal({ mode, entries, ready, error, replace, navigate }: Props) {
+function Judgement({value,at,label}:{value:EntrySnapshot;at:string;label:string}){
+ return <section><h4>{label}</h4><time dateTime={at}>{new Date(at).toLocaleString('ko-KR')}</time>{value.kind==='investment'?<><h5>내 가설</h5><p>{value.hypothesis||'별도로 기록한 가설이 없습니다.'}</p><h5>반대 증거</h5><p>{value.counterEvidence||'별도로 기록한 반대 증거가 없습니다.'}</p></>:null}{value.text&&<p>{value.text}</p>}{value.answer&&<><h5>{value.question||'나의 질문'}</h5><p>{value.answer}</p></>}{!value.text&&!value.answer&&!value.hypothesis&&!value.counterEvidence&&<p>사진·필기 기록입니다. 별도로 남긴 판단 문장이 없습니다.</p>}</section>
+}
+
+export function LifetimeJournal({ mode, entries, ready, error, replace, navigate, assetFlow }: Props) {
  const [selected, setSelected] = useState<Story | undefined>(), [open, setOpen] = useState(false), [dirty, setDirty] = useState(false), [filter, setFilter] = useState('all'), [query, setQuery] = useState(''), [notice, setNotice] = useState('')
  const importRef = useRef<HTMLInputElement>(null), returnFocus = useRef<HTMLElement | null>(null), reduce = useReducedMotion()
  const sorted = entries.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+ const investmentPages = sorted.filter(e=>e.kind==='investment')
  const today = new Date().toLocaleDateString('sv-SE')
  const due = sorted.find(e => e.reviewDate && e.reviewDate <= today), latest = sorted[0]
  const transition = reduce ? { duration: 0 } : { type: 'spring' as const, stiffness: 280, damping: 32 }
@@ -59,28 +64,26 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
  function card(e: JournalEntry) {
   const story = entryStory(e)
   return <motion.button type="button" layoutId={`frame-${story.key}`} transition={transition} className="journal-story" onClick={() => show(story)} key={e.id} aria-label={story.label}>
-   {e.photo && <img src={e.photo} alt="" loading="lazy" />}
-   <div className="journal-story-copy"><time>{story.kicker}</time><h3>{e.title}</h3>{e.ink.length ? <InkPreview strokes={e.ink} /> : <p>{e.text.slice(0, 180) || e.answer || '생각을 이어 써보세요.'}</p>}<span>페이지 펼치기 →</span></div>
+   {entryPhotos(e).length>1?<div className="journal-gallery-collage">{entryPhotos(e).map((photo,i)=><img key={i} src={photo} alt="" loading="lazy"/>)}</div>:e.photo&&<img src={e.photo} alt="" loading="lazy"/>}
+   <div className="journal-story-copy"><time>{story.kicker}</time><h3>{e.title}</h3>{e.ink.length ? <InkPreview strokes={e.ink} /> : <p>{(e.hypothesis || e.text || e.answer).slice(0, 180) || '생각을 이어 써보세요.'}</p>}<span>페이지 펼치기 →</span></div>
   </motion.button>
  }
- const list = sorted.filter(e => (filter === 'all' || e.kind === filter) && `${e.title} ${e.text} ${e.answer} ${e.ticker} ${e.place}`.toLowerCase().includes(query.toLowerCase()))
+ const list = sorted.filter(e => (filter === 'all' || e.kind === filter) && `${e.title} ${e.text} ${e.answer} ${e.hypothesis||''} ${e.counterEvidence||''} ${e.ticker} ${e.place}`.toLowerCase().includes(query.toLowerCase()))
  function go(page: string) { setOpen(false); navigate(page) }
  return <LayoutGroup id={`folio-${mode}`}><div className={`lifetime-workspace lifetime-${mode}`}>
   {mode === 'today' ? <>
-   <header className="lifetime-heading today-heading"><div><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>오늘</h2></div><p>발견하고, 기록하고, 다시 생각하다.</p></header>
+   <header className="lifetime-heading today-heading"><div><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>오늘,<br/>어떤 생각이 남았나요?</h2></div><Button variant="secondary" disabled={!ready} onClick={()=>show()}>새 페이지 쓰기</Button></header>
    <div className="today-stories">{stories.map((story, i) => <motion.button key={story.key} type="button" layoutId={`frame-${story.key}`} transition={transition} className={`today-story story-${story.tone}${i === 0 ? ' journal-story-hero' : ''}`} aria-label={story.label} disabled={!ready && story.action === 'edit'} onClick={() => show(story)}><StoryCover story={story} /></motion.button>)}</div>
-   <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p><Button variant="secondary" disabled={!ready} onClick={() => show()}>새 페이지 쓰기</Button></div>
+   <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p></div>
   </> : mode === 'journal' ? <>
    <header className="lifetime-heading"><span className="journey-kicker">MY PAGES</span><h2>나의 생각이 쌓이는 곳</h2><p>관찰, 판단, 그리고 일상의 아름다움.</p><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></header>
-   <div className="journal-links"><Button variant="ghost" onClick={() => navigate('thesis')}>종목별 Thesis →</Button><Button variant="ghost" onClick={() => navigate('journal')}>매매 기록 →</Button><Button variant="ghost" onClick={() => navigate('research')}>리서치 노트 →</Button></div>
-   <Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList><input className="journal-search" aria-label="내 기록 검색" placeholder="내 기록 검색" value={query} onChange={e => setQuery(e.target.value)} />{['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}><div className="journal-gallery">{list.map(e => card(e))}</div>{!list.length && <p className="journal-empty">{entries.length ? '조건에 맞는 기록이 없습니다.' : '아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.'}</p>}</TabsContent>)}</Tabs>
-   <div className="journal-backup"><span>이 기기 저장 · 클라우드 동기화 전</span><Button variant="ghost" disabled={!ready || !entries.length} onClick={() => downloadNotebook(entries)}>백업 내보내기</Button><Button variant="ghost" disabled={!ready} onClick={() => importRef.current?.click()}>백업 가져오기</Button><input ref={importRef} type="file" accept="application/json,.json" className="sr-only" aria-label="저널 백업 파일" onChange={async e => {
+   <Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList><input className="journal-search" aria-label="내 기록 검색" placeholder="내 기록 검색" value={query} onChange={e => setQuery(e.target.value)} />{['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}><div className="journal-gallery">{list.map(e => card(e))}</div>{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={brandPhoto} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p></div></div>)}</TabsContent>)}</Tabs>
+   <details className="journal-backup"><summary>저장 및 백업</summary><div className="journal-backup-actions"><span>이 기기 저장 · 클라우드 동기화 전</span><Button variant="ghost" disabled={!ready || !entries.length} onClick={() => downloadNotebook(entries)}>백업 내보내기</Button><Button variant="ghost" disabled={!ready} onClick={() => importRef.current?.click()}>백업 가져오기</Button><input ref={importRef} type="file" accept="application/json,.json" className="sr-only" aria-label="저널 백업 파일" onChange={async e => {
     const file = e.target.files?.[0]; e.target.value = ''; if (!file) return
     try { if (file.size > 20000000) throw Error('20MB 이하 파일을 선택하세요.'); const incoming = parseNotebook(await file.text()); const ids = new Set(entries.map(x => x.id)); const additions = incoming.filter(x => !ids.has(x.id)); await replace(additions, true); setNotice(`${additions.length}개 기록을 가져왔습니다. 기존 기록은 유지했습니다.`) } catch (err) { setNotice((err as Error).message) }
-   }} /></div>
+   }} /></div></details>
   </> : <>
-   <header className="lifetime-heading"><span className="journey-kicker">A LIFETIME IN PAGES</span><h2>그때의 나, 지금의 나</h2><p>결과와 판단을 나란히 놓고, 다음 결정을 준비합니다.</p></header>
-   <div className="journal-timeline">{sorted.map(e => <article key={e.id}><time>{day(e.createdAt)}</time>{card(e)}<p>{e.revisions.length ? `생각의 변화 ${e.revisions.length}회 · 처음 쓴 판단부터 다시 읽어보세요.` : '처음 남긴 생각'}</p></article>)}</div>{!entries.length && <div className="journal-empty"><p>저널에 남긴 기록이 이곳에서 시간의 흐름으로 이어집니다.</p><Button variant="secondary" onClick={() => navigate('notebook')}>나의 첫 기록 남기기</Button></div>}
+   {assetFlow}<section className="journey-review"><h3>다시 읽을 투자 판단</h3><p className="note">투자 기록의 판단과 변경 이력을 모았습니다. 일상 기록은 저널에서 읽습니다.</p><div className="journal-timeline">{investmentPages.map(e=><article key={e.id}><header><time>{day(e.createdAt)}</time>{e.ticker&&<span>{e.ticker}</span>}</header><h3>{e.title}</h3><p>{(e.hypothesis||e.text||e.answer).slice(0,140)||'아직 판단 문장을 남기지 않았습니다.'}</p><p>{e.revisions.length?`생각의 변화 ${e.revisions.length}회`:'처음 남긴 판단'}{e.reviewDate?` · 다음 점검 ${e.reviewDate}`:''}</p>{e.revisions.length>0&&<details className="journey-revision"><summary>그때와 지금의 판단 비교</summary><div className="journey-judgement" aria-label={`${e.title} 판단 비교`}><Judgement value={e.revisions[0].snapshot} at={e.revisions[0].at} label="그때의 판단"/><Judgement value={e} at={e.updatedAt} label="지금의 판단"/></div></details>}<Button variant="ghost" onClick={()=>show(entryStory(e))} aria-label={`${e.title} 기록 열기`}>원본 기록 열기 →</Button></article>)}</div>{!investmentPages.length&&<div className="journal-empty"><p>아직 돌아볼 투자 기록이 없습니다.</p><Button variant="secondary" onClick={()=>navigate('notebook')}>저널에서 투자 기록 남기기</Button></div>}</section>
   </>}
   {error && <p role="alert">{error}</p>}{!ready && !error && <p role="status">나의 기록을 불러오는 중…</p>}{notice && <p role="status">{notice}</p>}
   <DialogPrimitive.Root open={open} onOpenChange={value => { if (!value) close() }}>

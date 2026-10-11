@@ -9,6 +9,10 @@ Decision date: 2026-10-06
 
 This file exists to stop iterative visual drift. Future design work starts from this baseline; it does not invent a new visual system per screen.
 
+## MAGAZINE-1 exception — 2026-10-11
+
+The latest user direction in `FOLIO_SCREEN_ACCEPTANCE.md` retains Today's approved Motion cards while simplifying Discover/Journal/Journey into a visual magazine. Large regular editorial headings, unboxed primary content and single-level Journey navigation override the earlier major-region glass/tab grouping on these primary pages only. Branding, touch sizing, themes, market colours and calculations remain authoritative.
+
 ## 1. Authority order
 
 When two rules conflict, use this order:
@@ -149,7 +153,7 @@ A visual-identity change is complete only when:
 
 - STOCK-CARDS-2 / TRACKING-GLASS-1 (user decision 2026-10-07 20:17 KST): shared stock/ETF cards contain no initials avatar. KR displays company/fund name first with ticker secondary; US keeps ticker first and name secondary. Readable name/price/meta tokens scale with screen width; cards reflow by available container width, including phone/tablet landscape and portrait and desktop. Preserve actual trends, prices, returns, rankings and click targets. Tracking tabs 관심종목 / 보유종목 / 투자일지 use the same borderless rounded Liquid Glass and readable selected-state/focus treatment as leadership controls.
 
-## LIFETIME-JOURNEY-1 — user decision 2026-10-10 (current)
+## LIFETIME-JOURNEY-1 — user decision 2026-10-10 (MAGAZINE-1 overrides page roles)
 
 This decision supersedes older Home/navigation placement rules only. Primary navigation is **오늘 / 발견 / 저널 / 여정**. Today follows the Motion App Store editorial demo: four large cover cards in a staggered 3:2 / 2:3 desktop grid, one-column phone layout, shared frame/image/title expansion into an accessible detail, and reverse transition to the original card. Covers contain the latest own page, a question/due review, discovery, and journey; supplied assets remain authoritative. The former analytical Home remains accessible as **시장 요약** (`dashboard`); its existing market/category/leader/ETF parity contracts still apply there. Discover retains the existing stock analysis and ranking. Journal links to the canonical Thesis, Research and Trading Journal editors. Journey adds a read-only personal timeline before interest/holdings/trade tabs. No screening, ranking, market colours or supplied brand assets change.
 

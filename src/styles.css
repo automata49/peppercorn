@@ -933,7 +933,9 @@ body,p,span,strong,b,small,em,label,button,a,h1,h2,h3,h4,th,td,.note,.setting,.c
   .mobile-brandbar{position:sticky;top:0;z-index:18;display:flex;align-items:center;justify-content:space-between;height:62px;padding:8px 20px;background:color-mix(in srgb,var(--folio-paper,#f4f1ec) 96%,transparent);border-bottom:1px solid #e6ebf0;backdrop-filter:blur(12px)}
   .mobile-brand-home{display:flex;align-items:center;gap:9px;padding:0;border:0;background:transparent;color:#18314f;cursor:pointer}
   .mobile-brand-home img{width:32px;height:32px;object-fit:contain}
-  .mobile-brand-menu{display:grid;place-items:center;width:40px;height:40px;border:1px solid #dde4eb;border-radius:10px;background:var(--folio-surface,#efe9e3);color:#53657b;font-size:19px;cursor:pointer}
+  .mobile-brand-actions{display:flex;align-items:center;gap:4px}
+  .mobile-brand-search,.mobile-brand-menu{display:grid;place-items:center;flex-shrink:0;width:44px;height:44px;padding:10px}
+  .mobile-brand-menu{display:grid;place-items:center;width:44px;height:44px;border:1px solid #dde4eb;border-radius:10px;background:var(--folio-surface,#efe9e3);color:#53657b;font-size:19px;cursor:pointer}
   .topbar{position:sticky;top:62px;z-index:14;height:auto;min-height:74px;padding:12px 20px;background:color-mix(in srgb,var(--folio-paper,#f4f1ec) 96%,transparent)}
   .topbar>.topbar-title{min-width:0}
   .topbar p{max-width:100%;overflow:hidden;text-overflow:ellipsis}

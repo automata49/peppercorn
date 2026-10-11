@@ -127,7 +127,7 @@ test('Light theme keeps one Folio visual system across every product workspace',
   ] as const
   const nav=page.locator('.sidebar nav')
   for(const [label,key] of destinations){
-    await nav.getByRole('button',{name:label,exact:true}).click()
+    await openPage(page,label)
     const main=page.locator('.app-main.page-'+key)
     await expect(main).toBeVisible()
     const signature=await main.evaluate(e=>{

@@ -337,7 +337,7 @@ test('table headers are left-aligned and numeric cells right-aligned',async({pag
     expect(pill.x-(change.x+change.width)).toBeLessThan(12);
     await expect(first.locator('.live-change')).toHaveText('—');
   }
-  await page.locator('.sidebar nav').getByRole('button',{name:'Leaderboard'}).click();
+  await openPage(page,'Leaderboard');
   const priceCell=page.locator('.ag-row .ag-cell[col-id="price"]').first();
   await expect(priceCell).toHaveClass(/cell-num/);
   expect(await priceCell.evaluate(e=>getComputedStyle(e).textAlign)).toBe('right');

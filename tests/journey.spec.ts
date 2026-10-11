@@ -36,7 +36,7 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  const conclusion=page.getByRole('textbox',{name:'내 결론',exact:true})
  await conclusion.fill('성장 동력 확인 후 추적');await conclusion.blur()
  await nav(page,'추적')
- await expect(page.getByRole('tablist',{name:'추적 영역'}).getByRole('tab')).toHaveText(['회고','관심종목','보유종목','투자일지'])
+ await expect(page.getByRole('tablist',{name:'여정 영역'}).getByRole('tab')).toHaveText(['회고','관심종목','보유종목'])
  await page.getByRole('tab',{name:'보유종목',exact:true}).click();await expect(page.locator('.workspace-mobile-summary:visible,.workspace-grid-panel:visible').first()).toBeVisible()
  await nav(page,'Thesis');await expect(conclusion).toHaveValue('성장 동력 확인 후 추적')
  await nav(page,'탐색');await expect(page.locator('.analysis-finder')).toBeVisible();await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)

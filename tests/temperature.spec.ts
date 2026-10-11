@@ -31,7 +31,7 @@ const views=[{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait
 const row={id:'a',ticker:'TEST',market:'US',name:'테스트',asset_class:'Equity',sector:'Technology',industry:'Semiconductors',exchange:'NASDAQ',index_memberships:[],price:110,ma50:100,ma200:90,high_52w_distance:-.05,return_1w:.01,rs_rank:90,leadership_class:'중립',stage:'▲ 돌파 매수권'}
 async function goTemperature(page:Page){
   const side=page.locator('.sidebar nav')
-  if(await side.isVisible())await side.getByRole('button',{name:'시장 온도계'}).click()
+  if(await side.isVisible())await openPage(page,'시장 온도계')
   else{await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click();await page.locator('.menu-drawer').getByRole('button',{name:'시장 온도계'}).click()}
   await expect(page.locator('.temp-page')).toBeVisible()
 }

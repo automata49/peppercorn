@@ -5,7 +5,9 @@ export async function openPage(page:Page,label:string){
  if(await side.isVisible())return side.click()
  const quick=page.locator('.mobile-bottom-nav').getByRole('button',{name:label,exact:true})
  if(await quick.isVisible())return quick.click()
- await page.getByRole('button',{name:'전체 메뉴 열기',exact:true}).first().click()
+ const tools=page.locator('.sidebar-tools')
+ if(await tools.isVisible())await tools.click()
+ else await page.getByRole('button',{name:'전체 메뉴 열기',exact:true}).first().click()
  await page.locator('.menu-drawer').getByRole('button',{name:label,exact:true}).click()
  await expect(page.locator('.menu-drawer')).toHaveCount(0)
 }

@@ -28,7 +28,7 @@ test('phone analysis records are secondary and editable on demand',async({browse
 test('desktop analysis records stay open without an extra disclosure header',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await page.locator('.sidebar nav').getByRole('button',{name:'Thesis',exact:true}).click()
+  await openPage(page,'Thesis')
   const records=page.locator('.analysis-records-disclosure')
   await expect(records).toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeHidden()
