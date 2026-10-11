@@ -24,34 +24,13 @@ for(const view of views){
   await boot(page)
 
   const launch=page.locator('.launch-overlay')
-  const hero=launch.getByRole('img',{name:'Folio xx visual'})
-  await expect(hero).toBeVisible()
-  const useLandscape=view.width>view.height&&view.width>=700
-  await expect.poll(async()=>hero.evaluate((el:any)=>el.currentSrc)).toContain(useLandscape?'folio-brand-launch-landscape.webp?v=u3':'folio-brand-launch.webp?v=u3')
-  await expect(launch.locator('.launch-editorial-caption')).toBeHidden()
-  await expect(launch.locator('.launch-footer')).toBeHidden()
-  const frame=await launch.locator('.launch-editorial-frame').boundingBox()
+  const wordmark=launch.getByRole('img',{name:'Folio xx',exact:true})
+  await expect(wordmark).toBeVisible()
+  await expect(launch.locator('.launch-b-hero,.launch-progress')).toHaveCount(0)
+  const frame=await wordmark.boundingBox()
   expect(frame).not.toBeNull()
-  if(useLandscape){
-    const ratio=frame!.width/frame!.height
-    expect(ratio).toBeGreaterThan(2.12)
-    expect(ratio).toBeLessThan(2.20)
-    expect(frame!.width).toBeGreaterThanOrEqual(view.width*.82)
-    await expect(launch.locator('.launch-landscape-lockup')).toBeVisible()
-  }else if(view.name==='phone'){
-    expect(frame!.width).toBeGreaterThanOrEqual(view.width-1)
-    expect(frame!.height).toBeGreaterThanOrEqual(view.height-1)
-    expect(Math.abs(frame!.x)).toBeLessThanOrEqual(1)
-    expect(Math.abs(frame!.y)).toBeLessThanOrEqual(1)
-  }else{
-    const ratio=frame!.width/frame!.height
-    expect(ratio).toBeGreaterThan(.55)
-    expect(ratio).toBeLessThan(.575)
-    expect(frame!.height).toBeGreaterThanOrEqual(view.height*view.launchMin)
-    expect(frame!.height).toBeLessThanOrEqual(view.height*view.launchMax)
-    expect(frame!.x).toBeGreaterThanOrEqual(0)
-    expect(frame!.y).toBeGreaterThanOrEqual(0)
-  }
+  expect(Math.abs(frame!.x+frame!.width/2-view.width/2)).toBeLessThan(2)
+  expect(Math.abs(frame!.y+frame!.height/2-view.height/2)).toBeLessThan(2)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000});await openPage(page,'시장 요약')
 

@@ -8,7 +8,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import {heatColor,HEAT_MISSING} from './lib/marketColors'
 import { CHART_SESSIONS } from './lib/rsChart'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
-import gsap from 'gsap'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
 import { FolioWordmark } from './components/FolioWordmark'
@@ -813,26 +812,11 @@ export default function App(){
   useLayoutEffect(()=>{
     const root=launchRef.current
     if(!showIntro||!root)return
-    const frame=root.querySelector<HTMLElement>('.launch-editorial-frame')
-    const hero=root.querySelector<HTMLElement>('.launch-b-hero')
-    const progress=root.querySelector<HTMLElement>('.launch-progress span')
-    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const finish=()=>{
+    const timer=window.setTimeout(()=>{
       try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
       setShowIntro(false)
-    }
-    const fallback=window.setTimeout(finish,5600)
-    const context=gsap.context(()=>{
-      if(progress)gsap.set(progress,{scaleX:0,transformOrigin:'0% 50%'})
-      const timeline=gsap.timeline({onComplete:finish})
-      if(!reduceMotion){
-        if(frame)timeline.fromTo(frame,{autoAlpha:0,clipPath:'inset(0 18% 0 18%)'},{autoAlpha:1,clipPath:'inset(0 0% 0 0%)',duration:1.05,ease:'power3.out'},.08)
-        if(hero)timeline.fromTo(hero,{scale:1.045,xPercent:1.2},{scale:1,xPercent:0,duration:4.35,ease:'sine.out'},.08)
-      }
-      if(progress)timeline.to(progress,{scaleX:1,duration:4.45,ease:'none'},0)
-      timeline.to(root,{autoAlpha:0,duration:.62,ease:'power2.inOut'},4.48)
-    },root)
-    return()=>{window.clearTimeout(fallback);context.revert()}
+    },2000)
+    return()=>window.clearTimeout(timer)
   },[showIntro])
   useEffect(()=>{setSector(null);setSectorKeySelected(null);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null)},[market])
   useEffect(()=>{
@@ -1574,5 +1558,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><div data-market={market} className={'shell page-shell-'+page+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay" role="status" aria-label="Folio 시작 화면"><div className="launch-screen"><div className="launch-center"><div className="launch-editorial-frame"><picture className="launch-picture"><source media="(orientation: landscape) and (min-width: 700px)" srcSet="./folio-brand-launch-landscape.webp?v=u3"/><img className="launch-b-hero" src="./folio-brand-launch.webp?v=u3" alt="Folio xx visual"/></picture><div className="launch-landscape-mask" aria-hidden="true"/><div className="launch-landscape-lockup"><FolioWordmark className="launch-landscape-wordmark"/><span>STRUCTURED FREEDOM</span><i/><p>A wider perspective<br/>for a brighter tomorrow.</p></div></div><div className="launch-progress" aria-label="화면 준비 중"><span/></div></div></div></div>}</LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><div data-market={market} className={'shell page-shell-'+page+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</div>{showIntro&&<div ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><FolioWordmark className="launch-wordmark"/></div>}</LiveQuoteProvider>
 }
