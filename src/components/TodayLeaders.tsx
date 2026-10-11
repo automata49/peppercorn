@@ -14,12 +14,8 @@ type Props = {
 function httpUrl(value: unknown) {
  try { const url = new URL(String(value || '')); return /^https?:$/.test(url.protocol) ? url : null } catch { return null }
 }
-/** Public source drafts and explicit saved research; provider status is disclosed per observation. */
-export function leaderObservation(row: LeaderRow, research: EditableRow[]) {
- return research.map<EditableRow>(note => ({ ...note, verification: note.verification || (note.verified === false ? '반박됨' : note.verified === true ? '확인됨' : '미검증') })).filter(note => String(note.market) === row.market && String(note.ticker).trim().toUpperCase() === row.ticker.toUpperCase()
-  && httpUrl(note.source) && String(note.fact || '').trim() && note.verification !== '반박됨')
-  .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))[0]
-}
+export { leaderObservation } from '../lib/leaderObservation'
+import { leaderObservation } from '../lib/leaderObservation'
 const short = (value: unknown, fallback: string) => String(value || '').trim().slice(0, 70) || fallback
 const art = `${import.meta.env.BASE_URL}folio-brand-photography.webp`
 
@@ -53,7 +49,7 @@ export function TodayLeaders({ rows, research, insights, market, source, onMarke
   {!rows.length && <div className="leader-home-empty"><h3>선별된 주도주가 없습니다.</h3><p>현재 시장·분류의 기존 선별 기준을 통과한 종목이 없습니다.</p><Button variant="secondary" onClick={onDiscover}>발견에서 조건 확인</Button></div>}
   <footer className="leader-home-footer"><span>기존 선별 순서 · 최대 5종목</span><Button variant="ghost" onClick={onDiscover}>발견에서 전체 보기 →</Button></footer>
   <Dialog.Root open={!!selected} onOpenChange={open => { if (!open) setSelected(null) }}>
-   <Dialog.Portal forceMount><AnimatePresence onExitComplete={() => { if (returnFocus.current?.isConnected) returnFocus.current.focus() }}>
+   <Dialog.Portal forceMount><AnimatePresence onExitComplete={() => { if (returnFocus.current?.isConnected) returnFocus.current.focus({preventScroll:true}) }}>
     {selected && <Dialog.Overlay forceMount asChild><motion.div className="story-dialog-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .2 }} /></Dialog.Overlay>}
     {selected && <Dialog.Content forceMount asChild onOpenAutoFocus={event => { event.preventDefault(); document.querySelector<HTMLButtonElement>('.leader-detail-close')?.focus() }} onCloseAutoFocus={event => event.preventDefault()} onPointerDownOutside={event => event.preventDefault()}>
      <motion.section layoutId={`leader-frame-${selected.id}`} layoutScroll transition={transition} className="story-dialog leader-detail">

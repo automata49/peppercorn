@@ -115,9 +115,9 @@ assert(baselineCss.includes('.folio-wordmark-image')&&baselineCss.includes('heig
 assert(css.includes('.folio-wordmark-image-light')&&css.includes('.folio-wordmark-image-dark'),'Light/dark supplied wordmark switching is missing.');
 assert(css.includes('display:inline-grid!important')&&css.includes('grid-area:1 / 1!important'),'Wordmark variants must share one grid cell so they can never render side-by-side.');
 assert(css.includes(':root[data-theme="light"] .leadership-overview')&&css.includes(':root[data-theme="light"] .analysis-page'),'Light theme must explicitly keep Leadership and Analysis surfaces light.');
-assert(css.includes('--folio-surface:#efe9e3;'),'Light structural surface must remain the warm Sunset Editorial surface, not pure white.');
+assert(css.includes('--folio-paper:#ffffff;')&&css.includes('--folio-surface:#f5f5f5;'),'Light must use white paper and neutral structural surfaces.');
 assert(!css.includes('--folio-surface:#ffffff;'),'Pure-white light surface token must not return.');
-assert(journeyCss.includes('radial-gradient(circle at 94% 4%,rgba(240,106,69,.055)')&&journeyCss.includes('radial-gradient(circle at 75% 10%,rgba(84,38,95,.045)'),'Every workspace must keep the restrained Detail-style sunset field.');
+assert(journeyCss.includes('.app-main .content{')&&journeyCss.includes('background:var(--folio-paper)!important;'),'Every workspace must inherit monochrome paper rather than a sunset field.');
 assert(css.includes('var(--folio-ds-icon-size)')&&css.includes('var(--folio-ds-icon-stroke)'),'Compact functional icons must consume baseline tokens.');
 assert(!/OPTICAL LOCK V[4-9]|QUALITY PASS V[3-9]/.test(css),'Do not append new quality-pass override generations.');
 
@@ -155,8 +155,8 @@ const expectedIcons=[
 ];
 assert.deepEqual(manifest.icons.map(icon=>icon.src),expectedIcons,'Manifest must use the supplied-icon derivatives.');
 assert(appIndex.includes('folio-b-icon-180.png?v=u2'),'Apple touch icon must use supplied-icon cache revision u1.');
-assert.equal(manifest.background_color,'#f4f1ec');
-assert.equal(manifest.theme_color,'#f4f1ec');
+assert.equal(manifest.background_color,'#ffffff');
+assert.equal(manifest.theme_color,'#ffffff');
 
 for(const file of ['app/index.html','public/sw.js','src/components/InstallApp.tsx','.github/workflows/deploy.yml']){
   const content=read(file);
@@ -194,9 +194,9 @@ assert(!stockCard.includes('stock-avatar')&&stockCard.includes('stock-trend-name
 assert(pebbleCss.includes('.journey-tracking-tabs button[aria-selected=true]')&&journeyCss.includes('@container stock-list'),'Tracking must share glass and stock cards must adapt to available width.');
 
 // LIFETIME-JOURNEY-1 retains analytics in Market Summary while making personal pages primary.
-assert(app.includes("useState('today')")&&app.includes('<TodayLeaders')&&app.includes('<LifetimeJournal'),'Today must open leader cards while retaining the personal journal workspace.');
+assert(app.includes("useState('today')")&&app.includes('<LifestyleHome')&&app.includes('<LifetimeJournal'),'Home must open four lifestyle cards while retaining the personal journal workspace.');
 for(const label of ["['today','home','오늘']","['analysis','search','발견']","['notebook','journal','저널']","['tracking','watchlist','여정']"])assert(sidebar.includes(label),'Lifetime primary destination missing: '+label);
 assert(mainEntry.includes("import './design/lifetime.css'"),'Lifetime component styles must load.');
 for(const dependency of ['motion','@tiptap/react','@tiptap/starter-kit','lightweight-charts','@radix-ui/react-tabs','@radix-ui/react-slot','class-variance-authority'])assert(pkg.dependencies[dependency],'Missing approved UI dependency '+dependency);
 
-assert(app.includes('<FolioWordmark className="launch-wordmark"/>')&&app.includes('},2000)'), 'Launch must show canonical wordmark for 2000ms.');
+assert(app.includes('<img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/>')&&app.includes('},2000)'), 'Launch must show canonical wordmark for 2000ms.');

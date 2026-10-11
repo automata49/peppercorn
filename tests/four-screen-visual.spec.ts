@@ -57,7 +57,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     return r.fulfill({json: {series: Object.fromEntries(ids.map(id => [id, series]))}})
   })
   await page.goto('/peppercorn/')
-  await expect(page.getByRole('heading', {name: '오늘의 주도주', exact:true})).toBeVisible()
+  await expect(page.getByRole('heading', {name: '나의 여정', exact:true})).toBeVisible()
   await page.evaluate(async records => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open('folio-lifetime-journal', 1)
@@ -72,7 +72,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     })
   }, entries)
   await page.reload()
-  await expect(page.locator('.leader-cover').first()).toBeVisible()
+  await expect(page.locator('.home-motion-card').first()).toBeVisible()
   await expect(page.locator('.source.supabase')).toHaveCount(1)
   await expect(page.locator('html')).toHaveAttribute('data-theme', theme)
 }
@@ -119,7 +119,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
     for (const screen of screens) {
       await openScreen(page, screen.label, view.touch)
       await expect(page.locator(screen.selector)).toBeVisible()
-      if (screen.name === 'today') {expect(await page.locator('.leader-cover').count()).toBeGreaterThan(0);expect(await page.locator('.leader-cover').count()).toBeLessThanOrEqual(5)}
+      if (screen.name === 'today') await expect(page.locator('.home-motion-card')).toHaveCount(4)
       if (screen.name === 'discover') {
         const active = page.locator('.analysis-scope button[aria-pressed=true]')
         if (await active.count()) { if (view.touch) await active.tap(); else await active.click() }
@@ -128,16 +128,17 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       }
       if (screen.name === 'journal') {
         await expect(page.getByRole('tablist', {name: '저널 분류'}).getByRole('tab')).toHaveText(['전체', '일상', '투자'])
-        await expect(page.locator('.journal-gallery > button')).toHaveCount(3)
+        await expect(page.locator('.journal-albums .journal-gallery > button')).toHaveCount(3)
       }
       if (screen.name === 'journey') {
-        await expect(page.locator('.journal-timeline > article')).toHaveCount(1)
+        await expect(page.locator('.review-gallery-item')).toHaveCount(1)
         await expect(page.locator('.journal-timeline')).not.toContainText('바다 앞에서 생각한 긴 시간')
-        await expect(page.locator('.journal-story')).toHaveCount(0)
+        await expect(page.locator('.review-gallery-item .journal-story')).toHaveCount(1)
         await expect(page.locator('.journal-timeline')).toContainText('생각의 변화 1회')
       }
       await page.evaluate(() => window.scrollTo(0, 0))
       await rendered(page)
+      if(theme==='light'){await expect(page.locator('.app-main')).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(page.locator('.content')).toHaveCSS('background-color','rgb(255, 255, 255)')}
       expect(await page.evaluate(() => matchMedia('(hover:none)').matches)).toBe(view.touch)
       expect(await page.evaluate(() => matchMedia('(pointer:coarse)').matches)).toBe(view.touch)
       await expect(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: 150, threshold: 0.15})

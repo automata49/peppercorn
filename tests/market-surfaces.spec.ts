@@ -8,7 +8,7 @@ async function checkLeadership(button:Locator){
  await expect(button).toHaveCSS('border-radius','24px')
  for(const edge of ['top','right','bottom','left'])await expect(button).toHaveCSS(`border-${edge}-width`,'0px')
  await expect(button).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
- expect(await button.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+ const selected=await button.getAttribute('aria-pressed')==='true';const image=await button.evaluate(e=>getComputedStyle(e).backgroundImage);if(selected)expect(image).toContain('linear-gradient');else expect(image).toBe('none')
  const geometry=await button.evaluate(e=>{
   const box=e.getBoundingClientRect();const label=e.querySelector('span')||e
   const range=document.createRange();range.selectNodeContents(label);const text=range.getBoundingClientRect()
@@ -37,7 +37,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  await page.goto('/peppercorn/');await openPage(page,'시장 요약');await expect(page.locator('.journey-home')).toBeVisible()
  for(const selector of ['.journey-market','.journey-today','.journey-insight','.journey-classes button']){
   for(const el of await page.locator(selector).all()){await expect(el).toHaveCSS('backdrop-filter','blur(18px) saturate(1.22)')
-  expect(await el.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('linear-gradient')
+  expect(await el.evaluate(e=>getComputedStyle(e).backgroundImage)).toBe('none')
   expect(parseFloat(await el.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(20)
   }
  }

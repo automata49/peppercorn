@@ -89,7 +89,7 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  expect(touch).toBe('./folio-b-icon-180.png?v=u2')
  const manifest=await (await request.get('manifest.webmanifest')).json()
  expect(manifest.name).toBe('Folio xx')
- expect(manifest.background_color).toBe('#f4f1ec')
+ expect(manifest.background_color).toBe('#ffffff')
  const srcs=[touch!,...manifest.icons.map((i:{src:string})=>i.src)]
  expect(srcs.every(s=>s.includes('folio-b-icon-'))).toBe(true)
  for(const src of srcs){
@@ -99,12 +99,14 @@ test('home-screen metadata uses exact B icon assets',async({page,request})=>{
  }
 })
 
-test('user supplied wordmark, hero, typography and photography assets are deployable',async({request})=>{
+test('wordmark, brand and lifestyle photography assets are deployable',async({request})=>{
  for(const asset of [
   'folio-brand-launch.webp',
   'folio-brand-launch-landscape.webp',
   'folio-brand-typography.webp',
   'folio-brand-photography.webp',
+  'folio-lifestyle-journal.webp',
+  'folio-lifestyle-journey.webp',
   'folio-brand-wordmark-light.webp',
   'folio-brand-wordmark-dark.webp',
   'folio-brand-icon-black.webp',
