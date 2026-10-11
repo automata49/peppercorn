@@ -1,5 +1,27 @@
 ## SOURCE-NEWS-1 implementation — 2026-10-11
 
+## LIFESTYLE-HOME-1 implementation — 2026-10-12
+
+The launch directly renders the supplied light-surface wordmark image on white for exactly 2000ms in both themes; old live lettering/vector CSS was removed. Shared Light surfaces are white/neutral-gray with black ink; Dark/System remain explicit. Analysis page/price-chart local dark palettes were removed so instrument detail inherits root appearance, keeping market colours and financial/ranking logic.
+
+Home is exactly four shared-frame/image/title Motion covers (오늘 / 발견 / 저널 / 여정) with one-line captions. Today expands the existing public source feed and issuer-matched personal research/notebook snippets; Discover previews the unchanged <=5 market leaders; Journal summarizes actual notebook, saved Thesis/trading journal fields and available public AI drafts; Journey prioritizes overdue hypothesis review. Public AI remains a labelled draft, private writing is not sent or rewritten, and unconfigured/expired evidence remains explicit. Two AI-generated decorative lifestyle photos supplement supplied assets; see LIFESTYLE_PHOTOGRAPHY.md for asset provenance/prompts.
+
+Journal/Review use responsive Motion photo thumbnails, local calendar year/month/day search/grouping and 40-entry progressive batches. Notebook IDs/revisions/photo/ink/backup/atomic storage stay unchanged. Legacy Thesis opens by exact ID (including archived issuers); a selected trading journal opens by exact ID and edits through explicit Save rather than per-keystroke cloud requests. Drafts survive SPA navigation, are keyed by account+record, and cloud save failures are disclosed. Read-only review identified and resolved original trade selection, deferred home summaries, overdue order, cloud write frequency, canonical search fields, calendar grouping and account-isolated draft remount. Focus restores without scrolling.
+
+Validation: production build, harness and diff checks passed. Initial full UI executed 233 cases: 220 passed and 13 exposed obsolete gradient/shadow expectations or missing ETF test fixtures. After correcting those cases and adding exact white checks, the final 34-case repair/identity subset passed; all 32 actual reference images were recreated and a separate CI-mode eight-case no-update comparison passed. Reviewer inspected all final frames with no remaining visual blocker. PR CI must verify the final full suite before publication. Exact-white assertions supplement tolerant pixel comparisons: earlier Discover PNGs remained visually warm under the historical per-pixel tolerance even though the new compiled app/touch probe already used white. Final reference capture must recreate actual PNGs before the no-update comparison. Physical Safari/Apple Pencil, arbitrary additional information channels, personal AI synthesis and historical cash-flow series remain unverified/open.
+
+
+## LIFESTYLE-HOME-1 — latest user authority (2026-10-12)
+
+This supersedes LEADER-EDITORIAL-1 home placement, warm-surface and forced-dark analysis rules.
+- Launch: one original `folio-brand-wordmark-light.webp` image on pure white for 2000ms, independent of selected theme; no generated lettering or themed wrapper.
+- Default Light: black ink on white, neutral gray structural surfaces. Dark/System remain explicit selections; Sunset is restricted to quiet typography/rules/selected accents, never a page-wide field. All stock detail/chart/actionbar colours inherit the same root palette, with market gain/loss semantics preserved.
+- Home is a lifestyle overview of the user's journey, exactly four shared-element Motion photo cards: 오늘 / 발견 / 저널 / 여정. Each cover has its label and one single-line summary; no stock roster or numerical analysis on the cover.
+- Expanded 오늘 reads public source changes and the user's leader-linked journal records; source dates/draft states stay explicit. 발견 previews existing leaders without changing selection/ranking. 저널 summarizes life/records, source Insights, saved Thesis and trading journals. 여정 revisits hypotheses, counter-evidence, revisions and next review dates; no automatic rewriting of private records.
+- Journal and investment-only Review use Motion thumbnails, responsive photo-gallery columns, text search, dependent local-calendar year/month/day filters and grouping, and 40-record progressive batches. Preserve photo/ink/edit/revision/backup/atomic-save behaviour and original cloud record IDs. No new live AI, arbitrary channel ingestion or historical cash-flow claims.
+- Verify white image launch in both themes, four fixed covers, all four expanded flows, date filters and pagination, original record actions, and stock detail contrast at 390/834/1366/1440 portrait/landscape Light/Dark. Update and inspect changed four-screen references; passing a new reference is regression evidence, not physical Safari proof.
+
+
 ## WORDMARK-LAUNCH-1 — user direction (2026-10-11)
 Launch shows only the canonical theme-aware FolioWordmark centered on theme paper for 2000ms, then dismisses. No hero, tagline or progress bar. This supersedes all older hero-launch requirements; supplied artwork files remain available for other uses. Session-seen behavior is preserved.
 

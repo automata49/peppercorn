@@ -46,11 +46,11 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
       }
     })
     expect(rootVars).toEqual({
-      paper:'#f4f1ec',
+      paper:'#fff',
       ink:'#111113',
       black:'#0b0b0d',
-      sand:'#e8ded4',
-      surface:'#efe9e3',
+      sand:'#ededed',
+      surface:'#f5f5f5',
     })
 
     const compactBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
@@ -107,7 +107,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     await page.locator('.analysis-idea-list > button').first().click()
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
-    expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
+    expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(255, 255, 255)')
     await expect(analysis.locator('.analysis-detail-tabs').getByRole('tab')).toHaveText(['Overview','Analysis','Financials','Thesis'])
     await expect(analysis.locator('.folio-insight')).toBeVisible()
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
@@ -134,14 +134,14 @@ test('Light theme keeps one Folio visual system across every product workspace',
       const s=getComputedStyle(e)
       return {background:s.backgroundColor,color:s.color}
     })
-    expect(signature.background).toBe('rgb(244, 241, 236)')
+    expect(signature.background).toBe('rgb(255, 255, 255)')
     expect(signature.color).toBe('rgb(17, 17, 19)')
     const content=main.locator('.content')
-    expect(await content.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(244, 241, 236)')
-    expect(await content.evaluate(e=>getComputedStyle(e).backgroundImage)).toContain('radial-gradient')
+    expect(await content.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(255, 255, 255)')
+    expect(await content.evaluate(e=>getComputedStyle(e).backgroundImage)).toBe('none')
     const structural=main.locator('.panel,.page-note,.workspace-grid-panel,.catalog-grid-panel,.temp-card,.ticker-entry')
     for(const node of await structural.all()){
-      if(await node.isVisible())expect(await node.evaluate(e=>getComputedStyle(e).backgroundColor)).not.toBe('rgb(255, 255, 255)')
+      if(await node.isVisible()){const channels=await node.evaluate(e=>getComputedStyle(e).backgroundColor.match(/[\d.]+/g)?.slice(0,3).map(Number)||[]);expect(Math.max(...channels)-Math.min(...channels)).toBeLessThan(6)}
     }
   }
   await context.close()

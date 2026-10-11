@@ -25,7 +25,7 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
     await expect(node).toBeVisible()
     expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
     expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
-    expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toContain('inset')
+    expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
   }
 
   const explore=page.locator('.dashboard-explore')
