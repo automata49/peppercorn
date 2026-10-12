@@ -16,7 +16,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  const section=page.getByRole('region',{name:'HS아카데미 추천 읽을거리'})
  await expect(section).toContainText('공개 미리보기 요약 초안')
  await expect(section.getByRole('link',{name:'HS아카데미 원문 보기 ↗'})).toHaveAttribute('href',feed().items[0].url)
- await expect(page.getByRole('region',{name:'Gemini AI Insights'})).toBeVisible()
+ await expect(page.getByRole('region',{name:'Gemini AI Insights'})).toContainText(feed().items[0].summary)
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
 })
 test('source failure preserves channel link',async({page})=>{
