@@ -119,7 +119,7 @@ test('pending list history is shared with detail and invalidated refresh rejects
  // Both mounted readers wait for the shared first batch.
  await expect(page.locator('.analysis-price-momentum svg')).toHaveCount(0)
  expect(batches).toHaveLength(1)
- await page.locator('.topbar-refresh').click()
+ await page.locator('.obra-masthead').getByRole('button',{name:'전체 메뉴 열기'}).click();await page.locator('.drawer-refresh').click()
  await expect.poll(()=>batches.length).toBeGreaterThan(1)
  await expect(page.locator('.analysis-price-momentum svg').first()).toBeVisible()
  const firstResponse=page.waitForResponse(r=>r.url().includes('price-history')&&(new URL(r.url()).searchParams.get('ids')||'').includes(','))
