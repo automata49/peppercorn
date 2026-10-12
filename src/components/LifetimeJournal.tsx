@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import type { EditableRow } from '../types'
 import type { InsightsFeed } from '../lib/leaderInsights'
 import { calendarDate, calendarGroup, matchesCalendar } from '../lib/journalGallery'
-import { AppIcon } from './AppIcon'
+import { useCardDismiss } from '../lib/useCardDismiss'
 import { InkPreview } from './InkPad'
 import { downloadNotebook, entryPhotos, parseNotebook, questions, type JournalEntry, type EntrySnapshot } from '../lib/lifetimeJournal'
 const JournalEditor = lazy(() => import('./JournalEditor'))
@@ -18,7 +18,7 @@ const brandType = `${import.meta.env.BASE_URL}folio-brand-typography.webp`
 
 function StoryCover({ story, expanded = false }: { story: Story; expanded?: boolean }) {
  return <>
-  {story.image && <motion.img layoutId={`cover-${story.key}`} src={story.image} alt="" loading="eager" />}
+  {story.image && <motion.img layoutId={`cover-${story.key}`} src={story.image} alt="" draggable={false} loading="eager" />}
   <div className="story-cover-copy">
    <span className="story-kicker">{story.kicker}</span>
    <motion.h3 layoutId={`title-${story.key}`}>{story.title}</motion.h3>
@@ -56,6 +56,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
   if (dirty && !window.confirm('저장하지 않은 변경이 있습니다. 닫을까요?')) return
   setOpen(false); setDirty(false)
  }
+ const dismiss = useCardDismiss(open, close)
  function entryStory(e: JournalEntry, key = e.id): Story {
   return { key, entry: e, action: 'edit', title: e.title, kicker: `${day(e.createdAt)} · ${e.kind === 'life' ? '일상' : '투자'}`, caption: '나의 페이지 펼치기', image: entryPhotos(e)[0], tone: entryPhotos(e).length ? 'photo' : 'paper', label: `${e.title} 기록 열기` }
  }
@@ -117,9 +118,9 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
   <DialogPrimitive.Root open={open} onOpenChange={value => { if (!value) close() }}>
    <DialogPrimitive.Portal forceMount><AnimatePresence onExitComplete={() => returnFocus.current?.isConnected && returnFocus.current.focus({preventScroll:true})}>
     {open && <DialogPrimitive.Overlay forceMount asChild><motion.div className="story-dialog-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .2 }} /></DialogPrimitive.Overlay>}
-    {open && <DialogPrimitive.Content forceMount asChild onOpenAutoFocus={e => { e.preventDefault(); document.querySelector<HTMLButtonElement>('.journal-dialog-close')?.focus() }} onCloseAutoFocus={e => e.preventDefault()} onEscapeKeyDown={e => { e.preventDefault(); close() }} onPointerDownOutside={e => e.preventDefault()}>
-     <motion.section layoutId={selected ? `frame-${selected.key}` : undefined} layoutScroll transition={transition} className="journal-dialog story-dialog" initial={selected ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={selected ? { opacity: 1 } : { opacity: 0, y: 16 }}>
-      <Button variant="secondary" size="icon" className="journal-dialog-close" aria-label="기록 닫기" onClick={close}><AppIcon name="close" /></Button>
+    {open && <DialogPrimitive.Content forceMount asChild onOpenAutoFocus={e => { e.preventDefault(); dismiss.ref.current?.querySelector<HTMLButtonElement>('.card-dismiss-handle')?.focus() }} onCloseAutoFocus={e => e.preventDefault()} onEscapeKeyDown={e => { e.preventDefault(); close() }} onPointerDownOutside={e => { e.preventDefault(); close() }}>
+     <motion.section ref={dismiss.ref} style={{ y: dismiss.y }} layoutId={selected ? `frame-${selected.key}` : undefined} layoutScroll transition={transition} className="journal-dialog story-dialog" initial={selected ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: selected ? 1 : 0 }}>
+      <button type="button" className="card-dismiss-handle" aria-label="기록 닫기" title="아래로 당겨 닫기" onClick={close}><span aria-hidden="true"/></button>
       {selected && <div className={`story-detail-cover story-${selected.tone}`}><StoryCover story={selected} expanded /></div>}
       <motion.div className="story-detail-body" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .18, delay: reduce ? 0 : .15 }}>
        <div className="journal-dialog-header"><div><DialogPrimitive.Title>{selected?.action === 'market' ? '세상의 흐름 발견하기' : selected?.action === 'journey' ? '나의 투자 여정' : selected?.entry ? '나의 페이지' : '새 페이지'}</DialogPrimitive.Title><DialogPrimitive.Description>{selected?.action === 'edit' || !selected ? '기기 저장 · 사진과 손글씨, 판단의 흔적' : '관찰과 판단을 이어가는 Folio'}</DialogPrimitive.Description></div></div>

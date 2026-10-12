@@ -12,7 +12,7 @@ test('Google button sends a PKCE request and the returned code signs in',async({
   await base(page)
   let exchange:any=null,authorize:URL|null=null
   await page.route('**/auth/v1/authorize?*',route=>{authorize=new URL(route.request().url());return route.fulfill({status:302,headers:{location:APP+'?code=test-code-123'}})})
-  await page.route('**/functions/v1/auth',route=>{exchange=route.request().postDataJSON();return route.fulfill({json:{access_token:'a.b.c',refresh_token:'r',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'u1',email:'owner@example.com'}}})})
+  await page.route('**/functions/v1/auth',route=>{const body=route.request().postDataJSON();if(body.action==='google_status')return route.fulfill({json:{ready:true}});exchange=body;return route.fulfill({json:{access_token:'a.b.c',refresh_token:'r',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'u1',email:'owner@example.com'}}})})
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP)
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await page.locator('.top-actions').getByRole('button',{name:'로그인',exact:true}).click()
@@ -52,4 +52,28 @@ test('a Google error in the redirect is shown without a request',async({page})=>
   await expect(page.locator('.auth-error')).toContainText('등록된 계정과 연결되어 있지 않습니다')
   await expect(page).toHaveURL(APP)
   expect(calls).toBe(0)
+})
+
+for(const code of ['google_provider_disabled','auth_provider_check_failed'])test(`Google ${code}: keep app and email login without navigating`,async({page})=>{
+ await base(page)
+ let authorize=0
+ await page.route('**/auth/v1/authorize?*',r=>{authorize++;return r.abort()})
+ await page.route('**/functions/v1/auth',r=>r.fulfill({status:503,json:{error:code}}))
+ await page.addInitScript(()=>sessionStorage.setItem('peppercorn-intro-seen','1'))
+ await page.goto(APP);await page.locator('.top-actions').getByRole('button',{name:'로그인',exact:true}).click()
+ await page.getByRole('button',{name:'Google 계정으로 로그인'}).click()
+ await expect(page.locator('.auth-error')).toContainText(code==='google_provider_disabled'?'연결 설정이 아직 완료되지 않았습니다':'연결을 확인하지 못했습니다')
+ await expect(page.getByRole('button',{name:'Google 계정으로 로그인'})).toBeEnabled()
+ await expect(page.getByLabel('이메일',{exact:true})).toBeVisible()
+ await expect(page).toHaveURL(APP);expect(authorize).toBe(0)
+ expect(await page.evaluate(()=>sessionStorage.getItem('peppercorn-pkce-verifier'))).toBeNull()
+})
+
+test('failed code exchange removes callback parameters and does not store a session',async({page})=>{
+ await base(page);await page.addInitScript(()=>sessionStorage.setItem('peppercorn-pkce-verifier','x'.repeat(64)))
+ await page.route('**/functions/v1/auth',r=>r.fulfill({status:401,json:{error:'oauth_failed'}}))
+ await page.goto(APP+'?code=expired&keep=1')
+ await expect(page.locator('.auth-error')).toContainText('Google 로그인을 확인하지 못했습니다')
+ await expect(page).toHaveURL(APP+'?keep=1')
+ expect(await page.evaluate(()=>localStorage.getItem('peppercorn-session'))).toBeNull()
 })

@@ -16,7 +16,7 @@ function cors(origin: string | null) {
   };
 }
 function json(data: unknown, status: number, headers: Record<string,string>) {
-  return Response.json(data,{status,headers});
+  return Response.json(data,{status,headers:{...headers,"Cache-Control":"no-store"}});
 }
 
 Deno.serve(async (req: Request) => {
@@ -36,6 +36,17 @@ Deno.serve(async (req: Request) => {
   const anon=Deno.env.get("SUPABASE_ANON_KEY");
   const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if(!url||!anon||!service) return json({error:"server_not_configured"},500,headers);
+
+  // Public readiness only; provider credentials and the remaining auth configuration stay server-side.
+  if(action==="google_status"){
+    try{
+      const result=await fetch(url+"/auth/v1/settings",{headers:{apikey:anon},signal:AbortSignal.timeout(8000)});
+      if(!result.ok)return json({error:"auth_provider_check_failed"},503,headers);
+      const settings=await result.json();
+      if(settings?.external?.google!==true)return json({error:"google_provider_disabled"},503,headers);
+      return json({ready:true},200,headers);
+    }catch{return json({error:"auth_provider_check_failed"},503,headers)}
+  }
 
   if(action==="signup"){
     const setupCheck=await fetch(url+"/rest/v1/rpc/check_account_setup_code",{
@@ -87,8 +98,8 @@ Deno.serve(async (req: Request) => {
 
   // GOOGLE-LOGIN-1: exchange the PKCE code from the Google redirect. The app has a single owner account, so a Google
   // login is accepted only when it resolves to an account created through the invite flow (an email identity; Supabase
-  // links a verified Google identity with the same email to it). Any other Google login is refused, and a user it
-  // created moments ago is removed so the single-account rule holds even if sign-ups are left open.
+  // links a verified Google identity with the same email to it). Any other Google login is refused and its session
+  // revoked. Never delete an account as a side effect of a failed login.
   if(action==="pkce"){
     const authCode=String(body?.auth_code||"");const verifier=String(body?.code_verifier||"");
     if(!authCode||!/^[A-Za-z0-9._~-]{43,128}$/.test(verifier)) return json({error:"pkce_required"},400,headers);
@@ -104,10 +115,7 @@ Deno.serve(async (req: Request) => {
     const providers=Array.isArray(user.app_metadata?.providers)?user.app_metadata.providers:[];
     const owner=identities.some((i:any)=>i?.provider==="email")||providers.includes("email");
     if(!owner){
-      const created=Date.parse(String(user.created_at||""));
-      if(user.id&&Number.isFinite(created)&&Date.now()-created<10*60*1000){
-        await fetch(url+"/auth/v1/admin/users/"+encodeURIComponent(String(user.id)),{method:"DELETE",headers:{apikey:service,Authorization:"Bearer "+service}}).catch(()=>null);
-      }
+      await fetch(url+"/auth/v1/logout?scope=local",{method:"POST",headers:{apikey:anon,Authorization:"Bearer "+String(payload.access_token||"")},signal:AbortSignal.timeout(8000)}).catch(()=>null);
       return json({error:"google_not_linked"},403,headers);
     }
     return json({
