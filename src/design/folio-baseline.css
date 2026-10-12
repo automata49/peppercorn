@@ -3,6 +3,17 @@
    it must not redefine them locally without an explicit documented exception. */
 :root{
   --folio-ds-unit:4px;
+  /* OBRA-EDITORIAL-1: component anatomy + semantic tokens across all pages. */
+  --folio-ui-radius:10px;
+  --folio-ui-height:44px;
+  --folio-ui-weight:500;
+  --folio-editorial-font:var(--folio-display);
+  --folio-editorial-weight:500;
+  --folio-editorial-tracking:-.045em;
+  --folio-editorial-leading:1.15;
+  --folio-editorial-title:clamp(38px,5vw,64px);
+  --folio-editorial-section:clamp(24px,3vw,36px);
+  --folio-editorial-statement:clamp(20px,2.4vw,28px);
   --folio-stock-name:clamp(20px,calc(15px + 1.2vw),24px);
   --folio-stock-price:clamp(18px,calc(14px + 1vw),22px);
   --folio-stock-meta:clamp(13px,calc(11px + .5vw),15px);

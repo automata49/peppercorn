@@ -823,3 +823,12 @@ Latest user decisions:
 - Home **오늘의 시장** now summarizes that same market-signal path: market breadth → leading sector → ETF RS leader. Its **전체 보기 →** navigates to 섹터>ETF.
 - Home **오늘 볼 종목** is renamed **오늘의 주도주** and is positioned above 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.
 - Harness contract, Level-0 baseline, identity spec, Claude/Codex/plugin identity/UI skills, read-only reviewers and deterministic identity gate were updated to enforce these decisions.
+
+
+## OBRA-EDITORIAL-1 — 2026-10-12
+
+User requested Obra across all pages including stock detail, magazine typography on Home/large headings/key statements, and multiple design previews. Implemented a Folio-owned shadcn semantic-token adapter, shared control/focus/disabled rules, shared Button detail actions, editorial roles and persisted Modern/Classic/Art selector under Settings. Bundled a renamed OFL-licensed Korean serif subset for Classic; it loads lazily, preserving default UI and numeric fonts. Updated Level-0/design/contract documentation and inspected 32 four-screen reference images. Canonical brand, four Motion covers, ranking/finance/account/journal-original contracts unchanged.
+
+Validation: harness check, production build and identity 31 passed; existing full UI suite 315 passed, including four-screen comparisons; final fresh build plus 27 editorial/font tests passed, including successful self-hosted Korean WOFF2 loading. A separate earlier simultaneous Playwright run lost one trace artifact because both runners shared output paths; the sequential full suite passed. Final font QA used isolated build/server/output paths. Chromium emulation is not physical Safari proof. Historical asset-flow series/live AI activation/original-publisher rights remain separate open gaps.
+
+Local branch: codex/obra-editorial-system. GitHub push was rejected by automatic approval review: it requires the destination to be explicitly authorized in the current request and regards repository upload as potential sensitive-code export. No workaround/retry, PR, merge or deployment was performed. Current changes are locally committed; remote production remains unchanged. Once user explicitly authorizes automata49/peppercorn push/deploy, fetch current main, reconcile any concurrent changes, push this reviewed branch, then use normal CI/merge/deploy gates.
