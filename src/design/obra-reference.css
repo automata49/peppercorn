@@ -4,6 +4,7 @@
 .obra-masthead .folio-wordmark-system{--folio-wordmark-size:25px;width:auto;max-width:120px;height:25px}
 .obra-masthead>.folio-button{font-size:12px;color:var(--folio-muted);padding:0;background:transparent;border:0;min-height:44px}
 .obra-back-cue{font-size:20px;line-height:1;margin-right:6px}
+.obra-masthead>.folio-button:not(.obra-back){min-width:44px;justify-content:flex-end}
 .obra-masthead>.obra-back{margin:0;min-width:0;color:var(--folio-ink)}
 .shell.obra-detail-shell .mobile-brandbar,.obra-detail-shell .topbar{display:none!important}
 .obra-detail-shell .content{padding:0 0 calc(92px + env(safe-area-inset-bottom))!important}
