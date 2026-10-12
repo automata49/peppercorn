@@ -1,0 +1,69 @@
+/* Obra Community is a Figma/shadcn reference. This is Folio's independent
+   token adapter, not a downloaded Obra component package or Figma artwork. */
+@font-face {
+  font-family:"Folio Editorial Serif";
+  src:url('/fonts/folio-editorial-serif.woff2') format('woff2');
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+}
+:root {
+  --background:var(--folio-paper);
+  --foreground:var(--folio-ink);
+  --primary:var(--folio-ink);
+  --primary-foreground:var(--folio-paper);
+  --secondary:var(--folio-surface);
+  --secondary-foreground:var(--folio-ink);
+  --muted-foreground:var(--folio-muted);
+  --border:var(--folio-line);
+  --input:var(--folio-line-strong);
+  --ring:var(--folio-ink);
+  --radius:var(--folio-ui-radius);
+}
+:root[data-editorial="classic"] {
+  --folio-editorial-font:"Folio Editorial Serif","Noto Serif CJK KR","AppleMyungjo","Batang",Georgia,serif;
+  --folio-editorial-weight:400;
+  --folio-editorial-tracking:-.035em;
+  --folio-editorial-leading:1.25;
+}
+:root[data-editorial="art"] {
+  --folio-editorial-weight:750;
+  --folio-editorial-tracking:-.055em;
+}
+/* Shared roles own type; price, tables, inputs and metadata keep the UI font. */
+:root :is(.topbar-title h1,.analysis-hub-copy h2,.journey-insight h2,.panel>h2,.lifetime-heading h2,.home-cover-copy h3,.hero-name,.journey-heading h2,.story-detail-body>h2,.journal-story h3,.folio-insight>header h3,.typography-sample) {
+  font-family:var(--folio-editorial-font);
+  font-weight:var(--folio-editorial-weight);
+  letter-spacing:var(--folio-editorial-tracking);
+  line-height:var(--folio-editorial-leading);
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+}
+:root :is(.folio-thesis,.journey-judgement h3) {
+  font-family:var(--folio-editorial-font);
+  font-size:var(--folio-editorial-statement);
+  line-height:1.65;
+  letter-spacing:-.025em;
+}
+/* Legacy semantic controls consume the same states as Button. Preserve
+   card/navigation geometry and the approved glass classification controls. */
+:root :is(.secondary-action,.settings-auth,.ticker-entry button,.temp-save button,.auth-submit,.dashboard-section-action) {
+  min-height:var(--folio-ui-height);
+  border-radius:var(--folio-ui-radius);
+  font-family:var(--folio-text);
+  font-weight:var(--folio-ui-weight);
+}
+:root :is(button,a,input,select,textarea):focus-visible {
+  outline:2px solid var(--ring);
+  outline-offset:3px;
+}
+:root button:disabled { opacity:.45; cursor:not-allowed; }
+:root :is(.app-main,.ui-dialog-content,.story-dialog) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),select,textarea) {
+  min-height:var(--folio-ui-height);
+  border-radius:var(--folio-ui-radius);
+  font-family:var(--folio-text);
+}
+.typography-settings label { display:grid;gap:12px;margin-top:24px;font-size:14px; }
+.typography-settings select { width:100%;padding:12px;border:1px solid var(--border);background:var(--secondary);color:var(--foreground); }
+.typography-sample { margin:32px 0;font-size:var(--folio-editorial-section); }
+@media(pointer:coarse) { :root :is(input,select,textarea) { font-size:16px; } }

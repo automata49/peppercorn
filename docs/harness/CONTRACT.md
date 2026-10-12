@@ -1,5 +1,9 @@
 # Pepper engineering contract
 
+## OBRA-EDITORIAL-1 — user direction 2026-10-12
+
+Use the shared Obra/shadcn token adapter on all destinations, including stock detail. Editorial Home/title/key-statement roles support Modern/Classic/Art expressions; controls and numeric information retain the UI stack. Read `docs/design/FOLIO_OBRA_EDITORIAL.md`; this supersedes the old Today-only component scope. Preserve supplied identity, account/data contracts, theme and approved Motion/glass geometry.
+
 ## PREMIUM-INSIGHTS-1 — user direction (2026-10-12)
 
 The user explicitly requested Gemini AI Insights and HS Academy summaries/original-link suggestions implemented in the app. This overrides the earlier no-new-AI/channel scope only for the registered `hsacademy/hsacademy1` public metadata. Preserve the four home covers; show the new sections inside expanded Today. Collect at most three exact-channel article URLs under the existing robots/DNS/redirect/time/byte gates, only OG title/description, never subscription bodies, credentials, user diaries or private workspace contents. AI summaries are grounded public-preview drafts, distinct from title-only links, with no claimed publication date when unavailable. Provider absence/failure and source failure are visible; channel link remains available. Ranking, classification, account isolation and originals are unchanged.

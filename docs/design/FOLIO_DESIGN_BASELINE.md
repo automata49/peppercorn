@@ -1,5 +1,9 @@
 # Folio xx — Design Baseline v1.0
 
+## OBRA-EDITORIAL-1 — user direction 2026-10-12
+
+All destinations share Obra/shadcn semantic component tokens, 44px controls, keyboard-focus and disabled states. Home, large headings and key statements use the shared editorial typography roles with Modern/Classic/Art expressions; numeric data and functional UI keep the grotesk stack. See `FOLIO_OBRA_EDITORIAL.md`. This supersedes older Today-only Obra scope and the single-family rule for editorial titles only. Supplied identity, theme, approved Motion/glass surfaces and finance logic remain authoritative.
+
 ## FILM-MOTION-2 — latest user authority (2026-10-12)
 
 - User chose an independent in-app film expression inspired by VSCO's published examples, not licensed VSCO presets or API integration. Generated defaults use modernist photographic composition. Apply the same subtle warm/faded display treatment to default and personal home-cover photos; preserve uploaded originals and backups unchanged.
