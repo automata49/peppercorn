@@ -12,7 +12,10 @@ const messages:Record<string,string>={
   google_not_linked:'이 Google 계정은 등록된 계정과 연결되어 있지 않습니다. 등록한 이메일과 같은 Google 계정으로 로그인하세요.',
   oauth_failed:'Google 로그인을 확인하지 못했습니다. 다시 시도하세요.',
   oauth_state_missing:'로그인을 시작한 창과 다른 곳에서 돌아왔습니다. 다시 시도하세요.',
-  oauth_access_denied:'Google 로그인이 취소되었습니다.'
+  oauth_access_denied:'Google 로그인이 취소되었습니다.',
+  google_provider_disabled:'Google 로그인 연결 설정이 아직 완료되지 않았습니다. 이메일로 로그인할 수 있습니다.',
+  google_unavailable:'Google 로그인 연결을 확인하지 못했습니다. 잠시 후 다시 시도하거나 이메일로 로그인하세요.',
+  auth_provider_check_failed:'Google 로그인 연결을 확인하지 못했습니다. 잠시 후 다시 시도하거나 이메일로 로그인하세요.'
 }
 
 export function AuthModal({
@@ -33,7 +36,7 @@ export function AuthModal({
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   useEffect(()=>{if(notice)setError(messages[notice]||'Google 로그인에 실패했습니다: '+notice)},[notice])
-  const google=async()=>{setBusy(true);setError('');try{await startGoogleLogin()}catch{setBusy(false);setError('Google 로그인을 시작하지 못했습니다.')}}
+  const google=async()=>{setBusy(true);setError('');try{await startGoogleLogin()}catch(e){setBusy(false);setError(messages[e instanceof Error?e.message:'']||messages.google_unavailable)}}
 
   const submit=async()=>{
     setBusy(true);setError('')

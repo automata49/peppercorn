@@ -34,7 +34,12 @@ export async function googleAuthorizeUrl(returnTo=location.origin+location.pathn
   sessionStorage.setItem(PKCE_KEY,verifier)
   return AUTH_BASE+'/authorize?'+new URLSearchParams({provider:'google',redirect_to:returnTo,code_challenge:challenge,code_challenge_method:'s256'}).toString()
 }
-export async function startGoogleLogin(){location.assign(await googleAuthorizeUrl())}
+export async function startGoogleLogin(){
+  const res=await fetch(BASE+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'google_status'}),signal:AbortSignal.timeout(10000)})
+  const status=await res.json().catch(()=>({}))
+  if(!res.ok||status.ready!==true)throw new Error(String(status.error||'google_unavailable'))
+  location.assign(await googleAuthorizeUrl())
+}
 // Reads ?code / ?error (or the same in the hash) left by the redirect, removes them from the address bar, and returns
 // the new session, null when this load is not a redirect, or throws the error code.
 export async function completeGoogleLogin():Promise<Session|null>{

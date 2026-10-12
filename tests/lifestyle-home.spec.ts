@@ -27,10 +27,10 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  expect(palette.paper).toBe(palette.root);expect(palette.background).toBe(theme==='light'?'rgb(255, 255, 255)':'rgb(10, 10, 12)');expect(palette.hero).toBe(theme==='light'?'rgb(17, 17, 19)':'rgb(250, 250, 250)')
  await page.screenshot({path:`test-results/lifestyle-detail-${width}-${theme}.png`,fullPage:true});await context.close()
 })
-for(const theme of ['light','dark'])test(`launch ${theme}: source image on white for exactly 2000ms`,async({page})=>{
+for(const theme of ['light','dark'])test(`launch ${theme}: source image on white for 2000ms before a gentle fade`,async({page})=>{
  await page.clock.install({time:new Date('2026-10-12T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-12T00:00:00Z'));await boot(page,theme,true)
  const launch=page.locator('.launch-overlay');await expect(launch).toBeVisible();await expect(launch).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(launch.locator('img')).toHaveCount(1);await expect(launch.locator('img')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2');await expect(launch.locator('.folio-wordmark-system')).toHaveCount(0)
- await page.clock.runFor(1999);await expect(launch).toBeVisible();await page.clock.runFor(1);await expect(launch).toHaveCount(0)
+ await page.clock.runFor(1999);await expect(launch).toBeVisible();await page.clock.runFor(1);await expect(launch).toBeVisible();await page.clock.runFor(500);await expect(launch).toHaveCount(0)
 })
 test('calendar filtering preserves date-only values and supports unknown dates',()=>{expect(calendarGroup('2026-02-01','month')).toBe('2026-02');expect(matchesCalendar('2026-02-01','2026','02','01')).toBe(true);expect(matchesCalendar('2026-02-01','2025','','')).toBe(false);expect(calendarGroup('','day')).toBe('날짜 미제공')})
 test('gallery: date drilldown, bounded thumbnails, exact record editor and investment-only review',async({page})=>{

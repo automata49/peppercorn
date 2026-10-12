@@ -1,5 +1,21 @@
 ## SOURCE-NEWS-1 implementation — 2026-10-11
 
+## FILM-MOTION-2 — latest user authority (2026-10-12)
+
+- User chose an independent in-app film expression inspired by VSCO's published examples, not licensed VSCO presets or API integration. Generated defaults use modernist photographic composition. Apply the same subtle warm/faded display treatment to default and personal home-cover photos; preserve uploaded originals and backups unchanged.
+- Keep four home sections fixed but give each a distinct cover size: staggered wide/narrow, tall/short desktop grid and varied phone aspect ratios.
+- Image-only white loading holds for 2000ms, then Motion cross-fades into the home over 350–400ms. Reduced motion removes the reveal movement and fade; no loading copy or extra progress UI.
+- Discover and stock detail chrome, action toolbar and bottom navigation consume root theme tokens in Light, Dark, System-light and System-dark. No forced dark footer or region may survive as a page-local exception. Verify the actual fixed bars and inactive buttons, not just the detail hero.
+
+
+## RETRO-GESTURE-1 — latest user authority (2026-10-12)
+
+- Home keeps exactly 오늘 / 발견 / 저널 / 여정. Context-relevant user journal photos take priority: today's records, leader-linked investment records, latest journal, and investment journey respectively. Without an available personal photo, use the four modern Vintage/Retro defaults `folio-retro-{today,discover,journal,journey}.webp`. Generated decorative photos are not article evidence. Supplied wordmark/icon/launch remain authoritative.
+- Journal and Review thumbnail cards use subtle neutral Liquid glass (translucent surface, blur, inset highlight and quiet depth), retaining gallery sizing/search/date grouping.
+- Motion home and journal details have no visible X. A small accessible pull handle, downward pull from the top, desktop cover drag, outside click and Escape dismiss. Ordinary scrolling, text editing and ink gestures are preserved; dirty journal dismissal still requires confirmation. Reverse motion restores the opener's focus and scroll, with reduced-motion support.
+- Google login checks provider readiness before redirecting so disabled/unavailable providers show an in-app email fallback. Deploy the PKCE-capable auth function; never delete an account following a refused OAuth login. Provider credentials, callback and app redirect settings remain an explicit configuration gate; readiness is not proof of a completed Google login.
+
+
 ## LIFESTYLE-HOME-1 implementation — 2026-10-12
 
 The launch directly renders the supplied light-surface wordmark image on white for exactly 2000ms in both themes; old live lettering/vector CSS was removed. Shared Light surfaces are white/neutral-gray with black ink; Dark/System remain explicit. Analysis page/price-chart local dark palettes were removed so instrument detail inherits root appearance, keeping market colours and financial/ranking logic.
@@ -666,7 +682,7 @@ Validation: `npm run test:temperature-db` (16), `npm run harness:check`, `npm ru
 
 ## Google login (GOOGLE-LOGIN-1) — 2026-10-03
 PR #77 (TEMP-1) merged at `15d462e`; the user ran `Market temperature migration (production)` (run 37109723528: RLS on, 4 policies, no anon access, 0 rows, latest metrics unchanged) and deployed `workspace` (run 37109752970).
-By user request the login dialog adds `Google 계정으로 로그인`: PKCE redirect to `/auth/v1/authorize?provider=google`, return to the same page with `?code=`, exchange through the `auth` function's new `pkce` action. Single-owner rule kept: only an account with an email identity (the invite-created owner, to which Supabase links a Google identity with the same verified email) is accepted; any other Google login gets `google_not_linked` and a user created in the last 10 minutes by that login is deleted. Redirect errors (cancel, sign-ups disabled) are shown in the dialog without a request; the code and error are removed from the address bar.
+By user request the login dialog adds `Google 계정으로 로그인`: PKCE redirect to `/auth/v1/authorize?provider=google`, return to the same page with `?code=`, exchange through the `auth` function's new `pkce` action. Single-owner rule kept: only an account with an email identity (the invite-created owner, to which Supabase links a Google identity with the same verified email) is accepted; any other Google login gets `google_not_linked`. The 2026-10-12 fix revokes only that returned session (`scope=local`) and never deletes an account. Redirect errors (cancel, sign-ups disabled) are shown in the dialog without a request; the code and error are removed from the address bar.
 Setup (person, before it works): (1) Google Cloud Console → APIs & Services → Credentials → OAuth client ID (Web), authorized redirect URI `https://mhbcchegrbakearqptdr.supabase.co/auth/v1/callback`; (2) Supabase → Authentication → Sign In / Providers → Google: enable, paste client ID and secret; (3) Authentication → URL Configuration: add `https://automata49.github.io/peppercorn/**` to Redirect URLs; (4) recommended: turn off `Allow new users to sign up` so no stranger's Google login creates a user at all (the owner's Google identity is linked to the existing account); (5) `Edge function deploy` → function `auth`, target `prod`, confirm `deploy` (token expires 2026-10-07). The owner's Google account must use the same email as the existing account.
 Not verified: the real Google/Supabase round trip and automatic identity linking (no access from this container); browser tests mock both.
 Validation: `npm run harness:check`, `npm run build`, `npm run test:ui` (google-login: PKCE parameters and verifier/challenge match, code exchange and session, URL cleaned, unlinked refusal, redirect error without a request), `git diff --check`.
