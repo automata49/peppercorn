@@ -6,6 +6,7 @@ const item:LeaderInsight={id:'KR:000660:news',market:'KR',ticker:'000660',headli
 const feed=(items:unknown[]=[item])=>({version:1,published_at:stamp(),ai_status:'enabled',items})
 test('public snapshot fails closed for stale/oversized/version/expiry/source/model identities',()=>{
  expect(parseInsights(feed(),now)?.items).toHaveLength(1)
+ expect(parseInsights(feed([{...item,model:'gemini-3.5-flash-lite'}]),now)?.items).toHaveLength(1)
  for(const value of [{...feed(),version:2},{...feed(),published_at:stamp(-49*3600_000)},{...feed(),published_at:stamp(2*3600_000)},{...feed(),items:Array(21).fill(item)}])expect(parseInsights(value,now)).toBeNull()
  for(const changes of [{ticker:'AAPL'},{market:'US'},{expires_at:stamp(-1)},{headline:'x'.repeat(71)},{model:'invented-model'},{evidence:''},{source:{...item.source,url:'https://evil.example/test'}},{source:{...item.source,published_at:stamp(-15*86400_000)}},{source:{...item.source,published_at:stamp(2*3600_000)}},{source:{...item.source,published_at:'2026-10-11T09:00:00'}}])expect(parseInsights(feed([{...item,...changes}]),now)?.items).toHaveLength(0)
  expect(parseInsights(feed([item,item]),now)?.items).toHaveLength(1)

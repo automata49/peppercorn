@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test'
 import {parsePremiumInsights,premiumChannel} from '../src/lib/premiumInsights'
-const feed=()=>({version:1,collected_at:new Date().toISOString(),state:'collected',ai_status:'ready',items:[{id:'test',url:premiumChannel+'/contents/261012083419860vz',title:'산업 변화 관찰',summary:'공개 미리보기에서 살펴본 산업의 변화입니다.',summary_kind:'public_preview_draft',evidence:'공개 미리보기에서 살펴본',model:'gemini-2.5-flash-lite'}]})
+const feed=()=>({version:1,collected_at:new Date().toISOString(),state:'collected',ai_status:'ready',items:[{id:'test',url:premiumChannel+'/contents/261012083419860vz',title:'산업 변화 관찰',summary:'공개 미리보기에서 살펴본 산업의 변화입니다.',summary_kind:'public_preview_draft',evidence:'공개 미리보기에서 살펴본',model:'gemini-3.5-flash-lite'}]})
 test('reject expired, foreign-channel and fabricated title-only summaries',()=>{
  expect(parsePremiumInsights(feed())?.items).toHaveLength(1)
  expect(parsePremiumInsights({...feed(),collected_at:'2020-01-01T00:00:00Z'})).toBeNull()

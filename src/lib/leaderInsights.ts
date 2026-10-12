@@ -28,7 +28,7 @@ export function parseInsights(value:unknown,now=Date.now()):InsightsFeed|null {
   if(!(now-publishedAt>=-3600_000&&now-publishedAt<=articleAge&&now-collected>=-3600_000&&now-collected<=maxAge&&expires>now&&expires<=collected+maxAge&&expires<=publishedAt+articleAge))continue
   if(!url(i.source.url,[new URL(config.feed).hostname]))continue
   if(i.summary_kind==='ai_draft'){
-   if(i.model!=='gemini-2.5-flash-lite'||i.prompt_version!=='folio-news-1'||!text(i.evidence,100)||i.evidence!.length<8||!text(i.summary,180)||!(date(i.generated_at)<=now+3600_000&&date(i.generated_at)>=publishedAt))continue
+   if(!['gemini-3.5-flash-lite','gemini-2.5-flash-lite'].includes(String(i.model))||i.prompt_version!=='folio-news-1'||!text(i.evidence,100)||i.evidence!.length<8||!text(i.summary,180)||!(date(i.generated_at)<=now+3600_000&&date(i.generated_at)>=publishedAt))continue
   }else if(i.summary_kind!=='source_excerpt')continue
   let image:InsightImage|null=null
   const candidate=i.image
