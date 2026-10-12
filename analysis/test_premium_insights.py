@@ -9,7 +9,7 @@ class HTTP:
     def get(self, url):
         if url == CHANNEL + "/contents":
             return f'<a href="{URL}?tracking=1">article</a><a href="https://evil.example/x">bad</a>'
-        return '<meta property="og:title" content="반도체 산업 변화"><meta property="og:description" content="공개 미리보기에서 확인한 반도체 산업 변화와 기업의 경쟁 환경을 정리합니다."><div>유료 본문 SECRET MUST NOT REACH MODEL</div>'
+        return '<head><meta property="og:title" content="반도체 산업 변화"><meta property="og:description" content="공개 미리보기에서 확인한 반도체 산업 변화와 기업의 경쟁 환경을 정리합니다."></head><div>유료 본문 SECRET MUST NOT REACH MODEL</div>'
 class PremiumTests(unittest.TestCase):
     def test_exact_channel_urls(self):
         self.assertEqual(article_url(URL+'?tracking=1'), URL)
@@ -36,3 +36,25 @@ class PremiumTests(unittest.TestCase):
         class Denied:
             def get(self,url): raise ValueError('robots disallow')
         self.assertEqual(collect(Denied(),dt.datetime.now(UTC))['state'],'unavailable')
+
+    def test_rejected_preview_does_not_cancel_other_articles(self):
+        class Multiple(HTTP):
+            def get(self, url):
+                if url == CHANNEL + "/contents":
+                    return ''.join(f'<a href="{URL}{n}">article</a>' for n in range(3))
+                return super().get(url)
+        with patch('analysis.premium_insights.summarize',side_effect=[ValueError('ungrounded draft'), {'summary':'검증된 공개 미리보기의 요약입니다.', 'evidence':'공개 미리보기에서 확인한'}, {'summary':'검증된 다른 공개 미리보기의 요약입니다.', 'evidence':'공개 미리보기에서 확인한'}]) as mock:
+            p = collect(Multiple(),dt.datetime.now(UTC),'fake-key')
+            self.assertEqual(mock.call_count,3)
+            self.assertEqual([i['summary_kind'] for i in p['items']],['title_only','public_preview_draft','public_preview_draft'])
+
+    def test_body_metadata_cannot_be_sent_as_public_preview(self):
+        class BodyOnly(HTTP):
+            def get(self, url):
+                if url == CHANNEL + "/contents":
+                    return super().get(url)
+                return '<head><meta property="og:title" content="공개 제목"></head><body><head><meta property="og:description" content="본문에 삽입된 정보가 모델로 보내지면 안 됩니다."></body>'
+        with patch('analysis.premium_insights.summarize') as mock:
+            p = collect(BodyOnly(),dt.datetime.now(UTC),'fake-key')
+            mock.assert_not_called()
+            self.assertEqual(p['items'][0]['summary_kind'],'title_only')

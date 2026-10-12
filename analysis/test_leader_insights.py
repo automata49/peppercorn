@@ -61,6 +61,12 @@ class LeaderInsightsTests(unittest.TestCase):
             self.assertIn("untrusted DATA", payload["systemInstruction"]["parts"][0]["text"])
             self.assertNotIn("portfolio", payload["contents"][0]["parts"][0]["text"])
             self.assertEqual(payload["generationConfig"]["temperature"], 0)
+            props = payload["generationConfig"]["responseJsonSchema"]["properties"]
+            self.assertEqual(props["source_id"]["enum"], [article["id"]])
+            for fragment in props["evidence"]["enum"]:
+                self.assertIn(fragment, article["text"])
+                self.assertTrue(8 <= len(fragment) <= 100)
+                self.assertLessEqual(len(fragment.split()),20)
             return {"candidates": [{"content": {"parts": [{"text": json.dumps(draft(article))}]}}]}
         self.assertEqual(li.summarize(article, "not-a-real-key", post), draft(article))
 
@@ -70,6 +76,24 @@ class LeaderInsightsTests(unittest.TestCase):
         self.assertEqual(result["ai_status"], "unavailable")
         self.assertEqual(result["items"][0]["summary_kind"], "source_excerpt")
         self.assertNotIn("secret-example", json.dumps(result))
+
+    def test_rejected_document_does_not_stop_other_issuers(self):
+        other = {**SOURCE, "ticker":"NVDA", "feed":"https://nvidianews.nvidia.com/rss-feed"}
+        class Multiple(HTTP):
+            def get(self, url):
+                if "nvidianews" in url:
+                    return FEED.replace("www.apple.com", "nvidianews.nvidia.com")
+                return super().get(url)
+        calls = []
+        def answer(article, key):
+            calls.append(article["id"])
+            if len(calls) == 1:
+                raise ValueError("ungrounded draft")
+            return draft(article)
+        with patch.object(li, "summarize", side_effect=answer):
+            result = li.collect({"sources":[SOURCE,other]},[SOURCE,other],Multiple(),NOW,"fake-key")
+        self.assertEqual(len(calls),2)
+        self.assertEqual([i["summary_kind"] for i in result["items"]],["source_excerpt","ai_draft"])
 
     def test_validated_ai_draft_has_model_and_version(self):
         with patch.object(li, "summarize", side_effect=lambda article, key: draft(article)):

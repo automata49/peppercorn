@@ -26,20 +26,29 @@ class Metadata(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.links, self.meta = [], {}
+        self.in_head = False
+        self.head_seen = False
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if tag == 'head' and not self.head_seen:
+            self.in_head, self.head_seen = True, True
         if tag == 'a' and article_url(a.get('href', '')):
             url = article_url(a['href'])
             if url not in self.links:
                 self.links.append(url)
-        if tag == 'meta':
+        if tag == 'meta' and self.in_head:
             key = a.get('property') or a.get('name')
             if key in ('og:title', 'og:description'):
                 self.meta[key] = plain(a.get('content', ''))
 
+    def handle_endtag(self, tag):
+        if tag == 'head':
+            self.in_head = False
+
 def collect(http, now, key=''):
     result = {'version': 1, 'collected_at': iso(now), 'state': 'unavailable',
               'ai_status': 'not_configured' if not key else 'no_drafts', 'items': []}
+    provider_stopped = False
     try:
         listing = Metadata()
         listing.feed(http.get(CHANNEL + "/contents"))
@@ -54,13 +63,16 @@ def collect(http, now, key=''):
                 preview = page.meta.get('og:description', '')[:1000]
                 item = {'id': hashlib.sha256(url.encode()).hexdigest()[:20], 'url': url,
                         'title': title, 'summary': '', 'summary_kind': 'title_only'}
-                if key and len(preview) >= 40 and result['ai_status'] != 'unavailable':
+                if key and len(preview) >= 40 and not provider_stopped:
                     try:
                         draft = summarize({'id': item['id'], 'title': title, 'text': preview}, key)
                         item.update(summary=draft['summary'], summary_kind='public_preview_draft',
                                     evidence=draft['evidence'], model=MODEL)
                         result['ai_status'] = 'ready'
+                    except ValueError:
+                        result['ai_status'] = 'unavailable'
                     except Exception:
+                        provider_stopped = True
                         result['ai_status'] = 'unavailable'
                 result['items'].append(item)
             except Exception:
