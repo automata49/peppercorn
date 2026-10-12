@@ -1,0 +1,27 @@
+/* OBRA-RESPONSIVE-1: horizontal theme-aware navigation replaces the black rail.
+   Compact brand bars and the four existing bottom buttons retain their owners. */
+html body .shell{display:block!important;grid-template-columns:1fr!important}
+html body .shell .app-main{width:100%;min-width:0;margin-left:0}
+@media(min-width:1280px) and (hover:hover),(min-width:1501px){
+  html body .shell>.desktop-navigation{position:sticky;top:0;z-index:45;display:flex!important;flex-direction:row;align-items:center;gap:24px;width:100%;height:76px;min-height:76px;padding:12px clamp(24px,3.3vw,48px);box-sizing:border-box;border:0;border-bottom:1px solid var(--folio-line);background:var(--folio-paper)!important;color:var(--folio-ink)!important;box-shadow:none;overflow:visible}
+  .app-main>.topbar{position:static!important}
+  .desktop-navigation .folio-brand{display:flex;flex-shrink:0;padding:0!important;margin:0}
+  .desktop-navigation .folio-wordmark-system{--folio-wordmark-size:25px;height:25px!important;color:var(--folio-ink)!important}
+  .desktop-navigation .folio-wordmark-image-light{filter:none!important}
+  :root[data-theme="light"] .desktop-navigation .folio-wordmark-image-light{display:block!important}
+  :root[data-theme="light"] .desktop-navigation .folio-wordmark-image-dark{display:none!important}
+  .desktop-navigation nav{display:flex!important;flex-direction:row;align-items:center;gap:8px;margin:0}
+  .desktop-navigation nav button{display:flex;align-items:center;justify-content:center;gap:8px;min-width:76px;min-height:44px;padding:10px 14px!important;border:0;border-radius:10px;background:transparent!important;color:var(--folio-muted)!important;font-size:14px!important;font-weight:500}
+  .desktop-navigation nav button:hover{background:var(--folio-reference-field)!important;color:var(--folio-ink)!important}
+  .desktop-navigation nav button.active{background:var(--folio-reference-field)!important;color:var(--folio-ink)!important;box-shadow:none!important}
+  html body .shell>.desktop-navigation nav button.active :is(.nav-label,.nav-icon){color:var(--folio-ink)!important}
+  .desktop-navigation nav button.active::before{display:none!important}
+  .desktop-navigation .nav-icon,.desktop-navigation .nav-label{display:inline-flex!important;font-size:14px!important}
+  .desktop-navigation .sidebar-tools{display:flex;align-items:center;gap:8px;margin:0 0 0 auto!important;padding:10px 14px;min-height:44px;color:var(--folio-ink)!important;border:1px solid var(--folio-line)!important;border-radius:10px;background:transparent!important;font-size:13px}
+  .desktop-navigation .side-foot{position:static;display:block;margin:0;padding:0;border:0;flex-shrink:0}
+  .desktop-navigation .side-foot-meta{display:none}
+  .desktop-navigation .theme-control{width:164px;border:1px solid var(--folio-line)!important;border-radius:10px;background:var(--folio-reference-field)!important}
+  .desktop-navigation .theme-control button{min-height:40px;border-radius:7px;color:var(--folio-muted)!important;background:transparent!important}
+  .desktop-navigation .theme-control button[aria-pressed="true"]{background:var(--folio-paper)!important;color:var(--folio-ink)!important;box-shadow:none!important}
+}
+@media(max-width:1279px),(hover:none) and (max-width:1500px){html body .shell>.desktop-navigation{display:none!important}}

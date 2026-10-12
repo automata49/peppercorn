@@ -62,8 +62,8 @@ for(const view of views){
   }else{
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u2')
+    await expect(sideBrand.locator('.folio-wordmark-image-light')).toBeVisible()
+    await expect(sideBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
 

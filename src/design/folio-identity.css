@@ -2693,8 +2693,6 @@ h1,h2,h3,.panel-head h2,.dashboard-section-head h2,.analysis-hero .hero-name{
 }
 .folio-wordmark-image-light{display:block!important}
 .folio-wordmark-image-dark{display:none!important}
-.sidebar .folio-wordmark-image-light{display:none!important}
-.sidebar .folio-wordmark-image-dark{display:block!important}
 :root[data-theme="dark"] .folio-wordmark-image-light{display:none!important}
 :root[data-theme="dark"] .folio-wordmark-image-dark{display:block!important}
 @media(prefers-color-scheme:dark){

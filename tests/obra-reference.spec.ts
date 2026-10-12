@@ -14,7 +14,7 @@ async function boot(page:Page,theme:string){
 }
 for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(`reference ${width} ${theme}: composition and connected tabs`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'});const page=await context.newPage();await boot(page,theme)
- const menu=await page.locator('.obra-masthead').getByRole('button',{name:'전체 메뉴 열기'}).boundingBox();expect(menu!.width).toBeGreaterThanOrEqual(44);expect(menu!.height).toBeGreaterThanOrEqual(44)
+ const menu=await page.getByRole('button',{name:width>=1280?'도구 및 설정':'전체 메뉴 열기',exact:true}).first().boundingBox();expect(menu!.width).toBeGreaterThanOrEqual(44);expect(menu!.height).toBeGreaterThanOrEqual(44)
  const cards=page.locator('.home-motion-card');await expect(cards).toHaveCount(4)
  const first=await cards.nth(0).boundingBox(),second=await cards.nth(1).boundingBox();expect(first!.x).toBeLessThan(second!.x);expect(first!.height).toBeGreaterThan(second!.height)
  await expect(page.locator('.home-heading p')).toBeVisible()

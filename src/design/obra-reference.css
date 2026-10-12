@@ -13,7 +13,7 @@
 .obra-detail .analysis-main.analysis-card{padding:0!important;margin:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
 .obra-detail .analysis-hero{padding:0!important;margin:0!important;border:0!important;background:transparent!important}
 .obra-detail .hero-meta{font-size:11px!important;line-height:1.5;margin:0;color:var(--folio-muted)!important}
-.obra-detail .hero-name{font-size:42px!important;line-height:1.1!important;margin:20px 0 10px!important}
+.obra-detail .hero-name{font-size:var(--folio-reference-title)!important;line-height:1.1!important;margin:20px 0 10px!important}
 .obra-detail .hero-company{font-size:14px;color:var(--folio-muted);margin:0 0 20px}
 .obra-detail .obra-status{display:inline-block;font-size:12px;line-height:1.5;padding:6px 12px;background:var(--folio-reference-field);border-radius:14px;color:var(--folio-ink)}
 .obra-quote{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 20px;font-size:11px;color:var(--folio-muted)}
@@ -26,7 +26,7 @@
 .obra-feature{padding:28px 0;border-bottom:1px solid var(--folio-line)}
 .obra-feature>span,.obra-thesis-preview>span{font-size:11px;line-height:1.5;font-weight:500;letter-spacing:.06em;color:var(--folio-muted)}
 .obra-feature h3,.obra-thesis-preview h3{font-family:var(--folio-editorial-font);font-weight:var(--folio-editorial-weight);letter-spacing:var(--folio-editorial-tracking);word-break:keep-all}
-.obra-feature h3{font-size:32px;line-height:1.3;margin:14px 0 18px}
+.obra-feature h3{font-size:clamp(32px,3.5vw,48px);line-height:1.3;margin:14px 0 18px}
 .obra-feature p{font-size:14px;line-height:1.8;margin:0;color:var(--folio-muted)}
 .obra-thesis-preview{padding-top:26px}
 .obra-thesis-preview h3{font-size:25px;line-height:1.3;margin:12px 0 20px}
@@ -39,6 +39,34 @@ html body .shell .app-main .obra-detail .analysis-secondary-body>.analysis-block
 .obra-market-details{padding-top:28px;min-width:0}
 .obra-market-details .price-rs{margin-top:16px}
 .obra-instrument-context{padding:24px 0;font-size:12px}
-.obra-instrument-context .hero-chips{margin-top:16px;flex-wrap:wrap}
+.obra-instrument-context .hero-chips{display:flex;gap:6px;margin-top:16px;flex-wrap:wrap}
 
 :root .obra-detail .analysis-actionbar button.primary{background:var(--folio-ink)!important;color:var(--folio-paper)!important}
+
+/* OBRA-RESPONSIVE-1: the reference composition expands with its viewport. */
+.obra-back-label{display:none}
+@media(min-width:768px){
+  .obra-overview{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(28px,4vw,64px);border-bottom:1px solid var(--folio-line);padding-bottom:32px}
+  .obra-feature{border:0;padding-bottom:0}
+  .obra-thesis-preview{padding-top:28px;min-width:0}
+  .obra-detail .analysis-detail-tabs{grid-template-columns:repeat(4,minmax(0,160px));justify-content:start}
+  .obra-detail .analysis-detail-tabs button{font-size:13px!important}
+  .obra-detail .analysis-secondary-body{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:32px!important}
+  .obra-detail .insight-block,.obra-detail .analysis-secondary[aria-labelledby="detail-tab-analysis"] .analysis-block,.obra-detail .analysis-secondary[aria-labelledby="detail-tab-financials"] .analysis-block,.obra-detail .analysis-judgement{grid-column:1/-1}
+  .obra-detail .hero-meta,.obra-quote,.obra-detail .obra-quote .hero-price,.obra-detail .obra-quote .hero-change{font-size:13px!important}
+}
+@media(min-width:1280px) and (hover:hover),(min-width:1501px){
+  .lifestyle-home>.obra-masthead{display:none}
+  .obra-masthead .obra-back .folio-wordmark-system{display:none!important}
+  .obra-back-label{display:inline;font-size:13px}
+}
+
+@media(min-width:1024px){
+  .obra-detail .analysis-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,340px);column-gap:40px;padding-bottom:24px!important}
+  .obra-detail .hero-meta{grid-column:1/-1}
+  .obra-detail .hero-name{grid-column:1;grid-row:2}
+  .obra-detail .hero-company{grid-column:1;grid-row:3;margin-bottom:0}
+  .obra-detail .obra-status{grid-column:2;grid-row:2;justify-self:end;align-self:center}
+  .obra-detail .obra-quote{grid-column:2;grid-row:3;justify-content:flex-end;align-items:baseline;margin:0}
+  .obra-detail .obra-quote .hero-price{font-size:24px!important;font-weight:500!important}
+}

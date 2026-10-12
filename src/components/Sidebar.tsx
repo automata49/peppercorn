@@ -97,7 +97,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
   </section>)}</nav>
 
   return <>
-    <aside className="sidebar">
+    <header className="sidebar desktop-navigation">
       <div className="brand folio-brand"><FolioBrand/></div>
       {navigation}
       <button className="sidebar-tools" onClick={()=>setOpen(true)} aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/>도구 및 설정</button>
@@ -105,7 +105,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
         <ThemeControl value={theme} onChange={setTheme}/>
         <div className="side-foot-meta">Investment Workspace <b>v0.1</b></div>
       </div>
-    </aside>
+    </header>
 
     <div className="mobile-brandbar">
       <button className="mobile-brand-home" onClick={()=>setPage('today')} aria-label="오늘로 이동">
