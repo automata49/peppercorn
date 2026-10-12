@@ -35,6 +35,16 @@ jobs:
                   reason = str(error) if type(error) is ValueError and str(error) in allowed else type(error).__name__
                   print('PROVIDER_RESULT=failed; HTTP_STATUS=' + str(getattr(error, 'code', None)) + '; VALIDATION=' + reason)
           import json
+          original = adapter.summarize
+          def checked(*args, **kwargs):
+              try:
+                  return original(*args, **kwargs)
+              except Exception as error:
+                  allowed = {'invalid draft schema','ungrounded draft','draft size','generated link or HTML','unsupported numeric token','investment instruction','oversized model response'}
+                  reason = str(error) if type(error) is ValueError and str(error) in allowed else type(error).__name__
+                  print('PUBLIC_DRAFT_FAILURE=' + reason + '; HTTP_STATUS=' + str(getattr(error, 'code', None)))
+                  raise
+          adapter.summarize = checked
           import analysis.premium_insights as premium
           premium.HOSTS.clear()
           premium.HOSTS.add('contents.premium.naver.com')
