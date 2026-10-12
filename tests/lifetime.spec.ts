@@ -15,7 +15,7 @@ async function compose(page:Page,title:string){const questions=page.locator('.jo
 for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, revisit, revise and keyboard tabs`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440});const page=await context.newPage();await setup(page)
  await expect(page.locator('.journey-today')).toHaveCount(0)
- if(width<1440){await expect(page.locator('.mobile-brandbar')).toBeVisible();expect(await page.locator('.mobile-brandbar .folio-wordmark-system>img:visible').count()).toBe(1)}
+ await expect(page.locator('.obra-masthead')).toBeVisible();expect(await page.locator('.obra-masthead .folio-wordmark-system>img:visible').count()).toBe(1)
  await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정'])
  await openPage(page,'저널');await page.getByRole('button',{name:'새 페이지',exact:true}).click();await compose(page,'기다림도 하나의 결정')
  await page.getByText('손글씨 추가',{exact:true}).click();await page.getByRole('button',{name:'필기 시작',exact:true}).click()

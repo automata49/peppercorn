@@ -1,5 +1,10 @@
 # Folio xx — four-screen acceptance contract
 
+## OBRA-REFERENCE-1 — user direction (2026-10-13)
+
+Implement the first Modern Magazine Obra preview's Home and stock-detail composition. Use its 390px editorial column, 24px gutter, 42px titles, compact 1.1/.9 two-column photo grid (10px gaps, 94px rows; 110px phone rows), 16px photo corners, flat detail rules and two inline actions. This supersedes FILM-MOTION-2 phone stacking and older detail glass/floating toolbar rules for these two surfaces. Preserve the existing bottom navigation unchanged, original photography priority/Motion dismissal, theme/market semantics, all Overview/Analysis/Financials/Thesis data/editing and chart/compare actions. Prototype question field opens the existing persistent Thesis editor. Device frame and mock-data text are preview-only.
+
+
 ## FILM-MOTION-2 — latest user authority (2026-10-12)
 
 - User chose an independent in-app film expression inspired by VSCO's published examples, not licensed VSCO presets or API integration. Generated defaults use modernist photographic composition. Apply the same subtle warm/faded display treatment to default and personal home-cover photos; preserve uploaded originals and backups unchanged.

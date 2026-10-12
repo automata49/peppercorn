@@ -1,5 +1,10 @@
 # Folio xx — Design Baseline v1.0
 
+## OBRA-REFERENCE-1 — user direction (2026-10-13)
+
+Implement the first Modern Magazine Obra preview's Home and stock-detail composition. Use its 390px editorial column, 24px gutter, 42px titles, compact 1.1/.9 two-column photo grid (10px gaps, 94px rows; 110px phone rows), 16px photo corners, flat detail rules and two inline actions. This supersedes FILM-MOTION-2 phone stacking and older detail glass/floating toolbar rules for these two surfaces. Preserve the existing bottom navigation unchanged, original photography priority/Motion dismissal, theme/market semantics, all Overview/Analysis/Financials/Thesis data/editing and chart/compare actions. Prototype question field opens the existing persistent Thesis editor. Device frame and mock-data text are preview-only.
+
+
 ## OBRA-EDITORIAL-1 — user direction 2026-10-12
 
 All destinations share Obra/shadcn semantic component tokens, 44px controls, keyboard-focus and disabled states. Home, large headings and key statements use the shared editorial typography roles with Modern/Classic/Art expressions; numeric data and functional UI keep the grotesk stack. See `FOLIO_OBRA_EDITORIAL.md`. This supersedes older Today-only Obra scope and the single-family rule for editorial titles only. Supplied identity, theme, approved Motion/glass surfaces and finance logic remain authoritative.

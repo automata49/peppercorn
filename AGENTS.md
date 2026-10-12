@@ -1,5 +1,10 @@
 # Peppercorn — Codex
 
+## OBRA-REFERENCE-1 — user direction (2026-10-13)
+
+Implement the first Modern Magazine Obra preview's Home and stock-detail composition. Use its 390px editorial column, 24px gutter, 42px titles, compact 1.1/.9 two-column photo grid (10px gaps, 94px rows; 110px phone rows), 16px photo corners, flat detail rules and two inline actions. This supersedes FILM-MOTION-2 phone stacking and older detail glass/floating toolbar rules for these two surfaces. Preserve the existing bottom navigation unchanged, original photography priority/Motion dismissal, theme/market semantics, all Overview/Analysis/Financials/Thesis data/editing and chart/compare actions. Prototype question field opens the existing persistent Thesis editor. Device frame and mock-data text are preview-only.
+
+
 ## MULTI-USER-1 — user authority (2026-10-12)
 
 Folio allows multiple independent user accounts. Supersedes all earlier single-owner/Setup Code restrictions: email registration uses GoTrue public signup with email verification and existing rate limits, never admin create/auto-confirm. Any valid Google PKCE session is accepted; enabling the Google provider is a separate configuration gate. Signup without a session displays confirmation instructions, not a signed-in state. Email confirmation returns to the login screen. All workspace cache keys are account-scoped, guests retain their own device records, and cloud writes require that account/resource's successful read. Late responses after account changes must not affect the new session. Keep database auth.uid() RLS and security_invoker views. Photo/ink notebooks remain device-local and account-scoped; do not imply cloud sync.

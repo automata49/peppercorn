@@ -1,4 +1,5 @@
 import { TypographySettings, useEditorialStyle } from './components/TypographySettings'
+import { ObraMasthead, ObraOverview } from './components/ObraPage'
 import { Button } from './components/ui/button'
 import { useAccountRows, migrateLegacyWorkspace } from './lib/accountRows'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
@@ -577,12 +578,17 @@ function AnalysisHero({row}:{row:LeaderRow}){
   const q=useLiveQuotes([row],1)(row)
   const change=liveChange(q)
   const diff=q&&q.previous_close?q.price-q.previous_close:null
-  const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
   return <section className="analysis-hero" data-market={row.market}>
     <p className="hero-meta">{row.market} · {row.ticker} · {row.exchange||row.market} · {row.industry||'분류 확인'}</p>
     <h2 className="hero-name">{row.name}</h2>
-    <div className={'hero-price'+(q?' live-price':'')}>{priceText(row,q?.price??row.price)}</div>
-    <div className={'hero-change '+signTone(change)}>{q&&change!=null?<>{change>0?'▲ ':change<0?'▼ ':''}{diff==null?'':priceText(row,Math.abs(diff))+' '}({pct(change)})</>:'일간 종가'}<span> · {q?'실시간'+(q.time?' '+liveQuoteTime(q):''):'장 마감 기준'}</span></div>
+    <p className="hero-company">기업을 읽는 시간</p>
+    <span className="obra-status">{leadership(row)||'관찰'}</span>
+    <div className="obra-quote"><span className={'hero-price'+(q?' live-price':'')}>{priceText(row,q?.price??row.price)}</span><span className={'hero-change '+signTone(change)}>{q&&change!=null?<>{change>0?'▲ ':change<0?'▼ ':''}{diff==null?'':priceText(row,Math.abs(diff))+' '}({pct(change)})</>:'일간 종가'}<span> · {q?'실시간'+(q.time?' '+liveQuoteTime(q):''):'장 마감 기준'}</span></span></div>
+  </section>
+}
+function InstrumentContext({row}:{row:LeaderRow}){
+  const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
+  return <section className="obra-instrument-context" aria-label="종목 정보">
     <div className="external-links hero-links">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
@@ -1123,7 +1129,7 @@ export default function App(){
   let content:ReactNode
   const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
   if(page==='today'){
-    content=<LifestyleHome entries={notebook.entries} leaders={todayLeaderRows} research={research} theses={enrichedAnalysis as EditableRow[]} trades={enrichedJournal} insights={leaderInsights} source={source} onSelect={openAnalysisStock} navigate={navigatePage}/>
+    content=<LifestyleHome entries={notebook.entries} leaders={todayLeaderRows} research={research} theses={enrichedAnalysis as EditableRow[]} trades={enrichedJournal} insights={leaderInsights} source={source} onSelect={openAnalysisStock} navigate={navigatePage} onMenu={()=>setMenuOpen(true)}/>
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
     content=<LifetimeJournal key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:enrichedAnalysis as EditableRow[],trades:enrichedJournal,insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
@@ -1336,7 +1342,12 @@ export default function App(){
     const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
     const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');setPage('thesis');window.scrollTo({top:0,behavior:'instant'})}
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
-    content=<><div className="analysis-page">
+    const detailActions=<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
+      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected?.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
+      <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
+    </div>
+    content=<><div className={'analysis-page'+(page==='analysis'&&analysisDetail?' obra-detail':'')}>
+      {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={()=>setAnalysisDetail(false)}/>}
       {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>오늘의 주도주</h2><p>변화하는 세상에서 기업을 발견하고, 나의 판단을 기록하세요.</p><button className="dashboard-section-action" onClick={()=>setDiscoverTab('signal')}>시장 신호 →</button></div></section>
       <div className="analysis-finder">
         <MarketSegment label="탐색" value={market} onChange={setMarket}/>
@@ -1349,17 +1360,18 @@ export default function App(){
           <StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list"/>
         </div>
       </div></>}
-      {page==='analysis'&&analysisDetail&&<button className="secondary-action journey-back" onClick={()=>setAnalysisDetail(false)}>← 탐색 목록</button>}
+
       {page==='thesis'&&<section className="journey-theses"><div className="journey-heading"><h2>내 투자 근거</h2><button className="dashboard-section-action" onClick={()=>navigatePage('analysis')}>종목 찾기 →</button></div><DecisionList items={(enrichedAnalysis as EditableRow[]).filter(r=>r.ticker).map((r,i)=>({key:String(r.id||i),data:r,title:String(r.name||r.ticker),meta:String(r.conclusion||'투자 근거를 작성하세요.'),eyebrow:String(r.market)+' · '+String(r.ticker)+' · '+String(r.date||'')}))} onSelect={r=>{setSelectedRecordId(r.id!=null?String(r.id):null);const hit=matchLeader(r);if(hit)setSelected(hit);setAnalysisSection('thesis')}} emptyLabel="아직 기록이 없습니다. 탐색에서 종목을 고르고 Thesis를 작성하세요."/></section>}
       {archived&&record&&<section className="analysis-card"><h3>{String(record.name||record.ticker)}</h3><p className="note">현재 유니버스에 없는 보관 기록입니다. 시장 데이터 없이 기존 투자 근거를 편집할 수 있습니다.</p><AnalysisSheet row={{name:String(record.name||record.ticker)}} record={record} onCreate={()=>{}} onChange={(field,value)=>updateAnalysisField(record,field,value)}/></section>}
       {selected&&!archived&&(page==='analysis'?analysisDetail:!!record)?<div className="analysis-body">
-        <div className="analysis-main analysis-card">
-          {page==='analysis'&&<section className="analysis-block analysis-price-momentum" data-market={selected.market}><AnalysisHero row={selected}/><PriceRsChart row={selected} rows={leaders}/></section>}
+        <div className={'analysis-main analysis-card'+(page==='analysis'?' analysis-price-momentum':'')} data-market={selected.market}>
+          {page==='analysis'&&<AnalysisHero row={selected}/>}
           {page==='thesis'&&<div className="journey-heading"><h3>{selected.name} · {selected.ticker}</h3><button className="dashboard-section-action" onClick={()=>openAnalysisStock(selected)}>종목 상세 →</button></div>}
           {page==='analysis'&&<nav className="analysis-detail-tabs" role="tablist" aria-label="종목 분석 영역">
-            {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
+            {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" id={"detail-tab-"+key} aria-controls="detail-panel" tabIndex={analysisSection===key?0:-1} onKeyDown={e=>{const keys=["overview","analysis","financials","thesis"] as const;const i=keys.indexOf(key);const next=e.key==="ArrowRight"?keys[(i+1)%4]:e.key==="ArrowLeft"?keys[(i+3)%4]:e.key==="Home"?keys[0]:e.key==="End"?keys[3]:null;if(next){e.preventDefault();setAnalysisSection(next);document.getElementById("detail-tab-"+next)?.focus()}}} aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
           </nav>}
-          <div className="analysis-secondary">
+          <div className="analysis-secondary" id="detail-panel" role={page==='analysis'?'tabpanel':undefined} aria-labelledby={page==='analysis'?'detail-tab-'+analysisSection:undefined}>
+            {page==='analysis'&&analysisSection==='overview'&&<ObraOverview conclusion={String(record?.conclusion||'')} onWrite={goJudgement}>{detailActions}</ObraOverview>}
             {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)}/></section>
               <section className="analysis-block"><h3 className="block-title">Essential Stats</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
@@ -1389,12 +1401,9 @@ export default function App(){
               </section>
             </div>}
           </div>
+          {page==='analysis'&&analysisSection!=='overview'&&detailActions}
+          {page==='analysis'&&<section className="obra-market-details" aria-label="시세와 가격 모멘텀"><h3 className="block-title">Price &amp; Relative Strength</h3><PriceRsChart row={selected} rows={leaders}/><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
         </div>
-        {page==='analysis'&&<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
-          <Button variant="secondary" size="icon" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★':'☆'}</Button>
-          <Button variant="secondary" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button>
-          <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
-        </div>}
       </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
       </div>
       {page==='thesis'&&<div ref={analysisRecordsRef} className="records-anchor">
@@ -1580,5 +1589,5 @@ export default function App(){
       <div className="ui-alert-actions"><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={confirmDeleteAnalysis}>삭제</AlertDialogAction></div>
     </AlertDialogContent>
   </AlertDialog>
-  return <LiveQuoteProvider enabled={source==='supabase'}><motion.div initial={false} animate={{opacity:showIntro?0:1,y:showIntro?8:0}} transition={{duration:reduceLaunchMotion?0:.4,ease:[.22,1,.36,1]}} inert={showIntro} data-market={market} className={'shell page-shell-'+page+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</motion.div><AnimatePresence>{showIntro&&<motion.div key="launch" initial={{opacity:1}} exit={{opacity:0}} transition={{duration:reduceLaunchMotion?0:.35}} ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/></motion.div>}</AnimatePresence></LiveQuoteProvider>
+  return <LiveQuoteProvider enabled={source==='supabase'}><motion.div initial={false} animate={{opacity:showIntro?0:1,y:showIntro?8:0}} transition={{duration:reduceLaunchMotion?0:.4,ease:[.22,1,.36,1]}} inert={showIntro} data-market={market} className={'shell page-shell-'+page+(page==='analysis'&&analysisDetail?' obra-detail-shell':'')+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</motion.div><AnimatePresence>{showIntro&&<motion.div key="launch" initial={{opacity:1}} exit={{opacity:0}} transition={{duration:reduceLaunchMotion?0:.35}} ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/></motion.div>}</AnimatePresence></LiveQuoteProvider>
 }
