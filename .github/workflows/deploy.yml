@@ -158,11 +158,13 @@ jobs:
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
           mkdir -p data
-          if [ -f dist/data/leader-insights.json ]; then
-            cp dist/data/leader-insights.json data/leader-insights.json
-          else
-            rm -f data/leader-insights.json
-          fi
+          for feed in leader-insights premium-insights; do
+            if [ -f "dist/data/$feed.json" ]; then
+              cp "dist/data/$feed.json" "data/$feed.json"
+            else
+              rm -f "data/$feed.json"
+            fi
+          done
           # Keep every active Folio identity asset at the branch root too. GitHub Pages can
           # publish the root sync after the Actions artifact deploy, so omitting these files
           # leaves the live shell with broken wordmark / launch / motif image URLs.
@@ -198,9 +200,11 @@ jobs:
             folio-brand-wordmark-light.webp folio-brand-wordmark-dark.webp \
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
-          if [ -f data/leader-insights.json ] || git ls-files --error-unmatch data/leader-insights.json >/dev/null 2>&1; then
-            git add -A -- data/leader-insights.json
-          fi
+          for feed in leader-insights premium-insights; do
+            if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
+              git add -A -- "data/$feed.json"
+            fi
+          done
           if ! git diff --cached --quiet; then
             git commit -m "chore: sync built Pages output [skip ci]"
             git push
