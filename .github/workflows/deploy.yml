@@ -189,6 +189,10 @@ jobs:
           do
             cp "dist/$f" "$f"
           done
+          # Keep self-hosted editorial fonts available when Pages serves the
+          # branch-root mirror as well as the Actions artifact.
+          mkdir -p fonts
+          cp -R dist/fonts/. fonts/
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -200,6 +204,7 @@ jobs:
             folio-brand-wordmark-light.webp folio-brand-wordmark-dark.webp \
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
+          git add fonts
           for feed in leader-insights premium-insights; do
             if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
               git add -A -- "data/$feed.json"
