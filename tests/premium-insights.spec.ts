@@ -1,0 +1,28 @@
+import {test,expect} from '@playwright/test'
+import {parsePremiumInsights,premiumChannel} from '../src/lib/premiumInsights'
+const feed=()=>({version:1,collected_at:new Date().toISOString(),state:'collected',ai_status:'ready',items:[{id:'test',url:premiumChannel+'/contents/261012083419860vz',title:'산업 변화 관찰',summary:'공개 미리보기에서 살펴본 산업의 변화입니다.',summary_kind:'public_preview_draft',evidence:'공개 미리보기에서 살펴본',model:'gemini-2.5-flash-lite'}]})
+test('reject expired, foreign-channel and fabricated title-only summaries',()=>{
+ expect(parsePremiumInsights(feed())?.items).toHaveLength(1)
+ expect(parsePremiumInsights({...feed(),collected_at:'2020-01-01T00:00:00Z'})).toBeNull()
+ expect(parsePremiumInsights({...feed(),items:[{...feed().items[0],url:'https://evil.example/x'}]})?.items).toHaveLength(0)
+ expect(parsePremiumInsights({...feed(),items:[{...feed().items[0],summary_kind:'title_only'}]})?.items).toHaveLength(0)
+})
+for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(`Today insights ${width} ${theme}`,async({page})=>{
+ await page.setViewportSize({width,height:1000})
+ await page.addInitScript(theme=>{localStorage.setItem('folio-theme',theme);sessionStorage.setItem('peppercorn-intro-seen','1')},theme)
+ await page.route('**/data/premium-insights.json',r=>r.fulfill({json:feed()}))
+ await page.goto('/peppercorn/')
+ await page.getByRole('button',{name:'오늘 카드 열기'}).click()
+ const section=page.getByRole('region',{name:'HS아카데미 추천 읽을거리'})
+ await expect(section).toContainText('공개 미리보기 요약 초안')
+ await expect(section.getByRole('link',{name:'HS아카데미 원문 보기 ↗'})).toHaveAttribute('href',feed().items[0].url)
+ await expect(page.getByRole('region',{name:'Gemini AI Insights'})).toBeVisible()
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
+})
+test('source failure preserves channel link',async({page})=>{
+ await page.addInitScript(()=>sessionStorage.setItem('peppercorn-intro-seen','1'))
+ await page.route('**/data/premium-insights.json',r=>r.fulfill({status:404,body:''}))
+ await page.goto('/peppercorn/');await page.getByRole('button',{name:'오늘 카드 열기'}).click()
+ await expect(page.getByRole('link',{name:'HS아카데미 채널 전체 보기 ↗'})).toHaveAttribute('href',premiumChannel)
+ await expect(page.getByRole('region',{name:'HS아카데미 추천 읽을거리'})).toContainText('현재 공개 글 정보를 가져오지 못했습니다.')
+})

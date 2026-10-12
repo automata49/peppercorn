@@ -41,7 +41,7 @@ jobs:
       - if: github.event_name != 'workflow_run'
         run: python -m pytest -q analysis/tests
       - if: github.event_name != 'workflow_run'
-        run: python -m unittest analysis.test_leader_insights
+        run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights
       - if: github.event_name != 'workflow_run'
         run: npm run harness:check
       - if: github.event_name != 'workflow_run'
@@ -115,6 +115,12 @@ jobs:
           else
             echo "::warning::No current leaderboard: editorial collection skipped"
           fi
+      - name: Collect HS Academy public metadata
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python -m analysis.premium_insights
       # STOCK-FLAGS-1 + GROWTH-1/SEPA-1: display-only badges.
       # UI/code pushes should not wait on the slow external refresh. They reuse the currently published
       # snapshot; the market-refresh workflow is the single place that recalculates the file.
