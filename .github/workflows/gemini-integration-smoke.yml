@@ -7,7 +7,7 @@ permissions:
 jobs:
   provider:
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 7
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,4 +34,10 @@ jobs:
                   allowed = {'invalid draft schema','ungrounded draft','draft size','generated link or HTML','unsupported numeric token','investment instruction','oversized model response'}
                   reason = str(error) if type(error) is ValueError and str(error) in allowed else type(error).__name__
                   print('PROVIDER_RESULT=failed; HTTP_STATUS=' + str(getattr(error, 'code', None)) + '; VALIDATION=' + reason)
+          import json
+          import analysis.premium_insights as premium
+          premium.HOSTS.clear()
+          premium.HOSTS.add('contents.premium.naver.com')
+          result = premium.collect(premium.PublicHTTP(), premium.dt.datetime.now(premium.UTC), key)
+          print('PUBLIC_PREVIEW_RESULT=' + json.dumps(result, ensure_ascii=False))
           PY
