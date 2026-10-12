@@ -15,46 +15,83 @@ export function loadStoredSession(): Session | null {
 }
 export function storeSession(session:Session|null){if(session)localStorage.setItem(STORAGE_KEY,JSON.stringify(session));else localStorage.removeItem(STORAGE_KEY)}
 
-async function authRequest(body:Record<string,unknown>):Promise<Session>{
-  const res=await fetch(BASE+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+async function authResponse(body:Record<string,unknown>,signal?:AbortSignal){
+  const res=await fetch(BASE+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal})
   const payload=await res.json().catch(()=>({}));if(!res.ok)throw new Error(String(payload?.error||'auth_failed'))
+  return payload
+}
+function acceptSession(payload:any):Session{
+  if(!payload?.access_token||!payload?.refresh_token||!payload?.user?.id)throw new Error('auth_failed')
   const session=payload as Session;storeSession(session);return session
 }
-export function login(email:string,password:string){return authRequest({action:'login',email,password})}
-export function signup(email:string,password:string,setupCode:string){return authRequest({action:'signup',email,password,setup_code:setupCode})}
+async function authRequest(body:Record<string,unknown>,signal?:AbortSignal):Promise<Session>{
+  const previous=localStorage.getItem(STORAGE_KEY),payload=await authResponse(body,signal)
+  if(signal?.aborted||localStorage.getItem(STORAGE_KEY)!==previous)throw new Error('auth_cancelled')
+  return acceptSession(payload)
+}
+export function login(email:string,password:string,signal?:AbortSignal){return authRequest({action:'login',email,password},signal)}
+export async function signup(email:string,password:string,signal?:AbortSignal):Promise<Session|null>{
+  const previous=localStorage.getItem(STORAGE_KEY),payload=await authResponse({action:'signup',email,password},signal)
+  if(signal?.aborted||localStorage.getItem(STORAGE_KEY)!==previous)throw new Error('auth_cancelled')
+  return payload.confirmation_required===true?null:acceptSession(payload)
+}
 // GOOGLE-LOGIN-1: Supabase Auth's Google provider with PKCE. The browser goes to /auth/v1/authorize and comes back to
 // this page with ?code=…; the auth function exchanges the code (no API key in the app). The verifier lives in
 // sessionStorage for that one round trip only.
 const AUTH_BASE = BASE.replace('/functions/v1', '/auth/v1')
 const PKCE_KEY = 'peppercorn-pkce-verifier'
+const PKCE_SESSION_KEY = 'peppercorn-pkce-session'
 const b64url = (bytes:Uint8Array) => btoa(String.fromCharCode(...bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')
 export async function googleAuthorizeUrl(returnTo=location.origin+location.pathname){
   const verifier=b64url(crypto.getRandomValues(new Uint8Array(48)))
   const challenge=b64url(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier))))
   sessionStorage.setItem(PKCE_KEY,verifier)
+  sessionStorage.setItem(PKCE_SESSION_KEY,localStorage.getItem(STORAGE_KEY)||'')
   return AUTH_BASE+'/authorize?'+new URLSearchParams({provider:'google',redirect_to:returnTo,code_challenge:challenge,code_challenge_method:'s256'}).toString()
 }
-export async function startGoogleLogin(){
-  const res=await fetch(BASE+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'google_status'}),signal:AbortSignal.timeout(10000)})
+export async function startGoogleLogin(signal?:AbortSignal){
+  const res=await fetch(BASE+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'google_status'}),signal:signal?AbortSignal.any([signal,AbortSignal.timeout(10000)]):AbortSignal.timeout(10000)})
   const status=await res.json().catch(()=>({}))
   if(!res.ok||status.ready!==true)throw new Error(String(status.error||'google_unavailable'))
-  location.assign(await googleAuthorizeUrl())
+  if(signal?.aborted)return
+  const url=await googleAuthorizeUrl()
+  if(signal?.aborted){sessionStorage.removeItem(PKCE_KEY);sessionStorage.removeItem(PKCE_SESSION_KEY);return}
+  location.assign(url)
 }
 // Reads ?code / ?error (or the same in the hash) left by the redirect, removes them from the address bar, and returns
 // the new session, null when this load is not a redirect, or throws the error code.
 export async function completeGoogleLogin():Promise<Session|null>{
   const query=new URLSearchParams(location.search),hash=new URLSearchParams(location.hash.replace(/^#/,''))
   const code=query.get('code'),error=query.get('error')||hash.get('error')
+  if(query.has('email-confirmed')){
+    query.delete('email-confirmed');const rest=query.toString();history.replaceState(history.state,'',location.pathname+(rest?'?'+rest:''));throw new Error(error?'email_confirmation_failed':'email_confirmed')
+  }
   if(!code&&!error)return null
   const description=(query.get('error_description')||hash.get('error_description')||'').toLowerCase()
   for(const k of ['code','error','error_code','error_description','state'])query.delete(k)
   const rest=query.toString();history.replaceState(history.state,'',location.pathname+(rest?'?'+rest:'')+(hash.get('error')?'':location.hash))
   const verifier=sessionStorage.getItem(PKCE_KEY);sessionStorage.removeItem(PKCE_KEY)
-  if(error)throw new Error(/signup|not allowed/.test(description)?'google_not_linked':'oauth_'+error)
+  const previous=sessionStorage.getItem(PKCE_SESSION_KEY);sessionStorage.removeItem(PKCE_SESSION_KEY)
+  if(previous!==null&&previous!==(localStorage.getItem(STORAGE_KEY)||''))throw new Error('auth_cancelled')
+  if(error)throw new Error(/signup|not allowed/.test(description)?'signup_disabled':'oauth_'+error)
   if(!verifier)throw new Error('oauth_state_missing')
   return authRequest({action:'pkce',auth_code:code,code_verifier:verifier})
 }
-export function refresh(session:Session){return authRequest({action:'refresh',refresh_token:session.refresh_token})}
+const refreshRequests=new Map<string,Promise<Session>>()
+export function refresh(session:Session):Promise<Session>{
+  const previous=localStorage.getItem(STORAGE_KEY)
+  const key=session.user.id+'|'+session.refresh_token+'|'+previous
+  const existing=refreshRequests.get(key);if(existing)return existing
+  const request=(async()=>{
+    const refreshed=await authResponse({action:'refresh',refresh_token:session.refresh_token}) as Session
+    if(localStorage.getItem(STORAGE_KEY)!==previous)throw new Error('auth_cancelled')
+    if(!refreshed.access_token||refreshed.user?.id!==session.user.id)throw new Error('refresh_failed')
+    // All concurrent resource reads share this refresh; an explicit new login still invalidates it.
+    if(loadStoredSession()?.user.id===session.user.id)storeSession(refreshed)
+    return refreshed
+  })().finally(()=>refreshRequests.delete(key))
+  refreshRequests.set(key,request);return request
+}
 export async function ensureSession(session:Session):Promise<Session>{const expiresAt=Number(session.expires_at||0);if(!expiresAt||Date.now()/1000<expiresAt-90)return session;return refresh(session)}
 
 function normalize(resource:WorkspaceResource,rows:any[]):any[]{

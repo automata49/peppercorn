@@ -34,12 +34,12 @@ test('Google button sends a PKCE request and the returned code signs in',async({
   expect(await page.evaluate(()=>sessionStorage.getItem('peppercorn-pkce-verifier'))).toBeNull()
 })
 
-test('an unlinked Google account is refused with a reason',async({page})=>{
+test('an expired Google exchange is refused with a reason',async({page})=>{
   await base(page)
   await page.addInitScript(()=>sessionStorage.setItem('peppercorn-pkce-verifier','x'.repeat(64)))
-  await page.route('**/functions/v1/auth',route=>route.fulfill({status:403,json:{error:'google_not_linked'}}))
+  await page.route('**/functions/v1/auth',route=>route.fulfill({status:401,json:{error:'oauth_failed'}}))
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP+'?code=other')
-  await expect(page.locator('.auth-error')).toContainText('등록된 계정과 연결되어 있지 않습니다')
+  await expect(page.locator('.auth-error')).toContainText('Google 로그인을 확인하지 못했습니다')
   await expect(page).toHaveURL(APP)
   expect(await page.evaluate(()=>localStorage.getItem('peppercorn-session'))).toBeNull()
 })
@@ -49,7 +49,7 @@ test('a Google error in the redirect is shown without a request',async({page})=>
   let calls=0
   await page.route('**/functions/v1/auth',route=>{calls++;return route.fulfill({json:{}})})
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP+'?error=access_denied&error_description=Signups+not+allowed+for+this+instance')
-  await expect(page.locator('.auth-error')).toContainText('등록된 계정과 연결되어 있지 않습니다')
+  await expect(page.locator('.auth-error')).toContainText('회원가입이 현재 중지되어 있습니다')
   await expect(page).toHaveURL(APP)
   expect(calls).toBe(0)
 })

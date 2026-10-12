@@ -1,5 +1,12 @@
 ## SOURCE-NEWS-1 implementation — 2026-10-11
 
+## MULTI-USER-1 — user authority (2026-10-12)
+
+Folio allows multiple independent user accounts. Supersedes all earlier single-owner/Setup Code restrictions: email registration uses GoTrue public signup with email verification and existing rate limits, never admin create/auto-confirm. Any valid Google PKCE session is accepted; enabling the Google provider is a separate configuration gate. Signup without a session displays confirmation instructions, not a signed-in state. Email confirmation returns to the login screen. All workspace cache keys are account-scoped, guests retain their own device records, and cloud writes require that account/resource's successful read. Late responses after account changes must not affect the new session. Keep database auth.uid() RLS and security_invoker views. Photo/ink notebooks remain device-local and account-scoped; do not imply cloud sync.
+
+Implementation: public GoTrue signup without setup/admin creation; confirmation-pending UI and email confirmation return; all valid Google identities accepted. Per-account caches, one-time legacy-owner cache migration, read-before-write and auth epoch guards; modal cancellation and session-aware PKCE, deduplicated refresh across six resources. Guests retain their own local records. Focused auth/account isolation 23/23, identity31/31, unchanged four-screen8/8, build/harness/diff passed. Read-only review found and resolved guest migration and refresh/auth races; final review found no blocker. Production metadata shows email signup enabled and confirmation required; Google disabled. RLS test with two disposable users verified no cross-user research reads/inserts/updates and rolled back entirely (remaining fixture accounts=0); all six workspace tables have ownership RLS and four views use security_invoker; security advisor found no lints. Real-user verification-email delivery and Google provider setup/round trip remain unverified.
+
+
 ## FILM-MOTION-2 — latest user authority (2026-10-12)
 
 - User chose an independent in-app film expression inspired by VSCO's published examples, not licensed VSCO presets or API integration. Generated defaults use modernist photographic composition. Apply the same subtle warm/faded display treatment to default and personal home-cover photos; preserve uploaded originals and backups unchanged.

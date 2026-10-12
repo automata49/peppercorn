@@ -34,8 +34,7 @@ Deno.serve(async (req: Request) => {
 
   const url=Deno.env.get("SUPABASE_URL");
   const anon=Deno.env.get("SUPABASE_ANON_KEY");
-  const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if(!url||!anon||!service) return json({error:"server_not_configured"},500,headers);
+  if(!url||!anon) return json({error:"server_not_configured"},500,headers);
 
   // Public readiness only; provider credentials and the remaining auth configuration stay server-side.
   if(action==="google_status"){
@@ -48,45 +47,33 @@ Deno.serve(async (req: Request) => {
     }catch{return json({error:"auth_provider_check_failed"},503,headers)}
   }
 
+  // MULTI-USER-1: regular GoTrue signup preserves email verification and provider rate limits.
+  // Never auto-confirm email or use the admin API for public registration.
   if(action==="signup"){
-    const setupCheck=await fetch(url+"/rest/v1/rpc/check_account_setup_code",{
-      method:"POST",
-      headers:{apikey:service,Authorization:"Bearer "+service,"Content-Type":"application/json"},
-      body:JSON.stringify({p_code:String(body?.setup_code||"")})
-    });
-    if(!setupCheck.ok || await setupCheck.json()!==true) return json({error:"invalid_setup_code"},403,headers);
     if(!email || password.length<8) return json({error:"email_and_password_required"},400,headers);
-
-    const list=await fetch(url+"/auth/v1/admin/users?page=1&per_page=1",{
-      headers:{apikey:service,Authorization:"Bearer "+service}
+    const created=await fetch(url+"/auth/v1/signup?redirect_to="+encodeURIComponent("https://automata49.github.io/peppercorn/?email-confirmed=1"),{
+      method:"POST",headers:{apikey:anon,"Content-Type":"application/json"},
+      body:JSON.stringify({email,password}),signal:AbortSignal.timeout(10000)
     });
-    if(!list.ok) return json({error:"admin_user_check_failed"},502,headers);
-    const listed=await list.json();
-    if(Array.isArray(listed?.users) && listed.users.length>0) {
-      return json({error:"signup_closed"},409,headers);
+    const payload=await created.json().catch(()=>({}));
+    if(!created.ok){
+      const allowed=["signup_disabled","email_provider_disabled","email_address_invalid","weak_password","user_already_exists","over_email_send_rate_limit","over_request_rate_limit"];
+      const error=allowed.includes(payload.error_code)?payload.error_code:"signup_failed";
+      return json({error},created.status,headers);
     }
-
-    const created=await fetch(url+"/auth/v1/admin/users",{
-      method:"POST",
-      headers:{
-        apikey:service,
-        Authorization:"Bearer "+service,
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({email,password,email_confirm:true})
-    });
-    const createdBody=await created.json().catch(()=>({}));
-    if(!created.ok) return json({error:"signup_failed",detail:createdBody},created.status,headers);
+    if(!payload.access_token) return json({confirmation_required:true},200,headers);
+    return json({access_token:payload.access_token,refresh_token:payload.refresh_token,expires_at:payload.expires_at,
+      user:{id:payload.user?.id,email:payload.user?.email}},200,headers);
   }
 
-  if(action==="signup" || action==="login"){
+  if(action==="login"){
     const token=await fetch(url+"/auth/v1/token?grant_type=password",{
       method:"POST",
       headers:{apikey:anon,"Content-Type":"application/json"},
       body:JSON.stringify({email,password})
     });
     const payload=await token.json().catch(()=>({}));
-    if(!token.ok) return json({error:"login_failed",detail:payload},401,headers);
+    if(!token.ok) return json({error:payload.error_code==="email_not_confirmed"?"email_not_confirmed":"login_failed"},401,headers);
     return json({
       access_token:payload.access_token,
       refresh_token:payload.refresh_token,
@@ -96,10 +83,7 @@ Deno.serve(async (req: Request) => {
     },200,headers);
   }
 
-  // GOOGLE-LOGIN-1: exchange the PKCE code from the Google redirect. The app has a single owner account, so a Google
-  // login is accepted only when it resolves to an account created through the invite flow (an email identity; Supabase
-  // links a verified Google identity with the same email to it). Any other Google login is refused and its session
-  // revoked. Never delete an account as a side effect of a failed login.
+  // Any valid Google PKCE session may sign in; users own their workspace through auth.uid().
   if(action==="pkce"){
     const authCode=String(body?.auth_code||"");const verifier=String(body?.code_verifier||"");
     if(!authCode||!/^[A-Za-z0-9._~-]{43,128}$/.test(verifier)) return json({error:"pkce_required"},400,headers);
@@ -111,13 +95,6 @@ Deno.serve(async (req: Request) => {
     const payload=await token.json().catch(()=>({}));
     if(!token.ok) return json({error:"oauth_failed"},401,headers);
     const user=payload.user||{};
-    const identities=Array.isArray(user.identities)?user.identities:[];
-    const providers=Array.isArray(user.app_metadata?.providers)?user.app_metadata.providers:[];
-    const owner=identities.some((i:any)=>i?.provider==="email")||providers.includes("email");
-    if(!owner){
-      await fetch(url+"/auth/v1/logout?scope=local",{method:"POST",headers:{apikey:anon,Authorization:"Bearer "+String(payload.access_token||"")},signal:AbortSignal.timeout(8000)}).catch(()=>null);
-      return json({error:"google_not_linked"},403,headers);
-    }
     return json({
       access_token:payload.access_token,
       refresh_token:payload.refresh_token,
