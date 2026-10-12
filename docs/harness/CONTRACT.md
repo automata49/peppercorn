@@ -1,5 +1,10 @@
 # Pepper engineering contract
 
+## PREMIUM-INSIGHTS-1 — user direction (2026-10-12)
+
+The user explicitly requested Gemini AI Insights and HS Academy summaries/original-link suggestions implemented in the app. This overrides the earlier no-new-AI/channel scope only for the registered `hsacademy/hsacademy1` public metadata. Preserve the four home covers; show the new sections inside expanded Today. Collect at most three exact-channel article URLs under the existing robots/DNS/redirect/time/byte gates, only OG title/description, never subscription bodies, credentials, user diaries or private workspace contents. AI summaries are grounded public-preview drafts, distinct from title-only links, with no claimed publication date when unavailable. Provider absence/failure and source failure are visible; channel link remains available. Ranking, classification, account isolation and originals are unchanged.
+
+
 ## MULTI-USER-1 — user authority (2026-10-12)
 
 Folio allows multiple independent user accounts. Supersedes all earlier single-owner/Setup Code restrictions: email registration uses GoTrue public signup with email verification and existing rate limits, never admin create/auto-confirm. Any valid Google PKCE session is accepted; enabling the Google provider is a separate configuration gate. Signup without a session displays confirmation instructions, not a signed-in state. Email confirmation returns to the login screen. All workspace cache keys are account-scoped, guests retain their own device records, and cloud writes require that account/resource's successful read. Late responses after account changes must not affect the new session. Keep database auth.uid() RLS and security_invoker views. Photo/ink notebooks remain device-local and account-scoped; do not imply cloud sync.

@@ -45,3 +45,7 @@ Primary documentation checked 2026-10-11:
 - https://generativelanguage.googleapis.com/$discovery/rest?version=v1beta (GenerationConfig responseJsonSchema / responseMimeType)
 - https://www.mediawiki.org/wiki/API:Imageinfo
 - https://commons.wikimedia.org/wiki/Commons:API/MediaWiki
+
+## HS Academy public metadata (PREMIUM-INSIGHTS-1)
+
+`python -m analysis.premium_insights` writes `dist/data/premium-insights.json` on the existing deployment/market-refresh workflow. Exact channel: https://contents.premium.naver.com/hsacademy/hsacademy1. Up to three article links, in listing order, are suggestions for reading, not stock recommendations or personalized ranking. This source is independent of the issuer/ticker feed. It reads public OG titles/descriptions only when robots permits access. It never opens a subscriber session or extracts paid bodies; missing dates remain explicitly unknown. Gemini drafts use only the public description, the existing schema/evidence validation, and a server-only Actions secret. No description means title-only. No invented summary or link is substituted on failure; expired (48h), malformed, foreign-channel or oversized feeds are rejected by the client. Collection errors retain a usable channel link in Today. Live Naver access and actual Gemini drafts require production evidence; unit fixtures do not prove activation.

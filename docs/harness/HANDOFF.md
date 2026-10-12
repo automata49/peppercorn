@@ -1,3 +1,7 @@
+## PREMIUM-INSIGHTS-1 (2026-10-12)
+
+Expanded Today now includes Gemini issuer draft status and HS Academy reading links/public-preview drafts. `analysis/premium_insights.py` reads exact-channel public OG metadata only, under robots/URL/DNS/budget gates; no paid body or private records. Pages invokes it with the existing server-only GEMINI_API_KEY after build. Client rejects expired/malformed/foreign links and retains the channel link on failure. Run `python -m unittest analysis.test_leader_insights analysis.test_premium_insights`, build/harness, identity/four-screen and `tests/premium-insights.spec.ts`/lifestyle flows. Live provider activation must be verified from production feed, not fixture tests.
+
 ## SOURCE-NEWS-1 implementation — 2026-10-11
 
 ## MULTI-USER-1 — user authority (2026-10-12)
