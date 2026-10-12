@@ -1,6 +1,7 @@
 import datetime as dt
 import unittest
 from unittest.mock import patch
+from urllib.error import HTTPError
 from analysis.premium_insights import CHANNEL, article_url, collect
 from analysis.leader_insights import UTC
 
@@ -27,7 +28,7 @@ class PremiumTests(unittest.TestCase):
             self.assertEqual(p['items'][0]['summary_kind'],'public_preview_draft')
             self.assertEqual(p['ai_status'],'ready')
     def test_provider_failure_retains_link(self):
-        with patch('analysis.premium_insights.summarize',side_effect=ValueError):
+        with patch('analysis.premium_insights.summarize',side_effect=HTTPError('https://generativelanguage.googleapis.com',429,'quota',None,None)):
             p = collect(HTTP(),dt.datetime.now(UTC),'fake-key')
             self.assertEqual(p['ai_status'],'unavailable')
             self.assertEqual(p['items'][0]['url'],URL)
@@ -58,3 +59,10 @@ class PremiumTests(unittest.TestCase):
             p = collect(BodyOnly(),dt.datetime.now(UTC),'fake-key')
             mock.assert_not_called()
             self.assertEqual(p['items'][0]['summary_kind'],'title_only')
+
+    def test_legal_boilerplate_is_not_an_insight(self):
+        with patch('analysis.premium_insights.summarize',return_value={'summary':'투자 관련 정보는 참고사항이며 모든 결정은 투자자 본인의 책임입니다.', 'evidence':'공개 미리보기에서 확인한'}):
+            p = collect(HTTP(),dt.datetime.now(UTC),'fake-key')
+            self.assertEqual(p['ai_status'],'no_drafts')
+            self.assertEqual(p['items'][0]['summary_kind'],'title_only')
+            self.assertEqual(p['items'][0]['summary'],'')

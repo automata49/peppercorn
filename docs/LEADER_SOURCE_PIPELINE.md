@@ -57,3 +57,7 @@ One non-publishing call using the configured Actions key returned HTTP 404 for `
 ### Exact evidence choices
 
 Source IDs are now a one-value schema enum, and evidence is chosen from up to eight exact, bounded substrings prepared from the public text (8–100 characters, at most 20 words). The JSON schema and prompt supply these choices; the existing independent validator still checks source identity, substring membership, sizes, numbers and advice exclusions. This improves quotation reliability without relaxing grounding. Output budget is 800 tokens; published summaries stay capped at 180 characters. Failed validation retains that article's title/link and does not cancel all remaining documents. Provider/transport failure still stops calls within the existing quotas.
+
+### Informative preview gate (2026-10-13)
+
+HS Academy summaries consisting of investment-responsibility/reference-only or editorial-independence boilerplate are rejected as uninformative. Their original title/link remain available, while other public-preview drafts continue. A content validation rejection reports `no_drafts` (or keeps `ready` if another draft exists); actual provider/transport failure remains `unavailable`. Existing live boilerplate drafts were removed without changing original collection dates or inventing replacement summaries.

@@ -10,6 +10,8 @@ from urllib.parse import urljoin, urlsplit
 from analysis.leader_insights import PublicHTTP, HOSTS, UTC, iso, plain, summarize, MODEL
 
 CHANNEL = 'https://contents.premium.naver.com/hsacademy/hsacademy1'
+BOILERPLATE = re.compile(r"본인(?:의)?\s*책임|투자자.{0,12}책임|투자\s*(?:관련\s*)?정보.{0,20}참고(?:사항|용)|외부의.{0,20}(?:압력|간섭)")
+
 
 def article_url(value):
     try:
@@ -66,11 +68,13 @@ def collect(http, now, key=''):
                 if key and len(preview) >= 40 and not provider_stopped:
                     try:
                         draft = summarize({'id': item['id'], 'title': title, 'text': preview}, key)
+                        if BOILERPLATE.search(draft['summary']):
+                            raise ValueError('uninformative preview')
                         item.update(summary=draft['summary'], summary_kind='public_preview_draft',
                                     evidence=draft['evidence'], model=MODEL)
                         result['ai_status'] = 'ready'
                     except ValueError:
-                        result['ai_status'] = 'unavailable'
+                        result['ai_status'] = 'ready' if any(i['summary_kind'] == 'public_preview_draft' for i in result['items']) else 'no_drafts'
                     except Exception:
                         provider_stopped = True
                         result['ai_status'] = 'unavailable'
