@@ -1,5 +1,10 @@
 # Pepper engineering contract
 
+## OBRA-REFERENCE-1 — user direction (2026-10-13)
+
+Implement the first Modern Magazine Obra preview's Home and stock-detail composition. Use its 390px editorial column, 24px gutter, 42px titles, compact 1.1/.9 two-column photo grid (10px gaps, 94px rows; 110px phone rows), 16px photo corners, flat detail rules and two inline actions. This supersedes FILM-MOTION-2 phone stacking and older detail glass/floating toolbar rules for these two surfaces. Preserve the existing bottom navigation unchanged, original photography priority/Motion dismissal, theme/market semantics, all Overview/Analysis/Financials/Thesis data/editing and chart/compare actions. Prototype question field opens the existing persistent Thesis editor. Device frame and mock-data text are preview-only.
+
+
 ## OBRA-EDITORIAL-1 — user direction 2026-10-12
 
 Use the shared Obra/shadcn token adapter on all destinations, including stock detail. Editorial Home/title/key-statement roles support Modern/Classic/Art expressions; controls and numeric information retain the UI stack. Read `docs/design/FOLIO_OBRA_EDITORIAL.md`; this supersedes the old Today-only component scope. Preserve supplied identity, account/data contracts, theme and approved Motion/glass geometry.

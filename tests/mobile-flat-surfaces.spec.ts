@@ -34,17 +34,17 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   await pickFirstStock(page)
-  const primary=page.locator('.analysis-main > .analysis-price-momentum')
+  const primary=page.locator('.analysis-main.analysis-price-momentum')
   await expect(primary).toHaveCount(1)
-  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await primary.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
   await page.locator('.analysis-card').getByRole('tab',{name:'Overview'}).click()
   const detailBlocks=page.locator('.analysis-secondary-body > .analysis-block')
   await expect(detailBlocks).toHaveCount(3)
   for(let i=0;i<3;i++){
     const block=detailBlocks.nth(i)
-    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThanOrEqual(14)
+    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+    expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
   }
   await context.close()
 })
@@ -57,7 +57,7 @@ test('desktop major regions share Pebble glass',async({page})=>{
 
   await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
   await pickFirstStock(page)
-  const block=page.locator('.analysis-main > .analysis-price-momentum').first()
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  const block=page.locator('.analysis-main.analysis-price-momentum').first()
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 })
