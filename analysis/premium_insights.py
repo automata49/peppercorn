@@ -40,6 +40,7 @@ class Metadata(HTMLParser):
 def collect(http, now, key=''):
     result = {'version': 1, 'collected_at': iso(now), 'state': 'unavailable',
               'ai_status': 'not_configured' if not key else 'no_drafts', 'items': []}
+    provider_stopped = False
     try:
         listing = Metadata()
         listing.feed(http.get(CHANNEL + "/contents"))
@@ -54,13 +55,16 @@ def collect(http, now, key=''):
                 preview = page.meta.get('og:description', '')[:1000]
                 item = {'id': hashlib.sha256(url.encode()).hexdigest()[:20], 'url': url,
                         'title': title, 'summary': '', 'summary_kind': 'title_only'}
-                if key and len(preview) >= 40 and result['ai_status'] != 'unavailable':
+                if key and len(preview) >= 40 and not provider_stopped:
                     try:
                         draft = summarize({'id': item['id'], 'title': title, 'text': preview}, key)
                         item.update(summary=draft['summary'], summary_kind='public_preview_draft',
                                     evidence=draft['evidence'], model=MODEL)
                         result['ai_status'] = 'ready'
+                    except ValueError:
+                        result['ai_status'] = 'unavailable'
                     except Exception:
+                        provider_stopped = True
                         result['ai_status'] = 'unavailable'
                 result['items'].append(item)
             except Exception:
