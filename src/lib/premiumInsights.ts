@@ -13,7 +13,7 @@ export function parsePremiumInsights(value: unknown, now = Date.now()): PremiumF
  const items = p.items.filter(i => {
   if (!i || !premiumArticleUrl(i.url) || seen.has(i.url) || !text(i.id,40) || !text(i.title,120) || typeof i.summary !== 'string') return false
   if (i.summary_kind === 'public_preview_draft') {
-   if (i.model !== 'gemini-2.5-flash-lite' || !text(i.summary,180) || !text(i.evidence,100) || i.evidence!.length < 8) return false
+   if (!['gemini-3.5-flash-lite','gemini-2.5-flash-lite'].includes(String(i.model)) || !text(i.summary,180) || !text(i.evidence,100) || i.evidence!.length < 8) return false
   } else if (i.summary_kind !== 'title_only' || i.summary !== '') return false
   seen.add(i.url); return true
  })

@@ -26,7 +26,7 @@ from pathlib import Path
 
 UTC = dt.timezone.utc
 PROMPT_VERSION = "folio-news-1"
-MODEL = "gemini-2.5-flash-lite"
+MODEL = "gemini-3.5-flash-lite"
 USER_AGENT = "FolioResearch/1.0 (+https://github.com/automata49/peppercorn)"
 HOSTS = {"www.apple.com", "nvidianews.nvidia.com", "news.skhynix.com", "news.samsung.com", "commons.wikimedia.org", "ir.amd.com", "investors.delltechnologies.com"}
 LICENSES = {"CC BY 4.0", "CC BY-SA 4.0", "CC BY 3.0", "CC BY-SA 3.0", "CC BY 2.0", "CC BY-SA 2.0", "CC BY 2.5", "CC BY-SA 2.5", "CC0", "Public domain"}

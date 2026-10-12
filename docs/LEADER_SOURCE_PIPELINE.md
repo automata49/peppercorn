@@ -10,7 +10,7 @@
 
 ## AI
 
-Default: **Gemini 2.5 Flash-Lite** using the server-side REST adapter. Official pricing documents a free tier, subject to project quotas and eligibility; use a free-tier project without paid billing if zero charges are required. No search-grounding or image-generation paid endpoint is used.
+Default: **Gemini 3.5 Flash-Lite** using the server-side REST adapter. Official pricing documents a free tier, subject to project quotas and eligibility; use a free-tier project without paid billing if zero charges are required. No search-grounding or image-generation paid endpoint is used.
 
 Add `GEMINI_API_KEY` in [repository Actions secrets](https://github.com/automata49/peppercorn/settings/secrets/actions). The connector used for this work cannot read or write repository secrets. Never use `VITE_` for a provider key, commit it, or paste it into the app. Only bounded public source text goes to the provider; no user records. Google's free-tier terms may use submitted public content for product improvement.
 
@@ -49,3 +49,7 @@ Primary documentation checked 2026-10-11:
 ## HS Academy public metadata (PREMIUM-INSIGHTS-1)
 
 `python -m analysis.premium_insights` writes `dist/data/premium-insights.json` on the existing deployment/market-refresh workflow. Exact channel: https://contents.premium.naver.com/hsacademy/hsacademy1. Up to three article links, in listing order, are suggestions for reading, not stock recommendations or personalized ranking. This source is independent of the issuer/ticker feed. It reads public OG titles/descriptions only when robots permits access. It never opens a subscriber session or extracts paid bodies; missing dates remain explicitly unknown. Gemini drafts use only the public description, the existing schema/evidence validation, and a server-only Actions secret. No description means title-only. No invented summary or link is substituted on failure; expired (48h), malformed, foreign-channel or oversized feeds are rejected by the client. Collection errors retain a usable channel link in Today. Live Naver access and actual Gemini drafts require production evidence; unit fixtures do not prove activation.
+
+## Provider compatibility fix (2026-10-12)
+
+One non-publishing call using the configured Actions key returned HTTP 404 for `gemini-2.5-flash-lite`; the same validated adapter succeeded with `gemini-3.5-flash-lite`. Google now limits 2.5 model access to prior active users and recommends 3.5 Flash-Lite for new projects: https://ai.google.dev/gemini-api/docs/models . Production generation uses the supported stable model. Client schema permits both models for already validated legacy drafts until their original expiry; it never extends expiry. This smoke verifies provider/schema connectivity, not the factual quality of production drafts.
