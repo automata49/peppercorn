@@ -1,3 +1,4 @@
+import {openPage} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 
 // GOOGLE-LOGIN-1: Google sign-in through Supabase Auth with PKCE; the auth function exchanges the code.
@@ -15,7 +16,7 @@ test('Google button sends a PKCE request and the returned code signs in',async({
   await page.route('**/functions/v1/auth',route=>{const body=route.request().postDataJSON();if(body.action==='google_status')return route.fulfill({json:{ready:true}});exchange=body;return route.fulfill({json:{access_token:'a.b.c',refresh_token:'r',expires_at:Math.floor(Date.now()/1000)+3600,user:{id:'u1',email:'owner@example.com'}}})})
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto(APP)
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await page.locator('.top-actions').getByRole('button',{name:'로그인',exact:true}).click()
+  await openPage(page,'Settings');await page.locator('.settings-auth').click()
   await page.getByRole('button',{name:'Google 계정으로 로그인'}).click()
   await expect.poll(()=>exchange).not.toBeNull()
   const u=authorize as unknown as URL
@@ -29,7 +30,7 @@ test('Google button sends a PKCE request and the returned code signs in',async({
   const challenge=await page.evaluate(async v=>{const d=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));return btoa(String.fromCharCode(...d)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')},exchange.code_verifier)
   expect(challenge).toBe(u.searchParams.get('code_challenge'))
   await expect(page).toHaveURL(APP)
-  await expect(page.locator('.top-actions').getByRole('button',{name:'로그아웃'})).toBeVisible()
+  await openPage(page,'Settings');await expect(page.locator('.settings-auth')).toHaveText('로그아웃')
   expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-session')||'null')?.user?.email)).toBe('owner@example.com')
   expect(await page.evaluate(()=>sessionStorage.getItem('peppercorn-pkce-verifier'))).toBeNull()
 })
@@ -60,7 +61,7 @@ for(const code of ['google_provider_disabled','auth_provider_check_failed'])test
  await page.route('**/auth/v1/authorize?*',r=>{authorize++;return r.abort()})
  await page.route('**/functions/v1/auth',r=>r.fulfill({status:503,json:{error:code}}))
  await page.addInitScript(()=>sessionStorage.setItem('peppercorn-intro-seen','1'))
- await page.goto(APP);await page.locator('.top-actions').getByRole('button',{name:'로그인',exact:true}).click()
+ await page.goto(APP);await openPage(page,'Settings');await page.locator('.settings-auth').click()
  await page.getByRole('button',{name:'Google 계정으로 로그인'}).click()
  await expect(page.locator('.auth-error')).toContainText(code==='google_provider_disabled'?'연결 설정이 아직 완료되지 않았습니다':'연결을 확인하지 못했습니다')
  await expect(page.getByRole('button',{name:'Google 계정으로 로그인'})).toBeEnabled()
