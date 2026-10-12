@@ -26,16 +26,24 @@ class Metadata(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.links, self.meta = [], {}
+        self.in_head = False
+        self.head_seen = False
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if tag == 'head' and not self.head_seen:
+            self.in_head, self.head_seen = True, True
         if tag == 'a' and article_url(a.get('href', '')):
             url = article_url(a['href'])
             if url not in self.links:
                 self.links.append(url)
-        if tag == 'meta':
+        if tag == 'meta' and self.in_head:
             key = a.get('property') or a.get('name')
             if key in ('og:title', 'og:description'):
                 self.meta[key] = plain(a.get('content', ''))
+
+    def handle_endtag(self, tag):
+        if tag == 'head':
+            self.in_head = False
 
 def collect(http, now, key=''):
     result = {'version': 1, 'collected_at': iso(now), 'state': 'unavailable',

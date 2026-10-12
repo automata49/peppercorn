@@ -35,6 +35,7 @@ jobs:
                   reason = str(error) if type(error) is ValueError and str(error) in allowed else type(error).__name__
                   print('PROVIDER_RESULT=failed; HTTP_STATUS=' + str(getattr(error, 'code', None)) + '; VALIDATION=' + reason)
           import json
+          initial_hosts = adapter.HOSTS.copy()
           original = adapter.summarize
           def checked(*args, **kwargs):
               try:
@@ -50,4 +51,9 @@ jobs:
           premium.HOSTS.add('contents.premium.naver.com')
           result = premium.collect(premium.PublicHTTP(), premium.dt.datetime.now(premium.UTC), key)
           print('PUBLIC_PREVIEW_RESULT=' + json.dumps(result, ensure_ascii=False))
+          adapter.HOSTS.clear()
+          adapter.HOSTS.update(initial_hosts)
+          config = json.load(open('config/leader-sources.json'))
+          issuers = adapter.collect(config, config['sources'], adapter.PublicHTTP(), adapter.dt.datetime.now(adapter.UTC), key)
+          print('ISSUER_DRAFT_RESULT=' + json.dumps(issuers, ensure_ascii=False))
           PY
