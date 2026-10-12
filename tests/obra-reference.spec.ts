@@ -30,3 +30,12 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  await page.getByRole('button',{name:'Thesis에서 내 판단 작성'}).click();await expect(page.locator('.analysis-judgement')).toBeVisible();await expect(page.locator('.analysis-sheet')).toBeVisible()
  await context.close()
 })
+
+test('US issuer headline matches NVIDIA reference while full security name and ticker remain available',async({page})=>{
+ await boot(page,'light')
+ await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows:[{...demoRows[0],id:'reference-nvda',market:'US',asset_class:'Equity',ticker:'NVDA',name:'NVIDIA Corporation Common Stock',exchange:'NASDAQ'}]}}))
+ await page.reload();await openPage(page,'발견')
+ await page.getByRole('combobox',{name:'종목 검색',exact:true}).fill('NVDA');await page.getByRole('combobox',{name:'종목 검색',exact:true}).press('Enter')
+ await expect(page.locator('.hero-name')).toHaveText('NVIDIA');await expect(page.locator('.hero-name')).toHaveAttribute('title','NVIDIA Corporation Common Stock')
+ await expect(page.locator('.hero-meta')).toContainText('US · NVDA · NASDAQ');await expect(page.locator('.obra-security-name')).toHaveText('NVIDIA Corporation Common Stock')
+})

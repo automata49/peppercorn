@@ -574,13 +574,18 @@ function SnapshotItem({label,children,wide=false,valueClassName=''}:{label:strin
 const priceText=(r:LeaderRow,v:number|null|undefined)=>v==null||!Number.isFinite(Number(v))?'—':r.market==='KR'?Math.round(Number(v)).toLocaleString('ko-KR')+'원':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})
 const tradedText=(r:LeaderRow,v:number|null|undefined)=>v==null||!Number.isFinite(Number(v))?'—':r.market==='KR'?Math.round(Number(v)/1e8).toLocaleString('ko-KR')+'억원':'$'+(Number(v)/1e6).toLocaleString('en-US',{maximumFractionDigits:1})+'M'
 const signTone=(v:number|null|undefined)=>v==null?'':v>0?'pos':v<0?'neg':''
+// Detail headlines use the issuer name; security/legal suffixes stay in the source name.
+function detailCompanyName(row:LeaderRow){
+  if(row.market!=='US'||row.asset_class!=='Equity')return row.name
+  return row.name.replace(/\s+(?:Class\s+[A-Z]\s+)?(?:Common Stock|Capital Stock|Ordinary Shares?)$/i,'').replace(/\s+(?:Corporation|Corp\.?|Inc\.?|Ltd\.?|Limited)$/i,'').trim()||row.name
+}
 function AnalysisHero({row}:{row:LeaderRow}){
   const q=useLiveQuotes([row],1)(row)
   const change=liveChange(q)
   const diff=q&&q.previous_close?q.price-q.previous_close:null
   return <section className="analysis-hero" data-market={row.market}>
     <p className="hero-meta">{row.market} · {row.ticker} · {row.exchange||row.market} · {row.industry||'분류 확인'}</p>
-    <h2 className="hero-name">{row.name}</h2>
+    <h2 className="hero-name" title={row.name}>{detailCompanyName(row)}</h2>
     <p className="hero-company">기업을 읽는 시간</p>
     <span className="obra-status">{leadership(row)||'관찰'}</span>
     <div className="obra-quote"><span className={'hero-price'+(q?' live-price':'')}>{priceText(row,q?.price??row.price)}</span><span className={'hero-change '+signTone(change)}>{q&&change!=null?<>{change>0?'▲ ':change<0?'▼ ':''}{diff==null?'':priceText(row,Math.abs(diff))+' '}({pct(change)})</>:'일간 종가'}<span> · {q?'실시간'+(q.time?' '+liveQuoteTime(q):''):'장 마감 기준'}</span></span></div>
@@ -588,7 +593,7 @@ function AnalysisHero({row}:{row:LeaderRow}){
 }
 function InstrumentContext({row}:{row:LeaderRow}){
   const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
-  return <section className="obra-instrument-context" aria-label="종목 정보">
+  return <section className="obra-instrument-context" aria-label="종목 정보">{detailCompanyName(row)!==row.name&&<p className="obra-security-name">{row.name}</p>}
     <div className="external-links hero-links">
       <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
       {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
