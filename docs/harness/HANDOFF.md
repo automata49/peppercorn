@@ -844,3 +844,9 @@ Live verification found US security/legal suffixes making the NVIDIA headline lo
 ## 2026-10-13 — OBRA-RESPONSIVE-1
 
 Removed the black desktop rail in favor of a theme-aware horizontal header, retaining primary destinations, tools, refresh and appearance controls. Compact bottom navigation is unchanged. Home expands to the available screen with fluid gutters/type/photo sizing and a wide heading/photo split. Stock detail expands with paired Insight/Thesis, readable data columns and a compact two-column company/quote header on wide screens. Phone composition and all data/editor actions remain intact. Desktop contextual bars are static to avoid hiding controls beneath navigation; wide touch screens retain navigation. UI review identified these breakpoint/scroll issues before release and they were addressed.
+
+## PATAGONIA-DESKTOP-1 / DETAIL-CLARITY-1 — user direction (2026-10-13)
+
+Desktop Home uses Patagonia-inspired full-width leading photography, a bold editorial headline, one clear story action and a three-story row. Reuse Folio photography and Motion; mobile/iPad compact composition, identity and destinations remain unchanged. Stock detail separates Overview (brief rules-based summary and two-axis checkup), Analysis (period RS/returns, one price chart and technical risk), Financials (filed financials/valuation), Thesis (user evidence/editor). Remove fixed generic marketing copy, duplicated Thesis preview, repeated key metrics/checklist and the chart repeated below every tab. Preserve data/ranking, missing-data states, save/edit, compare, watchlist and all four accessible tabs. This supersedes the earlier Obra Home desktop and detail-content arrangement.
+
+Implemented with existing assets and components. Validation and deployment pending.

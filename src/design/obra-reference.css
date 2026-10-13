@@ -70,3 +70,15 @@ html body .shell .app-main .obra-detail .analysis-secondary-body>.analysis-block
   .obra-detail .obra-quote{grid-column:2;grid-row:3;justify-content:flex-end;align-items:baseline;margin:0}
   .obra-detail .obra-quote .hero-price{font-size:24px!important;font-weight:500!important}
 }
+
+/* DETAIL-CLARITY-1: each section has one owner. */
+.obra-overview{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px 0;border-bottom:1px solid var(--folio-line)}
+.obra-overview h3{margin:0 0 8px;font-size:24px}.obra-overview p{margin:0;font-size:14px;line-height:1.6;color:var(--folio-muted)}
+:root .obra-overview .analysis-actionbar{width:auto;flex-shrink:0;margin:0}
+.obra-detail .overview-checkup{grid-column:1/-1}
+.obra-detail .analysis-detail-tabs button.on{border-bottom:2px solid var(--folio-ink)!important;font-weight:600!important}
+.obra-detail .block-title{font-size:20px!important}
+.obra-detail .analysis-secondary-body{gap:24px!important}
+@media(max-width:767px){.obra-overview{display:block}:root .obra-overview .analysis-actionbar{width:100%;margin-top:16px}}
+
+.obra-detail .folio-thesis{font-size:17px;line-height:1.75}.obra-detail .folio-insight-note{font-size:12px;line-height:1.6}

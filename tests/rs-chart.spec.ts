@@ -263,6 +263,7 @@ test('cold history mounts and sizes the stock chart after data arrives',async({p
   })
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await page.locator('.journey-today .decision-row').first().click()
+  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
   const chart=page.locator('.analysis-price-momentum .price-rs')
   await expect(chart).toContainText('일별 가격을 불러오는 중')
   release()

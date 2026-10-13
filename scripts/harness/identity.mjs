@@ -126,7 +126,7 @@ assert(appIndex.includes("saved === 'light' || saved === 'dark' || saved === 'sy
 for(const label of ["system:'System'","light:'Light'","dark:'Dark'"])assert(sidebar.includes(label),`Theme mode missing: ${label}`);
 
 assert(app.includes("['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']"),'Analysis depth tabs must remain Overview / Analysis / Financials / Thesis.');
-assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)}/>'),'Overview must keep structured Folio Insight.');
+assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)} compact/>'),'Overview must keep structured Folio Insight.');
 assert(stockSizeFilter.includes("STOCK_CATEGORY_LABELS=[['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']]"),'Explore category order must remain 대형주 / 중소형주 / 전체 / ETF.');
 assert(stockSizeFilter.includes('stock-size-equities')&&stockSizeFilter.includes('stock-size-divider')&&stockSizeFilter.includes('stock-size-etf'),'Category control must keep equities grouped, a visible divider, and a separate ETF pebble.');
 assert(stockSize.includes("export type StockSize='large'|'small'|'etf'|'all'")&&stockSize.includes("if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')"),'ETF must remain a first-class Explore category.');

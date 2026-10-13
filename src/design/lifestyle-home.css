@@ -28,3 +28,22 @@
 .linked-trade-original{padding:24px 0;margin-bottom:32px;border-bottom:1px solid var(--folio-line)}.linked-trade-original>header{display:flex;align-items:start;gap:16px;justify-content:space-between}.linked-trade-original>header>h2{font-size:24px}.linked-trade-original>label{display:grid;gap:8px;margin:20px 0;font-size:14px;color:var(--folio-ink)}.linked-trade-original textarea{width:100%;min-height:100px;padding:14px;border:1px solid var(--folio-line);border-radius:12px;background:var(--folio-surface);color:var(--folio-ink);font:inherit;line-height:1.7}
 
 .source-digest-item>img{display:block;width:100%;max-height:360px;object-fit:cover;border-radius:16px;margin-bottom:20px}.source-digest-item blockquote{margin:20px 0;padding-left:16px;border-left:2px solid var(--folio-line);color:var(--folio-muted);font-size:13px;line-height:1.8}
+
+.home-story-action{display:none}
+/* PATAGONIA-DESKTOP-1: immersive lead photo, direct navigation, quieter story row. */
+@media(min-width:1280px) and (hover:hover),(min-width:1501px){
+ .lifestyle-home{position:relative;display:block;max-width:none;padding:0}
+ .home-motion-cards{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:clamp(540px,72vh,840px) clamp(260px,27vw,420px);gap:24px}
+ .home-motion-card.home-today{grid-column:1/-1;grid-row:1;border-radius:0}
+ .home-motion-card.home-discover{grid-column:1;grid-row:2;margin-left:24px;width:calc(100% - 24px)}
+ .home-motion-card.home-journal{grid-column:2;grid-row:2}
+ .home-motion-card.home-journey{grid-column:3;grid-row:2;margin-right:24px;width:calc(100% - 24px)}
+ .home-heading{position:absolute;z-index:2;left:clamp(32px,6vw,96px);top:clamp(64px,12vh,150px);max-width:560px;margin:0;padding:0;pointer-events:none;color:#fff;text-shadow:0 1px 18px #0008}
+ .home-heading time,.home-heading p{color:#fff}.home-heading h2{font-size:clamp(56px,6vw,88px);font-weight:600}.home-heading p{font-size:22px}
+ .home-today::after{background:linear-gradient(90deg,#0009,transparent 85%),linear-gradient(0deg,#0008,transparent 65%)}
+ .home-today .home-cover-copy{inset:auto auto 48px clamp(32px,6vw,96px)}
+ .home-today .home-cover-copy h3{font-size:24px}.home-today .home-cover-copy p{font-size:16px}
+ .home-story-action{display:inline-block;margin-top:20px;padding:14px 24px;border-radius:24px;background:#fff;color:#111;font-size:15px;font-weight:600;text-shadow:none}
+ .home-journey-state{padding:24px}
+ .desktop-navigation nav button{border-radius:0!important;background:transparent!important}
+}

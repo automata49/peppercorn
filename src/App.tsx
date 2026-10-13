@@ -592,29 +592,7 @@ function AnalysisHero({row}:{row:LeaderRow}){
   </section>
 }
 function InstrumentContext({row}:{row:LeaderRow}){
-  const rank=row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank
-  return <section className="obra-instrument-context" aria-label="종목 정보">{detailCompanyName(row)!==row.name&&<p className="obra-security-name">{row.name}</p>}
-    <div className="external-links hero-links">
-      <a target="_blank" rel="noreferrer" href={tradingViewUrl(row)}>TradingView ↗</a>
-      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={saveTickerUrl(row)}>SaveTicker ↗</a>}
-      {row.market==='US'&&<a target="_blank" rel="noreferrer" href={finvizUrl(row)}>Finviz ↗</a>}
-    </div>
-    <div className="hero-chips"><ValuePill tone={leadTone(leadership(row))}>{leadership(row)||'관찰'}</ValuePill>{row.stage&&<ValuePill tone={stageTone(row.stage)}>{stageLabel(row.stage)}</ValuePill>}{rank!=null&&<ValuePill tone="red">{row.asset_class==='ETF'?'ETF RS':'RS'} {rank}</ValuePill>}{groupRankText(row)&&<span className="pill gray group-rank" title={groupRankTitle(row)}>{groupRankText(row)}</span>}<StockBadges row={row}/></div>
-  </section>
-}
-function KeyStats({row,filed}:{row:LeaderRow;filed?:PositionRow}){
-  const {pe}=valuation(row,filed)
-  const items:[string,string,string][]=[
-    [row.asset_class==='ETF'?'ETF RS순위':'RS순위',String((row.asset_class==='ETF'?row.etf_rs_rank:row.rs_rank)??'—'),''],
-    ['IBD식 RS',String(row.ibd_rs_estimate??'—'),''],
-    ['52주 고점 대비',pct(row.high_52w_distance),signTone(row.high_52w_distance)],
-    ['50일선 대비',gapPct(row.price,row.ma50),''],
-    ['200일선 대비',gapPct(row.price,row.ma200),''],
-    ['RS 3개월',pct(row.rs_3m),signTone(row.rs_3m)],
-    ['20일 평균 거래대금',tradedText(row,row.traded_value_20d),''],
-    ['PER (공시 EPS)',pe==null?'—':pe.toFixed(1)+'배',''],
-  ]
-  return <div className="key-stats" data-market={row.market}>{items.map(([label,value,tone])=><div key={label}><span>{label}</span><b className={tone}>{value}</b></div>)}</div>
+  return <details className="obra-instrument-context"><summary>종목 원문 이름</summary><p className="obra-security-name">{row.name}</p></details>
 }
 function PeerStrip({row,rows,onPick}:{row:LeaderRow;rows:LeaderRow[];onPick:(r:LeaderRow)=>void}){
   const peers=rows.filter(r=>r.market===row.market&&r.asset_class===row.asset_class&&r.industry&&r.industry===row.industry&&r.id!==row.id)
@@ -667,6 +645,7 @@ function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:Lea
         <SnapshotItem label="MA50 이격">{gapPct(row.price,row.ma50)}</SnapshotItem>
         <SnapshotItem label="200일선">{ma200Status}</SnapshotItem>
         <SnapshotItem label="52W 고점 대비" valueClassName={row.high_52w_distance!=null&&row.high_52w_distance>0?'pos':row.high_52w_distance!=null&&row.high_52w_distance<0?'neg':''}>{pct(row.high_52w_distance)}</SnapshotItem>
+        <SnapshotItem label="20일 평균 거래대금">{tradedText(row,row.traded_value_20d)}</SnapshotItem>
         <SnapshotItem label="거래량">{row.volume_ratio==null?'—':Number(row.volume_ratio).toFixed(2)+'x'}</SnapshotItem>
         <SnapshotItem label="RSI(14)">{row.rsi14==null?'—':Number(row.rsi14).toFixed(0)}</SnapshotItem>
         <SnapshotItem label="ATR배수">{row.atr_multiple==null?'—':Number(row.atr_multiple).toFixed(1)+'x'}</SnapshotItem>
@@ -1376,18 +1355,17 @@ export default function App(){
             {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" id={"detail-tab-"+key} aria-controls="detail-panel" tabIndex={analysisSection===key?0:-1} onKeyDown={e=>{const keys=["overview","analysis","financials","thesis"] as const;const i=keys.indexOf(key);const next=e.key==="ArrowRight"?keys[(i+1)%4]:e.key==="ArrowLeft"?keys[(i+3)%4]:e.key==="Home"?keys[0]:e.key==="End"?keys[3]:null;if(next){e.preventDefault();setAnalysisSection(next);document.getElementById("detail-tab-"+next)?.focus()}}} aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
           </nav>}
           <div className="analysis-secondary" id="detail-panel" role={page==='analysis'?'tabpanel':undefined} aria-labelledby={page==='analysis'?'detail-tab-'+analysisSection:undefined}>
-            {page==='analysis'&&analysisSection==='overview'&&<ObraOverview conclusion={String(record?.conclusion||'')} onWrite={goJudgement}>{detailActions}</ObraOverview>}
+            {page==='analysis'&&analysisSection==='overview'&&<ObraOverview>{detailActions}</ObraOverview>}
             {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body" data-market={selected.market}>
-              <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)}/></section>
-              <section className="analysis-block"><h3 className="block-title">Essential Stats</h3><KeyStats row={selected} filed={positionOf(selected)}/></section>
+              <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)} compact/></section>
+              <section className="analysis-block overview-checkup"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
               <section className="analysis-block"><h3 className="block-title">Same Industry</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
               {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">Compare <small>{compareRows.length}/4</small></h3><CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
             </div>}
             {page==='analysis'&&analysisSection==='analysis'&&<div className="analysis-secondary-body" data-market={selected.market}>
-              <section className="analysis-block"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
               <section className="analysis-block"><h3 className="analysis-part">Swing · 모멘텀</h3>
                 <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
-                <div className="checklist"><h3>리더보드 자동 체크</h3><label><span>Trend Template</span><b>{selected.leader_tt?'PASS':'CHECK'}</b></label><label><span>Price &gt; MA50 &gt; MA200</span><b>{selected.price&&selected.ma50&&selected.ma200&&selected.price>selected.ma50&&selected.ma50>selected.ma200?'PASS':'CHECK'}</b></label><label><span>RS순위 ≥ 70</span><b>{((selected.asset_class==='ETF'?selected.etf_rs_rank:selected.rs_rank)??0)>=70?'PASS':'CHECK'}</b></label><label><span>52주 고점 -25% 이내</span><b>{(selected.high_52w_distance??-1)>=-.25?'PASS':'CHECK'}</b></label></div>
+
               </section>
             </div>}
             {page==='analysis'&&analysisSection==='financials'&&<div className="analysis-secondary-body" data-market={selected.market}>
@@ -1406,8 +1384,8 @@ export default function App(){
               </section>
             </div>}
           </div>
-          {page==='analysis'&&analysisSection!=='overview'&&detailActions}
-          {page==='analysis'&&<section className="obra-market-details" aria-label="시세와 가격 모멘텀"><h3 className="block-title">Price &amp; Relative Strength</h3><PriceRsChart row={selected} rows={leaders}/><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
+          {page==='analysis'&&analysisSection!=='overview'&&analysisSection!=='thesis'&&detailActions}
+          {page==='analysis'&&analysisSection==='analysis'&&<section className="obra-market-details" aria-label="종목 비교와 출처"><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
         </div>
       </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
       </div>

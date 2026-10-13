@@ -10,7 +10,7 @@ function labelOf(row:LeaderRow){
   return '관찰'
 }
 
-export function FolioInsight({row,position}:{row:LeaderRow;position?:PositionRow}){
+export function FolioInsight({row,position,compact=false}:{row:LeaderRow;position?:PositionRow;compact?:boolean}){
   const label=labelOf(row)
   const above50=row.price!=null&&row.ma50!=null&&row.price>row.ma50
   const above200=row.price!=null&&row.ma200!=null&&row.price>row.ma200
@@ -49,12 +49,12 @@ export function FolioInsight({row,position}:{row:LeaderRow;position?:PositionRow
       : `${row.name}은(는) 현재 가격 구조의 확인이 우선입니다. 리더십 분류보다 추세 회복과 위험 신호의 해소 여부를 먼저 보는 편이 적합합니다.`
 
   return <section className="folio-insight" aria-label="Folio Insight">
-    <header><div><span>FOLIO INSIGHT</span><h3>Investment Thesis</h3></div><small>Structured signal synthesis</small></header>
-    <p className="folio-thesis">{thesis}</p>
-    <div className="folio-insight-grid">
+    <header><div><span>FOLIO INSIGHT</span><h3>{compact?'핵심 요약':'Investment Thesis'}</h3></div><small>규칙 기반 요약</small></header>
+    <p className="folio-thesis">{compact ? (strongRs&&above50&&nearHigh?'상대강도와 가격 추세가 함께 유지됩니다.':above200?'장기 추세는 유지되며, 단기 리더십의 확인이 필요합니다.':'가격 추세의 회복 여부를 먼저 확인하세요.')+(position?.status==='check_failed'?' 공시 데이터 검증이 필요합니다.':'') : thesis}</p>
+    {!compact&&<div className="folio-insight-grid">
       <div><h4>Key Strengths</h4><ul>{s.map(x=><li key={x}>{x}</li>)}</ul></div>
       <div><h4>Risk Considerations</h4><ul>{r.map(x=><li key={x}>{x}</li>)}</ul></div>
-    </div>
+    </div>}
     <p className="folio-insight-note">가격·RS·공시 데이터의 규칙 기반 요약입니다. 투자 판단이나 생성형 AI 의견을 의미하지 않습니다.</p>
   </section>
 }
