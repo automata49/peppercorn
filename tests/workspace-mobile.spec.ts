@@ -19,7 +19,7 @@ test('phone Watchlist and Portfolio use summary-first progressive disclosure',as
   const watchSummary=page.locator('.workspace-mobile-summary')
   await expect(watchSummary).toBeVisible()
   await expect(watchSummary.locator('.decision-row')).toHaveCount(4)
-  await expect(watchSummary.locator('.decision-row').first()).toContainText('Apple')
+  await expect(watchSummary.locator('.decision-row').first().locator('.decision-main>b')).toHaveText('AAPL')
   const watchTable=page.locator('.workspace-table-disclosure')
   await expect(watchTable).not.toHaveAttribute('open','')
   await watchTable.locator(':scope > summary').click()
@@ -30,7 +30,7 @@ test('phone Watchlist and Portfolio use summary-first progressive disclosure',as
   await page.locator('.menu-drawer').getByRole('button',{name:'Portfolio'}).click()
   const portfolioSummary=page.locator('.workspace-mobile-summary')
   await expect(portfolioSummary.locator('.decision-row')).toHaveCount(2)
-  await expect(portfolioSummary.locator('.decision-row').first()).toContainText('Strategy')
+  await expect(portfolioSummary.locator('.decision-row').first().locator('.decision-main>b')).toHaveText('MSTR')
   const portfolioTable=page.locator('.workspace-table-disclosure')
   await expect(portfolioTable).not.toHaveAttribute('open','')
 
