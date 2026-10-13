@@ -39,7 +39,7 @@ export function StockSearch({ rows, recent, onPick }: { rows: LeaderRow[]; recen
       {!results.length && <li className="empty" role="option" aria-selected={false}>일치하는 종목이 없습니다. 리더보드 유니버스에 없는 종목일 수 있습니다.</li>}
     </ul>}
     {recentRows.length > 0 && <div className="recent-stocks" aria-label="최근 본 종목">
-      <span>최근</span>{recentRows.map(r => <button key={r.id} type="button" onClick={() => onPick(r)}>{r.name}</button>)}
+      <span>최근</span>{recentRows.map(r => <button key={r.id} type="button" onClick={() => onPick(r)} title={r.name}>{r.market==='US'?r.ticker:r.name}</button>)}
     </div>}
   </div>
 }

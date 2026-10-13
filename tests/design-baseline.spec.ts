@@ -58,7 +58,7 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   expect(wordmarkMetrics.ratio).toBeGreaterThanOrEqual(3.9)
   expect(wordmarkMetrics.ratio).toBeLessThanOrEqual(4.1)
 
-  for(const selector of ['.mobile-brand-menu','.mobile-brand-search']){
+  for(const selector of ['.mobile-bottom-menu','.mobile-brand-search']){
     const box=await page.locator(selector).boundingBox()
     expect(box).not.toBeNull()
     expect(box!.width).toBeGreaterThanOrEqual(43.9)

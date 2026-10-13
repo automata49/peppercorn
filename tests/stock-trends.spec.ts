@@ -57,7 +57,7 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.locator('.journey-today .stock-trend-row')).toHaveCount(2)
  await expect(page.locator('.journey-today svg[role=img]').first()).toBeVisible()
  await openPage(page,'탐색')
- await expect(page.getByRole('heading',{name:'오늘의 주도주',exact:true})).toBeVisible()
+ await expect(page.getByRole('heading',{name:'변화하는 세상을 읽다',exact:true})).toBeVisible()
  await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
  const scope=page.getByRole('group',{name:'주도 분류'})

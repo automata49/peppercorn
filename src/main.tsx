@@ -1,6 +1,7 @@
 import { Component, StrictMode, type ErrorInfo, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { VisualStyleProvider } from './components/VisualStyle'
 import { FolioWordmark } from './components/FolioWordmark'
 import './design/folio-baseline.css'
 import './styles.css'
@@ -14,6 +15,8 @@ import './design/lifestyle-home.css'
 import './design/obra.css'
 import './design/obra-reference.css'
 import './design/obra-navigation.css'
+import './design/discovery-catalog.css'
+import './design/photography.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {
   state:{error:Error|null}={error:null}
@@ -49,7 +52,7 @@ class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AppErrorBoundary><App/></AppErrorBoundary>
+    <AppErrorBoundary><VisualStyleProvider><App/></VisualStyleProvider></AppErrorBoundary>
   </StrictMode>
 )
 

@@ -1,3 +1,5 @@
+import { instrumentLabel } from './lib/instrumentLabel'
+import { useVisualStyle, coverPhoto } from './components/VisualStyle'
 import { TypographySettings, useEditorialStyle } from './components/TypographySettings'
 import { ObraMasthead, ObraOverview } from './components/ObraPage'
 import { Button } from './components/ui/button'
@@ -673,6 +675,7 @@ function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
 
 export default function App(){
   const [editorialStyle,setEditorialStyle]=useEditorialStyle()
+  const {photoStyle}=useVisualStyle()
   const reduceLaunchMotion=useReducedMotion()
   const [showIntro,setShowIntro]=useState(()=>{
     try{return sessionStorage.getItem('peppercorn-intro-seen')!=='1'}catch{return true}
@@ -1266,7 +1269,7 @@ export default function App(){
           data:r,
           rank:i+1,
           eyebrow:String(r.market||''),
-          title:String(r.name||r.ticker||'—'),
+          title:instrumentLabel(r)||'—',
           meta:[r.ticker,r.industry,stageLabel(r.stage)].filter(Boolean).join(' · '),
           badge:String(r.priority||stageLabel(r.stage)||'관찰'),
           badgeTone:r.priority==='A'?'green':r.priority==='B'?'blue':'gray',
@@ -1288,7 +1291,7 @@ export default function App(){
           data:r,
           rank:i+1,
           eyebrow:String(r.market||''),
-          title:String(r.name||r.ticker||'—'),
+          title:instrumentLabel(r)||'—',
           meta:[r.ticker,r.account,r.shares==null?'':r.shares+'주'].filter(Boolean).join(' · '),
           badge:String(r.account||stageLabel(r.stage)||'보유'),
           badgeTone:'gray',
@@ -1332,18 +1335,16 @@ export default function App(){
     </div>
     content=<><div className={'analysis-page'+(page==='analysis'&&analysisDetail?' obra-detail':'')}>
       {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={()=>setAnalysisDetail(false)}/>}
-      {page==='analysis'&&!analysisDetail&&<><section className="analysis-hub-head"><div className="analysis-hub-copy"><h2>오늘의 주도주</h2><p>변화하는 세상에서 기업을 발견하고, 나의 판단을 기록하세요.</p><button className="dashboard-section-action" onClick={()=>setDiscoverTab('signal')}>시장 신호 →</button></div></section>
-      <div className="analysis-finder">
-        <MarketSegment label="탐색" value={market} onChange={setMarket}/>
+      {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog">
+        <div className="catalog-topline">{sizeControl}<MarketSegment label="탐색" value={market} onChange={setMarket}/></div>
         <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
-        {sizeControl}
-        <div className="analysis-browse">
-          <div className="mini-segment analysis-scope" role="group" aria-label="주도 분류">{([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" aria-pressed={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(current=>current===key?null:key)} disabled={stockSize==='etf'}>{label}</button>)}</div>
+        <div className="analysis-browse catalog-layout">
+          <aside className="catalog-filters" aria-label="종목 필터"><div className="mini-segment analysis-scope" role="group" aria-label="주도 분류">{([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" aria-pressed={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(current=>current===key?null:key)} disabled={stockSize==='etf'}>{label}</button>)}</div>
           <div className="journey-explore-filters"><label>섹터<select aria-label="탐색 섹터" value={sector||''} onChange={e=>setSector(e.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.map(g=><option key={g.key} value={g.key}>{g.market+' · '+sectorName(g.market,g.sector)}</option>)}</select></label><span>{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 · RS 순 · 일간 종가</span></div>
-          <LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/>
-          <StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list"/>
+          <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details></aside>
+          <div className="catalog-results"><StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list stock-card-grid"/></div>
         </div>
-      </div></>}
+      </div>}
 
       {page==='thesis'&&<section className="journey-theses"><div className="journey-heading"><h2>내 투자 근거</h2><button className="dashboard-section-action" onClick={()=>navigatePage('analysis')}>종목 찾기 →</button></div><DecisionList items={(enrichedAnalysis as EditableRow[]).filter(r=>r.ticker).map((r,i)=>({key:String(r.id||i),data:r,title:String(r.name||r.ticker),meta:String(r.conclusion||'투자 근거를 작성하세요.'),eyebrow:String(r.market)+' · '+String(r.ticker)+' · '+String(r.date||'')}))} onSelect={r=>{setSelectedRecordId(r.id!=null?String(r.id):null);const hit=matchLeader(r);if(hit)setSelected(hit);setAnalysisSection('thesis')}} emptyLabel="아직 기록이 없습니다. 탐색에서 종목을 고르고 Thesis를 작성하세요."/></section>}
       {archived&&record&&<section className="analysis-card"><h3>{String(record.name||record.ticker)}</h3><p className="note">현재 유니버스에 없는 보관 기록입니다. 시장 데이터 없이 기존 투자 근거를 편집할 수 있습니다.</p><AnalysisSheet row={{name:String(record.name||record.ticker)}} record={record} onCreate={()=>{}} onChange={(field,value)=>updateAnalysisField(record,field,value)}/></section>}
@@ -1414,7 +1415,7 @@ export default function App(){
               data:r,
               rank:Number(r.no||i+1),
               eyebrow:String(r.date||r.market||''),
-              title:String(r.name||r.ticker||'—'),
+              title:instrumentLabel(r)||'—',
               meta:[r.ticker,r.account,r.tranche,r.stage].filter(Boolean).join(' · '),
               badge:String(r.status||'기록'),
               badgeTone:r.status==='보유중'?'green':r.status==='재검토중'?'amber':'gray',
@@ -1465,7 +1466,7 @@ export default function App(){
 
   if(page==='analysis'&&!analysisDetail){
     if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}/>
-    content=<section className="discovery-workspace"><header className="lifetime-heading discovery-heading"><div><span className="journey-kicker">DISCOVER</span><h2>변화하는 세상을 읽다</h2><p>기업을 발견하고, 나의 관점으로 남기는 시간.</p></div><img src={`${import.meta.env.BASE_URL}folio-brand-photography.webp`} alt=""/></header><Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}><TabsList aria-label="발견 영역"><TabsTrigger value="stocks">종목</TabsTrigger><TabsTrigger value="topics">주제</TabsTrigger><TabsTrigger value="signal">시장 신호</TabsTrigger></TabsList>{(['stocks','topics','signal'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&content}</TabsContent>)}</Tabs></section>
+    content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}><header className="lifetime-heading discovery-heading"><div><span className="journey-kicker">DISCOVER</span><h2>변화하는 세상을 읽다</h2><p>기업을 발견하고, 나의 관점으로 남기는 시간.</p></div><img src={coverPhoto('discover',photoStyle)} alt=""/></header><Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}><TabsList aria-label="발견 영역"><TabsTrigger value="stocks">종목</TabsTrigger><TabsTrigger value="topics">주제</TabsTrigger><TabsTrigger value="signal">시장 신호</TabsTrigger></TabsList>{(['stocks','topics','signal'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&content}</TabsContent>)}</Tabs></section>
   }
   const trackingContent=<section className="journey-workspace"><header className="lifetime-heading"><span className="journey-kicker">A LIFETIME IN PAGES</span><h2>그때의 나,<br/>지금의 나</h2><p>가설과 투자 방향을 재점검하고, 새로운 증거에 대응합니다.</p></header><Tabs value={trackingTab} onValueChange={value=>setTrackingTab(value as typeof trackingTab)}><TabsList className="journey-magazine-tabs" aria-label="여정 영역">{([['review','회고'],['watchlist','관심종목'],['portfolio','보유종목']] as const).map(([key,label])=><TabsTrigger key={key} value={key}>{label}</TabsTrigger>)}</TabsList>{(['review','watchlist','portfolio'] as const).map(tab=><TabsContent key={tab} value={tab}>{trackingTab===tab&&content}</TabsContent>)}</Tabs></section>
   const pageTitle:Record<string,string>={today:'오늘',notebook:'저널',research:'리서치 노트',signal:'시장 신호',thesis:'Thesis',tracking:'여정',dashboard:'시장 요약',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'발견',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}

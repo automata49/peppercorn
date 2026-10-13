@@ -58,7 +58,7 @@ for(const view of views){
       expect(motifBox!.height).toBeGreaterThanOrEqual(299)
     }
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
-    await expect(page.locator('.mobile-brand-menu')).toBeVisible()
+    await expect(page.locator('.mobile-bottom-menu')).toBeVisible()
   }else{
     const sideBrand=page.locator('.sidebar .folio-wordmark-system')
     await expect(sideBrand).toBeVisible()
@@ -73,7 +73,7 @@ for(const view of views){
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
   if(view.compact){
-    await page.locator('.mobile-brand-menu').click()
+    await page.locator('.mobile-bottom-menu').click()
     const drawer=page.locator('.menu-drawer')
     await expect(drawer.getByRole('img',{name:'Folio xx'})).toBeVisible()
     await expect(drawer.locator('.theme-control')).toBeVisible()

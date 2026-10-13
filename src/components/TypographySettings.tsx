@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useVisualStyle, coverPhoto } from './VisualStyle'
 
 export const editorialStyles = [
   ['modern', '모던 매거진', '명확한 고딕 제목과 여백'],
@@ -18,8 +19,10 @@ export function useEditorialStyle() {
   return [style, setStyle] as const
 }
 export function TypographySettings({ style, onChange }: { style: EditorialStyle; onChange: (value: EditorialStyle) => void }) {
+  const {photoStyle,setPhotoStyle}=useVisualStyle()
   return <section className="panel typography-settings" aria-label="매거진 타이포그래피">
-    <h2>매거진 타이포그래피</h2>
+    <h2>사진과 타이포그래피</h2>
+    <div className="visual-style-options" role="group" aria-label="사진과 글자 스타일">{(['film','vivid'] as const).map(value=><button key={value} type="button" aria-pressed={photoStyle===value} onClick={()=>{setPhotoStyle(value);onChange(value==='vivid'?'art':'modern')}}><img src={coverPhoto('discover',value)} alt=""/><b>{value==='film'?'Film · 모던 매거진':'Vivid · 아트 저널'}</b><span>{value==='film'?'기존의 차분한 사진과 고딕 제목':'선명한 새 사진과 굵은 제목'}</span></button>)}</div>
     <label>제목 스타일<select value={style} onChange={e => { if (valid(e.target.value)) onChange(e.target.value) }}>
       {editorialStyles.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
     </select></label>

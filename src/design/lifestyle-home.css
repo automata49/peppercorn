@@ -11,7 +11,7 @@
 .home-motion-card{width:100%;height:100%;min-height:0;border:0;border-radius:16px;padding:0;text-align:left;cursor:pointer;font:inherit}
 .home-motion-card.home-today{grid-column:1;grid-row:1/span 2}.home-motion-card.home-discover{grid-column:2;grid-row:1}.home-motion-card.home-journal{grid-column:2;grid-row:2/span 2}.home-motion-card.home-journey{grid-column:1;grid-row:3}
 .home-motion-card:focus-visible{outline:3px solid var(--folio-coral);outline-offset:4px}
-.home-motion-card>img,.home-detail-cover>img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;filter:contrast(.94) saturate(.82) sepia(.11) brightness(1.025)}
+.home-motion-card>img,.home-detail-cover>img{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;filter:var(--folio-photo-filter)}
 .home-motion-card:after,.home-detail-cover:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.04) 35%,rgba(0,0,0,.66))}
 .home-cover-copy{position:absolute;inset:auto 14px 14px;min-width:0}
 .home-cover-copy h3{font-size:clamp(24px,2.5vw,36px);line-height:1.2;font-weight:500;letter-spacing:-.04em;margin:0 0 6px;color:#fff}
