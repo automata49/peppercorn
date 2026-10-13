@@ -196,8 +196,11 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(rs.locator('.signal-strip strong')).toHaveText(['+1.0%','+2.0%','+3.0%','+4.0%','+5.0%','+6.0%']);
   await expect(page.locator('.analysis-card .leadership-score').first()).toContainText('ETF RS순위50');
   await expect(page.locator('.analysis-card .ibd-score')).toHaveAttribute('title','ETF 가격 이력 253거래일 미만');
-  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'Trend Template'}).locator('b')).toHaveText('CHECK');
-  await expect(page.locator('.analysis-card .checklist label').filter({hasText:'RS순위 ≥ 70'}).locator('b')).toHaveText('CHECK');
+  await page.getByRole('tab',{name:'Overview',exact:true}).click();
+  await page.locator('.checkup-card').first().locator('summary').click();
+  await expect(page.locator('.checkup-list li').filter({hasText:'추세 템플릿'}).locator('b')).toHaveText('미통과');
+  await expect(page.locator('.checkup-list li').filter({hasText:'ETF RS순위'}).locator('b')).toHaveText('50');
+  await expect(page.locator('.checkup-list li').filter({hasText:'ETF RS순위'}).locator('.mark-dot')).toHaveAttribute('aria-label','미달');
 });
 
 test('ETF 주도 산업 treemap sizes by trading value, colours by the chosen RS period and sits under 섹터 요약',async({browser})=>{
