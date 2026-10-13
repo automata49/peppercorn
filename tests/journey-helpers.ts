@@ -1,5 +1,6 @@
 import {expect,type Page} from '@playwright/test'
 export async function openPage(page:Page,label:string){
+ await expect(page.locator('.shell:not([inert])')).toBeVisible()
  label=({홈:'시장 요약',탐색:'발견',추적:'여정',Journal:'매매 기록'} as Record<string,string>)[label]||label
  const side=page.locator('.sidebar nav').getByRole('button',{name:label,exact:true})
  if(await side.isVisible())return side.click()

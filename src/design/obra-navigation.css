@@ -1,5 +1,7 @@
+.shell .app-main .topbar .topbar-menu{display:none!important}
 /* OBRA-RESPONSIVE-1: horizontal theme-aware navigation replaces the black rail.
    Compact brand bars and the four existing bottom buttons retain their owners. */
+.mobile-bottom-nav button.mobile-bottom-menu>span{font-size:11px;line-height:1.15;font-weight:580}
 html body .shell{display:block!important;grid-template-columns:1fr!important}
 html body .shell .app-main{width:100%;min-width:0;margin-left:0}
 @media(min-width:1280px) and (hover:hover),(min-width:1501px){
@@ -10,7 +12,7 @@ html body .shell .app-main{width:100%;min-width:0;margin-left:0}
   .desktop-navigation .folio-wordmark-image-light{filter:none!important}
   :root[data-theme="light"] .desktop-navigation .folio-wordmark-image-light{display:block!important}
   :root[data-theme="light"] .desktop-navigation .folio-wordmark-image-dark{display:none!important}
-  .desktop-navigation nav{display:flex!important;flex-direction:row;align-items:center;gap:8px;margin:0}
+  .desktop-navigation nav{display:flex!important;flex-direction:row;align-items:center;gap:8px;margin:0 0 0 clamp(24px,4vw,64px)}
   .desktop-navigation nav button{display:flex;align-items:center;justify-content:center;gap:8px;min-width:76px;min-height:44px;padding:10px 14px!important;border:0;border-radius:10px;background:transparent!important;color:var(--folio-muted)!important;font-size:14px!important;font-weight:500}
   .desktop-navigation nav button:hover{background:var(--folio-reference-field)!important;color:var(--folio-ink)!important}
   .desktop-navigation nav button.active{background:var(--folio-reference-field)!important;color:var(--folio-ink)!important;box-shadow:none!important}

@@ -1,3 +1,9 @@
+## DISCOVERY-CATALOG-1 / VISUAL-STYLE-1 implementation — 2026-10-13
+
+Discover now opens with a compact photographic heading, two classification axes, search and real-data stock cards. Desktop uses a top category row and left filter column; mobile/iPad uses short full-width controls and adaptive two/three-column cards. Recent stocks stay one scrollable line; advanced lens conditions are an explicit disclosure. US linked-record and Journey interest/holding cards display ticker. Shared photo treatment spans decorative/personal/source photography, with supplied identity exempt. Film/Vivid presets persist and use four new decorative photos; see `docs/design/FOLIO_VIVID_PHOTOGRAPHY.md`. Supplied wordmark, market semantics, ranking/history, saved IDs and original images are unchanged. The fifth compact bottom action opens the existing accessible menu; portrait/landscape quote text shares 28px/16px roles.
+
+Validation is being executed; final results are recorded in the PR. Physical Safari/Pencil and the existing TODAY-1/JOURNEY-2 live-source/cash-flow gaps remain open.
+
 ## PREMIUM-INSIGHTS-1 (2026-10-12)
 
 Expanded Today now includes Gemini issuer draft status and HS Academy reading links/public-preview drafts. `analysis/premium_insights.py` reads exact-channel public OG metadata only, under robots/URL/DNS/budget gates; no paid body or private records. Pages invokes it with the existing server-only GEMINI_API_KEY after build. Client rejects expired/malformed/foreign links and retains the channel link on failure. Run `python -m unittest analysis.test_leader_insights analysis.test_premium_insights`, build/harness, identity/four-screen and `tests/premium-insights.spec.ts`/lifestyle flows. Live provider activation must be verified from production feed, not fixture tests.

@@ -28,7 +28,7 @@ test('phone Journal shows recent decisions before the full edit grid',async({bro
   const summary=page.locator('.workspace-mobile-summary')
   await expect(summary).toBeVisible()
   await expect(summary.locator('.decision-row')).toHaveCount(1)
-  await expect(summary.locator('.decision-row').first()).toContainText('Apple')
+  await expect(summary.locator('.decision-row').first().locator('.decision-main>b')).toHaveText('AAPL')
   await expect(summary.locator('.decision-row').first()).toContainText('보유중')
   const table=page.locator('.workspace-table-disclosure')
   await expect(table).not.toHaveAttribute('open','')

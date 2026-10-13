@@ -1,3 +1,4 @@
+import { useVisualStyle, coverPhoto } from './VisualStyle'
 import type { EditableRow, LeaderRow } from '../types'
 import { Button } from './ui/button'
 
@@ -7,13 +8,14 @@ function sourceUrl(value:unknown){
 
 /** Editorial observations are the user's sourced research, never invented news. */
 export function DiscoveryTopics({research,match,onSelect,onResearch}:{research:EditableRow[];match:(r:EditableRow)=>LeaderRow|null;onSelect:(r:LeaderRow)=>void;onResearch:()=>void}){
+ const {photoStyle}=useVisualStyle()
  const observations=research.filter(r=>sourceUrl(r.source)&&String(r.fact||'').trim()).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,3)
  return <section className="discovery-topics" aria-label="출처가 있는 주제">
   {observations.length?observations.map((note,i)=>{
    const url=sourceUrl(note.source)!,company=match(note),date=String(note.date||'')
    const parsed=Date.parse(date),stale=Number.isFinite(parsed)&&Date.now()-parsed>30*86400000
    return <article className={`discovery-topic${i===0?' discovery-topic-cover':''}`} key={String(note.id)}>
-    {i===0&&<img src={`${import.meta.env.BASE_URL}folio-brand-photography.webp`} alt=""/>}
+    {i===0&&<img src={coverPhoto('discover',photoStyle)} alt=""/>}
     <div className="discovery-topic-copy"><span className="journey-kicker">관찰에서 기업으로</span><h3>{String(note.title||note.target||'나의 리서치')}</h3><p className="discovery-observation">{String(note.fact)}</p>
      {note.interpretation&&<p>나의 해석 · {String(note.interpretation)}</p>}
      <p className="discovery-provenance"><time>{date||'기준일 미제공'}</time> · {String(note.verification||'미검증')}{stale?' · 오래된 관찰 · 출처 재확인 필요':''}<br/><a href={url.href} target="_blank" rel="noopener noreferrer">출처 확인 · {url.hostname}</a></p>

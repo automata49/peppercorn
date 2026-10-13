@@ -16,8 +16,8 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
   await boot(page)
 
   const bottom=page.locator('.mobile-bottom-nav')
-  await expect(bottom.locator('button')).toHaveCount(4)
-  await expect(bottom.locator('button > svg.app-icon')).toHaveCount(4)
+  await expect(bottom.locator('button')).toHaveCount(5)
+  await expect(bottom.locator('button > svg.app-icon')).toHaveCount(5)
   await expect(page.locator('.topbar-menu > svg.app-icon')).toHaveCount(1)
   await expect(page.locator('.topbar-refresh > svg.app-icon')).toHaveCount(1)
 

@@ -17,7 +17,10 @@
 .obra-detail .hero-company{font-size:14px;color:var(--folio-muted);margin:0 0 20px}
 .obra-detail .obra-status{display:inline-block;font-size:12px;line-height:1.5;padding:6px 12px;background:var(--folio-reference-field);border-radius:14px;color:var(--folio-ink)}
 .obra-quote{display:flex;flex-wrap:wrap;gap:6px;margin:24px 0 20px;font-size:11px;color:var(--folio-muted)}
-.obra-detail .obra-quote .hero-price,.obra-detail .obra-quote .hero-change{font-size:11px!important;font-weight:400!important;line-height:1.5;margin:0!important}
+.obra-detail .obra-quote .hero-price{font-size:var(--folio-quote-price)!important;font-weight:550!important;line-height:1.2;margin:0!important}
+.obra-detail .obra-quote .hero-change{font-size:var(--folio-quote-change)!important;font-weight:400!important;line-height:1.5;margin:0!important}
+.obra-quote{align-items:baseline;gap:8px 14px}
+.obra-quote .hero-change>span{font-size:12px}
 .obra-detail .analysis-detail-tabs{position:static!important;backdrop-filter:none!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:0 0 4px!important;margin:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--folio-line)!important;border-radius:0!important;box-shadow:none!important}
 .obra-detail .analysis-detail-tabs button{padding:0!important;min-width:0;min-height:44px;font-size:11px!important;font-weight:400!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--folio-muted)!important}
 .obra-detail .analysis-detail-tabs button::after{display:none!important}
@@ -53,7 +56,7 @@ html body .shell .app-main .obra-detail .analysis-secondary-body>.analysis-block
   .obra-detail .analysis-detail-tabs button{font-size:13px!important}
   .obra-detail .analysis-secondary-body{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:32px!important}
   .obra-detail .insight-block,.obra-detail .analysis-secondary[aria-labelledby="detail-tab-analysis"] .analysis-block,.obra-detail .analysis-secondary[aria-labelledby="detail-tab-financials"] .analysis-block,.obra-detail .analysis-judgement{grid-column:1/-1}
-  .obra-detail .hero-meta,.obra-quote,.obra-detail .obra-quote .hero-price,.obra-detail .obra-quote .hero-change{font-size:13px!important}
+  .obra-detail .hero-meta{font-size:13px!important}
 }
 @media(min-width:1280px) and (hover:hover),(min-width:1501px){
   .lifestyle-home>.obra-masthead{display:none}
@@ -68,7 +71,7 @@ html body .shell .app-main .obra-detail .analysis-secondary-body>.analysis-block
   .obra-detail .hero-company{grid-column:1;grid-row:3;margin-bottom:0}
   .obra-detail .obra-status{grid-column:2;grid-row:2;justify-self:end;align-self:center}
   .obra-detail .obra-quote{grid-column:2;grid-row:3;justify-content:flex-end;align-items:baseline;margin:0}
-  .obra-detail .obra-quote .hero-price{font-size:24px!important;font-weight:500!important}
+  .obra-detail .obra-quote .hero-price{font-size:var(--folio-quote-price)!important;font-weight:550!important}
 }
 
 /* DETAIL-CLARITY-1: each section has one owner. */

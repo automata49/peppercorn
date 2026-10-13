@@ -113,7 +113,6 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
       </button>
       <div className="mobile-brand-actions">
         <button className="mobile-brand-search" onClick={()=>setPage('analysis')} aria-label="종목 검색"><AppIcon name="search"/></button>
-        <button className="mobile-brand-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/></button>
       </div>
     </div>
 
@@ -122,6 +121,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
       <button className={['analysis','dashboard','signal','temperature','leaderboard','universe'].includes(page)?'active':''} onClick={()=>setPage('analysis')}><AppIcon name="search"/><b>발견</b></button>
       <button className={['notebook','thesis','research','journal'].includes(page)?'active':''} onClick={()=>setPage('notebook')}><AppIcon name="journal"/><b>저널</b></button>
       <button className={['tracking','watchlist','portfolio'].includes(page)?'active':''} onClick={()=>setPage('tracking')}><AppIcon name="watchlist"/><b>여정</b></button>
+      <button className="mobile-bottom-menu" onClick={()=>setOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/><span>메뉴</span></button>
     </nav>
 
     <Dialog open={open} onOpenChange={setOpen}>

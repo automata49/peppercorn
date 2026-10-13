@@ -1,0 +1,11 @@
+/* One display treatment for photos; supplied logos, icons and typography posters
+   retain their original pixels. Uploads and backups are never modified. */
+:root :is(.home-motion-card>img,.home-detail-cover>img,.story-photo>img,.journal-story>img,.journal-cover,.journal-gallery-collage>img,.discovery-heading>img,.discovery-topic-cover>img,.journal-empty-cover>img,.source-digest-item>img,.leader-cover>img,.leader-dialog-cover>img,.folio-photo-panel>img){filter:var(--folio-photo-filter)}
+:root[data-photo-style="vivid"]{--folio-photo-filter:contrast(1.02) saturate(1.12) sepia(0) brightness(1.015)}
+.visual-style-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:20px 0}
+.visual-style-options>button{display:grid;gap:10px;padding:10px;text-align:left;border:1px solid var(--folio-line);border-radius:var(--folio-ui-radius);background:var(--folio-surface);color:var(--folio-ink);cursor:pointer;min-width:0}
+.visual-style-options>button[aria-pressed="true"]{outline:2px solid var(--folio-ink);outline-offset:2px}
+.visual-style-options img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}
+.visual-style-options b{font-size:14px;line-height:1.4}.visual-style-options span{font-size:12px;line-height:1.5;color:var(--folio-muted)}
+.visual-style-options button:first-child img{filter:contrast(.94) saturate(.82) sepia(.11) brightness(1.025)}
+.visual-style-options button:last-child img{filter:contrast(1.02) saturate(1.12) brightness(1.015)}
