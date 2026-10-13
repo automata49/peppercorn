@@ -47,7 +47,7 @@ export function LifestyleHome({ entries, leaders, research, theses, trades, insi
  ]
  const active = covers.find(c => c.key === selected)
  function go(page: string) { setSelected(null); navigate(page) }
- function cover(c: typeof covers[number]) { return <><motion.img layoutId={`home-image-${c.key}`} src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><motion.h3 layoutId={`home-title-${c.key}`}>{c.label}</motion.h3><p title={c.summary}>{c.summary}</p></div></> }
+ function cover(c: typeof covers[number]) { return <><motion.img layoutId={`home-image-${c.key}`} src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><motion.h3 layoutId={`home-title-${c.key}`}>{c.label}</motion.h3><p title={c.summary}>{c.summary}</p>{c.key==='today'&&<span className="home-story-action" aria-hidden="true">오늘의 이야기 →</span>}</div></> }
  return <LayoutGroup id="lifestyle-home"><section className="lifetime-workspace lifetime-today lifestyle-home" aria-label="나의 여정 한눈에">
   <ObraMasthead label="홈" onMenu={onMenu}/>
   <header className="lifetime-heading home-heading"><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>나의 여정</h2><p>세상을 발견하고,<br/>나의 시간을 기록하다.</p></header>

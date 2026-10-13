@@ -1,5 +1,9 @@
 # Peppercorn — Codex
 
+## PATAGONIA-DESKTOP-1 / DETAIL-CLARITY-1 — user direction (2026-10-13)
+
+Desktop Home uses Patagonia-inspired full-width leading photography, a bold editorial headline, one clear story action and a three-story row. Reuse Folio photography and Motion; mobile/iPad compact composition, identity and destinations remain unchanged. Stock detail separates Overview (brief rules-based summary and two-axis checkup), Analysis (period RS/returns, one price chart and technical risk), Financials (filed financials/valuation), Thesis (user evidence/editor). Remove fixed generic marketing copy, duplicated Thesis preview, repeated key metrics/checklist and the chart repeated below every tab. Preserve data/ranking, missing-data states, save/edit, compare, watchlist and all four accessible tabs. This supersedes the earlier Obra Home desktop and detail-content arrangement.
+
 ## OBRA-RESPONSIVE-1 — user direction (2026-10-13)
 
 Expand the Obra composition with screen size instead of a fixed 390px desktop column. Home uses an editorial heading beside the photo grid on wide screens; detail uses wide tabs, paired Insight/Thesis and readable data columns. Remove the black left rail throughout the app: desktop navigation is a theme-aware horizontal header. Compact bottom navigation and its four labels/actions remain unchanged. Preserve supplied identity, all tabs, data, record editing and Motion/photo behaviour. Supersedes the fixed-width and preserved-desktop-rail parts of OBRA-REFERENCE-1.
