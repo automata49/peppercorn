@@ -1,5 +1,10 @@
 # Folio xx — Design Baseline v1.0
 
+## OBRA-RESPONSIVE-1 — user direction (2026-10-13)
+
+Expand the Obra composition with screen size instead of a fixed 390px desktop column. Home uses an editorial heading beside the photo grid on wide screens; detail uses wide tabs, paired Insight/Thesis and readable data columns. Remove the black left rail throughout the app: desktop navigation is a theme-aware horizontal header. Compact bottom navigation and its four labels/actions remain unchanged. Preserve supplied identity, all tabs, data, record editing and Motion/photo behaviour. Supersedes the fixed-width and preserved-desktop-rail parts of OBRA-REFERENCE-1.
+
+
 ## OBRA-REFERENCE-1 — user direction (2026-10-13)
 
 Implement the first Modern Magazine Obra preview's Home and stock-detail composition. Use its 390px editorial column, 24px gutter, 42px titles, compact 1.1/.9 two-column photo grid (10px gaps, 94px rows; 110px phone rows), 16px photo corners, flat detail rules and two inline actions. This supersedes FILM-MOTION-2 phone stacking and older detail glass/floating toolbar rules for these two surfaces. Preserve the existing bottom navigation unchanged, original photography priority/Motion dismissal, theme/market semantics, all Overview/Analysis/Financials/Thesis data/editing and chart/compare actions. Prototype question field opens the existing persistent Thesis editor. Device frame and mock-data text are preview-only.

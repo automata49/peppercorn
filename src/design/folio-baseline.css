@@ -115,4 +115,4 @@
 .launch-overlay.launch-wordmark-only{display:grid;place-items:center;background:#fff!important;padding:24px}
 .launch-wordmark-only .launch-wordmark{display:block;width:clamp(180px,32vw,320px);max-width:80vw;height:auto;object-fit:contain}
 
-:root{--folio-reference-width:390px;--folio-reference-gutter:24px;--folio-reference-title:42px;--folio-reference-field:color-mix(in srgb,var(--folio-ink) 4%,var(--folio-paper))}
+:root{--folio-reference-width:1280px;--folio-reference-gutter:clamp(24px,3.3vw,48px);--folio-reference-title:clamp(42px,5vw,72px);--folio-reference-field:color-mix(in srgb,var(--folio-ink) 4%,var(--folio-paper))}

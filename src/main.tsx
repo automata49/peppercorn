@@ -13,6 +13,7 @@ import './design/today-leaders.css'
 import './design/lifestyle-home.css'
 import './design/obra.css'
 import './design/obra-reference.css'
+import './design/obra-navigation.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {
   state:{error:Error|null}={error:null}

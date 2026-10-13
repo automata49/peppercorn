@@ -69,8 +69,8 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }else{
       await expect(desktopBrand).toBeVisible()
       await expect(topbar).toBeVisible()
-      await expect(desktopBrand.locator('.folio-wordmark-image-dark')).toBeVisible()
-      await expect(desktopBrand.locator('.folio-wordmark-image-dark')).toHaveAttribute('src','./folio-brand-wordmark-dark.webp?v=u2')
+      await expect(desktopBrand.locator('.folio-wordmark-image-light')).toBeVisible()
+      await expect(desktopBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
     }
 
     await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
