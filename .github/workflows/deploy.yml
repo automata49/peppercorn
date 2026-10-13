@@ -181,6 +181,10 @@ jobs:
             folio-retro-discover.webp \
             folio-retro-journal.webp \
             folio-retro-journey.webp \
+            folio-vivid-today.webp \
+            folio-vivid-discover.webp \
+            folio-vivid-journal.webp \
+            folio-vivid-journey.webp \
             folio-brand-wordmark-light.webp \
             folio-brand-wordmark-dark.webp \
             folio-brand-icon-black.webp \
@@ -201,6 +205,7 @@ jobs:
             public/folio-b-icon-180.png public/folio-b-icon-192.png public/folio-b-icon-512.png public/folio-b-icon-512-maskable.png \
             folio-brand-launch.webp folio-brand-launch-landscape.webp folio-brand-typography.webp folio-brand-photography.webp \
             folio-retro-today.webp folio-retro-discover.webp folio-retro-journal.webp folio-retro-journey.webp \
+            folio-vivid-today.webp folio-vivid-discover.webp folio-vivid-journal.webp folio-vivid-journey.webp \
             folio-brand-wordmark-light.webp folio-brand-wordmark-dark.webp \
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
