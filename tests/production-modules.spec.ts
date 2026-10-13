@@ -32,6 +32,7 @@ for(const entryMode of ['canonical','cached-app-url','historical-alias'])test(`p
  const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click()
  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click()
  await page.locator('.analysis-idea-list>button').first().click()
+ await page.getByRole('tab',{name:'Analysis',exact:true}).click()
  await page.getByRole('button',{name:'종가 확대',exact:true}).click()
  await expect(page.locator('.close-price-chart canvas').first()).toBeVisible()
  await expect(page.getByRole('slider',{name:'종가 날짜 탐색'})).toHaveAttribute('aria-valuetext',/102/)

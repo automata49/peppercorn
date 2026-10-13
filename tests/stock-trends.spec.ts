@@ -116,6 +116,7 @@ test('pending list history is shared with detail and invalidated refresh rejects
  await expect.poll(()=>batches.length).toBe(1)
  await page.locator('.journey-today .stock-trend-row').first().click()
  await expect(page.locator('.analysis-price-momentum')).toBeVisible()
+ await page.getByRole('tab',{name:'Analysis',exact:true}).click()
  // Both mounted readers wait for the shared first batch.
  await expect(page.locator('.analysis-price-momentum svg')).toHaveCount(0)
  expect(batches).toHaveLength(1)
