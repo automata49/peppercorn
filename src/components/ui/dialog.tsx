@@ -28,3 +28,7 @@ export function DialogDescription({className='',...props}:ComponentProps<typeof 
 export function DialogClose(props:ComponentProps<typeof DialogPrimitive.Close>){
   return <DialogPrimitive.Close {...props}/>
 }
+
+export function DialogTrigger(props:ComponentProps<typeof DialogPrimitive.Trigger>){
+  return <DialogPrimitive.Trigger {...props}/>
+}

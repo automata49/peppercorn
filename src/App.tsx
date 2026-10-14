@@ -33,7 +33,7 @@ import { animateSurface } from './motion/system'
 import { ProgressiveDisclosure } from './components/ProgressiveDisclosure'
 import { AuthModal } from './components/AuthModal'
 import { PositionPanel, valuation } from './components/PositionPanel'
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
+import { Dialog, DialogTrigger, DialogClose, DialogContent, DialogDescription, DialogTitle } from './components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
@@ -723,6 +723,8 @@ export default function App(){
   const flagFile=useStockFlags()
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
+  const [catalogFiltersOpen,setCatalogFiltersOpen]=useState(false)
+  const [catalogSort,setCatalogSort]=useState<'rs'|'return'|'name'>('rs')
   const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|null>('core')
   const [analysisSection,setAnalysisSection]=useState<'overview'|'analysis'|'financials'|'thesis'>('overview')
   const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
@@ -1336,14 +1338,25 @@ export default function App(){
     content=<><div className={'analysis-page'+(page==='analysis'&&analysisDetail?' obra-detail':'')}>
       {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={()=>setAnalysisDetail(false)}/>}
       {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog">
-        <div className="catalog-topline">{sizeControl}<MarketSegment label="탐색" value={market} onChange={setMarket}/></div>
-        <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
-        <div className="analysis-browse catalog-layout">
-          <aside className="catalog-filters" aria-label="종목 필터"><div className="mini-segment analysis-scope" role="group" aria-label="주도 분류">{([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" aria-pressed={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(current=>current===key?null:key)} disabled={stockSize==='etf'}>{label}</button>)}</div>
-          <div className="journey-explore-filters"><label>섹터<select aria-label="탐색 섹터" value={sector||''} onChange={e=>setSector(e.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.map(g=><option key={g.key} value={g.key}>{g.market+' · '+sectorName(g.market,g.sector)}</option>)}</select></label><span>{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 · RS 순 · 일간 종가</span></div>
-          <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details></aside>
-          <div className="catalog-results"><StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list stock-card-grid"/></div>
+        <div className="catalog-topline">
+          <Dialog open={catalogFiltersOpen} onOpenChange={setCatalogFiltersOpen}>
+            <DialogTrigger asChild><button type="button" className="catalog-filter-toggle" aria-expanded={catalogFiltersOpen}>Filter &amp; Sort <span aria-hidden="true">＋</span></button></DialogTrigger>
+            <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
+              <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
+              <DialogDescription className="sr-only">종목 분류, 시장, 주도 분류, 섹터와 정렬을 선택하세요.</DialogDescription>
+              <section><h3>분류</h3>{sizeControl}</section>
+              <section><h3>시장</h3><MarketSegment label="탐색" value={market} onChange={setMarket}/></section>
+              <section><h3>주도 분류</h3><div className="mini-segment analysis-scope" role="group" aria-label="주도 분류">{([['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([key,label])=><button key={key} type="button" aria-pressed={analysisScope===key} className={analysisScope===key?'on':''} onClick={()=>setAnalysisScope(current=>current===key?null:key)} disabled={stockSize==='etf'}>{label}</button>)}</div></section>
+              <section><h3>섹터</h3><select aria-label="탐색 섹터" value={sector||''} onChange={e=>setSector(e.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.map(g=><option key={g.key} value={g.key}>{g.market+' · '+sectorName(g.market,g.sector)}</option>)}</select></section>
+              <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
+              <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
+              <DialogClose asChild><button type="button" className="catalog-show-results">{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 보기 →</button></DialogClose>
+            </DialogContent>
+          </Dialog>
+          <span className="catalog-result-count" aria-live="polite">{lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).length}종목 · {catalogSort==='rs'?'RS 순':catalogSort==='return'?'20D 등락 순':'종목명 순'}</span>
         </div>
+        <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
+        <div className="catalog-results"><StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)+'|'+catalogSort} rows={lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>catalogSort==='name'?(a.market==='KR'?a.name||a.ticker:a.ticker).localeCompare(b.market==='KR'?b.name||b.ticker:b.ticker,'ko'):catalogSort==='return'?(b.return_20d??-Infinity)-(a.return_20d??-Infinity):(b.rs_rank??0)-(a.rs_rank??0))} onSelect={pickStock} getClass={displayClass} className="stock-list analysis-idea-list stock-card-grid"/></div>
       </div>}
 
       {page==='thesis'&&<section className="journey-theses"><div className="journey-heading"><h2>내 투자 근거</h2><button className="dashboard-section-action" onClick={()=>navigatePage('analysis')}>종목 찾기 →</button></div><DecisionList items={(enrichedAnalysis as EditableRow[]).filter(r=>r.ticker).map((r,i)=>({key:String(r.id||i),data:r,title:String(r.name||r.ticker),meta:String(r.conclusion||'투자 근거를 작성하세요.'),eyebrow:String(r.market)+' · '+String(r.ticker)+' · '+String(r.date||'')}))} onSelect={r=>{setSelectedRecordId(r.id!=null?String(r.id):null);const hit=matchLeader(r);if(hit)setSelected(hit);setAnalysisSection('thesis')}} emptyLabel="아직 기록이 없습니다. 탐색에서 종목을 고르고 Thesis를 작성하세요."/></section>}

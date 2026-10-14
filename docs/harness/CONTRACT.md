@@ -1,3 +1,7 @@
+## DISCOVERY-FILTER-2 — user direction (2026-10-14)
+
+Discover's Filter & Sort starts collapsed in every orientation and opens an accessible left drawer. Category, market, leadership, sector, advanced conditions and local display sort live in that drawer; readable plain text with bold/underline selection replaces boxed controls. Stock cards and recent items have no border, filled box or shadow. Preserve market colours, real trends, missing states, saved filters, detail return and progressive loading. RS remains the default display order; optional 20D/name sorting never changes scores or classification. This supersedes DISCOVERY-CATALOG-1's always-visible filters and boxed cards only.
+
 ## DISCOVERY-CATALOG-1 / VISUAL-STYLE-1 — user direction (2026-10-13)
 
 Discover stocks use a compact editorial banner, category menu (대형주 / 중소형주 / 전체 / ETF), one search and a responsive stock-card catalogue. Desktop has leadership filters at the upper left beneath the category menu; compact mobile/iPad uses four short leadership controls above cards. Keep first stock cards near the initial viewport, one-line horizontally scrollable recent history, optional detailed conditions and preserved category/market/sector/lens state. Obra token controls replace old animated Pebble/glass geometry **in this catalogue only**, with visible focus, >=44px targets and reduced motion. Preserve ranking, ETF independence, progressive rows, price history and missing states.

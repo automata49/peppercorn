@@ -17,8 +17,10 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
  await page.setViewportSize({width,height});await page.goto('/peppercorn/');await openPage(page,'시장 요약')
  for(const [w,h] of [[width,height],[height,width]]){
   await page.setViewportSize({width:w,height:h});await openPage(page,'탐색')
+  await page.getByRole('button',{name:'Filter & Sort'}).click()
   const core=page.locator('.analysis-scope button').first()
   if(await core.getAttribute('aria-pressed')==='true')await core.click()
+  await page.getByRole('button',{name:'필터 닫기'}).click()
   const list=page.locator('.analysis-idea-list')
   await expect(list.locator('.stock-trend-row')).toHaveCount(3)
   await expect(page.locator('.stock-avatar')).toHaveCount(0)
