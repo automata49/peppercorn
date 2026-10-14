@@ -46,7 +46,7 @@ test('linked trade beyond summary limit opens and edits only its exact original'
 })
 for(const [width,height] of [[844,390],[1194,834]])for(const theme of ['light','dark'])test(`landscape ${width} ${theme}: ETF detail inherits the selected palette`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true,reducedMotion:'reduce'}),page=await context.newPage();await boot(page,theme)
- await openPage(page,'발견');await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();await page.locator('.analysis-idea-list>button').first().click();await expect(page.locator('.analysis-body')).toBeVisible()
+ await openPage(page,'발견');await page.getByRole('button',{name:'Filter & Sort'}).click();await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();await page.getByRole('button',{name:'필터 닫기'}).click();await page.locator('.analysis-idea-list>button').first().click();await expect(page.locator('.analysis-body')).toBeVisible()
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  const colours=await page.locator('.analysis-price-momentum').evaluate(el=>({paper:getComputedStyle(el).getPropertyValue('--folio-paper'),root:getComputedStyle(document.documentElement).getPropertyValue('--folio-paper'),hero:getComputedStyle(el.querySelector('.hero-name')!).color,ink:getComputedStyle(document.body).color}))
  expect(colours.paper).toBe(colours.root);expect(colours.hero).toBe(colours.ink)
