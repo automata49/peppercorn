@@ -1,3 +1,7 @@
+## 2026-10-15 — PREMIUM-DISPLAY-2
+
+HS Academy in expanded Today now renders titles and original/channel links only. The dedicated Gemini AI Insights section is removed from rendering; feed loading/validation and optional Gemini generation/collection are untouched. Harness/build and 41 browser tests (including 10 premium feed/display tests) passed. Four-screen comparisons initially blocked by missing host CJK fonts; final verification is recorded in delivery. No Drive/PDF ingestion or live AI activation is claimed by this display change.
+
 ## DISCOVERY-FILTER-2 — user direction (2026-10-14)
 
 Discover's Filter & Sort starts collapsed in every orientation and opens an accessible left drawer. Category, market, leadership, sector, advanced conditions and local display sort live in that drawer; readable plain text with bold/underline selection replaces boxed controls. Stock cards and recent items have no border, filled box or shadow. Preserve market colours, real trends, missing states, saved filters, detail return and progressive loading. RS remains the default display order; optional 20D/name sorting never changes scores or classification. This supersedes DISCOVERY-CATALOG-1's always-visible filters and boxed cards only.

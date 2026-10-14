@@ -61,3 +61,7 @@ Source IDs are now a one-value schema enum, and evidence is chosen from up to ei
 ### Informative preview gate (2026-10-13)
 
 HS Academy summaries consisting of investment-responsibility/reference-only or editorial-independence boilerplate are rejected as uninformative. Their original title/link remain available, while other public-preview drafts continue. A content validation rejection reports `no_drafts` (or keeps `ready` if another draft exists); actual provider/transport failure remains `unavailable`. Existing live boilerplate drafts were removed without changing original collection dates or inventing replacement summaries.
+
+## 2026-10-15 display-only simplification
+
+Expanded Today hides the dedicated Gemini AI Insights section. HS Academy shows only article titles and original/channel links, with no summary, date, status or explanatory copy. Public metadata collection, optional Gemini draft generation, feed schema validation and expiry handling are unchanged.
