@@ -20,8 +20,8 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,102
  expect(await card.evaluate(el=>getComputedStyle(el).borderWidth)).toBe('0px')
  expect(await card.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
  await toggle.click();const drawer=page.locator('.catalog-filter-drawer');await expect(drawer).toBeVisible();expect((await drawer.boundingBox())!.x).toBe(0)
- for(const option of await drawer.locator('button[aria-pressed]').all()){expect(await option.evaluate(el=>getComputedStyle(el).borderWidth)).toBe('0px');expect(await option.evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(18)}
- await drawer.getByRole('button',{name:'종목명 순',exact:true}).click();await drawer.getByRole('button',{name:/종목 보기/}).click();await expect(page.locator('.catalog-result-count')).toContainText('종목명 순')
+ for(const option of await drawer.locator('button[aria-pressed]').all()){expect(await option.evaluate(el=>getComputedStyle(el).borderWidth)).toBe('0px');expect(await option.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');expect(await option.evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(18)}
+ await page.screenshot({path:`test-results/catalog-drawer-${width}-${height}.png`});await drawer.getByRole('button',{name:'종목명 순',exact:true}).click();await drawer.getByRole('button',{name:/종목 보기/}).click();await expect(page.locator('.catalog-result-count')).toContainText('종목명 순')
  await toggle.click();await expect(drawer.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true');await page.keyboard.press('Escape');await expect(drawer).toHaveCount(0);await expect(toggle).toBeFocused()
  if(width>=1280){const brand=(await page.locator('.desktop-navigation .folio-brand').boundingBox())!,nav=(await page.locator('.desktop-navigation nav').boundingBox())!;expect(nav.x-brand.x-brand.width).toBeGreaterThan(40)}
  else{await expect(page.locator('.topbar-menu')).toBeHidden();await expect(page.locator('.mobile-bottom-nav>button')).toHaveCount(5)}
