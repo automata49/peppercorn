@@ -42,11 +42,14 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
  const due = investment.filter(e => e.reviewDate && e.reviewDate <= today)
  const currentSources = (insights?.items || []).filter(i => Date.parse(i.expires_at) > Date.now()).filter(i => leaders.some(r => r.market === i.market && r.ticker === i.ticker))
  const relatedRecords = investment.filter(e => leaders.some(r => e.ticker.toUpperCase() === r.ticker.toUpperCase() || e.ticker.toUpperCase() === `${r.market}:${r.ticker}`.toUpperCase()))
- const ownPhoto = (records: JournalEntry[]) => records.flatMap(entryPhotos).find(photo => !failedPhotos.has(photo))
+ const usedPhotos=new Set<string>()
+ const ownPhoto = (records: JournalEntry[]) => {const photo=records.flatMap(entryPhotos).find(photo=>!failedPhotos.has(photo)&&!usedPhotos.has(photo));if(photo)usedPhotos.add(photo);return photo}
+ // The journal owns its latest photo; other sections only consume distinct eligible photos.
+ const journalPhoto=ownPhoto(sorted)
  const covers: { key: Section; label: string; summary: string; image: string; position: string; fallback: string }[] = [
   { key: 'today', label: '오늘', summary: oneLine(currentSources[0]?.headline, relatedRecords[0] ? `세상의 변화와 ${relatedRecords[0].title}` : '변화하는 세상을 읽다'), image: ownPhoto(sorted.filter(e => calendarDate(e.updatedAt) === today || calendarDate(e.createdAt) === today)) || coverPhoto('today',photoStyle), fallback: coverPhoto('today',photoStyle), position: 'center 50%' },
   { key: 'discover', label: '발견', summary: leaders.length ? `${leaders.slice(0, 3).map(instrumentName).join(' · ')}에서 발견하는 흐름` : '새로운 기업, 새로운 가능성', image: ownPhoto(relatedRecords) || coverPhoto('discover',photoStyle), fallback: coverPhoto('discover',photoStyle), position: 'center 50%' },
-  { key: 'journal', label: '저널', summary: oneLine(sorted[0]?.title, '기록, 일상, 투자 — 나의 생각을 남기다'), image: ownPhoto(sorted) || coverPhoto('journal',photoStyle), fallback: coverPhoto('journal',photoStyle), position: 'center 50%' },
+  { key: 'journal', label: '저널', summary: oneLine(sorted[0]?.title, '기록, 일상, 투자 — 나의 생각을 남기다'), image: journalPhoto || coverPhoto('journal',photoStyle), fallback: coverPhoto('journal',photoStyle), position: 'center 50%' },
   { key: 'journey', label: '여정', summary: due.length ? `다시 살펴볼 ${due.length}개의 생각` : '가설을 돌아보고, 다음 방향을 찾다', image: ownPhoto(investment) || coverPhoto('journey',photoStyle), fallback: coverPhoto('journey',photoStyle), position: 'center 50%' },
  ]
  const active = covers.find(c => c.key === selected)

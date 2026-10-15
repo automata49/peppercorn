@@ -13,6 +13,8 @@ import { loadLeaderInsights, type InsightsFeed } from './lib/leaderInsights'
 import { LifetimeJournal } from './components/LifetimeJournal'
 import { DiscoveryTopics } from './components/DiscoveryTopics'
 import { PortfolioDisclosure } from './components/PortfolioDisclosure'
+import {readWorkspaceOutbox,queueWorkspaceWrite,acknowledgeWorkspaceWrite} from './lib/workspaceOutbox'
+import {useCloudBasket} from './lib/cloudBasket'
 import { useLifetimeJournal } from './lib/lifetimeJournal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import {heatColor,HEAT_MISSING} from './lib/marketColors'
@@ -759,7 +761,8 @@ export default function App(){
   const activeAccountRef=useRef(accountScope);activeAccountRef.current=accountScope
   const cloudReadyRef=useRef<{scope:string;resources:Set<WorkspaceResource>}>({scope:accountScope,resources:new Set()})
   if(cloudReadyRef.current.scope!==accountScope)cloudReadyRef.current={scope:accountScope,resources:new Set()}
-  const [basket,setBasket]=useAccountRows<Pick<LeaderRow,'market'|'ticker'|'name'>>('folio-stock-basket',accountScope,[])
+  const basketState=useCloudBasket(session,accountScope)
+  const basket=basketState.rows,setBasket=basketState.setRows
   const headerActionRef=useRef<HTMLElement|null>(null)
   const restoreHeaderFocus=(event:Event)=>{event.preventDefault();headerActionRef.current?.focus({preventScroll:true})}
   const [basketOpen,setBasketOpen]=useState(false)
@@ -772,7 +775,7 @@ export default function App(){
   const [analysis,setAnalysis]=useAccountRows<EditableRow>('peppercorn-analysis',accountScope,session?[]:initialAnalysis)
   const [journal,setJournal]=useAccountRows<EditableRow>('peppercorn-journal',accountScope,session?[]:initialJournal)
   const [tempEntries,setTempEntries]=useAccountRows<TempEntry>('peppercorn-temperature',accountScope,[])
-  const notebook=useLifetimeJournal(session?.user.id||'guest')
+  const notebook=useLifetimeJournal(session?.user.id||'guest',session)
   const sourceReports=useSourceReports(session)
   const [authOpen,setAuthOpen]=useState(false)
   const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
@@ -881,36 +884,71 @@ export default function App(){
     }
   },[page,scrollToAnalysis])
 
+  const workspaceRevision=useRef(0),workspaceWrites=useRef(0),workspaceQueue=useRef(Promise.resolve())
   useEffect(()=>{
     if(!session) return
     let cancelled=false;const epoch=accountEpochRef.current
+    let reading=false
+    const read=async()=>{
+    if(reading||workspaceWrites.current||document.visibilityState==='hidden')return
+    reading=true
+    try{
+    // Failed writes survive reload and are retried before any remote snapshot can replace them.
+    const pending=await readWorkspaceOutbox(session.user.id)
+    for(const item of pending){
+      if(cancelled||epoch!==accountEpochRef.current)return
+      if(!await syncRows(item.resource,item.rows,item.mutation))return
+    }
+    if(cancelled||workspaceWrites.current||epoch!==accountEpochRef.current||(await readWorkspaceOutbox(session.user.id)).length)return
+    const revision=workspaceRevision.current
+    const auth=loadStoredSession();if(auth?.user.id!==session.user.id)return
     setSyncState('loading')
-    Promise.all([
-      loadWorkspace(session,'watchlist'),loadWorkspace(session,'portfolio'),loadWorkspace(session,'research'),loadWorkspace(session,'analysis'),loadWorkspace(session,'journal')
+    await Promise.all([
+      loadWorkspace(auth,'watchlist'),loadWorkspace(auth,'portfolio'),loadWorkspace(auth,'research'),loadWorkspace(auth,'analysis'),loadWorkspace(auth,'journal')
     ]).then(([w,p,r,a,j])=>{
-      if(cancelled||epoch!==accountEpochRef.current||activeAccountRef.current!==session.user.id) return
+      if(cancelled||revision!==workspaceRevision.current||workspaceWrites.current||epoch!==accountEpochRef.current||activeAccountRef.current!==session.user.id) return
       for(const resource of ['watchlist','portfolio','research','analysis','journal'] as WorkspaceResource[])cloudReadyRef.current.resources.add(resource)
       setWatch(w.rows);setPortfolio(p.rows);setResearch(r.rows);setAnalysis(a.rows);setJournal(j.rows)
       if(w.session.access_token!==session.access_token) updateSession(w.session,true)
       setSyncState('saved')
     }).catch(()=>{if(!cancelled&&epoch===accountEpochRef.current&&activeAccountRef.current===session.user.id)setSyncState('error')})
-    cloudReadyRef.current.resources.clear()
     // Loaded on its own so a workspace function or database without TEMP-1 leaves the other lists working.
-    loadWorkspace(session,'temperature').then(t=>{if(cancelled||epoch!==accountEpochRef.current||activeAccountRef.current!==session.user.id)return;cloudReadyRef.current.resources.add('temperature');setTempEntries(t.rows as TempEntry[])}).catch(()=>{})
-    return()=>{cancelled=true}
+    loadWorkspace(auth,'temperature').then(t=>{if(cancelled||revision!==workspaceRevision.current||workspaceWrites.current||epoch!==accountEpochRef.current||activeAccountRef.current!==session.user.id)return;cloudReadyRef.current.resources.add('temperature');setTempEntries(t.rows as TempEntry[])}).catch(()=>{})
+    }catch{if(!cancelled&&epoch===accountEpochRef.current)setSyncState('error')}finally{reading=false}
+    }
+    cloudReadyRef.current.resources.clear();read()
+    window.addEventListener('focus',read);window.addEventListener('online',read);document.addEventListener('visibilitychange',read)
+    const timer=window.setInterval(read,60000)
+    return()=>{cancelled=true;window.clearInterval(timer);window.removeEventListener('focus',read);window.removeEventListener('online',read);document.removeEventListener('visibilitychange',read)}
   },[session?.user?.id,authVersion])
 
-  const syncRows=async(resource:WorkspaceResource,rows:EditableRow[])=>{
+  const syncRows=async(resource:WorkspaceResource,rows:EditableRow[],retryMutation?:string)=>{
     if(!session){setSyncState('local');return true}
-    const epoch=accountEpochRef.current
-    if(activeAccountRef.current!==session.user.id||!cloudReadyRef.current.resources.has(resource)){setSyncState('error');return false}
-    setSyncState('saving')
+    const epoch=accountEpochRef.current,scope=session.user.id
+    if(activeAccountRef.current!==scope||(!cloudReadyRef.current.resources.has(resource)&&!retryMutation)){setSyncState('error');return false}
+    workspaceRevision.current++;workspaceWrites.current++
     try{
-      const result=await saveWorkspace(session,resource,rows)
-      if(epoch!==accountEpochRef.current||activeAccountRef.current!==session.user.id)return false
-      if(result.session.access_token!==session.access_token) updateSession(result.session,true)
-      setSyncState('saved');return true
-    }catch{if(epoch===accountEpochRef.current&&activeAccountRef.current===session.user.id)setSyncState('error');return false}
+      // Transactional per-resource records preserve other tabs' pending writes.
+      const mutation=retryMutation||await queueWorkspaceWrite(scope,resource,rows)
+      const run=async()=>{
+        if(epoch!==accountEpochRef.current||activeAccountRef.current!==scope)return false
+        const latest=(await readWorkspaceOutbox(scope)).find(item=>item.resource===resource)
+        if(latest?.mutation!==mutation)return true
+        setSyncState('saving')
+        try{
+          const auth=loadStoredSession();if(auth?.user.id!==scope)return false
+          const result=await saveWorkspace(auth,resource,rows)
+          if(epoch!==accountEpochRef.current||activeAccountRef.current!==scope)return false
+          await acknowledgeWorkspaceWrite(scope,resource,mutation)
+          if(result.session.access_token!==session.access_token)updateSession(result.session,true)
+          setSyncState((await readWorkspaceOutbox(scope)).length?'saving':'saved');return true
+        }catch{if(epoch===accountEpochRef.current&&activeAccountRef.current===scope)setSyncState('error');return false}
+      }
+      const locked=()=>navigator.locks?navigator.locks.request('folio-workspace-sync:'+scope+':'+resource,run):run()
+      const result=workspaceQueue.current.then(locked)
+      workspaceQueue.current=result.then(()=>{},()=>{})
+      return await result
+    }catch{if(epoch===accountEpochRef.current)setSyncState('error');return false}finally{workspaceWrites.current--}
   }
   const updateWatch=(rows:EditableRow[])=>{if(session&&!cloudReadyRef.current.resources.has('watchlist')){setSyncState('error');return}setWatch(rows);void syncRows('watchlist',rows)}
   const updatePortfolio=(rows:EditableRow[])=>{if(session&&!cloudReadyRef.current.resources.has('portfolio')){setSyncState('error');return}setPortfolio(rows);void syncRows('portfolio',rows)}
@@ -1494,7 +1532,7 @@ export default function App(){
       </ProgressiveDisclosure></>
   }else{
     content=<div className="settings-grid"><TypographySettings style={editorialStyle} onChange={setEditorialStyle}/><div className="panel"><h2>주도력 선별 기준</h2><div className="setting"><span>추세 통과 · 간소화 필터</span><b>종가 &gt; 50일선 &gt; 200일선 · 52주 고점 -25% 이내 · RS순위 ≥70</b></div><div className="setting"><span>주도 후보</span><b>추세 통과 · IBD식 RS(추정) ≥{CANDIDATE_RS_MIN} · 52주 고점 {CANDIDATE_HIGH_DISTANCE_MIN*100}% 이내 · RS 3M &gt; 0</b></div><div className="setting"><span>핵심 주도 · Peppercorn 강화 기준</span><b>RS순위 ≥95 · 52주 고점 -15% 이내 · RS 3M/6M &gt; 0</b></div><div className="setting"><span>조정 중 · 별도 관찰</span><b>후보에 자동 포함하지 않음</b></div><div className="setting"><span>강세 전환 · 자체 발굴 기준</span><b>52주 고점 -30% 이내 · RS 개선</b></div><div className="setting"><span>돌파 거래량 참고</span><b>20일 평균 대비 ≥1.4배</b></div><div className="setting"><span>52W 계산</span><b>52W 고점: 최근 최대 252개 거래 세션의 최고가(이력 부족 시 확보된 기간) · RS/등락 52W: 252거래일 전 종가 대비</b></div><div className="criteria-sources"><p>출처와 적용 범위: 미너비니의 Trend Template는 52주 고점 -25% 이내·RS 70 이상을 포함합니다. IBD는 초기 주도주의 RS Rating 80 이상을 중시합니다. IBD식 RS(추정)는 최근 12개월을 63거래일씩 나눠 최신 분기 40%, 이전 분기 각 20%의 수익률로 계산하고, KR·US 시장의 수집 종목을 각각 1~99 백분위로 변환합니다. 주식 가격 이력 253거래일 미만은 공란입니다. ETF는 주식 순위와 섞지 않고 같은 시장 ETF끼리 따로 RS순위·IBD식 RS를 산정하며, 같은 Trend Template·단계·최종 판단·액션 가이드 규칙을 적용합니다(주도 분류는 주식 전용). 공식 IBD Rating은 독점적인 별도 종목군을 사용하므로 일치하지 않습니다. 기존 RS순위는 벤치마크 대비 자체 점수입니다. 150일선, 200일선 상승 여부 등 전체 Trend Template도 아직 계산하지 않습니다. 종목 분류는 매수 신호가 아닙니다.</p><a href="https://books.google.com/books/about/Trade_Like_a_Stock_Market_Wizard_How_to.html?id=i5ZdR7mekpEC" target="_blank" rel="noreferrer">Mark Minervini · Trade Like a Stock Market Wizard ↗</a><a href="https://www.williamoneil.com/about-us/legal/oneil-proprietary-rating-and-rankings" target="_blank" rel="noreferrer">William O’Neil + Co. · RS Rating 계산 설명 ↗</a><a href="https://www.investors.com/news/beigene-stock-meets-80-plus-rs-rating-benchmark/" target="_blank" rel="noreferrer">Investor’s Business Daily · RS Rating 80 ↗</a></div></div>
-      <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · Watchlist / Portfolio / 시장 온도계 / Analysis / Journal은 Supabase에 저장됩니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 회원가입'}</button></div></div>
+      <div className="panel"><h2>Account & Storage</h2><p className="note">{session?'로그인됨 · 저널 사진·필기·회고, 장바구니와 투자 기록을 계정에 동기화합니다. 기존 기기 기록은 해당 기기에서 로그인하면 합쳐집니다.':'로그인하지 않은 편집 내용은 이 기기의 브라우저에만 저장됩니다.'}</p><div className="setting"><span>Market Data</span><b>Supabase Live</b></div><div className="setting"><span>Personal Data</span><b>{session?'Cloud + RLS':'Local only'}</b></div><button className="settings-auth" onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인 / 회원가입'}</button></div></div>
   }
 
   if(page==='analysis'&&!analysisDetail){
@@ -1608,5 +1646,5 @@ export default function App(){
     </AlertDialogContent>
   </AlertDialog>
   return <LiveQuoteProvider enabled={source==='supabase'}><motion.div initial={false} animate={{opacity:showIntro?0:1,y:showIntro?8:0}} transition={{duration:reduceLaunchMotion?0:.4,ease:[.22,1,.36,1]}} inert={showIntro} data-market={market} className={'shell page-shell-'+page+(page==='analysis'&&analysisDetail?' obra-detail-shell':'')+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing} onSearch={()=>{headerActionRef.current=document.activeElement as HTMLElement;setStockSearchOpen(true)}} onBasket={()=>{headerActionRef.current=document.activeElement as HTMLElement;setBasketOpen(true)}} basketCount={basket.length}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title"><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><div className="content">{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</div><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main><Dialog open={stockSearchOpen} onOpenChange={setStockSearchOpen}><DialogContent className="global-stock-dialog" onCloseAutoFocus={restoreHeaderFocus} onOpenAutoFocus={event=>{event.preventDefault();document.querySelector<HTMLInputElement>('.global-stock-dialog input')?.focus()}}><DialogTitle>종목 검색</DialogTitle><DialogDescription className="sr-only">종목명이나 코드를 입력해 상세 화면으로 이동하세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="검색 닫기"><AppIcon name="close"/></button></DialogClose><StockSearch rows={leaders} recent={recentStocks} onPick={row=>{setStockSearchOpen(false);openAnalysisStock(row)}}/></DialogContent></Dialog>
-    <Dialog open={basketOpen} onOpenChange={setBasketOpen}><DialogContent className="global-stock-dialog stock-basket-dialog" onCloseAutoFocus={restoreHeaderFocus}><DialogTitle>장바구니 · {basket.length}종목</DialogTitle><DialogDescription>담아둔 종목을 한곳에서 살펴보세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="장바구니 닫기"><AppIcon name="close"/></button></DialogClose>{basket.length?<ul className="stock-basket-list">{basket.map(row=><li key={row.market+'|'+row.ticker}><button type="button" disabled={!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)} onClick={()=>{const current=leaders.find(r=>r.market===row.market&&r.ticker===row.ticker);if(current){setBasketOpen(false);openAnalysisStock(current)}}}><b>{row.market==='US'?row.ticker:row.name||row.ticker}</b><small>{row.market} · {row.market==='US'?row.name:row.ticker}{!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)&&' · 현재 데이터 없음'}</small></button><button type="button" aria-label={`${row.ticker} 장바구니에서 삭제`} onClick={()=>setBasket(basket.filter(r=>r.market!==row.market||r.ticker!==row.ticker))}><AppIcon name="close"/></button></li>)}</ul>:<p className="basket-empty">발견 카드나 종목 상세에서 종목을 담아보세요.</p>}<p className="note">이 계정의 이 기기에 저장됩니다.</p></DialogContent></Dialog>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</motion.div><AnimatePresence>{showIntro&&<motion.div key="launch" initial={{opacity:1}} exit={{opacity:0}} transition={{duration:reduceLaunchMotion?0:.35}} ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/></motion.div>}</AnimatePresence></LiveQuoteProvider>
+    <Dialog open={basketOpen} onOpenChange={setBasketOpen}><DialogContent className="global-stock-dialog stock-basket-dialog" onCloseAutoFocus={restoreHeaderFocus}><DialogTitle>장바구니 · {basket.length}종목</DialogTitle>{basketState.error&&<div role="alert"><p>{basketState.error}</p><button onClick={()=>void basketState.retry()}>동기화 다시 시도</button></div>}<DialogDescription>담아둔 종목을 한곳에서 살펴보세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="장바구니 닫기"><AppIcon name="close"/></button></DialogClose>{basket.length?<ul className="stock-basket-list">{basket.map(row=><li key={row.market+'|'+row.ticker}><button type="button" disabled={!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)} onClick={()=>{const current=leaders.find(r=>r.market===row.market&&r.ticker===row.ticker);if(current){setBasketOpen(false);openAnalysisStock(current)}}}><b>{row.market==='US'?row.ticker:row.name||row.ticker}</b><small>{row.market} · {row.market==='US'?row.name:row.ticker}{!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)&&' · 현재 데이터 없음'}</small></button><button type="button" aria-label={`${row.ticker} 장바구니에서 삭제`} onClick={()=>setBasket(basket.filter(r=>r.market!==row.market||r.ticker!==row.ticker))}><AppIcon name="close"/></button></li>)}</ul>:<p className="basket-empty">발견 카드나 종목 상세에서 종목을 담아보세요.</p>}<p className="note">{session?'계정에 동기화됩니다.':'로그인 전에는 이 기기에 저장됩니다.'}</p></DialogContent></Dialog>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</motion.div><AnimatePresence>{showIntro&&<motion.div key="launch" initial={{opacity:1}} exit={{opacity:0}} transition={{duration:reduceLaunchMotion?0:.35}} ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/></motion.div>}</AnimatePresence></LiveQuoteProvider>
 }

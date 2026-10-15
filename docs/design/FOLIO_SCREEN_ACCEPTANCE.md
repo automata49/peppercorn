@@ -1,3 +1,11 @@
+## ACCOUNT-JOURNAL-2 — current acceptance (2026-10-15)
+
+- Same-account separate browser contexts share notebook bodies, photos/ink/revisions, reflection results and basket mutations; other accounts/guests remain isolated. Legacy divergent IDs survive as recovered pages. Multiple offline edits retry without duplicate IDs; independent remote records still appear after failed uploads.
+- Journal cards keep image and caption in separate document flow with no negative overlap, including phone portrait and landscape.
+- Exactly four Today destinations and the existing portrait two-column composition remain. A personal photo appears on at most one cover, prioritizing Journal.
+- Journey distinguishes due/planned/completed reviews and writes dated result, maintain/revise/close decision, lesson, next action and next review date while preserving original journal content. Dirty reflection dismissal requires confirmation.
+- Tiptap formatting and state, undo/redo, photo/ink, revisions and safe backup roundtrips work on retained records. Signed-in sync state is visible; guests are accurately labelled local.
+
 ## JOURNAL-EDITORIAL-1 — user direction (2026-10-15)
 
 Journal and Journey extend the Patagonia-inspired Folio editorial hierarchy beneath the unchanged shared SectionHeading. Landscape >=700px and desktop >=1024px place search/calendar in a left column; portrait keeps inline filters and a two-column gallery. Journal/Review cards use neutral translucent Liquid Glass with inset highlights and a readable overlapping glass caption; opaque fallback and reduced transparency are supported. Preserve dates, grouping, 40-record batches, original linked editors, private PDF readers, backup/import, Motion/focus, and dirty-edit protection. Journey prioritizes investment reflections; existing asset disclosure follows the records, and review/watchlist/holdings remain a single tab level. New destination/caption labels have no arrows or “으로” suffix. Supplied identity, shared title/image sizes, themes, market semantics and stored data remain unchanged. CSS approximates glass, not native Apple rendering.

@@ -41,6 +41,7 @@ jobs:
           python -m pip install --quiet -r analysis/requirements-drive-pdf.txt
           python -m unittest analysis.test_drive_pdf_reports
           node supabase/tests/source_reports.verify.mjs
+          node supabase/tests/notebook.verify.mjs
       - if: github.event_name != 'workflow_run'
         run: python -m pytest -q analysis/fundamentals
       - if: github.event_name != 'workflow_run'

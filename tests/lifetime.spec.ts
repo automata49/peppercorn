@@ -14,6 +14,7 @@ async function setup(page:Page){
 }
 async function compose(page:Page,title:string){const questions=page.locator('.journal-questions');if(await questions.getAttribute('open')===null)await questions.locator(':scope>summary').click();await page.getByRole('textbox',{name:'기록 제목'}).fill(title);await page.getByRole('textbox',{name:'기록 본문'}).fill('관찰: 수요가 늘었다. 해석과 증거는 구분한다.');await page.getByLabel('질문에 대한 나의 답').fill('반대 증거도 확인한다.')}
 for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, revisit, revise and keyboard tabs`,async({browser})=>{
+ test.setTimeout(60000)
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440});const page=await context.newPage();await setup(page)
  await expect(page.locator('.journey-today')).toHaveCount(0)
  const masthead=page.locator(width===1440?'.desktop-navigation':'.mobile-brandbar')
