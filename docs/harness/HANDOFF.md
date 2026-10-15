@@ -1,3 +1,7 @@
+## 2026-10-15 — private Drive PDF reports
+
+Added owner-read-only private_source_reports storage, authenticated source-reports function, bounded PDF text/link/chart extraction, lazy Today/Journal readers and account-switch guards. Current Drive PDF imported through connected private tools; no private content committed. Existing HS Academy/Gemini display simplification was merged separately. Read docs/PRIVATE_PDF_REPORTS.md for the import/update contract and separate notebook storage. Automated collection uses the connected Drive/DB workflow; validation/deployment status is recorded in delivery.
+
 ## 2026-10-15 — PREMIUM-DISPLAY-2
 
 HS Academy in expanded Today now renders titles and original/channel links only. The dedicated Gemini AI Insights section is removed from rendering; feed loading/validation and optional Gemini generation/collection are untouched. Harness/build and 41 browser tests (including 10 premium feed/display tests) passed. Four-screen comparisons initially blocked by missing host CJK fonts; final verification is recorded in delivery. No Drive/PDF ingestion or live AI activation is claimed by this display change.
