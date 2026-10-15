@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {openPage} from './journey-helpers'
@@ -17,15 +18,15 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
  await page.setViewportSize({width,height});await page.goto('/peppercorn/');await openPage(page,'시장 요약')
  for(const [w,h] of [[width,height],[height,width]]){
   await page.setViewportSize({width:w,height:h});await openPage(page,'탐색')
-  await page.getByRole('button',{name:'Filter & Sort'}).click()
+  await openFilters(page)
   const core=page.locator('.analysis-scope button').first()
   if(await core.getAttribute('aria-pressed')==='true')await core.click()
-  await page.getByRole('button',{name:'필터 닫기'}).click()
+  await closeFilters(page)
   const list=page.locator('.analysis-idea-list')
   await expect(list.locator('.stock-trend-row')).toHaveCount(3)
   await expect(page.locator('.stock-avatar')).toHaveCount(0)
   for(const row of rows){
-   const card=list.getByRole('listitem',{name:row.name+' 종목 상세 보기'})
+   const card=list.getByRole('button',{name:row.name+' 종목 상세 보기'})
    await expect(card.locator('.stock-trend-copy>b')).toHaveText(row.market==='KR'?row.name:row.ticker)
    await expect(card.locator('.stock-trend-copy>small')).toHaveText(row.market==='KR'?row.ticker:row.name)
    expect(parseFloat(await card.locator('.stock-trend-copy>b').evaluate(e=>getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(20)

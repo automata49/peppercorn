@@ -65,3 +65,9 @@ HS Academy summaries consisting of investment-responsibility/reference-only or e
 ## 2026-10-15 display-only simplification
 
 Expanded Today hides the dedicated Gemini AI Insights section. HS Academy shows only article titles and original/channel links, with no summary, date, status or explanatory copy. Public metadata collection, optional Gemini draft generation, feed schema validation and expiry handling are unchanged.
+
+## Discovery editorial news — 2026-10-15
+
+Discover now reuses the validated public issuer feed in a Patagonia-inspired editorial strip: image → instrument/industry eyebrow → news headline → short summary → dated source/attribution and separate original/security links. No additional model calls or browser searches occur on page load. The existing market-refresh/deploy collector searches registered official RSS and licensed related images; source and image identity/rights checks remain unchanged. Newest eligible articles come first (up to four, published within seven days, original expiry enforced), matched by exact market+ticker to the loaded universe. The editorial strip follows market selection, independently of stock screening/ranking. News from issuers across sectors is market context, not a fabricated broad-market or macro report. Missing/expired news never becomes a decorative 'latest' story; the strip is omitted. Original/related/decorative photos are explicitly distinguished and credited, with image failures reverting to labelled Folio art. Portrait has swipeable single-story previews; landscape has three/four columns with readable copy. No auto-rotation. Sources beyond the reviewed registry remain unsupported.
+
+Reference inspected: https://www.patagonia.com/shop/womens/jackets-vests/insulated/down — image tiles above the filters, with product-family eyebrows, bold subheads, short supporting paragraphs and destination links. Folio uses its own assets, type, theme and financial semantics.

@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {stockSizes,filterStockSize,CAP_COVERAGE_MIN} from '../src/lib/stockSize'
@@ -58,18 +59,18 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.locator('.journey-today svg[role=img]').first()).toBeVisible()
  await openPage(page,'탐색')
  await expect(page.getByRole('heading',{name:'변화하는 세상을 읽다',exact:true})).toBeVisible()
- await page.getByRole('button',{name:'Filter & Sort'}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
+ await openFilters(page)
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
  const scope=page.getByRole('group',{name:'주도 분류'})
  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
  // Category and leadership are independent axes: changing size/asset category preserves the active leadership class.
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(6)
- await scope.getByRole('button',{name:'핵심 주도',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
- for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(count);await button.click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)}
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(6)
+ await scope.getByRole('button',{name:'핵심 주도',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20)
+ for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});await button.click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(count);await button.click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20)}
  await expect(page.locator('.analysis-idea-list svg[role=img]')).toHaveCount(20)
- await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(18)
- await page.getByRole('button',{name:'필터 닫기'}).click();await page.locator('.analysis-idea-list > button').first().click();await expect(page.locator('.analysis-price-momentum')).toBeVisible();await page.getByRole('button',{name:'← 탐색 목록'}).click();await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(18)
+ await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await expect(page.locator('.analysis-price-momentum')).toBeVisible();await page.getByRole('button',{name:'← 탐색 목록'}).click();await openFilters(page)
  await expect(page.getByRole('button',{name:'중소형주',exact:true})).toHaveAttribute('aria-pressed','true')
  await page.screenshot({path:`test-results/stock-trends-${width}.png`,fullPage:true})
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
@@ -79,19 +80,19 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
 })
 test('fallback basis and empty history are explicit, unknown size only appears in all',async({page})=>{
  const data=rows.map(r=>({...r,market_cap:null,traded_value_20d:r.id.endsWith('-0')?null:r.traded_value_20d}))
- await boot(page,data,{missing:true});await openPage(page,'탐색');await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await boot(page,data,{missing:true});await openPage(page,'탐색');await openFilters(page)
  await expect(page.locator('.stock-size-basis summary')).toContainText('시가총액 대체')
- const scope=page.getByRole('group',{name:'주도 분류'});const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
+ const scope=page.getByRole('group',{name:'주도 분류'});const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  await expect(page.locator('.analysis-idea-list .stock-trend-missing').first()).toHaveText('이력 없음')
- await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(16)
- await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20)
+ await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(16)
+ await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20)
  await expect(page.locator('.analysis-idea-list svg[role=img]')).toHaveCount(0)
 })
 test('progressive listing loads bounded history and retains all filtered rows',async({page})=>{
  const data=Array.from({length:45},(_,i)=>({...rows[0],id:'extra-'+i,ticker:'T'+i,market_cap:i+1,leadership_class:'핵심 주도'}))
- const batches=await boot(page,data);await openPage(page,'탐색');await page.getByRole('button',{name:'Filter & Sort'}).click();await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(20);await page.getByRole('button',{name:'필터 닫기'}).click();await page.getByRole('button',{name:'더 보기 · 20종목'}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(40);await page.getByRole('button',{name:'더 보기 · 5종목'}).click();await expect(page.locator('.analysis-idea-list > button')).toHaveCount(45)
+ const batches=await boot(page,data);await openPage(page,'탐색');await openFilters(page);await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click()
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20);await closeFilters(page);await page.getByRole('button',{name:'더 보기 · 20종목'}).click()
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(40);await page.getByRole('button',{name:'더 보기 · 5종목'}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(45)
  expect(batches.every(ids=>ids.length<=10)).toBe(true)
 })
 
@@ -100,9 +101,9 @@ test('ETF is a first-class classification and does not use equity leadership cla
   {...rows[0],id:'ETF-US',ticker:'SPY',name:'US ETF',asset_class:'ETF',leadership_class:null},
   {...rows[10],id:'ETF-KR',ticker:'069500',name:'KR ETF',asset_class:'ETF',leadership_class:null},
  ] as LeaderRow[]
- await boot(page,[...rows,...etfs]);await openPage(page,'탐색');await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await boot(page,[...rows,...etfs]);await openPage(page,'탐색');await openFilters(page)
  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(2)
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  const leadershipButtons=page.getByRole('group',{name:'주도 분류'}).getByRole('button')
  await expect(leadershipButtons).toHaveCount(4)
  for(const button of await leadershipButtons.all())await expect(button).toBeDisabled()
@@ -119,14 +120,14 @@ test('pending list history is shared with detail and invalidated refresh rejects
  await expect(page.locator('.analysis-price-momentum')).toBeVisible()
  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
  // Both mounted readers wait for the shared first batch.
- await expect(page.locator('.analysis-price-momentum svg')).toHaveCount(0)
+ await expect(page.locator('.analysis-price-momentum svg[role=img]')).toHaveCount(0)
  expect(batches).toHaveLength(1)
- await page.locator('.obra-masthead').getByRole('button',{name:'전체 메뉴 열기'}).click();await page.locator('.drawer-refresh').click()
+ await page.locator('.sidebar-tools').click();await page.locator('.drawer-refresh').click()
  await expect.poll(()=>batches.length).toBeGreaterThan(1)
- await expect(page.locator('.analysis-price-momentum svg').first()).toBeVisible()
+ await expect(page.locator('.analysis-price-momentum svg[role=img]').first()).toBeVisible()
  const firstResponse=page.waitForResponse(r=>r.url().includes('price-history')&&(new URL(r.url()).searchParams.get('ids')||'').includes(','))
  release();await (await firstResponse).finished()
- await expect(page.locator('.analysis-price-momentum svg').first()).toBeVisible()
+ await expect(page.locator('.analysis-price-momentum svg[role=img]').first()).toBeVisible()
  const refreshCount=batches.length
  await page.getByRole('button',{name:'← 탐색 목록'}).click()
  await expect(page.locator('.analysis-idea-list svg[role=img]').first()).toBeVisible()

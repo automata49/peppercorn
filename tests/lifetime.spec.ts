@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {openPage} from './journey-helpers'
@@ -15,7 +16,7 @@ async function compose(page:Page,title:string){const questions=page.locator('.jo
 for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, revisit, revise and keyboard tabs`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height:1000},hasTouch:width<1440});const page=await context.newPage();await setup(page)
  await expect(page.locator('.journey-today')).toHaveCount(0)
- const masthead=page.locator(width===1440?'.desktop-navigation':'.obra-masthead')
+ const masthead=page.locator(width===1440?'.desktop-navigation':'.mobile-brandbar')
  await expect(masthead).toBeVisible();expect(await masthead.locator('.folio-wordmark-system>img:visible').count()).toBe(1)
  await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정'])
  await openPage(page,'저널');await page.getByRole('button',{name:'새 페이지',exact:true}).click();await compose(page,'기다림도 하나의 결정')
@@ -53,7 +54,7 @@ test('reduced motion, dirty dismissal, photo preview and real close-price chart'
  await expect(page.locator('.journal-cover')).toBeVisible()
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'기록 닫기'}).click();await expect(page.getByRole('dialog')).toBeVisible()
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.locator('.journal-gallery img').first()).toBeVisible()
- await openPage(page,'발견');await page.getByRole('button',{name:'Filter & Sort'}).click();const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click();await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click();await page.getByRole('button',{name:'필터 닫기'}).click();await page.locator('.analysis-idea-list>button').first().click();await page.getByRole('tab',{name:'Analysis',exact:true}).click();await page.getByRole('button',{name:'종가 확대',exact:true}).click()
+ await openPage(page,'발견');await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click();await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click();await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await page.getByRole('tab',{name:'Analysis',exact:true}).click();await page.getByRole('button',{name:'종가 확대',exact:true}).click()
  await expect(page.locator('.close-price-chart canvas').first()).toBeVisible();await expect(page.getByRole('slider',{name:'종가 날짜 탐색'})).toHaveAttribute('aria-valuetext',/102/)
  await page.getByRole('button',{name:'가격 · RS 비교',exact:true}).click();await expect(page.locator('.scrubbable-chart')).toBeVisible()
 })

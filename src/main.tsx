@@ -16,6 +16,7 @@ import './design/obra.css'
 import './design/obra-reference.css'
 import './design/obra-navigation.css'
 import './design/discovery-catalog.css'
+import './design/discovery-news.css'
 import './design/photography.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {

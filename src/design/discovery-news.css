@@ -1,0 +1,28 @@
+/* Patagonia's image / eyebrow / headline / short prose hierarchy, owned by Folio. */
+.discovery-news{margin:28px 0 40px;min-width:0;color:var(--folio-ink)}
+.discovery-news-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
+.discovery-news-heading h3{margin:8px 0 0;font-size:clamp(22px,2.5vw,32px);font-weight:550;line-height:1.2;letter-spacing:-.035em}
+.discovery-news-heading>span{color:var(--folio-muted);font-size:12px;flex-shrink:0}
+.discovery-news-stories{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.discovery-news-story{min-width:0;background:transparent}
+.discovery-news-story figure{margin:0 0 16px}
+.discovery-news-story figure>a{display:block;border-radius:16px;overflow:hidden;background:var(--folio-surface)}
+.discovery-news-story img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;object-position:center}
+.discovery-news-story figcaption{display:flex;flex-wrap:wrap;gap:4px 8px;margin-top:8px;font-size:10px;line-height:1.5;color:var(--folio-muted)}
+.discovery-news-story figcaption a{color:inherit;text-decoration:none}
+.discovery-news-instrument{font-size:12px;line-height:1.6;color:var(--folio-muted);overflow-wrap:anywhere}
+.discovery-news-copy h4{margin:8px 0 12px;font-family:var(--folio-editorial-font);font-size:clamp(20px,1.9vw,28px);font-weight:600;line-height:1.3;letter-spacing:-.035em;overflow-wrap:anywhere;word-break:keep-all}
+.discovery-news-copy h4 a{color:var(--folio-ink);text-decoration:none}
+.discovery-news-copy>p{font-size:14px;line-height:1.7;margin:0 0 14px;color:var(--folio-ink);word-break:keep-all;overflow-wrap:anywhere}
+.discovery-news-source{display:flex;flex-wrap:wrap;gap:4px 8px;font-size:11px;line-height:1.6;color:var(--folio-muted)}
+.discovery-news-actions{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:8px}
+html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:center;min-height:44px;padding:8px 0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--folio-ink);font:inherit;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.discovery-news :is(a,button):focus-visible{outline:2px solid var(--folio-ink);outline-offset:4px}
+@media(min-width:768px) and (max-width:1100px) and (orientation:landscape){.discovery-news-stories{grid-template-columns:repeat(3,minmax(0,1fr))}.discovery-news-story:nth-child(4){display:none}}
+@media(orientation:portrait),(max-width:767px){
+ .discovery-news-stories{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(78vw,340px);gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:0 4px 12px;scroll-padding-inline:4px;overscroll-behavior-x:contain}
+ .discovery-news-story{scroll-snap-align:start}
+ .discovery-news-heading{align-items:start}.discovery-news-heading>span{max-width:90px;line-height:1.6;text-align:right}
+ .discovery-news-copy h4{font-size:23px}
+}
+@media(orientation:landscape) and (max-height:600px){.discovery-news-story img{aspect-ratio:16/9}.discovery-news-stories{grid-auto-flow:initial;grid-auto-columns:initial;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}.discovery-news-story:nth-child(4){display:none}.discovery-news-copy h4{font-size:19px}.discovery-news-copy>p{font-size:13px}}

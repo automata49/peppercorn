@@ -74,7 +74,7 @@ function FolioBrand(){
   return <FolioWordmark/>
 }
 
-export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean}){
+export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch,onBasket,basketCount}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean;onSearch:()=>void;onBasket:()=>void;basketCount:number}){
   const [theme,setTheme]=useState<ThemeMode>(readTheme)
 
   useEffect(()=>{
@@ -96,10 +96,15 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
     {pages.filter(([id])=>(ids as readonly string[]).includes(id)).map(pageButton)}
   </section>)}</nav>
 
+  const stockActions=<div className="global-stock-actions">
+    <button type="button" className="mobile-brand-search" onClick={onSearch} aria-label="종목 검색" aria-haspopup="dialog"><AppIcon name="search"/></button>
+    <button type="button" onClick={onBasket} aria-label={`장바구니 ${basketCount}종목`} aria-haspopup="dialog"><AppIcon name="basket"/>{basketCount>0&&<span className="basket-count" aria-hidden="true">{basketCount}</span>}</button>
+  </div>
   return <>
     <header className="sidebar desktop-navigation">
       <div className="brand folio-brand"><FolioBrand/></div>
       {navigation}
+      {stockActions}
       <button className="sidebar-tools" onClick={()=>setOpen(true)} aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/>도구 및 설정</button>
       <div className="side-foot">
         <ThemeControl value={theme} onChange={setTheme}/>
@@ -111,9 +116,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing}:{page:s
       <button className="mobile-brand-home" onClick={()=>setPage('today')} aria-label="오늘로 이동">
         <span className="folio-brand"><FolioBrand/></span>
       </button>
-      <div className="mobile-brand-actions">
-        <button className="mobile-brand-search" onClick={()=>setPage('analysis')} aria-label="종목 검색"><AppIcon name="search"/></button>
-      </div>
+      <div className="mobile-brand-actions">{stockActions}</div>
     </div>
 
     <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">

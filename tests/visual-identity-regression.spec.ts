@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {openPage} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
@@ -101,12 +102,12 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }else{
       await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
     }
-    await page.getByRole('button',{name:'Filter & Sort'}).click()
+    await openFilters(page)
     const scope=page.locator('.analysis-scope')
     const active=scope.locator('button[aria-pressed="true"]')
     if(await active.count())await active.first().click()
-    await page.getByRole('button',{name:'필터 닫기'}).click()
-    await page.locator('.analysis-idea-list > button').first().click()
+    await closeFilters(page)
+    await page.locator('.analysis-idea-list .stock-trend-row').first().click()
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
     expect(await analysis.evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgb(255, 255, 255)')

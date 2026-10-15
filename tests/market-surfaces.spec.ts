@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect,type Locator} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {heatColor} from '../src/lib/marketColors'
@@ -44,8 +45,8 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  for(const button of await page.locator('.journey-classes button').all())await checkLeadership(button)
  if(width===390)await page.screenshot({path:`test-results/market-pebble-${theme}.png`})
  await openPage(page,'탐색')
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(6)
- await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(6)
+ await openFilters(page)
  await expect(page.locator('.analysis-scope')).toHaveCSS('border-top-width','0px')
  await expect(page.locator('.analysis-scope')).toHaveCSS('gap','0px')
  for(const button of await page.locator('.analysis-scope button').all()){
@@ -64,7 +65,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
   await button.click();await expect(button).toHaveAttribute('aria-pressed','false')
  }
  if(width===390)await page.screenshot({path:`test-results/leadership-explore-${theme}.png`})
- await page.getByRole('button',{name:'필터 닫기'}).click()
+ await closeFilters(page)
  const colors=theme==='dark'?{KR:['#ff8580','#78b4ff'],US:['#72d5a2','#ff8580']}:{KR:['#b3261e','#1c5cab'],US:['#196b42','#b3261e']}
  for(const m of ['KR','US'] as const){
   for(const [i,name] of ['UP','DOWN'].entries()){

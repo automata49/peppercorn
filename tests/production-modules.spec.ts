@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 import {readFileSync} from 'node:fs'
 import {demoRows} from '../src/data/mock'
@@ -29,11 +30,11 @@ for(const entryMode of ['canonical','cached-app-url','historical-alias'])test(`p
  await page.getByRole('button',{name:'기록 닫기',exact:true}).click()
  await expect(page.getByRole('dialog')).toHaveCount(0)
  await openPage(page,'발견')
- await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await openFilters(page)
  const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click()
  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click()
- await page.getByRole('button',{name:'필터 닫기'}).click()
- await page.locator('.analysis-idea-list>button').first().click()
+ await closeFilters(page)
+ await page.locator('.analysis-idea-list .stock-trend-row').first().click()
  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
  await page.getByRole('button',{name:'종가 확대',exact:true}).click()
  await expect(page.locator('.close-price-chart canvas').first()).toBeVisible()

@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {openSignal,openPage,pickFirstStock} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 const rows=Array.from({length:20},(_,i)=>({id:String(i),ticker:'TEST'+i,market:i%2?'KR':'US',name:'검증 종목 '+i,asset_class:'Equity',sector:i%2?'Electronic Technology':'Technology',industry:'Semiconductors',exchange:i%2?'KOSPI':'NASDAQ',index_memberships:[i%2?'KOSPI200':'S&P 500'],price:100+i,rs_rank:99-i%4,ibd_rs_estimate:95,high_52w_distance:-.1,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_3m:.1,rs_6m:.2,rs_5d:.01,rs_20d:.02,rs_50d:.03,rs_120d:.04,rs_200d:.05,rs_12m:.06,ma50:90,ma200:80,return_1w:.01,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}))
@@ -188,9 +189,9 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
   await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click();
   // ETF is a first-class Explore classification and ignores equity leadership tabs.
-  await page.getByRole('button',{name:'Filter & Sort'}).click();
+  await openFilters(page);
   await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();
-  await page.getByRole('button',{name:'필터 닫기'}).click();
+  await closeFilters(page);
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
   await page.locator('.analysis-card .analysis-detail-tabs').getByRole('tab',{name:'Analysis'}).click();
