@@ -76,7 +76,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
   const story = entryStory(e)
   return <motion.button type="button" layoutId={`frame-${story.key}`} transition={transition} className="journal-story" onClick={() => show(story)} key={e.id} aria-label={story.label}>
    {entryPhotos(e).length>0?<motion.img layoutId={`cover-${story.key}`} src={entryPhotos(e)[0]} alt="" loading="lazy"/>:<div className="journal-thumbnail-paper" aria-hidden="true">{e.ink.length?<InkPreview strokes={e.ink}/>:<span>{e.kind==='life'?'LIFE':'THOUGHTS'}</span>}</div>}
-   <div className="journal-story-copy"><time>{story.kicker}</time><motion.h3 layoutId={`title-${story.key}`}>{e.title}</motion.h3><p>{(e.hypothesis || e.text || e.answer).slice(0, 180) || '생각을 이어 써보세요.'}</p><span>페이지 펼치기 →</span></div>
+   <div className="journal-story-copy"><time>{story.kicker}</time><motion.h3 layoutId={`title-${story.key}`}>{e.title}</motion.h3><p>{(e.hypothesis || e.text || e.answer).slice(0, 180) || '생각을 이어 써보세요.'}</p><span>페이지 펼치기</span></div>
   </motion.button>
  }
  const list = sorted.filter(e => (mode!=='journey'||e.kind==='investment') && matchesCalendar(e.createdAt,year,month,date) && (filter === 'all' || e.kind === filter) && `${e.title} ${e.text} ${e.answer} ${e.hypothesis||''} ${e.counterEvidence||''} ${e.ticker} ${e.place}`.toLowerCase().includes(query.toLowerCase()))
@@ -94,6 +94,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
   <label>모아보기<select aria-label="기록 묶음" value={scale} onChange={e=>setScale(e.target.value as typeof scale)}><option value="year">연도별</option><option value="month">월별</option><option value="day">일별</option></select></label>
  </div>
  const search = <input className="journal-search" aria-label="내 기록 검색" placeholder="제목, 종목, 기록으로 검색" value={query} onChange={e=>setQuery(e.target.value)}/>
+ const collectionFilters = <aside className="journal-collection-filters" aria-label="기록 검색 및 날짜 필터"><h3>기록 찾기</h3>{search}{calendarControls}{(query||year||month||date)&&<Button variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>검색·날짜 초기화</Button>}<p className="journal-collection-hint">날짜별로 모으고,<br/>그때의 생각을 다시 읽습니다.</p></aside>
  function gallery(items:JournalEntry[],review=false){
   const groups = new Map<string,JournalEntry[]>()
   for(const item of items.slice(0,limit)){const key=calendarGroup(item.createdAt,scale);groups.set(key,[...(groups.get(key)||[]),item])}
@@ -101,7 +102,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
  }
  const linkedGroups = new Map<string,typeof linkedList>()
  for(const record of linkedList.slice(0,limit)){const group=calendarGroup(String(record.row.date||''),scale);linkedGroups.set(group,[...(linkedGroups.get(group)||[]),record])}
- const linkedGallery = <section className="journal-linked-summary"><h3>Thesis와 투자일지</h3><div className="linked-albums">{[...linkedGroups].map(([group,records])=><section className="journal-album" key={group}><h4>{group.replace(/-/g,' · ')}</h4><div className="journal-gallery linked-gallery">{records.map(({kind,row})=><motion.button key={kind+String(row.id)} type="button" className="journal-story linked-record-card" whileHover={reduce?undefined:{y:-3}} whileTap={reduce?undefined:{scale:.98}} onClick={()=>openLinked?.(kind,row)}><div className="linked-record-cover"><span>{kind==='thesis'?'THESIS':'투자일지'}</span><h4>{instrumentLabel(row)}</h4></div><div className="journal-story-copy"><time>{String(row.date||'날짜 미제공')}</time><h3>{String(row.conclusion||row.thesis||row.memo||row.note||(kind==='thesis'?'투자 근거 다시 읽기':'매매 판단 다시 읽기'))}</h3><span>원본 기록 열기 →</span></div></motion.button>)}</div></section>)}</div>{!linkedList.length&&<p className="note">조건에 맞는 Thesis·투자일지가 없습니다.</p>}{linkedList.length>limit&&<Button variant="secondary" onClick={()=>setLimit(v=>v+40)}>연결 기록 더 보기</Button>}</section>
+ const linkedGallery = <section className="journal-linked-summary"><h3>Thesis와 투자일지</h3><div className="linked-albums">{[...linkedGroups].map(([group,records])=><section className="journal-album" key={group}><h4>{group.replace(/-/g,' · ')}</h4><div className="journal-gallery linked-gallery">{records.map(({kind,row})=><motion.button key={kind+String(row.id)} type="button" className="journal-story linked-record-card" whileHover={reduce?undefined:{y:-3}} whileTap={reduce?undefined:{scale:.98}} onClick={()=>openLinked?.(kind,row)}><div className="linked-record-cover"><span>{kind==='thesis'?'THESIS':'투자일지'}</span><h4>{instrumentLabel(row)}</h4></div><div className="journal-story-copy"><time>{String(row.date||'날짜 미제공')}</time><h3>{String(row.conclusion||row.thesis||row.memo||row.note||(kind==='thesis'?'투자 근거 다시 읽기':'매매 판단 다시 읽기'))}</h3><span>원본 기록</span></div></motion.button>)}</div></section>)}</div>{!linkedList.length&&<p className="note">조건에 맞는 Thesis·투자일지가 없습니다.</p>}{linkedList.length>limit&&<Button variant="secondary" onClick={()=>setLimit(v=>v+40)}>연결 기록 더 보기</Button>}</section>
  function go(page: string) { setOpen(false); navigate(page) }
  return <LayoutGroup id={`folio-${mode}`}><div className={`lifetime-workspace lifetime-${mode}`}>
   {mode === 'today' ? <>
@@ -110,16 +111,30 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
    <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p></div>
   </> : mode === 'journal' ? <>
    <SectionHeading kind="journal" kicker="MY PAGES" title="기록, 일상, 투자" description="관찰, 판단, 그리고 일상의 아름다움."><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></SectionHeading>
-   <SourceReports controller={reports} view="journal"/>
-   <Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>{search}{calendarControls}{['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p></div></div>)}</TabsContent>)}</Tabs>
-   {(filter==='all'||filter==='investment')&&linkedGallery}
+   <Tabs value={filter} onValueChange={setFilter}>
+    <TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>
+    <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
+     <header className="journal-collection-heading"><h3>나의 페이지 <span>{list.length}개</span></h3><p>이 기기에 보관한 기록</p></header>
+     {['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p><Button variant="secondary" disabled={!ready} onClick={()=>show()}>첫 페이지 쓰기</Button></div></div>)}</TabsContent>)}
+     {(filter==='all'||filter==='investment')&&linkedGallery}
+     <SourceReports controller={reports} view="journal"/>
+    </div></div>
+   </Tabs>
    <details className="journal-linked-tools"><summary>AI Insights · 연결된 관찰</summary>{linkedRecords?.insights?.items.filter(i=>Date.parse(i.expires_at)>Date.now()).slice(0,5).map(i=><article key={i.market+i.ticker}><h4>{i.headline}</h4><p>{i.summary||i.source.title}</p><a href={i.source.url} target="_blank" rel="noopener noreferrer">{i.source.publisher} · {i.summary_kind==='ai_draft'?'AI 요약 초안':'원문 제목'} ↗</a></article>)}{!linkedRecords?.insights?.items.length&&<p className="note">연결된 자동 수집 자료가 없습니다. 기업 상세에서 규칙 기반 Insights를 확인할 수 있습니다.</p>}</details>
    <details className="journal-backup"><summary>저장 및 백업</summary><div className="journal-backup-actions"><span>이 기기 저장 · 클라우드 동기화 전</span><Button variant="ghost" disabled={!ready || !entries.length} onClick={() => downloadNotebook(entries)}>백업 내보내기</Button><Button variant="ghost" disabled={!ready} onClick={() => importRef.current?.click()}>백업 가져오기</Button><input ref={importRef} type="file" accept="application/json,.json" className="sr-only" aria-label="저널 백업 파일" onChange={async e => {
     const file = e.target.files?.[0]; e.target.value = ''; if (!file) return
     try { if (file.size > 20000000) throw Error('20MB 이하 파일을 선택하세요.'); const incoming = parseNotebook(await file.text()); const ids = new Set(entries.map(x => x.id)); const additions = incoming.filter(x => !ids.has(x.id)); await replace(additions, true); setNotice(`${additions.length}개 기록을 가져왔습니다. 기존 기록은 유지했습니다.`) } catch (err) { setNotice((err as Error).message) }
    }} /></div></details>
   </> : <>
-   {assetFlow}<section className="journey-review"><h3>다시 읽을 투자 판단</h3><p className="note">처음의 가설, 반대 증거, 바뀐 방향을 날짜별로 다시 읽습니다.</p>{search}{calendarControls}{gallery(list,true)}{!list.length&&<div className="journal-empty"><p>{investmentPages.length?'조건에 맞는 투자 기록이 없습니다.':'아직 돌아볼 투자 기록이 없습니다.'}</p><Button variant="secondary" onClick={()=>navigate('notebook')}>저널에서 투자 기록 남기기</Button></div>}{linkedGallery}</section>
+   <section className="journey-review">
+    <header className="journal-review-heading"><div><span className="journey-kicker">REFLECTIONS</span><h3>다시 읽을 투자 판단</h3></div><p>처음의 가설, 반대 증거, 바뀐 방향을 날짜별로 다시 읽습니다.</p></header>
+    <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
+     <header className="journal-collection-heading"><h3>판단의 기록 <span>{list.length}개</span></h3><p>가설과 생각의 변화</p></header>
+     {gallery(list,true)}
+     {!list.length&&<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journey',photoStyle)} alt=""/><div><span className="journey-kicker">A THOUGHT TO RETURN TO</span><h3>판단의 흔적을 이어갑니다.</h3><p>{investmentPages.length?'조건에 맞는 투자 기록이 없습니다.':'아직 돌아볼 투자 기록이 없습니다. 가설과 반대 증거를 한 페이지에 남겨보세요.'}</p><Button variant="secondary" onClick={()=>navigate('notebook')}>투자 기록 남기기</Button></div></div>}
+     {linkedGallery}{assetFlow}
+    </div></div>
+   </section>
   </>}
   {error && <p role="alert">{error}</p>}{!ready && !error && <p role="status">나의 기록을 불러오는 중…</p>}{notice && <p role="status">{notice}</p>}
   <DialogPrimitive.Root open={open} onOpenChange={value => { if (!value) close() }}>

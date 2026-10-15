@@ -143,7 +143,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       if(theme==='light'){await expect(page.locator('.app-main')).toHaveCSS('background-color','rgb(255, 255, 255)');await expect(page.locator('.content')).toHaveCSS('background-color','rgb(255, 255, 255)')}
       expect(await page.evaluate(() => matchMedia('(hover:none)').matches)).toBe(view.touch)
       expect(await page.evaluate(() => matchMedia('(pointer:coarse)').matches)).toBe(view.touch)
-      await expect(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: 150, threshold: 0.15})
+      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: 150, threshold: 0.15})
     }
     await context.close()
   })
