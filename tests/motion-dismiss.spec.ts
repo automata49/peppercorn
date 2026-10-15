@@ -27,7 +27,8 @@ async function pull(page:Page,touch:boolean,distance=145,horizontal=0) {
 for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(`Motion dismissal ${width} ${theme}: pull, scroll and backdrop without X`,async({browser})=>{
  const touch=width<1440,context=await browser.newContext({viewport:{width,height:600},hasTouch:touch,reducedMotion:'reduce'}),page=await context.newPage();await boot(page,theme)
  const covers=page.locator('.home-motion-card');await expect(covers).toHaveCount(4)
- const sizes=await covers.evaluateAll(els=>els.map(el=>`${(el as HTMLElement).offsetWidth}x${(el as HTMLElement).offsetHeight}`));if(width<1440)expect(new Set(sizes).size).toBe(4);else{const lead=await covers.first().boundingBox(),story=await covers.nth(1).boundingBox();expect(lead!.width).toBe(width);expect(lead!.height).toBeGreaterThan(story!.height)}
+ // Portrait keeps four staggered covers; every landscape viewport uses the full-bleed hero.
+ const sizes=await covers.evaluateAll(els=>els.map(el=>`${(el as HTMLElement).offsetWidth}x${(el as HTMLElement).offsetHeight}`));if(width<600)expect(new Set(sizes).size).toBe(4);else{const lead=await covers.first().boundingBox(),story=await covers.nth(1).boundingBox();expect(lead!.width).toBeCloseTo(width,0);expect(lead!.height).toBeGreaterThan(story!.height);expect(new Set(sizes.slice(1)).size).toBe(1)}
  for(const key of ['today','discover','journal','journey'])await expect(page.locator(`.home-${key}>img`)).toHaveAttribute('src',`/peppercorn/folio-retro-${key}.webp`)
  const opener=page.getByRole('button',{name:'오늘 카드 열기'});await opener.click();await expect(page.getByRole('dialog')).toBeVisible();await expect(page.locator('.journal-dialog-close')).toHaveCount(0);await expect(page.locator('.card-dismiss-handle svg')).toHaveCount(0)
  await pull(page,touch,0,145);await expect(page.getByRole('dialog')).toBeVisible()
