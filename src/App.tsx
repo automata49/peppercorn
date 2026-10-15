@@ -1,3 +1,4 @@
+import { useSourceReports } from './lib/sourceReports'
 import { instrumentLabel } from './lib/instrumentLabel'
 import { useVisualStyle, coverPhoto } from './components/VisualStyle'
 import { TypographySettings, useEditorialStyle } from './components/TypographySettings'
@@ -758,6 +759,7 @@ export default function App(){
   const [journal,setJournal]=useAccountRows<EditableRow>('peppercorn-journal',accountScope,session?[]:initialJournal)
   const [tempEntries,setTempEntries]=useAccountRows<TempEntry>('peppercorn-temperature',accountScope,[])
   const notebook=useLifetimeJournal(session?.user.id||'guest')
+  const sourceReports=useSourceReports(session)
   const [authOpen,setAuthOpen]=useState(false)
   const [syncState,setSyncState]=useState<'local'|'loading'|'saving'|'saved'|'error'>(session?'loading':'local')
   const drillOpen=!!drillStock||!!summaryTab||drillSectorKey!==null
@@ -1118,9 +1120,9 @@ export default function App(){
   let content:ReactNode
   const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
   if(page==='today'){
-    content=<LifestyleHome entries={notebook.entries} leaders={todayLeaderRows} research={research} theses={enrichedAnalysis as EditableRow[]} trades={enrichedJournal} insights={leaderInsights} source={source} onSelect={openAnalysisStock} navigate={navigatePage} onMenu={()=>setMenuOpen(true)}/>
+    content=<LifestyleHome reports={sourceReports} entries={notebook.entries} leaders={todayLeaderRows} research={research} theses={enrichedAnalysis as EditableRow[]} trades={enrichedJournal} insights={leaderInsights} source={source} onSelect={openAnalysisStock} navigate={navigatePage} onMenu={()=>setMenuOpen(true)}/>
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
-    content=<LifetimeJournal key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:enrichedAnalysis as EditableRow[],trades:enrichedJournal,insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
+    content=<LifetimeJournal reports={sourceReports} key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:enrichedAnalysis as EditableRow[],trades:enrichedJournal,insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
     content=<><h2>리서치 노트</h2><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={600}/></>
   }else if(page==='dashboard'){

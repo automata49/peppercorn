@@ -1,3 +1,5 @@
+import { SourceReports } from './SourceReports'
+import type { ReportController } from '../lib/sourceReports'
 import { instrumentLabel } from '../lib/instrumentLabel'
 import { useVisualStyle, coverPhoto } from './VisualStyle'
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
@@ -12,7 +14,7 @@ import { useCardDismiss } from '../lib/useCardDismiss'
 import { InkPreview } from './InkPad'
 import { downloadNotebook, entryPhotos, parseNotebook, questions, type JournalEntry, type EntrySnapshot } from '../lib/lifetimeJournal'
 const JournalEditor = lazy(() => import('./JournalEditor'))
-type Props = { mode: 'today' | 'journal' | 'journey'; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; navigate: (p: string) => void; assetFlow?:ReactNode; linkedRecords?:{theses:EditableRow[];trades:EditableRow[];insights:InsightsFeed|null}; openLinked?:(kind:'thesis'|'trade',row:EditableRow)=>void }
+type Props = { reports:ReportController; mode: 'today' | 'journal' | 'journey'; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; navigate: (p: string) => void; assetFlow?:ReactNode; linkedRecords?:{theses:EditableRow[];trades:EditableRow[];insights:InsightsFeed|null}; openLinked?:(kind:'thesis'|'trade',row:EditableRow)=>void }
 type Story = { key: string; title: string; kicker: string; caption: string; tone: 'photo' | 'paper' | 'type' | 'sunset'; image?: string; entry?: JournalEntry; action: 'edit' | 'market' | 'journey'; label: string }
 const day = (value: string) => new Date(value).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 const brandPhoto = `${import.meta.env.BASE_URL}folio-brand-photography.webp`
@@ -35,7 +37,7 @@ function Judgement({value,at,label}:{value:EntrySnapshot;at:string;label:string}
  return <section><h4>{label}</h4><time dateTime={at}>{new Date(at).toLocaleString('ko-KR')}</time>{value.kind==='investment'?<><h5>내 가설</h5><p>{value.hypothesis||'별도로 기록한 가설이 없습니다.'}</p><h5>반대 증거</h5><p>{value.counterEvidence||'별도로 기록한 반대 증거가 없습니다.'}</p></>:null}{value.text&&<p>{value.text}</p>}{value.answer&&<><h5>{value.question||'나의 질문'}</h5><p>{value.answer}</p></>}{!value.text&&!value.answer&&!value.hypothesis&&!value.counterEvidence&&<p>사진·필기 기록입니다. 별도로 남긴 판단 문장이 없습니다.</p>}</section>
 }
 
-export function LifetimeJournal({ mode, entries, ready, error, replace, navigate, assetFlow, linkedRecords, openLinked }: Props) {
+export function LifetimeJournal({ reports, mode, entries, ready, error, replace, navigate, assetFlow, linkedRecords, openLinked }: Props) {
  const {photoStyle}=useVisualStyle()
  const [selected, setSelected] = useState<Story | undefined>(), [open, setOpen] = useState(false), [dirty, setDirty] = useState(false), [filter, setFilter] = useState('all'), [query, setQuery] = useState(''), [notice, setNotice] = useState('')
  const [year,setYear]=useState(''),[month,setMonth]=useState(''),[date,setDate]=useState(''),[scale,setScale]=useState<'year'|'month'|'day'>('month'),[limit,setLimit]=useState(40)
@@ -107,6 +109,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
    <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p></div>
   </> : mode === 'journal' ? <>
    <header className="lifetime-heading"><span className="journey-kicker">MY PAGES</span><h2>기록, 일상, 투자</h2><p>관찰, 판단, 그리고 일상의 아름다움.</p><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></header>
+   <SourceReports controller={reports} view="journal"/>
    <Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>{search}{calendarControls}{['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p></div></div>)}</TabsContent>)}</Tabs>
    {(filter==='all'||filter==='investment')&&linkedGallery}
    <details className="journal-linked-tools"><summary>AI Insights · 연결된 관찰</summary>{linkedRecords?.insights?.items.filter(i=>Date.parse(i.expires_at)>Date.now()).slice(0,5).map(i=><article key={i.market+i.ticker}><h4>{i.headline}</h4><p>{i.summary||i.source.title}</p><a href={i.source.url} target="_blank" rel="noopener noreferrer">{i.source.publisher} · {i.summary_kind==='ai_draft'?'AI 요약 초안':'원문 제목'} ↗</a></article>)}{!linkedRecords?.insights?.items.length&&<p className="note">연결된 자동 수집 자료가 없습니다. 기업 상세에서 규칙 기반 Insights를 확인할 수 있습니다.</p>}</details>

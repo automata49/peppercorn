@@ -23,6 +23,11 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --quiet 'requests==2.32.5' 'pytest==8.4.2' 'pandas==2.3.2' 'numpy==2.3.3'
+      - name: Verify private PDF importer fixtures
+        run: |
+          python -m pip install --quiet -r analysis/requirements-drive-pdf.txt
+          python -m unittest analysis.test_drive_pdf_reports
+          node supabase/tests/source_reports.verify.mjs
       - run: python -m pytest -q analysis/fundamentals
       - run: python -m pytest -q analysis/tests
       - run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights

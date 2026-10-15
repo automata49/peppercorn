@@ -1,3 +1,7 @@
+## PRIVATE-PDF-REPORTS-1 — user direction (2026-10-15)
+
+Read PDFs from the registered Drive folder into owner-only report storage. Expanded Today shows a source-grounded summary; Journal exposes full text, original chart/image renders and Drive links without rewriting personal notebooks. Import by owner + Drive id, update changed/corrected content without duplicates, preserve source times and limitations. Private report bodies/images never enter public repo/static feeds. HS Academy stays titles/links-only; hidden Gemini generation remains intact. See docs/PRIVATE_PDF_REPORTS.md.
+
 ## PREMIUM-DISPLAY-2 — user direction (2026-10-15)
 
 HS Academy displays article titles and original/channel links only; no summary, explanation, loading/error copy, date or provider status. Hide the Gemini AI Insights section in expanded Today. Preserve feed loading, validation and existing Gemini generation/collection functions. This supersedes PREMIUM-INSIGHTS-1 display requirements only.
