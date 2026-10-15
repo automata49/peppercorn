@@ -92,7 +92,14 @@ export function refresh(session:Session):Promise<Session>{
   })().finally(()=>refreshRequests.delete(key))
   refreshRequests.set(key,request);return request
 }
-export async function ensureSession(session:Session):Promise<Session>{const expiresAt=Number(session.expires_at||0);if(!expiresAt||Date.now()/1000<expiresAt-90)return session;return refresh(session)}
+export async function ensureSession(session:Session):Promise<Session>{
+  // Polling hooks may still hold the session from before another resource rotated its token.
+  const stored=loadStoredSession()
+  if(stored?.user.id===session.user.id)session=stored
+  const expiresAt=Number(session.expires_at||0)
+  if(!expiresAt||Date.now()/1000<expiresAt-90)return session
+  return refresh(session)
+}
 
 function normalize(resource:WorkspaceResource,rows:any[]):any[]{
   if(resource==='research')return rows.map(r=>({...r,date:r.written_at,type:r.note_type,verification:r.verification||(r.verified===true?'확인됨':r.verified===false?'반박됨':'미검증')}))

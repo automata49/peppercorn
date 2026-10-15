@@ -39,9 +39,9 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  if(!touch){const box=(await page.getByRole('dialog').boundingBox())!;await page.mouse.click(box.x-8,box.y+100);await expect(page.getByRole('dialog')).toHaveCount(0)}else{await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0)}
  await context.close()
 })
-test('personal photos take contextual priority and failed photos return to retro defaults',async({page})=>{
+test('personal photos keep Journal priority without duplicates and failed photos return to defaults',async({page})=>{
  await boot(page);const at=new Date().toISOString(),entry={...blankSnapshot(),id:'own-photo',title:'직접 기록한 사진',kind:'investment' as const,ticker:`${demoRows[0].market}:${demoRows[0].ticker}`,photos:['/peppercorn/folio-brand-photography.webp'],createdAt:at,updatedAt:at,revisions:[]}
- await seed(page,demoRows.map((r,i)=>({...entry,id:'photo-'+i,ticker:r.market+':'+r.ticker})));await expect.poll(()=>page.locator('.home-motion-card>img').evaluateAll(els=>els.map(el=>el.getAttribute('src')))).toEqual(Array(4).fill('/peppercorn/folio-brand-photography.webp'))
+ await seed(page,demoRows.map((r,i)=>({...entry,id:'photo-'+i,ticker:r.market+':'+r.ticker})));await expect.poll(()=>page.locator('.home-motion-card>img').evaluateAll(els=>els.filter(el=>el.getAttribute('src')==='/peppercorn/folio-brand-photography.webp').length)).toBe(1);await expect(page.locator('.home-journal>img')).toHaveAttribute('src',entry.photos[0])
  const treatment=await page.locator('.home-motion-card>img').first().evaluate(el=>getComputedStyle(el).filter);expect(treatment).not.toBe('none')
  await page.getByRole('button',{name:'저널 카드 열기'}).click();await expect(page.locator('.home-detail-cover>img')).toHaveAttribute('src',entry.photos[0]);expect(await page.locator('.home-detail-cover>img').evaluate(el=>getComputedStyle(el).filter)).toBe(treatment);await page.keyboard.press('Escape')
  await seed(page,demoRows.map((r,i)=>({...entry,id:'photo-'+i,ticker:r.market+':'+r.ticker,photos:['/peppercorn/missing-personal-photo.webp']})));for(const key of ['today','discover','journal','journey'])await expect(page.locator(`.home-${key}>img`)).toHaveAttribute('src',`/peppercorn/folio-retro-${key}.webp`)
