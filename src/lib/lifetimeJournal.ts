@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { JSONContent } from '@tiptap/react'
 import { ensureSession, loadStoredSession, type Session } from './session'
-export type InkPoint={x:number;y:number}
+export type InkPoint={x:number;y:number;pressure?:number;color?:'ink'|'blue'|'red'|'green'|'yellow';size?:number;tool?:'pen'|'pencil'|'highlighter'}
 export type InkStroke=InkPoint[]
-export type Reflection={at:string;outcome:'maintain'|'revise'|'close';result:string;lesson:string;nextAction:string}
-export type EntrySnapshot={title:string;body:JSONContent;text:string;question:string;answer:string;hypothesis?:string;counterEvidence?:string;reflections?:Reflection[];photo?:string;photos?:string[];ink:InkStroke[];kind:'life'|'investment';ticker:string;reviewDate:string;place:string;expense:string;currency:string}
+export type NotebookNote={body:JSONContent;text:string;ink:InkStroke[];photos:string[];paper?:'plain'|'ruled'|'grid'}
+export type Reflection={note?:NotebookNote;at:string;outcome:'maintain'|'revise'|'close';result:string;lesson:string;nextAction:string}
+export type EntrySnapshot={paper?:'plain'|'ruled'|'grid';title:string;body:JSONContent;text:string;question:string;answer:string;hypothesis?:string;counterEvidence?:string;reflections?:Reflection[];photo?:string;photos?:string[];ink:InkStroke[];kind:'life'|'investment';ticker:string;reviewDate:string;place:string;expense:string;currency:string}
 export type JournalEntry=EntrySnapshot&{id:string;createdAt:string;updatedAt:string;revisions:{at:string;snapshot:EntrySnapshot}[]}
 export const questions=[
  '오늘 새롭게 발견한 것은 무엇인가요?',
@@ -15,7 +16,7 @@ export const questions=[
  '결과를 보기 전에도 좋은 결정이었다고 평가할 수 있나요?'
 ]
 export const blankSnapshot=():EntrySnapshot=>({title:'',body:{type:'doc',content:[{type:'paragraph'}]},text:'',question:questions[0],answer:'',hypothesis:'',counterEvidence:'',photos:[],ink:[],kind:'life',ticker:'',reviewDate:'',place:'',expense:'',currency:'KRW'})
-export const snapshot=(e:EntrySnapshot):EntrySnapshot=>({title:e.title,body:e.body,text:e.text,question:e.question,answer:e.answer,hypothesis:e.hypothesis||'',counterEvidence:e.counterEvidence||'',...(e.reflections?.length?{reflections:e.reflections}:{}),photo:e.photo,photos:e.photos||[],ink:e.ink,kind:e.kind,ticker:e.ticker,reviewDate:e.reviewDate,place:e.place,expense:e.expense,currency:e.currency})
+export const snapshot=(e:EntrySnapshot):EntrySnapshot=>({...((e.paper)?{paper:e.paper}:{}),title:e.title,body:e.body,text:e.text,question:e.question,answer:e.answer,hypothesis:e.hypothesis||'',counterEvidence:e.counterEvidence||'',...(e.reflections?.length?{reflections:e.reflections}:{}),photo:e.photo,photos:e.photos||[],ink:e.ink,kind:e.kind,ticker:e.ticker,reviewDate:e.reviewDate,place:e.place,expense:e.expense,currency:e.currency})
 export const entryPhotos=(e:EntrySnapshot):string[]=>e.photos?.length?e.photos:e.photo?[e.photo]:[]
 let database:Promise<IDBDatabase>|undefined
 function db(){
@@ -163,13 +164,22 @@ export function cleanDocument(raw:unknown,depth=0):JSONContent{
  const type=allowed.includes(n.type||'')?n.type!:'paragraph'
  return {type,...(type==='text'?{text:String(n.text||''),marks:n.marks?.filter(m=>['bold','italic','strike','code','underline'].includes(m.type)).map(m=>({type:m.type}))}:{}),...(type==='heading'?{attrs:{level:Math.min(6,Math.max(1,Number(n.attrs?.level)||2))}}:{}),...(type==='orderedList'&&n.attrs?.start!=null?{attrs:{start:Math.min(1000000,Math.max(1,Math.trunc(Number(n.attrs.start)||1)))}}:{}),...(Array.isArray(n.content)?{content:n.content.map(c=>cleanDocument(c,depth+1))}:{})}
 }
+export function cleanInk(raw:unknown):InkStroke[]{
+ if(!Array.isArray(raw))throw Error('필기 형식을 확인할 수 없습니다.')
+ return raw.map(s=>Array.isArray(s)?s.filter(p=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1000&&p.y>=0&&p.y<=100000).map(p=>({x:p.x,y:p.y,...(Number.isFinite(p.pressure)?{pressure:Math.max(0,Math.min(1,p.pressure))}:{}),...(['ink','blue','red','green','yellow'].includes(p.color)?{color:p.color}:{}),...(Number.isFinite(p.size)?{size:Math.max(1,Math.min(60,p.size))}:{}),...(['pen','pencil','highlighter'].includes(p.tool)?{tool:p.tool}:{})})):[])
+}
+function cleanPaper(paper:unknown):{paper?:EntrySnapshot['paper']}{return ['plain','ruled','grid'].includes(String(paper))?{paper:paper as EntrySnapshot['paper']}:{} }
+function cleanNote(raw:any):NotebookNote{
+ if(!raw||!Array.isArray(raw.photos)||raw.photos.length>4||!raw.photos.every(validPhoto))throw Error('회고 노트 형식을 확인할 수 없습니다.')
+ return {body:cleanDocument(raw.body),text:String(raw.text||''),ink:cleanInk(raw.ink),photos:raw.photos,...cleanPaper(raw.paper)}
+}
 export function parseNotebook(text:string):JournalEntry[]{
  if(text.length>20000000)throw Error('백업 파일은 20MB 이하로 가져올 수 있습니다.')
  const data=JSON.parse(text)
  if(data.format!=='folio-journal'||data.version!==1||!Array.isArray(data.entries)||data.entries.length>1000)throw Error('Folio 저널 백업 파일을 선택하세요.')
  const clean=(e:any):EntrySnapshot=>{
   if(!e||typeof e.title!=='string'||!Array.isArray(e.ink)||(e.photo&&!validPhoto(e.photo))||(e.photos!=null&&(!Array.isArray(e.photos)||e.photos.length>4||!e.photos.every(validPhoto))))throw Error('기록 형식을 확인할 수 없습니다.')
-  return {title:e.title,body:cleanDocument(e.body),text:String(e.text||''),question:String(e.question||''),answer:String(e.answer||''),hypothesis:String(e.hypothesis||''),counterEvidence:String(e.counterEvidence||''),...(Array.isArray(e.reflections)&&e.reflections.length?{reflections:e.reflections.map((r:any)=>{if(!r||!Number.isFinite(Date.parse(r.at))||!['maintain','revise','close'].includes(r.outcome))throw Error('회고 형식을 확인할 수 없습니다.');return {at:r.at,outcome:r.outcome,result:String(r.result||''),lesson:String(r.lesson||''),nextAction:String(r.nextAction||'')}})}:{}),photos:e.photos||[],photo:validPhoto(e.photo)?e.photo:undefined,ink:e.ink.map((s:any)=>Array.isArray(s)?s.filter((p:any)=>p&&Number.isFinite(p.x)&&Number.isFinite(p.y)&&p.x>=0&&p.x<=1000&&p.y>=0&&p.y<=400).map((p:any)=>({x:p.x,y:p.y})):[]),kind:e.kind==='investment'?'investment':'life',ticker:String(e.ticker||''),reviewDate:/^\d{4}-\d{2}-\d{2}$/.test(e.reviewDate||'')?e.reviewDate:'',place:String(e.place||''),expense:String(e.expense||''),currency:['KRW','USD','EUR'].includes(e.currency)?e.currency:'KRW'}
+  return {...cleanPaper(e.paper),title:e.title,body:cleanDocument(e.body),text:String(e.text||''),question:String(e.question||''),answer:String(e.answer||''),hypothesis:String(e.hypothesis||''),counterEvidence:String(e.counterEvidence||''),...(Array.isArray(e.reflections)&&e.reflections.length?{reflections:e.reflections.map((r:any)=>{if(!r||!Number.isFinite(Date.parse(r.at))||!['maintain','revise','close'].includes(r.outcome))throw Error('회고 형식을 확인할 수 없습니다.');return {at:r.at,outcome:r.outcome,result:String(r.result||''),lesson:String(r.lesson||''),nextAction:String(r.nextAction||''),...(r.note?{note:cleanNote(r.note)}:{})}})}:{}),photos:e.photos||[],photo:validPhoto(e.photo)?e.photo:undefined,ink:cleanInk(e.ink),kind:e.kind==='investment'?'investment':'life',ticker:String(e.ticker||''),reviewDate:/^\d{4}-\d{2}-\d{2}$/.test(e.reviewDate||'')?e.reviewDate:'',place:String(e.place||''),expense:String(e.expense||''),currency:['KRW','USD','EUR'].includes(e.currency)?e.currency:'KRW'}
  }
  return data.entries.map((e:any)=>{
   if(typeof e.id!=='string'||!Number.isFinite(Date.parse(e.createdAt))||!Number.isFinite(Date.parse(e.updatedAt)))throw Error('기록 날짜 또는 식별자를 확인할 수 없습니다.')
