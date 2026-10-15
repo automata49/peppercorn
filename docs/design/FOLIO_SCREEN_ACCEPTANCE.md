@@ -1,3 +1,7 @@
+## NOTEBOOK-WRITING-1 — user direction (2026-10-16)
+
+Journal and reflection writing use a shared note-app surface inspired by the supplied Notability screenshot: full-height paper, quiet top actions and a floating bottom tool dock. Use MIT Tiptap for rich text and perfect-freehand for pressure-aware vector ink. Provide pen/pencil/highlighter, colour/width, stroke eraser, rectangle selection/move/delete, independent text/ink undo-redo, photos and plain/ruled/grid paper. Preserve all old x/y ink, version-1 backups, dated revisions, account sync, dirty-dismissal guards and structured result/lesson/decision/action/date fields. Reflection note bodies/photos/ink belong to that dated reflection, never overwrite the original notebook; saved rich content remains readable with formatting. Finger scrolling is retained by default, with explicit finger-writing opt-in. Paper height follows stored ink bounds so shortening text cannot hide ink. Canonical 390/834/1366/1440 Light/Dark checks apply. No native Notability/PencilKit or physical Pencil fidelity claim.
+
 ## ACCOUNT-JOURNAL-2 — current acceptance (2026-10-15)
 
 - Same-account separate browser contexts share notebook bodies, photos/ink/revisions, reflection results and basket mutations; other accounts/guests remain isolated. Legacy divergent IDs survive as recovered pages. Multiple offline edits retry without duplicate IDs; independent remote records still appear after failed uploads.

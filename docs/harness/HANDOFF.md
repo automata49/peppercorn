@@ -1,3 +1,9 @@
+## 2026-10-16 — shared notebook writing surface
+
+NOTEBOOK-WRITING-1 adds shared full-screen Journal/Reflection paper and a floating tool dock. Tiptap remains lazy-loaded; perfect-freehand 1.2.3 (MIT) renders pressure-aware pen/pencil/highlighter strokes. Added stroke eraser, rectangle selection/move/delete, bounded undo/redo, colour/width, finger-writing opt-in, photo handling and plain/ruled/grid paper. Default touch gestures scroll without creating ink; cancelled pointer gestures roll back. Saved ink bounds keep long pages visible. Legacy ink previews remain pixel-stable.
+
+Reflection note JSON/photos/ink/paper are optional per-reflection additions; original notebook stays intact, and sanitized read-only rich rendering retains formatting. Existing backup format version, sync endpoint and database JSON are unchanged. Local review found and repaired clipping, SVG pointer mapping and history rendering defects. Final validation and publication status are recorded in the PR/delivery; physical Safari/Pencil fidelity is unverified. See docs/NOTEBOOK_EDITOR.md.
+
 ## 2026-10-15 — account notebooks, reflections and journal repairs
 
 ACCOUNT-JOURNAL-2 supersedes device-only signed-in notebooks/baskets and overlapping captions. Notebook text/photos/ink/revisions/reflections sync through owner-RLS storage and authenticated notebook endpoint. Local IndexedDB saves queue durably; reconnect/focus/foreground retry reads before uploading. Legacy and concurrent divergent IDs survive as recovered pages; stale acknowledgments cannot delete newer pending work. Existing workspace lists now refresh with a transactional per-resource outbox and cross-tab upload locks. Baskets sync individual additions/removals and respect server tombstones on first migration. Guests remain isolated.

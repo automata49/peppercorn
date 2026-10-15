@@ -1,0 +1,68 @@
+/* NOTEBOOK-WRITING-1: shared journal/reflection writing surface. */
+.notebook-writing.story-dialog{inset:0;height:100dvh;max-width:none;border-radius:0;background:var(--folio-surface)}
+.notebook-writing .story-detail-cover{display:none}
+.notebook-writing .story-detail-body{padding:20px clamp(12px,3vw,40px) calc(28px + env(safe-area-inset-bottom));max-width:1120px;margin:auto}
+.notebook-writing .journal-dialog-header{position:sticky;top:0;z-index:8;background:var(--folio-surface);margin:0 0 16px;padding:0 0 12px;border-bottom:1px solid var(--folio-line);gap:12px}
+.notebook-writing .journal-dialog-header h2{font-size:14px;margin:0;font-weight:500}
+.notebook-writing .journal-dialog-header p{font-size:11px;margin:4px 0 0;color:var(--folio-muted)}
+.notebook-writing .journal-dialog-header>div{flex:1}
+.notebook-writing .card-dismiss-handle{margin-bottom:-24px;min-height:24px}
+.notebook-heading{position:sticky;top:64px;z-index:7;display:flex;align-items:center;gap:16px;padding:8px 0;background:var(--folio-surface)}
+.notebook-heading .journal-title-input{flex:1;min-width:0;font-size:clamp(21px,3vw,32px)!important;font-weight:500;min-height:52px}
+.notebook-heading h3{flex:1;margin:0;font-size:clamp(21px,3vw,32px);font-weight:500}
+.notebook-heading>.folio-button{flex-shrink:0}
+.notebook-writing .journal-tools>label{flex-direction:row;align-items:center}.notebook-writing .journal-tools select{width:auto}
+.notebook-writing .journal-editor,.notebook-writing .reflection-panel{max-width:1040px;gap:12px}
+.notebook{min-width:0;isolation:isolate}
+.notebook-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 0}
+.notebook-actions>span{font-size:11px;color:var(--folio-muted);font-variant-numeric:tabular-nums}
+.notebook-actions>div{display:flex;gap:4px;border-radius:20px;background:var(--folio-paper);padding:4px;box-shadow:0 4px 20px #00000008}
+.notebook-paper{position:relative;min-height:0;min-height:calc((100vw - 24px)*1.4);min-height:clamp(480px,130vw,1400px);background-color:var(--folio-paper);color:var(--folio-ink);border:1px solid var(--folio-line);box-shadow:0 8px 36px #00000006;overflow:hidden}
+.notebook-paper-ruled{background-image:repeating-linear-gradient(transparent 0 31px,var(--folio-line) 31px 32px)}
+.notebook-paper-grid{background-image:linear-gradient(var(--folio-line) 1px,transparent 1px),linear-gradient(90deg,var(--folio-line) 1px,transparent 1px);background-size:24px 24px}
+.notebook-content{position:relative;min-height:inherit;padding:clamp(20px,4vw,64px);padding-bottom:150px}
+.notebook-content .journal-prose{padding:0;min-height:440px;line-height:2;background:transparent;box-shadow:none}
+.notebook-content .journal-prose:focus-visible{outline:1px solid var(--folio-line);outline-offset:12px}
+.notebook-content .journal-prose:empty:before,.notebook-content .journal-prose>p:first-child:last-child:has(>.ProseMirror-trailingBreak):before{content:'생각을 자유롭게 남겨보세요';color:var(--folio-muted);pointer-events:none;position:absolute;font-size:15px}
+.notebook .notebook-ink.ink-canvas{position:absolute;inset:0;width:100%;height:100%;max-height:none;display:block;aspect-ratio:auto;background:transparent;border:0;border-radius:0;margin:0;color:var(--folio-ink);cursor:crosshair}
+.notebook-paper[data-tool=text] .notebook-ink{cursor:default}
+.notebook-selection{stroke:var(--folio-ink)}
+.notebook-dock{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));z-index:6;margin:-104px auto 16px;width:fit-content;max-width:calc(100% - 16px);padding:4px 8px;background:color-mix(in srgb,var(--folio-paper) 94%,transparent);border:1px solid var(--folio-line);border-radius:24px;box-shadow:0 8px 32px #00000012,inset 0 1px #ffffff35;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.notebook-toolbar{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px 0}
+.notebook-toolbar>.folio-button{border-radius:12px;width:44px;height:44px;padding:10px;position:relative}
+.notebook-toolbar .app-icon{width:23px;height:23px}
+.notebook-toolbar [aria-pressed=true]{background:var(--folio-surface-2)}
+.notebook-toolbar [aria-pressed=true]:after{content:'';position:absolute;bottom:4px;width:18px;height:2px;background:currentColor}
+.notebook .journal-format{flex-wrap:nowrap;border:0;overflow-x:auto;max-width:440px;gap:0;padding:0 0 4px;border-bottom:1px solid var(--folio-line);scrollbar-width:thin}
+.notebook .journal-format>.folio-button{flex-shrink:0;font-size:12px;padding:8px 10px;min-height:44px}
+.notebook-tool-options{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;border-bottom:1px solid var(--folio-line);font-size:11px;max-width:440px}
+.notebook-tool-options>span{padding:4px 8px;line-height:1.6}
+.notebook-tool-options label{display:flex;flex-direction:row;align-items:center;gap:4px;font-size:11px}
+.notebook .notebook-tool-options select{min-height:44px;border:0;background:transparent;padding:4px;font-size:12px;width:auto;color:var(--folio-ink)}
+.notebook-colors{display:flex;gap:0}
+.notebook-swatch{display:grid;place-items:center;width:44px;height:44px;border:0;background:transparent;border-radius:50%;cursor:pointer}
+.notebook-swatch>span{width:14px;height:14px;border-radius:50%;background:currentColor}
+.notebook-swatch[aria-pressed=true]>span{outline:1px solid currentColor;outline-offset:4px}
+.notebook button:focus-visible{outline:2px solid var(--ring,var(--folio-ink));outline-offset:2px}
+.notebook-settings{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px;padding:12px;margin-bottom:12px;border:1px solid var(--folio-line);border-radius:12px;background:var(--folio-paper)}
+.notebook-settings label{font-size:12px;display:flex;align-items:center;gap:8px;flex-direction:row}
+.notebook-settings select{min-height:44px;padding:8px;background:var(--folio-surface);color:var(--folio-ink);border:1px solid var(--folio-line);border-radius:8px}
+.notebook-settings .notebook-check input{width:20px;height:20px;min-height:20px}
+.notebook-settings small{color:var(--folio-muted);font-size:11px}
+.notebook-content .journal-photo-collage{margin:0 0 24px}
+.notebook-content .journal-photo-collage .journal-cover{margin:0;filter:none}
+.notebook-meta{margin-block:20px;border-top:1px solid var(--folio-line)}
+.notebook-meta>summary{min-height:44px;padding:12px 0;font-size:13px;cursor:pointer}
+.notebook-meta-content{padding:16px 0}
+.reflection-panel .notebook-content fieldset{padding:0;gap:24px;margin:0 0 32px}
+.reflection-panel .notebook-content legend{font-size:12px;color:var(--folio-muted);padding-bottom:24px}
+.reflection-panel .notebook-content textarea{border:0;border-bottom:1px solid var(--folio-line);border-radius:0;padding:8px 0;background:transparent;min-height:88px;resize:vertical;line-height:2}
+.reflection-panel .notebook-content label{font-size:13px}
+.reflection-panel .notebook-content input,.reflection-panel .notebook-content select{background:transparent}
+.reflection-panel .notebook-content h4{font-size:13px;font-weight:500;margin-top:32px}
+@media(min-width:700px){.notebook-paper{min-height:1400px}.notebook-dock{margin-top:-108px}.notebook-writing .story-detail-body{padding-top:28px}}
+@media(max-width:420px){.notebook-dock{padding-inline:3px;max-width:calc(100% - 8px)}.notebook-toolbar{gap:0}.notebook-tool-options{flex-wrap:wrap;justify-content:center;gap:0}.notebook-tool-options label{margin-inline:8px}.notebook .journal-format{max-width:308px}.notebook-heading{gap:8px}.notebook-heading>.folio-button{padding-inline:12px;font-size:13px}}
+@supports not (backdrop-filter:blur(1px)){.notebook-dock{background:var(--folio-paper)}}
+@media(prefers-reduced-transparency:reduce){.notebook-dock{background:var(--folio-paper);backdrop-filter:none;-webkit-backdrop-filter:none}}
+.notebook-readonly.journal-prose{min-height:0;padding:12px 0;line-height:1.8}
+.journal-editor .notebook-heading input.journal-title-input{border:0;border-radius:0;background:transparent;box-shadow:none;padding-inline:0}
