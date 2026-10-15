@@ -16,7 +16,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce'});const page=await context.newPage();await boot(page,theme)
  const menu=await page.getByRole('button',{name:width>=1280?'도구 및 설정':'전체 메뉴 열기',exact:true}).first().boundingBox();expect(menu!.width).toBeGreaterThanOrEqual(44);expect(menu!.height).toBeGreaterThanOrEqual(44)
  const cards=page.locator('.home-motion-card');await expect(cards).toHaveCount(4)
- const first=await cards.nth(0).boundingBox(),second=await cards.nth(1).boundingBox();expect(first!.x).toBeLessThan(second!.x);expect(first!.height).toBeGreaterThan(second!.height)
+ const first=await cards.nth(0).boundingBox(),second=await cards.nth(1).boundingBox();if(width<1000){expect(first!.x).toBeLessThan(second!.x);expect(first!.height).toBeGreaterThan(second!.height)}else{expect(second!.y).toBeGreaterThanOrEqual(first!.y+first!.height);expect(first!.width).toBeGreaterThan(second!.width)}
  await expect(page.locator('.home-heading p')).toBeVisible()
  await openPage(page,'발견');await pickFirstStock(page)
  const overview=page.getByRole('tab',{name:'Overview',exact:true});await overview.focus();await overview.press('ArrowRight')

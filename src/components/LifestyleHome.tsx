@@ -15,7 +15,6 @@ import { AppIcon } from './AppIcon'
 import { leaderObservation } from './TodayLeaders'
 import { calendarDate } from '../lib/journalGallery'
 import { useCardDismiss } from '../lib/useCardDismiss'
-import { ObraMasthead } from './ObraPage'
 
 type Section = 'today' | 'discover' | 'journal' | 'journey'
 type Props = { reports:ReportController; entries: JournalEntry[]; leaders: LeaderRow[]; research: EditableRow[]; theses: EditableRow[]; trades: EditableRow[]; insights: InsightsFeed | null; source: string; navigate: (page: string) => void; onSelect: (row: LeaderRow) => void; onMenu:()=>void }
@@ -52,11 +51,12 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
  ]
  const active = covers.find(c => c.key === selected)
  function go(page: string) { setSelected(null); navigate(page) }
- function cover(c: typeof covers[number]) { return <><motion.img layoutId={`home-image-${c.key}`} src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><motion.h3 layoutId={`home-title-${c.key}`}>{c.label}</motion.h3><p title={c.summary}>{c.summary}</p>{c.key==='today'&&<span className="home-story-action" aria-hidden="true">오늘의 이야기 →</span>}</div></> }
+ function cover(c: typeof covers[number]) { return <><motion.img layoutId={`home-image-${c.key}`} src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><motion.h3 layoutId={`home-title-${c.key}`}>{c.label}</motion.h3><p title={c.summary}>{c.summary}</p><span className="home-story-action" aria-hidden="true">{c.key==='today'?'오늘의 이야기':c.key==='discover'?'기업 발견하기':c.key==='journal'?'기록 모아보기':'여정 돌아보기'} →</span></div></> }
  return <LayoutGroup id="lifestyle-home"><section className="lifetime-workspace lifetime-today lifestyle-home" aria-label="나의 여정 한눈에">
-  <ObraMasthead label="홈" onMenu={onMenu}/>
+
   <header className="lifetime-heading home-heading"><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>나의 여정</h2><p>세상을 발견하고,<br/>나의 시간을 기록하다.</p></header>
   <div className="home-motion-cards">{covers.map(c => <motion.button key={c.key} layoutId={`home-frame-${c.key}`} transition={transition} className={`home-motion-card home-${c.key}`} type="button" aria-label={`${c.label} 카드 열기`} onClick={() => { focus.current = document.activeElement as HTMLElement; setSelected(c.key) }}>{cover(c)}</motion.button>)}</div>
+  <nav className="home-destination-nav" aria-label="홈에서 페이지로 바로 이동"><button type="button" onClick={()=>navigate('analysis')}>발견</button><button type="button" onClick={()=>navigate('notebook')}>저널</button><button type="button" onClick={()=>navigate('tracking')}>여정</button></nav>
   <p className="home-journey-state">{entries.length ? `${entries.length}개의 기록 · 투자 가설 ${theses.filter(t => t.ticker).length}개 · 다시 볼 생각 ${due.length}개` : '사진 한 장, 작은 발견 하나에서 시작하는 나의 여정.'}</p>
   <Dialog.Root open={!!selected} onOpenChange={open => { if (!open) setSelected(null) }}><Dialog.Portal forceMount><AnimatePresence onExitComplete={() => focus.current?.isConnected && focus.current.focus({preventScroll:true})}>
    {active && <Dialog.Overlay forceMount asChild><motion.div className="story-dialog-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .2 }}/></Dialog.Overlay>}

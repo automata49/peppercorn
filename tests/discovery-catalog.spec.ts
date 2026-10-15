@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 import {openPage,pickFirstStock,backToExplore} from './journey-helpers'
@@ -10,21 +11,17 @@ async function boot(page:Page){
  await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:{}}}))
  await page.goto('/peppercorn/')
 }
-for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,1024],[1440,900]])test(`catalog ${width}x${height}: immediate cards, category/filter geometry, menu and quote readability`,async({browser})=>{
+for(const [width,height] of [[390,844],[568,320],[844,390],[834,1194],[1194,834],[1366,1024],[1440,900]])test(`catalog ${width}x${height}: responsive filters, glass cards and quote readability`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height},hasTouch:width<1280,reducedMotion:'reduce'}),page=await context.newPage();await boot(page)
- await openPage(page,'발견');const toggle=page.getByRole('button',{name:'Filter & Sort'});await expect(page.locator('.catalog-filter-drawer')).toHaveCount(0);await toggle.click();const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.click();await page.getByRole('button',{name:'필터 닫기'}).click()
- const card=page.locator('.analysis-idea-list>button').first(),grid=page.locator('.stock-card-grid');await expect(card).toBeVisible()
- const cardBox=(await card.boundingBox())!,gridBox=(await grid.boundingBox())!
- expect(cardBox.y).toBeLessThan(height<500?height-70:Math.min(height-80,620))
- expect(await grid.evaluate(el=>getComputedStyle(el).display)).toBe('grid');expect(await grid.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width<=580?2:3)
- expect(await card.evaluate(el=>getComputedStyle(el).borderWidth)).toBe('0px')
- expect(await card.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)')
- await toggle.click();const drawer=page.locator('.catalog-filter-drawer');await expect(drawer).toBeVisible();expect((await drawer.boundingBox())!.x).toBe(0)
- for(const option of await drawer.locator('button[aria-pressed]').all()){expect(await option.evaluate(el=>getComputedStyle(el).borderWidth)).toBe('0px');expect(await option.evaluate(el=>getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');expect(await option.evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(18)}
- await page.screenshot({path:`test-results/catalog-drawer-${width}-${height}.png`});await drawer.getByRole('button',{name:'종목명 순',exact:true}).click();await drawer.getByRole('button',{name:/종목 보기/}).click();await expect(page.locator('.catalog-result-count')).toContainText('종목명 순')
- await toggle.click();await expect(drawer.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true');await page.keyboard.press('Escape');await expect(drawer).toHaveCount(0);await expect(toggle).toBeFocused()
- if(width>=1280){const brand=(await page.locator('.desktop-navigation .folio-brand').boundingBox())!,nav=(await page.locator('.desktop-navigation nav').boundingBox())!;expect(nav.x-brand.x-brand.width).toBeGreaterThan(40)}
- else{await expect(page.locator('.topbar-menu')).toBeHidden();await expect(page.locator('.mobile-bottom-nav>button')).toHaveCount(5)}
+ await openPage(page,'발견');const pinned=width>=1024||(width>=480&&width>height)
+ if(pinned){await expect(page.getByRole('complementary',{name:'Filter & Sort'})).toBeVisible();await expect(page.getByRole('button',{name:'Filter & Sort'})).toHaveCount(0)}
+ else await expect(page.locator('.catalog-filter-drawer')).toHaveCount(0)
+ await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.click()
+ await page.getByRole('button',{name:'종목명 순',exact:true}).click();await closeFilters(page)
+ const card=page.locator('.stock-catalog-card').first();await expect(card).toBeVisible();await expect(page.locator('.catalog-result-count')).toContainText('종목명 순')
+ expect(await card.evaluate(el=>getComputedStyle(el).borderRadius)).toBe('24px');expect(await card.evaluate(el=>getComputedStyle(el).backdropFilter)).toContain('blur')
+ if(pinned){const sidebar=(await page.locator('.catalog-filter-sidebar').boundingBox())!,results=(await page.locator('.catalog-products').boundingBox())!;expect(sidebar.x+sidebar.width).toBeLessThan(results.x)}
+ else{await openFilters(page);await page.keyboard.press('Escape');await expect(page.locator('.catalog-filter-drawer')).toHaveCount(0);await expect(page.getByRole('button',{name:'Filter & Sort'})).toBeFocused()}
  await pickFirstStock(page);expect(await page.locator('.hero-price').evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBe(28);expect(await page.locator('.hero-change').evaluate(el=>parseFloat(getComputedStyle(el).fontSize))).toBe(16)
  await backToExplore(page);await expect(card).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  await page.screenshot({path:`test-results/catalog-${width}-${height}.png`});await context.close()

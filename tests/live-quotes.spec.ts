@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {openLeaderTools,openSignal,openPage,pickFirstStock,backToExplore} from './journey-helpers'
 import {test,expect} from '@playwright/test'
 const base={asset_class:'Equity',sector:'Technology',industry:'Semiconductors',index_memberships:[],rs_rank:99,ibd_rs_estimate:95,high_52w_distance:-.05,leader_tt:true,leadership_class:'핵심 주도',stage:'▲ 돌파',rs_1m:.05,rs_3m:.1,rs_6m:.2,rs_12m:.3,rs_5d:.01,rs_20d:.02,rs_50d:.03,rs_120d:.04,rs_200d:.05,ma50:90,ma200:80,return_5d:.01,return_20d:.02,return_50d:.03,return_120d:.04,return_200d:.05,return_12m:.06,action_guide:'테스트 전용'}
@@ -51,18 +52,18 @@ test('stock detail links to Finviz for US tickers and no longer to the Google Sh
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
  const list=page.locator('.stock-list')
- await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await openFilters(page)
  const scope=page.locator('.analysis-scope');const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click()
- await page.getByRole('button',{name:'필터 닫기'}).click()
+ await closeFilters(page)
  const finviz=page.locator('.external-links').first().getByRole('link',{name:'Finviz ↗'})
- await list.locator('> button').filter({hasText:'MU'}).click()
+ await list.locator('.stock-trend-row').filter({hasText:'MU'}).click()
  await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis',exact:true}).click()
  await expect(finviz).toHaveAttribute('href','https://finviz.com/stock?t=MU&p=d')
  await expect(page.getByRole('link',{name:/Google Sheet/})).toHaveCount(0)
- await backToExplore(page);await list.locator('> button').filter({hasText:'CRAK'}).click()
+ await backToExplore(page);await list.locator('.stock-trend-row').filter({hasText:'CRAK'}).click()
  await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis',exact:true}).click()
  await expect(finviz).toHaveAttribute('href','https://finviz.com/stock?t=CRAK&ty=c&ta=1&p=d')
- await backToExplore(page);await list.locator('> button').filter({hasText:'247540'}).click()
+ await backToExplore(page);await list.locator('.stock-trend-row').filter({hasText:'247540'}).click()
  await page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Analysis',exact:true}).click()
  await expect(finviz).toHaveCount(0)
 })

@@ -1,6 +1,7 @@
 import { SourceReports } from './SourceReports'
 import type { ReportController } from '../lib/sourceReports'
 import { instrumentLabel } from '../lib/instrumentLabel'
+import { SectionHeading } from './SectionHeading'
 import { useVisualStyle, coverPhoto } from './VisualStyle'
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
@@ -108,7 +109,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
    <div className="today-stories">{stories.map((story, i) => <motion.button key={story.key} type="button" layoutId={`frame-${story.key}`} transition={transition} className={`today-story story-${story.tone}${i === 0 ? ' journal-story-hero' : ''}`} aria-label={story.label} disabled={!ready && story.action === 'edit'} onClick={() => show(story)}><StoryCover story={story} /></motion.button>)}</div>
    <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p></div>
   </> : mode === 'journal' ? <>
-   <header className="lifetime-heading"><span className="journey-kicker">MY PAGES</span><h2>기록, 일상, 투자</h2><p>관찰, 판단, 그리고 일상의 아름다움.</p><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></header>
+   <SectionHeading kind="journal" kicker="MY PAGES" title="기록, 일상, 투자" description="관찰, 판단, 그리고 일상의 아름다움."><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></SectionHeading>
    <SourceReports controller={reports} view="journal"/>
    <Tabs value={filter} onValueChange={setFilter}><TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>{search}{calendarControls}{['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p></div></div>)}</TabsContent>)}</Tabs>
    {(filter==='all'||filter==='investment')&&linkedGallery}

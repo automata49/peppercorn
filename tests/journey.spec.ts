@@ -1,3 +1,4 @@
+import {openFilters,closeFilters} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {openPage} from './journey-helpers'
 import {demoRows} from '../src/data/mock'
@@ -40,17 +41,17 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  await page.getByRole('tab',{name:'보유종목',exact:true}).click();await expect(page.locator('.workspace-mobile-summary:visible,.workspace-grid-panel:visible').first()).toBeVisible()
  await nav(page,'Thesis');await expect(conclusion).toHaveValue('성장 동력 확인 후 추적')
  await nav(page,'탐색');await expect(page.locator('.analysis-finder')).toBeVisible();await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
- await page.getByRole('button',{name:'Filter & Sort'}).click()
+ await openFilters(page)
  const leadershipScope=page.locator('.analysis-scope')
  const activeScope=leadershipScope.locator('button[aria-pressed="true"]')
  if(await activeScope.count())await activeScope.first().click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(rows.length)
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(rows.length)
  await expect(leadershipScope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
  for(const control of await leadershipScope.locator('button').all()){expect((await control.boundingBox())!.height).toBeGreaterThanOrEqual(44)}
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
- await page.getByRole('button',{name:'필터 닫기'}).click()
+ await closeFilters(page)
  await page.screenshot({path:`test-results/journey-explore-${width}.png`,fullPage:true})
- await page.locator('.analysis-idea-list > button').first().click();await page.getByRole('button',{name:'← 탐색 목록'}).click()
+ await page.locator('.analysis-idea-list .stock-trend-row').first().click();await page.getByRole('button',{name:'← 탐색 목록'}).click()
  await expect(page.locator('.analysis-scope button[aria-pressed="true"]')).toHaveCount(0)
  await context.close()
 })
@@ -89,12 +90,12 @@ test('archived Thesis remains editable without fabricating market data',async({p
  await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
 })
 test('Explore market change clears the prior market sector',async({page})=>{
- await boot(page);await nav(page,'탐색');{await page.getByRole('button',{name:'Filter & Sort'}).click();const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
+ await boot(page);await nav(page,'탐색');{await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
  await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'US',exact:true}).click()
  const sector=page.getByRole('combobox',{name:'탐색 섹터'});await sector.selectOption({index:1})
  await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'KR',exact:true}).click();await expect(sector).toHaveValue('')
- await page.getByRole('button',{name:'필터 닫기'}).click()
- expect(await page.locator('.analysis-idea-list > button').count()).toBeGreaterThan(0)
+ await closeFilters(page)
+ expect(await page.locator('.analysis-idea-list .stock-trend-row').count()).toBeGreaterThan(0)
 })
 
 test('Explore ignores hidden catalog search after external stock detail',async({page})=>{
@@ -103,7 +104,7 @@ test('Explore ignores hidden catalog search after external stock detail',async({
  await page.getByPlaceholder('Ticker · 종목 · 산업 · 섹터 검색').fill(rows[0].ticker)
  await page.locator('.catalog-mobile-summary .decision-row').first().click()
  await page.getByRole('button',{name:'← 탐색 목록'}).click()
- {await page.getByRole('button',{name:'Filter & Sort'}).click();const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
- await page.getByRole('button',{name:'필터 닫기'}).click()
- await expect(page.locator('.analysis-idea-list > button')).toHaveCount(rows.length)
+ {await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
+ await closeFilters(page)
+ await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(rows.length)
 })

@@ -14,5 +14,8 @@ export async function openPage(page:Page,label:string){
 }
 export async function openSignal(page:Page){await openPage(page,'시장 신호');await expect(page.locator('.dashboard-sector-panel')).toBeVisible()}
 export async function openLeaderTools(page:Page){await openSignal(page);await page.locator('.leader-tools-trigger').click()}
-export async function pickFirstStock(page:Page){await page.getByRole('button',{name:'Filter & Sort'}).click();const scope=page.locator('.analysis-scope');const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click();await page.getByRole('button',{name:'필터 닫기'}).click();await page.locator('.analysis-idea-list > button').first().click()}
+export async function pickFirstStock(page:Page){await openFilters(page);const scope=page.locator('.analysis-scope');const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click();await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click()}
 export async function backToExplore(page:Page){await page.getByRole('button',{name:'← 탐색 목록',exact:true}).click()}
+
+export async function openFilters(page:Page){if(!await page.locator('.catalog-filter-sidebar').count())await page.getByRole('button',{name:'Filter & Sort'}).click()}
+export async function closeFilters(page:Page){if(!await page.locator('.catalog-filter-sidebar').count())await page.getByRole('button',{name:'필터 닫기'}).click()}

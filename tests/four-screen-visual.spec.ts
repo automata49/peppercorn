@@ -121,12 +121,12 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       await expect(page.locator(screen.selector)).toBeVisible()
       if (screen.name === 'today') await expect(page.locator('.home-motion-card')).toHaveCount(4)
       if (screen.name === 'discover') {
-        const toggle=page.getByRole('button', {name:'Filter & Sort'});if(view.touch)await toggle.tap();else await toggle.click()
+        const pinned=await page.locator('.catalog-filter-sidebar').count();const toggle=page.getByRole('button', {name:'Filter & Sort'});if(!pinned){if(view.touch)await toggle.tap();else await toggle.click()}
         const active = page.locator('.analysis-scope button[aria-pressed=true]')
         if (await active.count()) { if (view.touch) await active.tap(); else await active.click() }
-        const close=page.getByRole('button', {name:'필터 닫기'});if(view.touch)await close.tap();else await close.click()
-        await expect(page.locator('.analysis-idea-list > button').first()).toBeVisible()
-        await expect(page.locator('.catalog-filter-drawer')).toHaveCount(0)
+        const close=page.getByRole('button', {name:'필터 닫기'});if(!pinned){if(view.touch)await close.tap();else await close.click()}
+        await expect(page.locator('.analysis-idea-list .stock-trend-row').first()).toBeVisible()
+        await expect(page.locator('.catalog-filter-drawer.ui-dialog-content')).toHaveCount(0)
       }
       if (screen.name === 'journal') {
         await expect(page.getByRole('tablist', {name: '저널 분류'}).getByRole('tab')).toHaveText(['전체', '일상', '투자'])
