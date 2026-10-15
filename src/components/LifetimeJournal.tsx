@@ -42,6 +42,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
  const {photoStyle}=useVisualStyle()
  const [selected, setSelected] = useState<Story | undefined>(), [open, setOpen] = useState(false), [dirty, setDirty] = useState(false), [filter, setFilter] = useState('all'), [query, setQuery] = useState(''), [notice, setNotice] = useState('')
  const [year,setYear]=useState(''),[month,setMonth]=useState(''),[date,setDate]=useState(''),[scale,setScale]=useState<'year'|'month'|'day'>('month'),[limit,setLimit]=useState(40)
+ const [calendarOpen,setCalendarOpen]=useState(false)
  const importRef = useRef<HTMLInputElement>(null), returnFocus = useRef<HTMLElement | null>(null), reduce = useReducedMotion()
  const sorted = entries.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
  const investmentPages = sorted.filter(e=>e.kind==='investment')
@@ -94,7 +95,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
   <label>모아보기<select aria-label="기록 묶음" value={scale} onChange={e=>setScale(e.target.value as typeof scale)}><option value="year">연도별</option><option value="month">월별</option><option value="day">일별</option></select></label>
  </div>
  const search = <input className="journal-search" aria-label="내 기록 검색" placeholder="제목, 종목, 기록으로 검색" value={query} onChange={e=>setQuery(e.target.value)}/>
- const collectionFilters = <aside className="journal-collection-filters" aria-label="기록 검색 및 날짜 필터"><h3>기록 찾기</h3>{search}{calendarControls}{(query||year||month||date)&&<Button variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>검색·날짜 초기화</Button>}<p className="journal-collection-hint">날짜별로 모으고,<br/>그때의 생각을 다시 읽습니다.</p></aside>
+ const collectionFilters = <aside className="journal-collection-filters" data-dates-open={calendarOpen} aria-label="기록 검색 및 날짜 필터"><h3>기록 찾기</h3>{search}<Button className="journal-date-toggle" variant="ghost" aria-expanded={calendarOpen} onClick={()=>setCalendarOpen(v=>!v)}>{year?`${year}년${month?` · ${Number(month)}월`:''}${date?` · ${Number(date)}일`:''}`:'날짜 · 모아보기'}</Button>{calendarControls}{(query||year||month||date)&&<Button variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>검색·날짜 초기화</Button>}<p className="journal-collection-hint">날짜별로 모으고,<br/>그때의 생각을 다시 읽습니다.</p></aside>
  function gallery(items:JournalEntry[],review=false){
   const groups = new Map<string,JournalEntry[]>()
   for(const item of items.slice(0,limit)){const key=calendarGroup(item.createdAt,scale);groups.set(key,[...(groups.get(key)||[]),item])}

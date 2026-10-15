@@ -25,7 +25,7 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,102
   expect(glass.blur).toContain('blur(20px)');expect(glass.shadow).toContain('inset')
   const alpha=Number(glass.fill.match(/\/\s*([\d.]+)/)?.[1]??glass.fill.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)/)?.[1]??1)
   expect(alpha).toBeGreaterThan(.3);expect(alpha).toBeLessThan(1)
-  await page.getByLabel('내 기록 검색').fill('기록 1');await page.getByLabel('기록 연도',{exact:true}).selectOption('2026')
+  await page.getByLabel('내 기록 검색').fill('기록 1');const dates=page.locator('.journal-date-toggle');if(await dates.isVisible())await dates.click();await page.getByLabel('기록 연도',{exact:true}).selectOption('2026')
   await expect(page.locator('.journal-gallery .journal-story')).toHaveCount(1)
   await page.setViewportSize({width:height,height:width})
   await expect(page.getByLabel('내 기록 검색')).toHaveValue('기록 1');await expect(page.getByLabel('기록 연도',{exact:true})).toHaveValue('2026')
