@@ -28,6 +28,7 @@ jobs:
           python -m pip install --quiet -r analysis/requirements-drive-pdf.txt
           python -m unittest analysis.test_drive_pdf_reports
           node supabase/tests/source_reports.verify.mjs
+          node supabase/tests/notebook.verify.mjs
       - run: python -m pytest -q analysis/fundamentals
       - run: python -m pytest -q analysis/tests
       - run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights

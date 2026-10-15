@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "harness:sync": "node scripts/harness/sync.mjs",
     "harness:check": "node scripts/harness/check.mjs",
+    "test:notebook-db": "node supabase/tests/notebook.verify.mjs",
     "test:position-db": "node supabase/tests/position_growth.verify.mjs",
     "test:etf-rs": "node supabase/tests/etf_rs.verify.mjs",
     "test:universe-db": "node supabase/tests/universe.verify.mjs",
