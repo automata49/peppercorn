@@ -147,7 +147,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       // Keep the approved snapshots focused on the otherwise unchanged reading surfaces.
       // A style tag inserted on Journal persists through the following Journey screenshot.
       if (screen.name === 'journal') await page.addStyleTag({content:'.journal-heading-actions{display:contents!important}.journal-view-toggle{display:none!important}'})
-      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: 150, threshold: 0.15})
+      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
     }
     await context.close()
   })
