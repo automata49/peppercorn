@@ -15,6 +15,7 @@ async function setup(page:Page) {
  const entries:JournalEntry[]=Array.from({length:3},(_,i)=>({
   ...blankSnapshot(),id:`layout-${i}`,title:`기록 ${i+1}`,kind:i===0?'life':'investment',
   text:'기록 본문과 판단',hypothesis:i?'변화를 검증한다.':'',ticker:i?'US:AAPL':'',
+  photos:i===0?['/peppercorn/folio-retro-journal.webp']:[],
   createdAt:`2026-10-0${i+1}T09:00:00Z`,updatedAt:`2026-10-0${i+1}T09:00:00Z`,
   reviewDate:i?'2099-11-01':'',revisions:[]
  }))
@@ -40,9 +41,12 @@ for(const [width,height] of [[390,844],[834,1194],[1366,1024]]){
   const journalGroup=page.getByRole('group',{name:'저널 보기 방식'})
   await expect(journalGroup.getByRole('button',{name:'카드형 보기'})).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('.journal-albums .journal-gallery--card .journal-story')).toHaveCount(3)
+  await expect(page.locator('.journal-albums .journal-gallery--card img')).toHaveCount(1)
   await journalGroup.getByRole('button',{name:'목록형 보기'}).click()
   await expect(journalGroup.getByRole('button',{name:'목록형 보기'})).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('.journal-albums .journal-gallery--list .journal-story')).toHaveCount(3)
+  await expect(page.locator('.journal-albums .journal-gallery--list img, .journal-albums .journal-gallery--list .journal-thumbnail-paper')).toHaveCount(0)
+  await expect(page.locator('.journal-albums .journal-gallery--list .journal-list-instrument')).toHaveCount(2)
   const grid=page.locator('.journal-albums .journal-gallery').first()
   expect(await grid.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(1)
   const first=page.getByRole('button',{name:'기록 1 기록 열기'})
@@ -55,6 +59,7 @@ for(const [width,height] of [[390,844],[834,1194],[1366,1024]]){
   const reviewGroup=page.getByRole('group',{name:'재판단 보기 방식'})
   await expect(reviewGroup.getByRole('button',{name:'목록형 보기'})).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('.decision-queue--list .decision-queue-item')).toHaveCount(2)
+  await expect(page.locator('.decision-queue--list img')).toHaveCount(0)
   await reviewGroup.getByRole('button',{name:'카드형 보기'}).click()
   await expect(page.locator('.decision-queue--card .decision-queue-item')).toHaveCount(2)
   const cols=await page.locator('.decision-queue').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)
@@ -68,6 +73,9 @@ for(const [width,height] of [[390,844],[834,1194],[1366,1024]]){
   await openPage(page,'저널')
   await expect(page.getByRole('group',{name:'저널 보기 방식'}).getByRole('button',{name:'목록형 보기'})).toHaveAttribute('aria-pressed','true')
   await expect(page.locator('.journal-albums .journal-story')).toHaveCount(3)
+  await expect(page.locator('.journal-albums .journal-gallery--list img')).toHaveCount(0)
+  await page.getByRole('group',{name:'저널 보기 방식'}).getByRole('button',{name:'카드형 보기'}).click()
+  await expect(page.locator('.journal-albums .journal-gallery--card img')).toHaveCount(1)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
   await context.close()
  })
