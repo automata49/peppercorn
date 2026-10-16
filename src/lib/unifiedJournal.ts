@@ -13,6 +13,6 @@ export function legacyJournalEntry(kind:'thesis'|'trade',row:EditableRow,index:n
 }
 export function mergeLegacyJournal(entries:JournalEntry[],theses:EditableRow[],trades:EditableRow[]):JournalEntry[]{
  const known=new Set(entries.map(e=>e.id))
- const virtual=[...theses.filter(r=>!!r.ticker).map((row,i)=>legacyJournalEntry('thesis',row,i)),...trades.filter(r=>!!r.ticker).map((row,i)=>legacyJournalEntry('trade',row,i))]
+ const virtual=[...theses.filter(r=>!!r.ticker&&[r.conclusion,r.moat,r.growth_driver,r.key_risk].some(v=>typeof v==='string'&&v.trim())).map((row,i)=>legacyJournalEntry('thesis',row,i)),...trades.filter(r=>!!r.ticker).map((row,i)=>legacyJournalEntry('trade',row,i))]
  return [...entries,...virtual.filter(e=>!known.has(e.id))]
 }
