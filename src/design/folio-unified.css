@@ -45,3 +45,29 @@
 .analysis-page .analysis-secondary-body .analysis-part,.analysis-page .analysis-secondary-body .block-title{font-family:var(--folio-editorial-font)!important;font-size:clamp(28px,3vw,43px)!important;font-weight:var(--folio-editorial-weight)!important;letter-spacing:-.035em;line-height:1.15;margin:0 0 20px}
 .analysis-page .analysis-secondary-body p,.analysis-page .analysis-secondary-body li{line-height:1.65}
 @media(prefers-reduced-motion:reduce){.folio-route-motion{animation:none!important;transition:none!important}}
+
+/* Integrated notebook contextual controls */
+.journal-tools{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.journal-at-trigger{font:inherit;border:1px solid var(--folio-line);border-radius:999px;padding:9px 15px;min-height:44px;background:transparent;color:var(--folio-ink);cursor:pointer}
+.journal-mention-menu{z-index:9999;width:min(360px,calc(100vw - 24px));max-height:min(520px,70vh);overflow:auto;background:var(--folio-surface,#fff);color:var(--folio-ink);border:1px solid var(--folio-line);border-radius:18px;box-shadow:0 16px 36px #0002;padding:16px}
+.journal-mention-menu header{display:flex;align-items:center;justify-content:space-between}
+.journal-mention-menu header button{border:0;background:none;font-size:22px;color:inherit;min-width:44px;min-height:44px;cursor:pointer}
+.journal-mention-menu p{font-size:13px;line-height:1.45;color:var(--folio-muted)}
+.journal-mention-menu label{display:grid;gap:8px;margin:12px 0}
+.journal-mention-menu select{width:100%;min-height:44px;padding:8px;border-radius:10px;border:1px solid var(--folio-line);background:var(--folio-surface);color:var(--folio-ink)}
+.journal-mention-options{display:grid;gap:0}
+.journal-mention-options button{display:flex;gap:14px;align-items:center;justify-content:space-between;border:0;border-top:1px solid var(--folio-line);background:transparent;color:inherit;text-align:left;min-height:48px;padding:12px 4px;cursor:pointer;font:inherit}
+.journal-mention-options button:hover{background:color-mix(in srgb,var(--folio-ink) 5%,transparent)}
+.journal-ai-panel{margin:24px 0;border-top:1px solid var(--folio-line);border-bottom:1px solid var(--folio-line)}
+.journal-ai-panel>summary{padding:18px 4px;font-size:16px;font-weight:650;cursor:pointer}
+.journal-ai-conversation{display:grid;gap:14px;padding:4px 0 24px}
+.journal-ai-disclosure{font-size:12px;color:var(--folio-muted);line-height:1.65}
+.journal-ai-conversation [role=log]{display:grid;gap:12px;max-height:340px;overflow-y:auto}
+.journal-ai-conversation article{max-width:88%;border-radius:16px;padding:13px 16px;background:color-mix(in srgb,var(--folio-ink) 6%,transparent)}
+.journal-ai-conversation article.journal-chat-user{justify-self:end;background:color-mix(in srgb,var(--folio-ink) 11%,transparent)}
+.journal-ai-conversation article small{color:var(--folio-muted);font-size:11px}
+.journal-ai-conversation article p{font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:6px 0 0}
+.journal-ai-conversation form{display:grid;gap:8px}
+.journal-ai-conversation textarea{min-height:76px;resize:vertical;border:1px solid var(--folio-line);border-radius:12px;padding:12px;background:transparent;color:var(--folio-ink);font:inherit}
+.journal-ai-conversation button[type=submit]{justify-self:end;border:0;border-radius:999px;min-height:44px;padding:10px 18px;background:var(--folio-ink);color:var(--folio-paper,#fff);font:inherit;cursor:pointer}
+.journal-ai-conversation button:disabled{opacity:.45;cursor:not-allowed}
