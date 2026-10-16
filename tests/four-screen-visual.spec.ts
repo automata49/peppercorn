@@ -16,7 +16,7 @@ const screens = [
   { name: 'today', label: '오늘', selector: '.lifetime-today' },
   { name: 'discover', label: '발견', selector: '.analysis-finder' },
   { name: 'journal', label: '저널', selector: '.lifetime-journal' },
-  { name: 'journey', label: '여정', selector: '.journal-timeline' },
+  { name: 'journey', label: '여정', selector: '.decision-queue' },
 ] as const
 const photo = 'data:image/webp;base64,' + readFileSync('public/folio-brand-photography.webp').toString('base64')
 const secondPhoto = 'data:image/webp;base64,' + readFileSync('public/folio-brand-typography.webp').toString('base64')
@@ -134,9 +134,9 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       }
       if (screen.name === 'journey') {
         await expect(page.locator('.review-gallery-item')).toHaveCount(1)
-        await expect(page.locator('.journal-timeline')).not.toContainText('바다 앞에서 생각한 긴 시간')
-        await expect(page.locator('.review-gallery-item .journal-story')).toHaveCount(1)
-        await expect(page.locator('.journal-timeline')).toContainText('생각의 변화 1회')
+        await expect(page.locator('.decision-queue')).not.toContainText('바다 앞에서 생각한 긴 시간')
+        await expect(page.locator('.decision-queue-item')).toHaveCount(1);await expect(page.locator('.review-gallery-item .journal-story')).toHaveCount(0)
+        await expect(page.locator('.decision-queue')).toContainText('원본 판단 비교')
       }
       await page.evaluate(() => window.scrollTo(0, 0))
       await rendered(page)

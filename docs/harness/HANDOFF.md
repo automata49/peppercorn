@@ -1,3 +1,11 @@
+## 2026-10-16 — decision queue and judgement chain
+
+DECISION-REVIEW-1 addresses conceptual duplication: Journey previously reused Journal's photo card/editor and saved outcome labels without a changed judgement. Journey now labels its first tab 재판단 and shows a compact priority queue with latest judgement, schedule/condition and distinct primary review versus original-record action. Linked Thesis/trading cards are collapsed source references. Journal gallery and original notebook body/hypothesis remain unchanged.
+
+Dedicated review captures new evidence, maintain/revise/close, an explicit changed judgement when revising, and a next date or condition. Optional lessons/actions and the same Tiptap/ink/photo note tools remain available. Appended metadata preserves previous/current judgement and next review date per dated reflection; new review starts from the latest explicit judgement. Close clears schedule and is not made due by old dates; reopening requires new evidence/schedule. Timestamp instants handle imported timezone offsets. Condition-only entries stay planned and do not imply automatic market monitoring. New metadata remains optional in version-1 backups and owner-account cloud JSON.
+
+Validation: build, harness and diff checks passed; identity 31/31, final decision lifecycle/responsive checks 11/11, canonical four-screen comparisons 8/8 passed. All 12 changed Journey/Today references were visually inspected. Read-only review found no remaining material issue after timestamp, condition scheduling and stable priority repairs. Required full UI CI and publication status are recorded in the PR. Physical Safari/Pencil remains unverified. Prior NOTEBOOK-WRITING-1 PR #153 deployed successfully before this follow-up. See docs/DECISION_REVIEW.md.
+
 ## 2026-10-16 — shared notebook writing surface
 
 NOTEBOOK-WRITING-1 adds shared full-screen Journal/Reflection paper and a floating tool dock. Tiptap remains lazy-loaded; perfect-freehand 1.2.3 (MIT) renders pressure-aware pen/pencil/highlighter strokes. Added stroke eraser, rectangle selection/move/delete, bounded undo/redo, colour/width, finger-writing opt-in, photo handling and plain/ruled/grid paper. Default touch gestures scroll without creating ink; cancelled pointer gestures roll back. Saved ink bounds keep long pages visible. Legacy ink previews remain pixel-stable.
