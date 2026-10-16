@@ -2,8 +2,8 @@ import {motion} from 'motion/react'
 import {Button} from './ui/button'
 import type {JournalEntry} from '../lib/lifetimeJournal'
 import {currentJudgement,latestReview,reviewLabels,reviewStatus} from '../lib/decisionReview'
-export function DecisionQueue({entries,limit,onMore,onReview,onOpenOriginal}:{entries:JournalEntry[];limit:number;onMore:()=>void;onReview:(e:JournalEntry)=>void;onOpenOriginal:(e:JournalEntry)=>void}){
- return <><div className="decision-queue" aria-label="판단 점검 대기열">{entries.slice(0,limit).map(e=>{
+export function DecisionQueue({entries,view='list',limit,onMore,onReview,onOpenOriginal}:{entries:JournalEntry[];view?:'card'|'list';limit:number;onMore:()=>void;onReview:(e:JournalEntry)=>void;onOpenOriginal:(e:JournalEntry)=>void}){
+ return <><div className={`decision-queue decision-queue--${view}`} aria-label="판단 점검 대기열">{entries.slice(0,limit).map(e=>{
   const last=latestReview(e),status=reviewStatus(e),original=e.revisions[0]?.snapshot||e,nextDate=status==='closed'?'':e.reviewDate
   return <motion.article key={e.id} layoutId={`frame-review-${e.id}`} className="review-gallery-item decision-queue-item" aria-label={`${e.title} 판단`}>
    <header><span>{e.ticker?.replace(/^US:/,'')||'투자 판단'}</span><span className="decision-status" data-status={status}>{reviewLabels[status]}</span></header>
