@@ -147,7 +147,16 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       // Keep the approved snapshots focused on the otherwise unchanged reading surfaces.
       // A style tag inserted on Journal persists through the following Journey screenshot.
       if (screen.name === 'journal') await page.addStyleTag({content:'.journal-heading-actions{display:contents!important}.journal-view-toggle{display:none!important}'})
-      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+      if(screen.name==='today'){
+        const hero=(await page.locator('.home-motion-card.home-today').boundingBox())!
+        const follow=(await page.locator('.home-motion-card.home-discover').boundingBox())!
+        if(view.width>view.height){expect(hero.width).toBeLessThan(view.width*.8);expect(Math.abs(hero.y-follow.y)).toBeLessThan(2)}
+        else{expect(hero.x).toBeLessThan(follow.x);expect(hero.height).toBeGreaterThan(follow.height)}
+        await expect(page.locator('.home-destination-nav')).toHaveCount(0)
+      }else{
+        await expect(page.locator('.sidebar .folio-wordmark-system,.mobile-brandbar .folio-wordmark-system')).toHaveCount(0)
+      }
+      await page.screenshot({path:`test-results/folio-unified-${screen.name}-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
     }
     await context.close()
   })

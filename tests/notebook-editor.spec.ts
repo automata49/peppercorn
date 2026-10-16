@@ -46,13 +46,13 @@ test('ink undo/redo, selection move/delete, eraser and photo survive backup',asy
 test('reflection shares tools and preserves structured judgement and original notebook',async({page})=>{
  await setup(page);await page.getByLabel('기록 분류').selectOption('investment');await page.getByLabel('내 가설').fill('이전 가설')
  await page.getByRole('textbox',{name:'기록 본문',exact:true}).fill('원래 본문');await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
- await openPage(page,'여정');await page.getByRole('button',{name:'재판단하기'}).click();await page.getByLabel('회고 결과',{exact:true}).fill('새로 확인한 증거');await page.getByText('배운 점 남기기 · 선택',{exact:true}).click();await page.getByLabel('회고 배운 점').fill('배운 점');await page.getByText('증거 노트 · 사진·필기',{exact:true}).click();await page.getByRole('textbox',{name:'회고 노트 본문',exact:true}).fill('추가 서식 노트');await page.getByRole('textbox',{name:'회고 노트 본문',exact:true}).selectText();await page.getByRole('button',{name:'굵게',exact:true}).click()
+ await openPage(page,'여정');await page.getByRole('button',{name:'재검토하기'}).click();await page.getByLabel('회고 결과',{exact:true}).fill('새로 확인한 증거');await page.getByText('배운 점 남기기 · 선택',{exact:true}).click();await page.getByLabel('회고 배운 점').fill('배운 점');await page.getByText('증거 노트 · 사진·필기',{exact:true}).click();await page.getByRole('textbox',{name:'회고 노트 본문',exact:true}).fill('추가 서식 노트');await page.getByRole('textbox',{name:'회고 노트 본문',exact:true}).selectText();await page.getByRole('button',{name:'굵게',exact:true}).click()
  await page.getByRole('button',{name:'연필',exact:true}).click();await draw(page)
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'목록으로 돌아가기'}).click();await expect(page.getByRole('dialog')).toBeVisible()
  await page.getByLabel('다음 점검 조건').fill('새 공시 확인');await page.getByRole('button',{name:'판단 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
  const entries=await stored(page),entry=entries[0];expect(entry.text).toBe('원래 본문');expect(entry.hypothesis).toBe('이전 가설');expect(entry.ink).toEqual([]);expect(entry.reflections?.[0].note?.text).toBe('추가 서식 노트');expect(entry.reflections?.[0].note?.ink).toHaveLength(1)
  expect(parseNotebook(JSON.stringify({format:'folio-journal',version:1,entries}))).toEqual(entries)
- await page.getByRole('button',{name:'재판단하기'}).click();await page.getByText('원본·판단 이력 1회',{exact:true}).click();await expect(page.locator('.journal-revision').last()).toContainText('추가 서식 노트');await expect(page.locator('.journal-revision .ink-preview')).toBeVisible();await expect(page.locator('.journal-revision strong')).toHaveText('추가 서식 노트')
+ await page.getByRole('button',{name:'재검토하기'}).click();await page.getByText('원본·판단 이력 1회',{exact:true}).click();await expect(page.locator('.journal-revision').last()).toContainText('추가 서식 노트');await expect(page.locator('.journal-revision .ink-preview')).toBeVisible();await expect(page.locator('.journal-revision strong')).toHaveText('추가 서식 노트')
 })
 test('tall imported ink stays visible after shortening text and reopening',async({page})=>{
  await page.addInitScript(()=>{

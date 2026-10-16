@@ -41,9 +41,20 @@ test('gallery: date drilldown, bounded thumbnails, exact record editor and inves
  await page.getByRole('button',{name:'생각 60 기록 열기'}).click();await expect(page.getByLabel('기록 본문')).toContainText('원본 60');await page.getByRole('button',{name:'기록 닫기'}).click();await expect(page.getByRole('button',{name:'생각 60 기록 열기'})).toBeFocused()
  await openPage(page,'여정');await expect(page.locator('.review-gallery-item')).toHaveCount(33);await page.getByLabel('내 기록 검색').fill('생각 60');await expect(page.locator('.review-gallery-item')).toHaveCount(1);await page.getByRole('button',{name:'생각 60 기록 열기'}).click();await expect(page.getByLabel('기록 제목')).toHaveValue('생각 60')
 })
-test('linked trade beyond summary limit opens and edits only its exact original',async({page})=>{
- const records=Array.from({length:25},(_,i)=>({id:`trade-${i}`,ticker:'NVDA',market:'US',date:`2025-01-${String(i+1).padStart(2,'0')}`,thesis:`가설 ${i}`}))
- await page.addInitScript(records=>localStorage.setItem('peppercorn-journal',JSON.stringify(records)),records);await boot(page);await openPage(page,'여정');await page.getByLabel('기록 일',{exact:true}).selectOption('25');await page.getByText('연결된 원본 · Thesis·투자일지',{exact:true}).click();await page.locator('.linked-record-card').click();await expect(page.locator('.linked-trade-original')).toHaveAttribute('data-record-id','trade-24');await expect(page.getByLabel('thesis 원본')).toHaveValue('가설 24');await page.getByLabel('thesis 원본').fill('다시 점검한 가설');await expect(page.getByRole('button',{name:'원본 변경 저장'})).toBeEnabled();await openPage(page,'오늘');await openPage(page,'매매 기록');await expect(page.getByLabel('thesis 원본')).toHaveValue('다시 점검한 가설');await page.getByRole('button',{name:'원본 변경 저장'}).click();const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-journal')||'[]'));expect(saved.find((r:any)=>r.id==='trade-24').thesis).toBe('다시 점검한 가설');expect(saved.find((r:any)=>r.id==='trade-0').thesis).toBe('가설 0')
+test('legacy trade beyond former summary limit joins Journal and Review without altering the source',async({page})=>{
+ const records=Array.from({length:25},(_,i)=>({id:'trade-'+i,ticker:'NVDA',market:'US',date:'2025-01-'+String(i+1).padStart(2,'0'),thesis:'가설 '+i}))
+ await page.addInitScript(records=>localStorage.setItem('peppercorn-journal',JSON.stringify(records)),records)
+ await boot(page);await openPage(page,'저널');await page.getByLabel('내 기록 검색').fill('가설 24')
+ await expect(page.locator('.journal-albums .journal-story')).toHaveCount(1)
+ await page.getByRole('button',{name:/투자일지 기록 열기/}).click()
+ await expect(page.getByLabel('내 가설')).toHaveValue('가설 24')
+ await page.getByLabel('내 가설').fill('다시 검토할 가설')
+ await page.getByRole('button',{name:'페이지 저장'}).click()
+ await openPage(page,'여정');await page.getByLabel('내 기록 검색').fill('다시 검토할 가설')
+ await expect(page.locator('.decision-queue-item')).toHaveCount(1)
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-journal')||'[]'))
+ expect(saved.find((r:any)=>r.id==='trade-24').thesis).toBe('가설 24')
+ expect(saved.find((r:any)=>r.id==='trade-0').thesis).toBe('가설 0')
 })
 for(const [width,height] of [[844,390],[1194,834]])for(const theme of ['light','dark'])test(`landscape ${width} ${theme}: ETF detail inherits the selected palette`,async({browser})=>{
  const context=await browser.newContext({viewport:{width,height},hasTouch:true,isMobile:true,reducedMotion:'reduce'}),page=await context.newPage();await boot(page,theme)

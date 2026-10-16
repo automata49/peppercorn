@@ -36,11 +36,11 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
   if(device==='phone'&&w===width&&theme==='light')await page.screenshot({path:'test-results/stock-cards-phone.png',fullPage:true})
   await openPage(page,'추적')
-  await expect(page.getByRole('tablist',{name:'여정 영역'}).getByRole('tab')).toHaveText(['재판단','관심종목','보유종목'])
+  await expect(page.getByRole('tablist',{name:'여정 영역'}).getByRole('tab')).toHaveText(['재검토','관심종목','보유종목'])
   const tabs=page.getByRole('tablist',{name:'여정 영역'})
   await expect(tabs).toHaveCSS('border-bottom-width','1px')
   expect(parseFloat(await tabs.evaluate(e=>getComputedStyle(e).gap))).toBeGreaterThanOrEqual(20)
-  for(const name of ['재판단','관심종목','보유종목']){
+  for(const name of ['재검토','관심종목','보유종목']){
    const tab=tabs.getByRole('tab',{name});await tab.click()
    await expect(tab).toHaveAttribute('aria-selected','true')
    await expect(tab).toHaveCSS('border-top-width','0px')

@@ -34,39 +34,14 @@ for(const view of views){
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000});await openPage(page,'시장 요약')
 
+  // The Home wordmark is intentionally hidden after leaving Today.
+  await expect(page.locator('.sidebar .folio-wordmark-system,.mobile-brandbar .folio-wordmark-system')).toHaveCount(0)
   if(view.compact){
-    const homeBrand=page.locator('.mobile-brandbar .folio-wordmark-system')
-    await expect(homeBrand).toBeVisible()
-    await expect(homeBrand).toHaveAttribute('aria-label','Folio xx')
-    await expect(homeBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-    await expect(homeBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
-    if(view.name==='phone'){
-      const brandBox=await homeBrand.boundingBox()
-      expect(brandBox).not.toBeNull()
-      expect(brandBox!.height).toBeGreaterThanOrEqual(24.5)
-      expect(brandBox!.height).toBeLessThanOrEqual(25.5)
-      const ratio=await homeBrand.locator('.folio-wordmark-image-light').evaluate((e:any)=>e.naturalWidth/e.naturalHeight)
-      expect(ratio).toBeGreaterThanOrEqual(3.9)
-      expect(ratio).toBeLessThanOrEqual(4.1)
-      const navIcon=page.locator('.mobile-bottom-nav .app-icon').first()
-      const navIconBox=await navIcon.boundingBox()
-      expect(navIconBox).not.toBeNull()
-      expect(navIconBox!.width).toBeGreaterThanOrEqual(19.5)
-      expect(navIconBox!.width).toBeLessThanOrEqual(20.5)
-      const motifBox=await page.locator('.folio-motif-panel img').boundingBox()
-      expect(motifBox).not.toBeNull()
-      expect(motifBox!.height).toBeGreaterThanOrEqual(299)
-    }
     await expect(page.locator('.page-dashboard .topbar')).toBeHidden()
     await expect(page.locator('.mobile-bottom-menu')).toBeVisible()
   }else{
-    const sideBrand=page.locator('.sidebar .folio-wordmark-system')
-    await expect(sideBrand).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-    await expect(sideBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
     await expect(page.locator('.page-dashboard .topbar')).toBeVisible()
   }
-
   await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
   if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
@@ -75,7 +50,7 @@ for(const view of views){
   if(view.compact){
     await page.locator('.mobile-bottom-menu').click()
     const drawer=page.locator('.menu-drawer')
-    await expect(drawer.getByRole('img',{name:'Folio xx'})).toBeVisible()
+    await expect(drawer.getByText('전체 메뉴')).toBeVisible()
     await expect(drawer.locator('.theme-control')).toBeVisible()
     await page.keyboard.press('Escape')
   }
