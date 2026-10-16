@@ -134,16 +134,17 @@ html body .shell .app-main .section-heading>img{display:block;width:100%;height:
 .journal-view-toggle button:focus-visible{outline:2px solid var(--folio-coral);outline-offset:2px}
 @media(max-width:580px){.journal-collection-heading{align-items:center}.journal-heading-actions>p{display:none}.journal-view-toggle button{padding-inline:8px}}
 
-/* Photo-led cards become compact rows with a dedicated, non-overlapping image column. */
-.journal-collection .journal-gallery--list{grid-template-columns:minmax(0,1fr)!important;gap:12px}
-.journal-collection .journal-gallery--list .journal-story{display:grid;grid-template-columns:clamp(82px,19%,150px) minmax(0,1fr);align-items:stretch;gap:14px;min-width:0;min-height:120px;padding:9px;border-radius:20px}
-.journal-collection .journal-gallery--list .journal-story>img,.journal-collection .journal-gallery--list .journal-thumbnail-paper{width:100%;height:100%;max-height:155px;min-height:104px;aspect-ratio:1;object-fit:cover;border-radius:13px}
-.journal-collection .journal-gallery--list .journal-story-copy{width:auto;min-width:0;flex:auto;margin:0;padding:8px 6px;border:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-.journal-collection .journal-gallery--list .journal-story-copy h3{margin:4px 0;font-size:clamp(16px,1.7vw,21px);-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
-.journal-collection .journal-gallery--list .journal-story-copy>p{-webkit-line-clamp:2}
-.journal-collection .journal-gallery--list .journal-story-copy>span{margin-top:8px}
-.journal-collection .journal-gallery--list .linked-record-cover{aspect-ratio:auto;min-height:108px;max-height:155px;padding:12px}
-.journal-collection .journal-gallery--list .linked-record-cover h4{font-size:clamp(16px,2vw,22px)}
+/* Text-only list: a calm, full-width editorial row, no photo or decorative thumbnail. */
+.journal-collection .journal-gallery--list{grid-template-columns:minmax(0,1fr)!important;gap:0}
+.journal-collection .journal-gallery--list .journal-story,
+.journal-collection .journal-gallery--list .journal-story:first-child{display:block;min-height:0;min-width:0;padding:18px 8px;border:0;border-bottom:1px solid var(--folio-line);border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.journal-collection .journal-gallery--list .journal-story-copy{width:100%;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.journal-collection .journal-gallery--list .journal-story-copy h3{margin:6px 0;font-size:clamp(17px,1.8vw,22px);line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.journal-collection .journal-gallery--list .journal-story-copy>p{font-size:13px;line-height:1.7;-webkit-line-clamp:2}
+.journal-collection .journal-gallery--list .journal-story-copy time{font-size:12px}
+.journal-collection .journal-gallery--list .journal-list-instrument{display:block;font-size:12px;color:var(--folio-muted);margin:4px 0 0;overflow-wrap:anywhere}
+.journal-collection .journal-gallery--list .journal-story:hover{background:color-mix(in srgb,var(--folio-surface) 34%,transparent)}
+.journal-collection .journal-gallery--list .journal-story:focus-visible{outline:2px solid var(--folio-coral);outline-offset:-2px;border-radius:8px}
 
 /* Reassessment remains a date/priority ordered action queue, even in card view. */
 .decision-queue--card{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
@@ -155,7 +156,7 @@ html body .shell .app-main .section-heading>img{display:block;width:100%;height:
 .decision-queue--card .decision-queue-actions{flex-direction:row;margin-top:auto;padding-top:12px}
 .decision-queue--card .journey-revision{margin-top:12px}
 @media(max-width:699px){.decision-queue--card{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:420px){.journal-collection .journal-gallery--list .journal-story{grid-template-columns:82px minmax(0,1fr);gap:10px}.journal-collection .journal-gallery--list .journal-story-copy{padding:4px 0}.journal-collection .journal-gallery--list .journal-story-copy>p{-webkit-line-clamp:1}}
+@media(max-width:420px){.journal-collection .journal-gallery--list .journal-story{padding:14px 4px}.journal-collection .journal-gallery--list .journal-story-copy>p{-webkit-line-clamp:2}}
 @media(max-width:1023px) and (orientation:portrait){.journey-review .journal-heading-actions>p{display:none}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.decision-queue--card .decision-queue-item{background:var(--folio-paper)}}
 @media(prefers-reduced-transparency:reduce){.decision-queue--card .decision-queue-item{background:var(--folio-paper)}}
