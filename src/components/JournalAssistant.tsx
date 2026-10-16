@@ -9,7 +9,7 @@ export function JournalAssistant({session,messages,context,onMessages}:{session:
   setInput('');setError('');setBusy(true)
   const next=[...messages,{role:'user' as const,content:question,at:new Date().toISOString()}].slice(-40)
   onMessages(next)
-  try{const reply=await journalAiReply(session,next,context);onMessages([...next,{role:'assistant',content:reply,at:new Date().toISOString()}].slice(-40))}
+  try{const reply=await journalAiReply(session,next,context);onMessages([...next,{role:'assistant' as const,content:reply,at:new Date().toISOString()}].slice(-40))}
   catch(err){setError((err as Error).message)}
   finally{setBusy(false)}
  }
