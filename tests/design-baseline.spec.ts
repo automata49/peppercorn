@@ -42,22 +42,8 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   expect(header!.height).toBeGreaterThanOrEqual(59.5)
   expect(header!.height).toBeLessThanOrEqual(60.5)
 
-  const brand=page.locator('.mobile-brand-home .folio-wordmark-system')
-  const brandBox=await brand.boundingBox()
-  expect(brandBox).not.toBeNull()
-  expect(brandBox!.x).toBeGreaterThanOrEqual(15.5)
-  expect(brandBox!.x).toBeLessThanOrEqual(16.5)
-
-  const word=brand.locator('.folio-wordmark-image-light')
-  const darkWord=brand.locator('.folio-wordmark-image-dark')
-  await expect(word).toBeVisible()
-  await expect(darkWord).toBeHidden()
-  await expect(brand.locator('.folio-wordmark-image:visible')).toHaveCount(1)
-  const wordmarkMetrics=await word.evaluate((img:any)=>({ratio:img.naturalWidth/img.naturalHeight,height:img.getBoundingClientRect().height}))
-  expect(wordmarkMetrics.height).toBeCloseTo(25,1)
-  expect(wordmarkMetrics.ratio).toBeGreaterThanOrEqual(3.9)
-  expect(wordmarkMetrics.ratio).toBeLessThanOrEqual(4.1)
-
+  await expect(page.locator('.mobile-brand-home .folio-wordmark-system')).toHaveCount(0)
+  await expect(page.getByRole('button',{name:'오늘로 이동'})).toBeVisible()
   for(const selector of ['.mobile-bottom-menu','.mobile-brandbar .mobile-brand-search']){
     const box=await page.locator(selector).boundingBox()
     expect(box).not.toBeNull()
