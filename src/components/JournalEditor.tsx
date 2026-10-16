@@ -8,6 +8,7 @@ import {NotebookEditor} from './NotebookEditor'
 import { blankSnapshot, entryPhotos, questions, snapshot, type JournalEntry, type EntrySnapshot } from '../lib/lifetimeJournal'
 export default function JournalEditor({entry,initialQuestion,onSave,onDirty,financials=[],assistantSession=null,storageLabel='이 기기에 보관한 기록'}:{financials?:EditableRow[];assistantSession?:Session|null;storageLabel?:string;entry?:JournalEntry;initialQuestion?:string;onSave:(e:JournalEntry)=>Promise<void>;onDirty:(v:boolean)=>void}){
  const [draft,setDraft]=useState<EntrySnapshot>(()=>entry?snapshot(entry):{...blankSnapshot(),...(initialQuestion?{question:initialQuestion}:{})})
+ const [mentionOpen,setMentionOpen]=useState(false)
  const [insert,setInsert]=useState<{id:number;text:string}|null>(null)
  const [saving,setSaving]=useState(false),[error,setError]=useState(''),[photoBusy,setPhotoBusy]=useState(false)
  function change(p:Partial<EntrySnapshot>){setDraft(d=>({...d,...p}));onDirty(true)}
@@ -17,11 +18,11 @@ export default function JournalEditor({entry,initialQuestion,onSave,onDirty,fina
   const now=new Date().toISOString()
   try{await onSave({...draft,title:draft.title.trim(),id:entry?.id||crypto.randomUUID(),createdAt:entry?.createdAt||now,updatedAt:now,revisions:entry?[...entry.revisions,{at:entry.updatedAt,snapshot:snapshot(entry)}]:[]});onDirty(false)}catch(e){setError((e as Error)?.message||'저장하지 못했습니다. 기록을 닫지 말고 저장 공간을 확인한 뒤 다시 시도하세요.')}finally{setSaving(false)}
  }
- return <div className="journal-editor" aria-busy={saving} inert={saving}>
+ return <div className="journal-editor" aria-busy={saving} inert={saving} onKeyDownCapture={e=>{if(e.key==='@'&&(e.target as HTMLElement).closest('[contenteditable="true"]')){e.preventDefault();setMentionOpen(true)}}}>
  <div className="journal-editor-main">
  <div className="notebook-heading"><label className="sr-only" htmlFor="journal-title">기록 제목</label><input id="journal-title" className="journal-title-input" placeholder="오늘의 한 페이지" maxLength={160} value={draft.title} onChange={e=>change({title:e.target.value})}/><Button disabled={saving||photoBusy} onClick={()=>void save()}>{saving?'저장 중…':'페이지 저장'}</Button></div>
  {error&&<p role="alert">{error}</p>}
- <div className="journal-tools"><label>분류 <select aria-label="기록 분류" value={draft.kind} onChange={e=>change({kind:e.target.value as EntrySnapshot['kind']})}><option value="life">일상</option><option value="investment">투자</option></select></label><FinancialPicker rows={financials} ticker={draft.ticker} onTicker={ticker=>change({ticker,kind:'investment'})} onInsert={text=>setInsert({id:Date.now(),text})}/></div>
+ <div className="journal-tools"><label>분류 <select aria-label="기록 분류" value={draft.kind} onChange={e=>change({kind:e.target.value as EntrySnapshot['kind']})}><option value="life">일상</option><option value="investment">투자</option></select></label><FinancialPicker open={mentionOpen} onOpenChange={setMentionOpen} rows={financials} ticker={draft.ticker} onTicker={ticker=>change({ticker,kind:'investment'})} onInsert={text=>setInsert({id:Date.now(),text})}/></div>
  <NotebookEditor insert={insert} value={{body:draft.body,text:draft.text,ink:draft.ink,photos:entryPhotos(draft),paper:draft.paper}} onBusy={busy=>{setPhotoBusy(busy);if(busy)onDirty(true)}} onChange={patch=>change({...patch,...(patch.photos?{photo:patch.photos[0]}:{})})}/>
  {draft.kind==='investment'&&<section className="journal-investment-fields" aria-label="투자 판단"><label>내 가설<textarea aria-label="내 가설" value={draft.hypothesis||''} placeholder="어떤 변화가 이 기업의 가치로 이어질까요?" onChange={e=>change({hypothesis:e.target.value})}/></label><label>반대 증거<textarea aria-label="반대 증거" value={draft.counterEvidence||''} placeholder="어떤 사실이 이 가설을 반박하나요?" onChange={e=>change({counterEvidence:e.target.value})}/></label></section>}
  <JournalAssistant session={assistantSession} messages={draft.chat||[]} context={[draft.title,draft.ticker,draft.hypothesis,draft.counterEvidence,draft.text].filter(Boolean).join("\n").slice(0,5000)} onMessages={chat=>change({chat})}/>
