@@ -16,7 +16,7 @@ async function photoData(file:File){
  const ctx=canvas.getContext('2d');if(!ctx){bitmap.close();throw Error('사진을 처리할 수 없습니다.')}
  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();return canvas.toDataURL('image/jpeg',.82)
 }
-export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void}){
+export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy,insert}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void;insert?:{id:number;text:string}|null}){
  const [tool,setTool]=useState<Tool>('text'),[color,setColor]=useState<InkColor>('ink'),[size,setSize]=useState(5),[finger,setFinger]=useState(false),[settings,setSettings]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false)
  const [drawing,setDrawing]=useState<InkStroke>([]),[selection,setSelection]=useState<number[]>([]),[selectionRect,setSelectionRect]=useState<{x:number;y:number;right:number;bottom:number}|null>(null),[height,setHeight]=useState(1400),[paperWidth,setPaperWidth]=useState(0)
  const [,refresh]=useState(0),history=useRef<{past:InkStroke[][];future:InkStroke[][]}>({past:[],future:[]})
@@ -28,7 +28,9 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[])
  useEffect(()=>{const node=paper.current;if(!node)return;const observer=new ResizeObserver(()=>{const width=node.clientWidth;if(width){setPaperWidth(width);setHeight(node.clientHeight/width*1000)}});observer.observe(node);return()=>observer.disconnect()},[])
  function commit(next:InkStroke[],before=latest.current.ink){if(next===before)return;history.current.past.push(before);if(history.current.past.length>60)history.current.past.shift();history.current.future=[];changeRef.current({ink:next});refresh(n=>n+1)}
- function undo(){if(tool==='text'){editor?.chain().focus().undo().run();return}const previous=history.current.past.pop();if(previous){history.current.future.push(latest.current.ink);changeRef.current({ink:previous});setSelection([]);refresh(n=>n+1)}}
+ const lastInsertion=useRef<number|null>(null)
+  useEffect(()=>{if(!insert||!editor||insert.id===lastInsertion.current)return;lastInsertion.current=insert.id;editor.chain().focus().insertContent({type:'paragraph',content:[{type:'text',text:insert.text}]}).run()},[editor,insert])
+  function undo(){if(tool==='text'){editor?.chain().focus().undo().run();return}const previous=history.current.past.pop();if(previous){history.current.future.push(latest.current.ink);changeRef.current({ink:previous});setSelection([]);refresh(n=>n+1)}}
  function redo(){if(tool==='text'){editor?.chain().focus().redo().run();return}const next=history.current.future.pop();if(next){history.current.past.push(latest.current.ink);changeRef.current({ink:next});setSelection([]);refresh(n=>n+1)}}
  function point(e:ReactPointerEvent<SVGSVGElement>):InkPoint{const r=e.currentTarget.getBoundingClientRect();return {x:Math.max(0,Math.min(1000,(e.clientX-r.left)/r.width*1000)),y:Math.max(0,Math.min(height,(e.clientY-r.top)/r.height*height)),...(e.pointerType==='pen'?{pressure:Math.max(.05,e.pressure)}:{})}}
  function down(e:ReactPointerEvent<SVGSVGElement>){
