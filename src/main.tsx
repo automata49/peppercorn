@@ -18,6 +18,7 @@ import './design/obra-navigation.css'
 import './design/discovery-catalog.css'
 import './design/discovery-news.css'
 import './design/photography.css'
+import './design/folio-unified.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {
   state:{error:Error|null}={error:null}

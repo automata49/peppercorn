@@ -1,0 +1,47 @@
+/* FOLIO-UNIFIED-1 — editorial surface baseline, not a new design theme. */
+.folio-global-back{display:inline-flex;align-items:center;gap:8px;min-height:44px;margin:8px 0 14px;padding:4px 6px;border:0;background:transparent;color:var(--folio-ink);font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.folio-global-back:focus-visible,.folio-subpage-home:focus-visible{outline:2px solid var(--folio-ink);outline-offset:3px}
+.folio-subpage-home{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:var(--folio-ink);cursor:pointer}
+.folio-route-motion{min-width:0;width:100%}
+.home-card-eyebrow{display:block;color:#fff;font-size:11px;font-weight:650;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.home-destination-nav{display:none!important}
+@media (orientation:landscape){
+ .lifestyle-home{padding:18px clamp(20px,3vw,56px) 24px!important;max-width:1600px}
+ .home-heading{position:static!important;translate:none!important;margin:0 0 20px!important;width:100%!important;text-align:left!important;color:var(--folio-ink)!important;text-shadow:none!important}
+ .home-heading time,.home-heading p{color:var(--folio-muted)!important}
+ .home-heading h2{font-size:clamp(32px,3.5vw,56px)!important;margin:3px 0 6px!important}
+ .home-heading p{font-size:clamp(13px,1.25vw,16px)!important;line-height:1.35!important}
+ .home-heading p br{display:none}
+ .home-motion-cards{display:grid!important;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr)!important;grid-template-rows:repeat(2,clamp(205px,31svh,310px))!important;gap:clamp(12px,1.5vw,22px)!important}
+ .home-motion-card{border-radius:15px!important}
+ .home-motion-card.home-today{grid-column:1!important;grid-row:1!important}
+ .home-motion-card.home-discover{grid-column:2!important;grid-row:1!important}
+ .home-motion-card.home-journal{grid-column:1!important;grid-row:2!important}
+ .home-motion-card.home-journey{grid-column:2!important;grid-row:2!important}
+ .home-motion-card .home-cover-copy{inset:auto 28px 22px!important;text-align:left!important}
+ .home-motion-card .home-cover-copy h3{display:block!important;font-size:clamp(26px,2.5vw,38px)!important;line-height:1.12}
+ .home-motion-card .home-cover-copy p{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2!important;white-space:normal!important;font-size:clamp(13px,1.2vw,16px)!important;line-height:1.42!important;max-width:58ch!important}
+ .home-motion-card .home-story-action{display:none!important}
+}
+@media (orientation:portrait){
+ .lifestyle-home{padding:16px clamp(10px,3vw,22px) 18px!important}
+ .home-heading{margin-bottom:20px!important}
+ .home-heading h2{font-size:clamp(36px,7vw,54px)!important;margin:10px 0}
+ .home-heading p{font-size:14px!important;line-height:1.4!important}
+ .home-motion-cards{grid-auto-rows:clamp(122px,19svh,228px)!important;gap:clamp(9px,1.4vw,16px)!important}
+ .home-motion-card .home-cover-copy{inset:auto 11px 13px!important}
+ .home-motion-card .home-cover-copy h3{font-size:clamp(21px,4.1vw,30px)!important;margin:0 0 3px}
+ .home-motion-card .home-cover-copy p{font-size:clamp(11px,2.5vw,13px)!important;line-height:1.35!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:1!important;white-space:normal!important}
+ .home-card-eyebrow{font-size:9px;margin-bottom:5px;letter-spacing:.08em}
+}
+@media (max-width:600px) and (orientation:landscape){
+ .home-heading{margin:0 0 12px!important}
+ .home-motion-cards{grid-template-rows:repeat(2,180px)!important}
+ .home-motion-card .home-cover-copy{inset:auto 16px 14px!important}
+}
+.analysis-page .analysis-secondary-body{background:transparent!important;border:0!important;box-shadow:none!important}
+.analysis-page .analysis-secondary-body .analysis-block,.analysis-page .analysis-secondary-body .position-panel,.analysis-page .analysis-secondary-body .analysis-judgement{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:clamp(18px,2vw,32px) 0!important}
+.analysis-page .analysis-secondary-body .analysis-block + .analysis-block{border-top:1px solid var(--folio-line)!important}
+.analysis-page .analysis-secondary-body .analysis-part,.analysis-page .analysis-secondary-body .block-title{font-family:var(--folio-editorial-font)!important;font-size:clamp(28px,3vw,43px)!important;font-weight:var(--folio-editorial-weight)!important;letter-spacing:-.035em;line-height:1.15;margin:0 0 20px}
+.analysis-page .analysis-secondary-body p,.analysis-page .analysis-secondary-body li{line-height:1.65}
+@media(prefers-reduced-motion:reduce){.folio-route-motion{animation:none!important;transition:none!important}}
