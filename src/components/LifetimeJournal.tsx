@@ -31,7 +31,7 @@ function readViewMode(section:'journal'|'journey'):ViewMode {
  catch { return fallback }
 }
 function ViewSelector({section,view,onChange}:{section:'journal'|'journey';view:ViewMode;onChange:(next:ViewMode)=>void}) {
- return <div className="journal-view-toggle" role="group" aria-label={section==='journal'?'저널 보기 방식':'재판단 보기 방식'}>
+ return <div className="journal-view-toggle" role="group" aria-label={section==='journal'?'저널 보기 방식':'재검토 보기 방식'}>
   <button type="button" aria-label="카드형 보기" title="카드형 보기" aria-pressed={view==='card'} onClick={()=>onChange('card')}><AppIcon name="sectors" size={18}/><span>카드형</span></button>
   <button type="button" aria-label="목록형 보기" title="목록형 보기" aria-pressed={view==='list'} onClick={()=>onChange('list')}><AppIcon name="menu" size={18}/><span>목록형</span></button>
  </div>
@@ -115,7 +115,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
   <label>일<select aria-label="기록 일" value={date} onChange={e=>setDate(e.target.value)}><option value="">모든 일</option>{days.map(v=><option key={v} value={v}>{Number(v)}일</option>)}</select></label>
   {mode!=='journey'&&<label>모아보기<select aria-label="기록 묶음" value={scale} onChange={e=>setScale(e.target.value as typeof scale)}><option value="year">연도별</option><option value="month">월별</option><option value="day">일별</option></select></label>}
  </div>
- const search = <input className="journal-search" aria-label="내 기록 검색" placeholder={mode==='journey'?'판단, 새 증거, 점검 조건 검색':'제목, 종목, 기록으로 검색'} value={query} onChange={e=>setQuery(e.target.value)}/>
+ const search = <input className="journal-search" aria-label="내 기록 검색" placeholder={mode==='journey'?'Thesis, 종목, 새 증거, 점검 조건 검색':'제목, 종목, 기록으로 검색'} value={query} onChange={e=>setQuery(e.target.value)}/>
  const collectionFilters = <aside className="journal-collection-filters" data-dates-open={calendarOpen} aria-label="기록 검색 및 날짜 필터"><h3>{mode==='journey'?'판단 찾기':'기록 찾기'}</h3>{search}<Button className="journal-date-toggle" variant="ghost" aria-expanded={calendarOpen} onClick={()=>setCalendarOpen(v=>!v)}>{year?`${year}년${month?` · ${Number(month)}월`:''}${date?` · ${Number(date)}일`:''}`:mode==='journey'?'날짜':'날짜 · 모아보기'}</Button>{calendarControls}{(query||year||month||date)&&<Button variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>검색·날짜 초기화</Button>}<p className="journal-collection-hint">{mode==='journey'?'점검일이나 최근 판단일로 찾습니다. 원본 글은 저널에 보관됩니다.':<>날짜별로 모으고,<br/>그때의 생각을 다시 읽습니다.</>}</p></aside>
  function gallery(items:JournalEntry[]){
   const groups = new Map<string,JournalEntry[]>()
@@ -138,7 +138,7 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
     <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
      <header className="journal-collection-heading"><h3>나의 페이지 <span>{list.length}개</span></h3><div className="journal-heading-actions"><p role="status">{storageLabel}</p><ViewSelector section="journal" view={journalView} onChange={selectView}/></div></header>
      {['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p><Button variant="secondary" disabled={!ready} onClick={()=>show()}>첫 페이지 쓰기</Button></div></div>)}</TabsContent>)}
-     {(filter==='all'||filter==='investment')&&linkedGallery}
+     
      <SourceReports controller={reports} view="journal"/>
     </div></div>
    </Tabs>
@@ -151,10 +151,10 @@ export function LifetimeJournal({ reports, mode, entries, ready, error, replace,
    <section className="journey-review">
     <header className="journal-review-heading"><div><span className="journey-kicker">DECISION REVIEW</span><h3>지금 점검할 판단</h3></div><p>새 증거를 확인하고, 판단을 유지·수정·종료한 뒤 다음 점검을 정합니다.</p></header>
     <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
-     <div className="reflection-filters" role="group" aria-label="회고 상태">{[['all','전체'],['due',reviewLabels.due],['planned',reviewLabels.planned],['done',reviewLabels.done],['closed',reviewLabels.closed]].map(([key,label])=><Button key={key} variant="ghost" aria-pressed={reviewFilter===key} onClick={()=>setReviewFilter(key)}>{label} · {key==='all'?investmentPages.length:investmentPages.filter(e=>reviewStatus(e)===key).length}</Button>)}</div><header className="journal-collection-heading"><h3>점검 대기열 <span>{list.length}개</span></h3><div className="journal-heading-actions"><p>우선 점검할 판단부터 표시합니다.</p><ViewSelector section="journey" view={reviewView} onChange={selectView}/></div></header>
+     <div className="reflection-filters" role="group" aria-label="회고 상태">{[['all','전체'],['due',reviewLabels.due],['planned',reviewLabels.planned],['done',reviewLabels.done],['closed',reviewLabels.closed]].map(([key,label])=><Button key={key} variant="ghost" aria-pressed={reviewFilter===key} onClick={()=>setReviewFilter(key)}>{label} · {key==='all'?investmentPages.length:investmentPages.filter(e=>reviewStatus(e)===key).length}</Button>)}</div><header className="journal-collection-heading"><h3>Thesis 재검토 <span>{list.length}개</span></h3><div className="journal-heading-actions"><p>우선 점검할 판단부터 표시합니다.</p><ViewSelector section="journey" view={reviewView} onChange={selectView}/></div></header>
      <DecisionQueue entries={list} view={reviewView} limit={limit} onMore={()=>setLimit(v=>v+40)} onReview={e=>show({...entryStory(e,`review-${e.id}`),action:'reflect'})} onOpenOriginal={e=>show(entryStory(e))}/>
      {!list.length&&<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journey',photoStyle)} alt=""/><div><span className="journey-kicker">A THOUGHT TO RETURN TO</span><h3>점검할 판단을 준비합니다.</h3><p>{investmentPages.length?'조건에 맞는 투자 기록이 없습니다.':'아직 돌아볼 투자 기록이 없습니다. 가설과 반대 증거를 한 페이지에 남겨보세요.'}</p><Button variant="secondary" onClick={()=>navigate('notebook')}>투자 기록 남기기</Button></div></div>}
-     <details className="decision-linked-sources"><summary>연결된 원본 · Thesis·투자일지</summary>{linkedGallery}</details>{assetFlow}
+     {assetFlow}
     </div></div>
    </section>
   </>}
