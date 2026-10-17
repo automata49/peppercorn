@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type ReactNode,type PointerEvent as ReactPointerEvent} from 'react'
-import {EditorContent,useEditor,type JSONContent} from '@tiptap/react'
+import {EditorContent,useEditor,type Editor,type JSONContent} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import {AppIcon,type AppIconName} from './AppIcon'
 import {Button} from './ui/button'
@@ -8,6 +8,7 @@ import {inkBounds,inkColor,inkColors,inkPath,nearStroke,type InkColor,type Paper
 import '../design/notebook.css'
 export type NotebookContent={body:JSONContent;text:string;ink:InkStroke[];photos:string[];paper?:PaperStyle}
 type Tool='text'|'pen'|'pencil'|'highlighter'|'eraser'|'selection'
+type AICommand={from:number;to:number;question:string}
 const tools:{id:Tool;label:string;icon:AppIconName}[]=[{id:'pen',label:'펜',icon:'pen'},{id:'pencil',label:'연필',icon:'pencil'},{id:'highlighter',label:'형광펜',icon:'highlighter'},{id:'eraser',label:'지우개',icon:'eraser'},{id:'selection',label:'영역 선택',icon:'selection'},{id:'text',label:'텍스트',icon:'text'}]
 async function photoData(file:File){
  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>15000000)throw Error('15MB 이하의 JPG, PNG, WebP 사진을 선택하세요.')
@@ -16,15 +17,54 @@ async function photoData(file:File){
  const ctx=canvas.getContext('2d');if(!ctx){bitmap.close();throw Error('사진을 처리할 수 없습니다.')}
  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();return canvas.toDataURL('image/jpeg',.82)
 }
-export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy,insertSnippet,onMentionRequest}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void;insertSnippet?:{id:number;text:string};onMentionRequest?:()=>void}){
+export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy,insertSnippet,onAIRequest}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void;insertSnippet?:{id:number;text:string};onAIRequest?:(question:string,context:string)=>Promise<string>}){
  const [tool,setTool]=useState<Tool>('text'),[color,setColor]=useState<InkColor>('ink'),[size,setSize]=useState(5),[finger,setFinger]=useState(false),[settings,setSettings]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false)
+ const [aiCommand,setAICommand]=useState<AICommand|null>(null),[aiBusy,setAIBusy]=useState(false),[aiError,setAIError]=useState('')
  const [drawing,setDrawing]=useState<InkStroke>([]),[selection,setSelection]=useState<number[]>([]),[selectionRect,setSelectionRect]=useState<{x:number;y:number;right:number;bottom:number}|null>(null),[height,setHeight]=useState(1400),[paperWidth,setPaperWidth]=useState(0)
  const [,refresh]=useState(0),history=useRef<{past:InkStroke[][];future:InkStroke[][]}>({past:[],future:[]})
- const paper=useRef<HTMLDivElement>(null),photoInput=useRef<HTMLInputElement>(null),latest=useRef(value),changeRef=useRef(onChange),mentionRef=useRef(onMentionRequest),mounted=useRef(true)
- latest.current=value;changeRef.current=onChange;mentionRef.current=onMentionRequest
+ const paper=useRef<HTMLDivElement>(null),photoInput=useRef<HTMLInputElement>(null),latest=useRef(value),changeRef=useRef(onChange),aiRequestRef=useRef(onAIRequest),aiBusyRef=useRef(false),mounted=useRef(true)
+ latest.current=value;changeRef.current=onChange;aiRequestRef.current=onAIRequest
  const pan=useRef<{id:number;y:number;top:number;node:HTMLElement}|null>(null)
  const active=useRef<{id:number;start:InkPoint;points:InkStroke;before:InkStroke[];next:InkStroke[];kind:Tool|'move';selection:number[]}|null>(null)
- const editor=useEditor({shouldRerenderOnTransaction:true,extensions:[StarterKit.configure({link:false})],content:cleanDocument(value.body),editorProps:{attributes:{class:'journal-prose',role:'textbox','aria-label':label,'aria-multiline':'true'}},onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});const from=editor.state.selection.$from;const before=from.parent.textContent.slice(0,from.parentOffset);if(before.endsWith('@'))mentionRef.current?.()}})
+ function activeAICommand(instance:Editor):AICommand|null{
+  if(!aiRequestRef.current||!instance.state.selection.empty)return null
+  const {$from,from}=instance.state.selection
+  const before=$from.parent.textBetween(0,$from.parentOffset,'','')
+  const at=before.lastIndexOf('@')
+  if(at<0||(at>0&&!/\\s/.test(before[at-1])))return null
+  const after=before.slice(at+1)
+  if(after.length>1800||after.includes('\\n'))return null
+  return {from:from-after.length-1,to:from,question:after.replace(/^\\s*(?:AI\\s+)?/i,'').trim()}
+ }
+ async function submitAI(instance:Editor,command:AICommand){
+  if(aiBusyRef.current||!aiRequestRef.current||!command.question)return
+  aiBusyRef.current=true;setAIBusy(true);setAIError('');onBusy?.(true)
+  instance.setEditable(false)
+  try{
+   const response=await aiRequestRef.current(command.question,latest.current.text)
+   if(!mounted.current)return
+   const lines=response.split(/\\r?\\n/).filter(line=>line.trim()).slice(0,80)
+   const content=[{type:'paragraph',content:[{type:'text',text:'AI 초안 · 확인 후 수정'}]},...lines.map(line=>({type:'paragraph',content:[{type:'text',text:line.slice(0,4000)}]}))]
+   instance.commands.insertContentAt({from:command.from,to:command.to},{type:'blockquote',content})
+   setAICommand(null)
+  }catch(e){if(mounted.current)setAIError((e as Error).message)}
+  finally{
+   aiBusyRef.current=false
+   if(mounted.current){instance.setEditable(true);setAIBusy(false);onBusy?.(false);instance.commands.focus()}
+  }
+ }
+ const editor=useEditor({shouldRerenderOnTransaction:true,extensions:[StarterKit.configure({link:false})],content:cleanDocument(value.body),editorProps:{
+  attributes:{class:'journal-prose',role:'textbox','aria-label':label,'aria-multiline':'true'},
+  handleKeyDown:(_view,event)=>{
+   if(event.key!=='Enter'||event.shiftKey||event.isComposing||aiBusyRef.current)return false
+   if(!editor)return false
+   const command=activeAICommand(editor)
+   if(!command?.question)return false
+   event.preventDefault()
+   void submitAI(editor,command)
+   return true
+  }
+ },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor));setAIError('')},onSelectionUpdate:({editor})=>setAICommand(activeAICommand(editor))})
  const inserted=useRef<number>(0)
  useEffect(()=>{if(!editor||!insertSnippet||insertSnippet.id===inserted.current)return;inserted.current=insertSnippet.id;editor.chain().focus().insertContent(insertSnippet.text.split('\n').filter(Boolean).map(text=>({type:'paragraph',content:[{type:'text',text}]}))).run()},[editor,insertSnippet])
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[])
@@ -85,6 +125,15 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
    <div className="notebook-content">{children}
     {value.photos.length>0&&<div className="journal-photo-collage" aria-label="기록 사진 모음">{value.photos.map((photo,i)=><figure key={i}><img className="journal-cover" src={photo} alt={i===0?'기록에 첨부한 사진':`기록 사진 ${i+1}`}/><Button variant="secondary" disabled={busy} aria-label={`사진 ${i+1} 삭제`} onClick={()=>onChange({photos:value.photos.filter((_,index)=>index!==i)})}>삭제</Button></figure>)}</div>}
     <EditorContent editor={editor}/>
+    {aiCommand&&<div className="notebook-inline-ai" role="status" aria-label="노트 AI 명령">
+     <span><b>@ AI</b> {aiCommand.question||'질문을 입력하고 Enter를 누르세요.'}</span>
+     <div>
+      <Button size="sm" disabled={aiBusy||!aiCommand.question} onMouseDown={e=>e.preventDefault()} onClick={()=>{if(editor)void submitAI(editor,aiCommand)}}>{aiBusy?'AI 작성 중…':'노트에 작성 ↵'}</Button>
+      <Button size="sm" variant="ghost" disabled={aiBusy} onMouseDown={e=>e.preventDefault()} onClick={()=>{editor?.chain().focus().deleteRange({from:aiCommand.from,to:aiCommand.to}).run();setAICommand(null)}}>취소</Button>
+     </div>
+    </div>}
+    {aiBusy&&<p className="notebook-ai-progress" role="status">AI가 노트에 넣을 초안을 작성 중입니다…</p>}
+    {aiError&&<p className="notebook-ai-error" role="alert">{aiError}</p>}
    </div>
    <svg className="notebook-ink ink-canvas" viewBox={`0 0 1000 ${height}`} role="img" aria-label="손글씨 입력 영역" style={{pointerEvents:tool==='text'?'none':'auto',touchAction:'none'}} onPointerDown={down} onPointerMove={move} onPointerUp={e=>{if(!active.current||active.current.id===e.pointerId)finish()}} onPointerCancel={e=>{if(!active.current||active.current.id===e.pointerId)finish(true)}} onLostPointerCapture={e=>{if(!active.current||active.current.id===e.pointerId)finish(true)}}>
     {[...visible,drawing].map((s,i)=>s.length>0&&<path key={i} d={inkPath(s)} fill={inkColor(s[0].color)} opacity={s[0].tool==='highlighter'?.3:s[0].tool==='pencil'?.65:1}/>)}
