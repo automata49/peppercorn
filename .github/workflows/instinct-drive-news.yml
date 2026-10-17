@@ -5,6 +5,7 @@ on:
     - cron: '17 */4 * * *'
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: instinct-drive-leader-news
   cancel-in-progress: false
@@ -38,3 +39,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "data: refresh public Instinct leader news"
           git push
+      - name: Deploy updated news feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
