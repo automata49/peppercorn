@@ -65,7 +65,7 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
    void submitAI(editor,command)
    return true
   }
- },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor));setAIError('')}})
+ },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor))}})
  const inserted=useRef<number>(0)
  useEffect(()=>{if(!editor||!insertSnippet||insertSnippet.id===inserted.current)return;inserted.current=insertSnippet.id;editor.chain().focus().insertContent(insertSnippet.text.split('\n').filter(Boolean).map(text=>({type:'paragraph',content:[{type:'text',text}]}))).run()},[editor,insertSnippet])
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[])
