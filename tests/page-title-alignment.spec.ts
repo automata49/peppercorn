@@ -1,3 +1,4 @@
+// Release gate: only update approved visual reference images after this geometric alignment check passes.
 import { test, expect } from '@playwright/test'
 import { openPage } from './journey-helpers'
 
