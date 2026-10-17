@@ -54,7 +54,8 @@ test('model error leaves the author\'s @ question intact for retry',async({page}
  await page.route('**/functions/v1/workspace?*',route=>route.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
- await page.route('**/functions/v1/journal-ai',route=>route.fulfill({status:502,json:{error:'model_unavailable'}}))
+ let attempted=0
+ await page.route('**/functions/v1/journal-ai',route=>{attempted++;return route.fulfill({status:502,json:{error:'model_unavailable'}})})
  await page.goto('/peppercorn/')
  await openPage(page,'저널')
  await page.getByRole('button',{name:'새 페이지',exact:true}).click()
@@ -63,6 +64,7 @@ test('model error leaves the author\'s @ question intact for retry',async({page}
  await page.keyboard.insertText('@투자 위험을 분석해줘')
  await expect(page.getByRole('status',{name:'노트 AI 명령'})).toBeVisible()
  await page.getByRole('button',{name:'노트에 작성 ↵'}).click()
+ await expect.poll(()=>attempted,{message:'AI request must be sent by inline button'}).toBeGreaterThan(0)
  await expect(page.getByRole('alert')).toContainText('AI 모델 응답이 실패했습니다.')
  await expect(body).toContainText('@투자 위험을 분석해줘')
  await expect(body.locator('blockquote')).toHaveCount(0)
