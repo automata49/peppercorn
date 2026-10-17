@@ -1185,7 +1185,7 @@ export default function App(){
     const percent=(v:number|null)=>v==null||!Number.isFinite(v)?'—':(v*100).toFixed(1)+'%'
     const money=(v:number|null)=>v==null||!Number.isFinite(v)?'—':v.toLocaleString('en-US',{maximumFractionDigits:0})
     return {ticker:p.market+':'+p.ticker,label:(found?.name||p.ticker)+' · '+p.ticker,
-      summary:'@ Financial · '+p.market+':'+p.ticker+' · '+(p.as_of||'기준일 미제공')+' · 공시 기반 ('+(p.market==='KR'?'DART':'SEC')+')\n매출 성장 YoY '+percent(m.revenue_yoy)+' · 영업이익률 '+percent(m.operating_margin)+' · FCF(TTM) '+money(m.ttm_fcf)+'\n상태: '+p.status+' · 자동 공시 수치, 최신성 및 단위를 원문에서 확인하세요.'}
+      summary:'@ Financial · '+p.market+':'+p.ticker+' · '+(p.as_of||'기준일 미제공')+' · 공시 기반 ('+(p.market==='KR'?'DART':'SEC')+')\n매출 성장 YoY '+percent(m.revenue_yoy)+' · 영업이익률 '+percent(m.operating_margin)+' · FCF(TTM) '+money(m.ttm_fcf)+' '+(p.market==='KR'?'KRW':'USD')+'\n상태: '+p.status+' · 자동 공시 수치, 최신성 및 단위를 원문에서 확인하세요.'}
   })
   const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:focusLeaderRows(sizedRows(focusBase),market)).slice(0,5)
   if(page==='today'){
