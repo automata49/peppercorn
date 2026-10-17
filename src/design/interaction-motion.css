@@ -51,10 +51,10 @@
   transform-origin:center;
 }
 /* Discovery's filter drawer keeps its left-edge layout; add the missing exit. */
-:root body .catalog-filter-drawer.ui-dialog-content[data-state="open"] {
+:root body .catalog-filter-drawer.ui-dialog-content.ui-dialog-content.ui-dialog-content[data-state="open"] {
   animation:folio-panel-in var(--folio-open-ms) var(--folio-open-ease) both;
 }
-:root body .catalog-filter-drawer.ui-dialog-content[data-state="closed"] {
+:root body .catalog-filter-drawer.ui-dialog-content.ui-dialog-content.ui-dialog-content[data-state="closed"] {
   animation:folio-panel-out var(--folio-close-ms) var(--folio-close-ease) both;
 }
 /* Menu uses the existing left/right keyframes, but matching timing curves. */
