@@ -1,0 +1,40 @@
+name: Instinct Drive leader news (public summaries only)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */4 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: instinct-drive-leader-news
+  cancel-in-progress: false
+jobs:
+  publish-news:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Validate public news ingestion
+        run: python -m unittest analysis.test_sync_instinct_news
+      - name: Fetch configured Drive news files
+        env:
+          GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
+          GOOGLE_DRIVE_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
+          GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
+        run: python analysis/sync_instinct_news.py
+      - name: Commit changed public feed
+        run: |
+          if git diff --quiet -- public/data/instinct-leader-news.json; then
+            echo "No new articles"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/instinct-leader-news.json
+          git commit -m "data: refresh public Instinct leader news"
+          git push
