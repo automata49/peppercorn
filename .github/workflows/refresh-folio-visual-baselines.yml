@@ -1,0 +1,38 @@
+name: Refresh Folio visual baselines
+
+on:
+  push:
+    branches:
+      - fix/folio-visual-baselines-20261017
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get install -y fonts-noto-cjk
+      - name: Capture refreshed approved editorial snapshots
+        env:
+          CI: ''
+        run: npx playwright test tests/four-screen-visual.spec.ts --update-snapshots=all --workers=2
+      - name: Commit visual baselines
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tests/four-screen-visual.spec.ts-snapshots
+          if ! git diff --cached --quiet; then
+            git commit -m "test: refresh approved Folio visual baselines [skip ci]"
+            git push origin HEAD:fix/folio-visual-baselines-20261017
+          fi
