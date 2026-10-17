@@ -87,6 +87,10 @@ jobs:
         if: github.event_name != 'workflow_run'
         timeout-minutes: 4
         run: npx playwright test tests/overlay-motion.spec.ts
+      - name: Verify splash optical center and home card transitions
+        if: github.event_name != 'workflow_run'
+        timeout-minutes: 5
+        run: npx playwright test tests/launch-home-motion.spec.ts
       - name: Verify aligned editorial page headings
         if: github.event_name != 'workflow_run'
         timeout-minutes: 5
