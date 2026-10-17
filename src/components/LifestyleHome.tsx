@@ -36,7 +36,7 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
  const [failedPhotos, setFailedPhotos] = useState<Set<string>>(() => new Set())
  const dismiss = useCardDismiss(!!selected, () => setSelected(null))
  const focus = useRef<HTMLElement | null>(null), reduce = useReducedMotion()
- const transition = reduce ? { duration: 0 } : { type: 'spring' as const, stiffness: 280, damping: 32 }
+ const transition = reduce ? { duration: 0 } : { type: 'spring' as const, stiffness: 220, damping: 30, mass: 1.05 }
  const sorted = entries.slice().sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
  const investment = sorted.filter(e => e.kind === 'investment')
  const today = new Date().toLocaleDateString('sv-SE')
@@ -56,7 +56,7 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
  ]
  const active = covers.find(c => c.key === selected)
  function go(page: string) { setSelected(null); navigate(page) }
- function cover(c: typeof covers[number]) { return <><motion.img layoutId={`home-image-${c.key}`} src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><motion.h3 layoutId={`home-title-${c.key}`}>{c.label}</motion.h3><p title={c.summary}>{c.summary}</p><span className="home-story-action" aria-hidden="true">{c.key==='today'?'오늘의 이야기':c.key==='discover'?'기업 발견하기':c.key==='journal'?'기록 모아보기':'여정 돌아보기'} →</span></div></> }
+ function cover(c: typeof covers[number]) { return <><img decoding="async" src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><h3>{c.label}</h3><p title={c.summary}>{c.summary}</p><span className="home-story-action" aria-hidden="true">{c.key==='today'?'오늘의 이야기':c.key==='discover'?'기업 발견하기':c.key==='journal'?'기록 모아보기':'여정 돌아보기'} →</span></div></> }
  return <LayoutGroup id="lifestyle-home"><section className="lifetime-workspace lifetime-today lifestyle-home" aria-label="나의 여정 한눈에">
 
   <header className="lifetime-heading home-heading"><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>나의 여정</h2><p>세상을 발견하고,<br/>나의 시간을 기록하다.</p></header>
@@ -65,7 +65,7 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
   <p className="home-journey-state">{entries.length ? `${entries.length}개의 기록 · 투자 가설 ${theses.filter(t => t.ticker).length}개 · 다시 볼 생각 ${due.length}개` : '사진 한 장, 작은 발견 하나에서 시작하는 나의 여정.'}</p>
   <Dialog.Root open={!!selected} onOpenChange={open => { if (!open) setSelected(null) }}><Dialog.Portal forceMount><AnimatePresence onExitComplete={() => focus.current?.isConnected && focus.current.focus({preventScroll:true})}>
    {active && <Dialog.Overlay forceMount asChild><motion.div className="story-dialog-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .2 }}/></Dialog.Overlay>}
-   {active && <Dialog.Content forceMount asChild onOpenAutoFocus={e => { e.preventDefault(); dismiss.ref.current?.querySelector<HTMLButtonElement>('.card-dismiss-handle')?.focus() }} onCloseAutoFocus={e => e.preventDefault()} onPointerDownOutside={e => { e.preventDefault(); setSelected(null) }}><motion.section ref={dismiss.ref} style={{ y: dismiss.y }} className="story-dialog home-detail" layoutId={`home-frame-${active.key}`} layoutScroll transition={transition}>
+   {active && <Dialog.Content forceMount asChild onOpenAutoFocus={e => { e.preventDefault(); dismiss.ref.current?.querySelector<HTMLButtonElement>('.card-dismiss-handle')?.focus() }} onCloseAutoFocus={e => e.preventDefault()} onPointerDownOutside={e => { e.preventDefault(); setSelected(null) }}><motion.section key={active.key} ref={dismiss.ref} style={{ y: dismiss.y }} className="story-dialog home-detail" layoutId={`home-frame-${active.key}`} layoutScroll initial={reduce?false:{opacity:.96}} animate={{opacity:1}} exit={{opacity:0}} transition={{...transition,opacity:{duration:reduce?0:.28}}}>
     <button className="card-dismiss-handle" type="button" aria-label="카드 닫기" title="아래로 당겨 닫기" onClick={() => setSelected(null)}><span aria-hidden="true"/></button>
     <div className={`home-detail-cover home-${active.key}`}>{cover(active)}</div>
     <div className="story-detail-body"><Dialog.Title>{active.label === '오늘' ? '변화하는 세상을 읽다' : active.label === '저널' ? '기록, 일상, 투자' : active.label === '여정' ? '가설을 다시 읽고, 방향을 점검하다' : '오늘의 주도주'}</Dialog.Title><Dialog.Description>새로운 관찰과 나의 기록을 연결합니다.</Dialog.Description>
