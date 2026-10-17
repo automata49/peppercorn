@@ -16,15 +16,17 @@ async function photoData(file:File){
  const ctx=canvas.getContext('2d');if(!ctx){bitmap.close();throw Error('사진을 처리할 수 없습니다.')}
  ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();return canvas.toDataURL('image/jpeg',.82)
 }
-export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void}){
+export function NotebookEditor({value,onChange,label='기록 본문',children,onBusy,insertSnippet,onMentionRequest}:{value:NotebookContent;onChange:(patch:Partial<NotebookContent>)=>void;label?:string;children?:ReactNode;onBusy?:(busy:boolean)=>void;insertSnippet?:{id:number;text:string};onMentionRequest?:()=>void}){
  const [tool,setTool]=useState<Tool>('text'),[color,setColor]=useState<InkColor>('ink'),[size,setSize]=useState(5),[finger,setFinger]=useState(false),[settings,setSettings]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false)
  const [drawing,setDrawing]=useState<InkStroke>([]),[selection,setSelection]=useState<number[]>([]),[selectionRect,setSelectionRect]=useState<{x:number;y:number;right:number;bottom:number}|null>(null),[height,setHeight]=useState(1400),[paperWidth,setPaperWidth]=useState(0)
  const [,refresh]=useState(0),history=useRef<{past:InkStroke[][];future:InkStroke[][]}>({past:[],future:[]})
- const paper=useRef<HTMLDivElement>(null),photoInput=useRef<HTMLInputElement>(null),latest=useRef(value),changeRef=useRef(onChange),mounted=useRef(true)
- latest.current=value;changeRef.current=onChange
+ const paper=useRef<HTMLDivElement>(null),photoInput=useRef<HTMLInputElement>(null),latest=useRef(value),changeRef=useRef(onChange),mentionRef=useRef(onMentionRequest),mounted=useRef(true)
+ latest.current=value;changeRef.current=onChange;mentionRef.current=onMentionRequest
  const pan=useRef<{id:number;y:number;top:number;node:HTMLElement}|null>(null)
  const active=useRef<{id:number;start:InkPoint;points:InkStroke;before:InkStroke[];next:InkStroke[];kind:Tool|'move';selection:number[]}|null>(null)
- const editor=useEditor({shouldRerenderOnTransaction:true,extensions:[StarterKit.configure({link:false})],content:cleanDocument(value.body),editorProps:{attributes:{class:'journal-prose',role:'textbox','aria-label':label,'aria-multiline':'true'}},onUpdate:({editor})=>changeRef.current({body:editor.getJSON(),text:editor.getText()})})
+ const editor=useEditor({shouldRerenderOnTransaction:true,extensions:[StarterKit.configure({link:false})],content:cleanDocument(value.body),editorProps:{attributes:{class:'journal-prose',role:'textbox','aria-label':label,'aria-multiline':'true'}},onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});const from=editor.state.selection.$from;const before=from.parent.textContent.slice(0,from.parentOffset);if(before.endsWith('@'))mentionRef.current?.()}})
+ const inserted=useRef<number>(0)
+ useEffect(()=>{if(!editor||!insertSnippet||insertSnippet.id===inserted.current)return;inserted.current=insertSnippet.id;editor.chain().focus().insertContent(insertSnippet.text.split('\n').filter(Boolean).map(text=>({type:'paragraph',content:[{type:'text',text}]}))).run()},[editor,insertSnippet])
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[])
  useEffect(()=>{const node=paper.current;if(!node)return;const observer=new ResizeObserver(()=>{const width=node.clientWidth;if(width){setPaperWidth(width);setHeight(node.clientHeight/width*1000)}});observer.observe(node);return()=>observer.disconnect()},[])
  function commit(next:InkStroke[],before=latest.current.ink){if(next===before)return;history.current.past.push(before);if(history.current.past.length>60)history.current.past.shift();history.current.future=[];changeRef.current({ink:next});refresh(n=>n+1)}

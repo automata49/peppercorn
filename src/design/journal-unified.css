@@ -1,0 +1,34 @@
+
+/* Unified notebook — editorial paper, typography-first financial evidence. */
+.journal-financial-popover{z-index:250;width:min(380px,calc(100vw - 28px));max-height:min(440px,70svh);padding:16px;border-radius:18px;background:var(--folio-paper,#faf8f5);color:var(--folio-ink,#211e1b);border:1px solid var(--line,#ddd);box-shadow:0 15px 45px #0002;overflow:auto}
+.journal-financial-popover>strong{display:block;font-family:var(--folio-editorial-font,serif);font-size:21px;margin-bottom:10px}
+.journal-financial-popover input{width:100%;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid var(--line,#ddd);background:transparent;color:inherit;font:inherit}
+.journal-financial-options{display:grid;gap:0;margin-top:10px}
+.journal-financial-options button{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:48px;padding:10px 2px;border:0;border-bottom:1px solid var(--line,#ddd);background:none;color:inherit;text-align:left;cursor:pointer}
+.journal-financial-options button:hover,.journal-financial-options button:focus-visible{background:color-mix(in srgb,var(--folio-ink,#222) 5%,transparent)}
+.journal-financial-options small{white-space:nowrap;opacity:.7}
+.journal-ai-disclosure{margin:30px 0 24px;padding:18px 0;border-top:1px solid var(--line,#ddd);border-bottom:1px solid var(--line,#ddd)}
+.journal-ai-disclosure>summary{cursor:pointer;font-weight:650;min-height:44px;display:list-item;align-content:center}
+.journal-ai{padding:6px 0 14px}.journal-ai h3{font-size:clamp(23px,3vw,30px);font-family:var(--folio-editorial-font,serif);letter-spacing:-.03em;margin:8px 0}
+.journal-ai>p,.journal-ai small{color:var(--folio-muted,#6b655d);line-height:1.5}
+.journal-ai textarea{width:100%;min-height:90px;max-width:100%;font:inherit;line-height:1.5;color:var(--folio-ink,#211e1b);background:transparent;border:1px solid var(--line,#ddd);border-radius:12px;padding:12px}
+.journal-ai-messages{display:grid;gap:12px;max-height:380px;overflow:auto;margin:16px 0}
+.journal-ai-messages article{padding:12px 16px;border-left:2px solid var(--folio-ink,#282828);background:color-mix(in srgb,var(--folio-ink,#222) 3%,transparent)}
+.journal-ai-messages article[data-role="assistant"]{border-left-color:var(--folio-coral,#b75b48)}
+.journal-ai-messages article b{display:block;font-size:12px;letter-spacing:.08em}.journal-ai-messages article p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.folio-nav-heading{font-weight:650;font-size:16px;letter-spacing:-.035em;color:var(--folio-ink,#212121)}
+.folio-page-back{display:inline-flex;align-items:center;gap:6px;min-height:44px;border:0;background:transparent;color:var(--folio-ink,#222);font-size:14px;font-weight:600;padding:2px 0;cursor:pointer}
+.folio-page-back svg{width:16px;height:16px}
+.page-shell-analysis.obra-detail-shell .analysis-secondary-body{gap:clamp(12px,2vw,26px)}
+.page-shell-analysis.obra-detail-shell .analysis-secondary-body>.analysis-block{padding:clamp(6px,1.5vw,18px) 0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;backdrop-filter:none!important}
+.page-shell-analysis.obra-detail-shell .analysis-secondary-body .analysis-part,
+.page-shell-analysis.obra-detail-shell .analysis-secondary-body .block-title{font-family:var(--folio-editorial-font,Georgia,serif)!important;font-weight:var(--folio-editorial-weight,600)!important;font-size:clamp(26px,3.3vw,44px)!important;line-height:1.2!important;letter-spacing:-.045em!important;margin-bottom:clamp(16px,2vw,26px)!important}
+.page-shell-analysis.obra-detail-shell .position-panel{background:transparent;border:none;box-shadow:none;border-radius:0;padding:0}
+.page-shell-analysis.obra-detail-shell .position-labels{gap:clamp(12px,1.8vw,24px)}
+.page-shell-analysis.obra-detail-shell .position-label-card{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:12px 0!important;border-top:1px solid var(--line,#ddd)!important}
+.page-shell-analysis.obra-detail-shell .position-label-card strong{font-family:var(--folio-editorial-font,serif);font-size:clamp(23px,2.4vw,35px);letter-spacing:-.04em}
+.page-shell-analysis.obra-detail-shell .position-facts>div{border-radius:0!important;border:0!important;border-bottom:1px solid var(--line,#ddd)!important;background:transparent!important;padding:14px 0!important;box-shadow:none!important}
+.page-shell-analysis.obra-detail-shell .position-facts>div strong{font-size:clamp(16px,2vw,24px);font-variant-numeric:tabular-nums}
+.page-shell-analysis.obra-detail-shell .snapshot-section-head.position-head{border:0!important;background:transparent!important;box-shadow:none!important}
+@media(max-width:650px){.journal-financial-popover{width:min(340px,calc(100vw - 30px))}.folio-page-back{min-height:40px}.page-shell-analysis.obra-detail-shell .position-labels{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.folio-page-back,.journal-financial-options button{transition:none!important}}

@@ -41,8 +41,8 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await pickFirstStock(page)
   await expect(page.locator('.analysis-detail-tabs').getByRole('tab',{name:'Overview'})).toHaveAttribute('aria-selected','true')
   await expect(page.locator('.analysis-records-disclosure')).toHaveCount(0)
-  await openPage(page,'Thesis')
-  await expect(page.locator('.analysis-records-disclosure')).not.toHaveAttribute('open','')
+  await openPage(page,'저널')
+  await expect(page.locator('.lifetime-journal')).toBeVisible()
   await noHorizontalOverflow(page)
 
   // Watchlist / Portfolio / Journal: compact decision rows first, editable grids closed.
@@ -56,10 +56,9 @@ test('phone primary surfaces keep dense grids and secondary data out of the defa
   await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
   await noHorizontalOverflow(page)
 
-  await openDrawerPage(page,'매매 기록')
-  await expect(page.locator('.workspace-mobile-summary')).toBeVisible()
-  await expect(page.locator('.workspace-mobile-summary .decision-row')).toHaveCount(1)
-  await expect(page.locator('.workspace-table-disclosure')).not.toHaveAttribute('open','')
+  await openPage(page,'저널')
+  await expect(page.locator('.journal-collection')).toBeVisible()
+  await expect(page.locator('.journal-gallery')).toBeVisible()
   await noHorizontalOverflow(page)
 
   // Public catalog pages: summary rows first, canonical grids closed.

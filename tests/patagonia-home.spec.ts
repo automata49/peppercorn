@@ -15,5 +15,6 @@ for(const [width,height] of [[320,568],[390,844],[844,390],[834,1194],[1194,834]
  await page.screenshot({path:`test-results/patagonia-home-${width}-${height}.png`})
  await cards.first().click();await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(cards.first()).toBeFocused()
  for(const label of ['발견','저널','여정']){await page.getByRole('button',{name:`${label} 카드 열기`}).click();await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape')}
- for(const [label,selector] of [['발견','.discovery-workspace'],['저널','.lifetime-journal'],['여정','.journey-workspace']]){await page.getByRole('navigation',{name:'홈에서 페이지로 바로 이동'}).getByRole('button',{name:label,exact:true}).click();await expect(page.locator(selector)).toBeVisible();await openPage(page,'오늘')}
+ await expect(page.getByRole('navigation',{name:'홈에서 페이지로 바로 이동'})).toHaveCount(0)
+ for(const [label,selector] of [['발견','.discovery-workspace'],['저널','.lifetime-journal'],['여정','.journey-workspace']]){await openPage(page,label);await expect(page.locator(selector)).toBeVisible();await openPage(page,'오늘')}
 })
