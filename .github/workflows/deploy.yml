@@ -59,7 +59,7 @@ jobs:
       - if: github.event_name != 'workflow_run'
         run: python -m pytest -q analysis/tests
       - if: github.event_name != 'workflow_run'
-        run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights
+        run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights analysis.test_sync_instinct_news analysis.test_news_visuals
       - if: github.event_name != 'workflow_run'
         run: npm run harness:check
       - if: github.event_name != 'workflow_run'
