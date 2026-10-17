@@ -24,7 +24,7 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  expect(todayBox.y).toBeLessThan(classesBox.y)
  await expect(page.locator('.leader-spotlight,.dashboard-sector-panel')).toHaveCount(0)
  const brand=width===1440?page.locator('.sidebar .folio-wordmark-system'):page.locator('.mobile-brandbar .folio-wordmark-system')
- await expect(brand.locator('.folio-wordmark-image:visible')).toHaveCount(1)
+ await expect(brand).toHaveCount(0)
  await page.screenshot({path:`test-results/journey-home-${width}.png`,fullPage:true})
  await page.locator('.journey-today .decision-row').first().click()
  await expect(page.locator('.analysis-price-momentum')).toBeVisible()
@@ -39,7 +39,7 @@ for(const width of [390,834,1366,1440])test(`journey ${width}: home → detail �
  await nav(page,'추적')
  await expect(page.getByRole('tablist',{name:'여정 영역'}).getByRole('tab')).toHaveText(['재검토','관심종목','보유종목'])
  await page.getByRole('tab',{name:'보유종목',exact:true}).click();await expect(page.locator('.workspace-mobile-summary:visible,.workspace-grid-panel:visible').first()).toBeVisible()
- await nav(page,'Thesis');await expect(conclusion).toHaveValue('성장 동력 확인 후 추적')
+ await nav(page,'저널');await expect(page.locator('.journal-story').filter({hasText:'성장 동력 확인 후 추적'})).toHaveCount(1)
  await nav(page,'탐색');await expect(page.locator('.analysis-finder')).toBeVisible();await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
  await openFilters(page)
  const leadershipScope=page.locator('.analysis-scope')
@@ -69,25 +69,29 @@ test('Home Today market summarizes the Sector ETF signal and opens the full sign
  await expect(page.locator('.dashboard-explore-expanded')).toBeVisible()
 })
 
-test('Thesis opens and edits the selected dated record, retaining both versions after reload',async({page})=>{
+test('Thesis records are edited as independent notebook pages and the source remains intact',async({page})=>{
  const stock=rows[0]
- await page.addInitScript((r)=>{if(!localStorage.getItem('peppercorn-analysis'))localStorage.setItem('peppercorn-analysis',JSON.stringify([{id:100,date:'2026-09-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'older thesis'},{id:'new',date:'2026-10-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'newer thesis'}]))},stock)
- await boot(page);await nav(page,'Thesis')
- await page.locator('.journey-theses .decision-row').filter({hasText:'2026-09-01'}).click()
- const input=page.getByRole('textbox',{name:'내 결론',exact:true});await expect(input).toHaveValue('older thesis')
- await input.fill('edited older thesis');await input.blur()
- await page.locator('.journey-theses .decision-row').filter({hasText:'2026-10-01'}).click();await expect(input).toHaveValue('newer thesis')
- await page.reload();await openPage(page,'시장 요약');await nav(page,'Thesis');await page.locator('.journey-theses .decision-row').filter({hasText:'2026-09-01'}).click();await expect(input).toHaveValue('edited older thesis')
+ await page.addInitScript(r=>localStorage.setItem('peppercorn-analysis',JSON.stringify([{id:100,date:'2026-09-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'older thesis'},{id:'new',date:'2026-10-01',market:r.market,ticker:r.ticker,name:r.name,conclusion:'newer thesis'}])),stock)
+ await boot(page);await nav(page,'저널')
+ await page.locator('.journal-story').filter({hasText:'older thesis'}).click()
+ const input=page.getByRole('textbox',{name:'내 가설'})
+ await expect(input).toHaveValue('older thesis')
+ await input.fill('edited older thesis')
+ await page.getByRole('button',{name:'페이지 저장'}).click()
+ await expect(page.locator('.journal-story').filter({hasText:'newer thesis'})).toHaveCount(1)
+ await page.reload();await nav(page,'저널')
+ await expect(page.locator('.journal-story').filter({hasText:'edited older thesis'})).toHaveCount(1)
+ const originals=await page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-analysis')||'[]'))
+ expect(originals[0].conclusion).toBe('older thesis')
 })
-
-test('archived Thesis remains editable without fabricating market data',async({page})=>{
+test('archived Thesis remains readable and revisable without fake market data',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('peppercorn-analysis',JSON.stringify([{id:42,market:'US',ticker:'ARCHIVED',name:'보관 종목',date:'2026-09-01',conclusion:'보관 근거'}])))
- await boot(page);await nav(page,'Thesis');await page.locator('.journey-theses .decision-row').filter({hasText:'ARCHIVED'}).click()
- await expect(page.getByText('현재 유니버스에 없는 보관 기록입니다.',{exact:false})).toBeVisible()
- const input=page.getByRole('textbox',{name:'내 결론',exact:true});await expect(input).toHaveValue('보관 근거')
- await input.fill('보관 기록 수정');await input.blur()
- await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-analysis')||'[]')[0].conclusion)).toBe('보관 기록 수정')
- await expect(page.locator('.analysis-price-momentum')).toHaveCount(0)
+ await boot(page);await nav(page,'저널')
+ await page.getByRole('button',{name:'보관 종목 · Thesis 기록 열기'}).click()
+ const input=page.getByRole('textbox',{name:'내 가설'});await expect(input).toHaveValue('보관 근거')
+ await input.fill('보관 기록 수정');await page.getByRole('button',{name:'페이지 저장'}).click()
+ await expect(page.locator('.journal-story').filter({hasText:'보관 기록 수정'})).toHaveCount(1)
+ expect((await page.evaluate(()=>JSON.parse(localStorage.getItem('peppercorn-analysis')||'[]')))[0].conclusion).toBe('보관 근거')
 })
 test('Explore market change clears the prior market sector',async({page})=>{
  await boot(page);await nav(page,'탐색');{await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed="true"]');if(await active.count())await active.first().click()}
