@@ -42,6 +42,10 @@ class DrivePDFReportsTest(unittest.TestCase):
     def test_stock_only_and_no_supported_claim(self):
         company = 'NVDA revenue increased 31% year over year during the last quarter.'
         self.assertEqual(summarize_research(company), ['[종목] ' + company])
+        earnings = '9/1 발표 FY27 Q2 전사 매출470억 달러(+58%), GAAP EPS6.34달러, 영업현금22억 달러였습니다.'
+        self.assertEqual(summarize_research(earnings), ['[종목] ' + earnings])
+        self.assertFalse(any('증거가 아닙니다' in line for line in summarize_research(
+            '주가 하락은 기업 매출 악화의 증거가 아닙니다.\\n\\n' + earnings)))
         self.assertEqual(summarize_research('목차와 참고문헌입니다.'), [FALLBACK])
         with self.assertRaises(ValueError):
             summarize_research(company, preferred=['ok'] * 6)
