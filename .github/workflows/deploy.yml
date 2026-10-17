@@ -198,6 +198,11 @@ jobs:
               rm -f "data/$feed.json"
             fi
           done
+          # GitHub Pages may serve this root mirror, not only the artifact.
+          if [ -d dist/data/news-assets ]; then
+            mkdir -p data/news-assets
+            cp -R dist/data/news-assets/. data/news-assets/
+          fi
           # Keep every active Folio identity asset at the branch root too. GitHub Pages can
           # publish the root sync after the Actions artifact deploy, so omitting these files
           # leaves the live shell with broken wordmark / launch / motif image URLs.
@@ -243,6 +248,9 @@ jobs:
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
           git add fonts
+          if [ -d data/news-assets ]; then
+            git add -A -- data/news-assets
+          fi
           for feed in leader-insights premium-insights instinct-leader-news; do
             if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
               git add -A -- "data/$feed.json"
