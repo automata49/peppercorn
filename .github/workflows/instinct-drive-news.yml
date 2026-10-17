@@ -1,5 +1,11 @@
 name: Instinct Drive leader news (public summaries only)
 on:
+  push:
+    branches: [main]
+    paths:
+      - public/data/instinct-leader-news.json
+      - analysis/news_visuals.py
+      - .github/workflows/instinct-drive-news.yml
   workflow_dispatch:
   schedule:
     - cron: '17 */4 * * *'
