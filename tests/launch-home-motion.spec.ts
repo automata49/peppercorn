@@ -1,3 +1,4 @@
+// Release regression: preserve optical glyph centering and the bidirectional home-card frame transition.
 import { test, expect } from '@playwright/test'
 
 for (const viewport of [{width:390,height:844},{width:844,height:390},{width:834,height:1194},{width:1194,height:834},{width:1440,height:900}]) {
