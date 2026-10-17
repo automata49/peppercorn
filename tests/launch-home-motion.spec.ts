@@ -1,5 +1,17 @@
 // Release regression: preserve optical glyph centering and the bidirectional home-card frame transition.
 import { test, expect } from '@playwright/test'
+import { launchPhysicalScreenShift } from '../src/lib/centerLaunchWordmark'
+
+test('installed iPhone splash is centered against the physical screen, not below the status bar',()=>{
+ // Screenshot reference: 1179 x 2556 (393 x 852 CSS pixels), ink is 88 device
+ // pixels below the center. A 58-60px native top inset needs -29/-30 CSS px.
+ expect(launchPhysicalScreenShift(true,60,852,792)).toBe(-30)
+ expect(launchPhysicalScreenShift(true,58,852,794)).toBe(-29)
+ expect(launchPhysicalScreenShift(true,0,852,792)).toBe(-30)
+ expect(launchPhysicalScreenShift(false,60,852,792)).toBe(0)
+ expect(launchPhysicalScreenShift(true,0,852,852)).toBe(0)
+})
+
 
 for (const viewport of [{width:390,height:844},{width:844,height:390},{width:834,height:1194},{width:1194,height:834},{width:1440,height:900}]) {
  test(`optical splash center at ${viewport.width}x${viewport.height}`,async({browser})=>{
