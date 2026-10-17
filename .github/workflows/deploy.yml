@@ -24,7 +24,7 @@ jobs:
   build:
     if: >-
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
-      || (github.event_name != 'workflow_run' && github.actor != 'github-actions[bot]')
+      || (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.actor != 'github-actions[bot]'))
     runs-on: ubuntu-24.04
     steps:
       # One-time recovery: retire the earlier deployment runs blocked on full UI tests.
