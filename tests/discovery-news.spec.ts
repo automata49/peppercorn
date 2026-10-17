@@ -76,3 +76,32 @@ test('generated editorial image uses source-grounded labeling and falls back whe
  await expect(again.locator('img')).toHaveAttribute('src',/folio-(?:brand|retro|vivid)/)
  await expect(again).toContainText('Folio 이미지 · 원문 사진 아님')
 })
+
+test('GLOBAL TREND news is featured without ticker even outside leaderboard and works with KR filter',async({page})=>{
+ await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{
+  version:1,updated_at:stamp(),items:[
+   {type:'trend',market:'GLOBAL',trend_topic:'AI Infrastructure',
+    headline:'Major AI infrastructure adoption expands',
+    summary:'Confirmed project deployment and equipment delivery across several regions.',
+    source_name:'Original Newsroom',source_url:'https://example.com/research/ai-infrastructure',
+    published_at:stamp(-1)},
+   {market:'US',ticker:'AEM',headline:'A non-leading company announcement',
+    summary:'This separate company announcement must not be elevated to a Folio leader story.',
+    source_name:'Example',source_url:'https://example.com/company/aem',published_at:stamp(-2)}
+  ]
+ }}}))
+ await boot(page)
+ const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
+ const card=section.locator('article[data-kind="trend"]')
+ await expect(card).toHaveCount(1)
+ await expect(card).toContainText('TREND')
+ await expect(card).toContainText('AI Infrastructure')
+ await expect(card).toContainText('Major AI infrastructure adoption expands')
+ await expect(card.getByRole('button',{name:'종목 보기 →'})).toHaveCount(0)
+ await expect(card.getByRole('link',{name:'원문 읽기 ↗'})).toHaveAttribute('href','https://example.com/research/ai-infrastructure')
+ await expect(section).not.toContainText('A non-leading company announcement')
+ await openFilters(page)
+ await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'KR',exact:true}).click()
+ await closeFilters(page)
+ await expect(card).toBeVisible()
+})
