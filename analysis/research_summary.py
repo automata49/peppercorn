@@ -17,7 +17,7 @@ CATEGORIES = {
         r'industry|sector|semiconductor|shipments?|inventory|demand|supply|cloud', re.I),
     '종목': re.compile(
         r'종목|기업|회사|엔비디아|삼성전자|SK하이닉스|테슬라|애플|'
-        r'마이크로소프트|NVIDIA|NVDA|TSLA|AAPL|MSFT|GOOGL|AMZN|'
+        r'마이크로소프트|NVIDIA|NVDA|TSLA|AAPL|MSFT|GOOGL|AMZN|DELL|HPE|MRVL|ASML|AMD|AVGO|'
         r'매출|영업이익|순이익|실적|영업이익률|마진|목표주가|주가|'
         r'시가총액|가이던스|밸류에이션|EPS|ROE|PER|수주|고객사|'
         r'company|revenue|earnings|profit|guidance|operating margin', re.I),
@@ -34,6 +34,8 @@ FACT = re.compile(
     r'grew|growth|rose|fell|declin|increas|decreas|forecast|guidance|'
     r'expand|shipment|supply', re.I)
 CHANGE = re.compile(r'증가|감소|상승|하락|전년|전분기|증설|둔화|개선|grew|rose|fell|year.over.year|quarter.over.quarter', re.I)
+STOCK_FINANCIAL = re.compile(r'매출|영업이익|영업현금|영업마진|EPS|순이익|실적|마진|수주|revenue|earnings|profit|margin|guidance', re.I)
+EDITORIAL = re.compile(r'매수·매도|검토 강화|검토 약화|매매 판단|판단 유보|핵심 판단|해석:|의견|추격 매수|단서일 뿐|증거가 아닙니다', re.I)
 FALLBACK = '시장·산업·종목의 구체적인 사실을 자동 발췌하지 못했습니다. 원본 PDF를 확인해주세요.'
 
 
@@ -69,14 +71,17 @@ def summarize_research(text, preferred=None):
     buckets = {category: [] for category in CATEGORIES}
     seen = set()
     for order, fragment in enumerate(_fragments(text)):
-        if not 18 <= len(fragment) <= 580 or fragment in seen or REPORT_META.search(fragment) or not FACT.search(fragment):
+        if not 18 <= len(fragment) <= 580 or fragment in seen or REPORT_META.search(fragment) or not FACT.search(fragment) or EDITORIAL.search(fragment):
             continue
         seen.add(fragment)
         counts = {category: len(pattern.findall(fragment)) for category, pattern in CATEGORIES.items()}
         best = max(counts, key=lambda category: counts[category])
+        # Company earnings with currency amounts belong to stocks, not '시장'.
+        if len(STOCK_FINANCIAL.findall(fragment)) >= 2:
+            best = '종목'
         if not counts[best]:
             continue
-        score = 2 * counts[best] + min(len(re.findall(r'\d+(?:\.\d+)?%?', fragment)), 3)
+        score = 2 * counts[best] + 2 * min(len(re.findall(r'\d+(?:\.\d+)?%?', fragment)), 3)
         score += int(bool(CHANGE.search(fragment))) + 3 * int(any(fragment in hint for hint in hints))
         buckets[best].append((-score, order, fragment))
 
