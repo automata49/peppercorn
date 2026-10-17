@@ -1,0 +1,87 @@
+/* FOLIO MOTION: one reversible entrance/exit language for Radix surfaces.
+   Animate only opacity, scale and independent translate so fixed positioning,
+   CSS transforms, scroll, drag gestures and Motion layoutIds stay intact. */
+:root {
+  --folio-open-ms: 260ms;
+  --folio-close-ms: 210ms;
+  --folio-open-ease: cubic-bezier(.22,1,.36,1);
+  --folio-close-ease: cubic-bezier(.4,0,.2,1);
+}
+@keyframes folio-scrim-in { from { opacity:0 } to { opacity:1 } }
+@keyframes folio-scrim-out { from { opacity:1 } to { opacity:0 } }
+@keyframes folio-surface-in {
+  from { opacity:0; scale:.975; translate:0 10px }
+  to { opacity:1; scale:1; translate:0 0 }
+}
+@keyframes folio-surface-out {
+  from { opacity:1; scale:1; translate:0 0 }
+  to { opacity:0; scale:.985; translate:0 6px }
+}
+@keyframes folio-popover-in {
+  from { opacity:0; scale:.98; translate:0 8px }
+  to { opacity:1; scale:1; translate:0 0 }
+}
+@keyframes folio-popover-out {
+  from { opacity:1; scale:1; translate:0 0 }
+  to { opacity:0; scale:.985; translate:0 4px }
+}
+@keyframes folio-panel-in {
+  from { opacity:0; translate:-100% 0 }
+  to { opacity:1; translate:0 0 }
+}
+@keyframes folio-panel-out {
+  from { opacity:1; translate:0 0 }
+  to { opacity:0; translate:-100% 0 }
+}
+
+/* Every Radix-backed backdrop (dialog, alert, side sheet, filter & menu). */
+:root body .ui-dialog-overlay[data-state="open"] {
+  animation:folio-scrim-in var(--folio-open-ms) var(--folio-open-ease) both;
+}
+:root body .ui-dialog-overlay[data-state="closed"] {
+  animation:folio-scrim-out var(--folio-close-ms) var(--folio-close-ease) both;
+}
+/* Generic centered surfaces: account, stock search, summary, detail, delete. */
+:root body :is(.ui-dialog-content:not(.menu-drawer):not(.catalog-filter-drawer),.ui-alert-content)[data-state="open"] {
+  animation:folio-surface-in var(--folio-open-ms) var(--folio-open-ease) both;
+  transform-origin:center;
+}
+:root body :is(.ui-dialog-content:not(.menu-drawer):not(.catalog-filter-drawer),.ui-alert-content)[data-state="closed"] {
+  animation:folio-surface-out var(--folio-close-ms) var(--folio-close-ease) both;
+  transform-origin:center;
+}
+/* Discovery's filter drawer keeps its left-edge layout; add the missing exit. */
+:root body .catalog-filter-drawer.ui-dialog-content[data-state="open"] {
+  animation:folio-panel-in var(--folio-open-ms) var(--folio-open-ease) both;
+}
+:root body .catalog-filter-drawer.ui-dialog-content[data-state="closed"] {
+  animation:folio-panel-out var(--folio-close-ms) var(--folio-close-ease) both;
+}
+/* Menu uses the existing left/right keyframes, but matching timing curves. */
+:root body .menu-drawer[data-state="open"] {
+  animation-duration:var(--folio-open-ms);
+  animation-timing-function:var(--folio-open-ease);
+}
+:root body .menu-drawer[data-state="closed"] {
+  animation-duration:var(--folio-close-ms);
+  animation-timing-function:var(--folio-close-ease);
+}
+/* Installation and financial-reference popovers keep Radix placement intact. */
+:root body .ui-popover-content {
+  transform-origin:var(--radix-popover-content-transform-origin,center top);
+}
+:root body .ui-popover-content[data-state="open"] {
+  animation:folio-popover-in var(--folio-open-ms) var(--folio-open-ease) both;
+}
+:root body .ui-popover-content[data-state="closed"] {
+  animation:folio-popover-out var(--folio-close-ms) var(--folio-close-ease) both;
+}
+/* Motion transforms, authored photo-card morphs and page transitions are not
+   overridden here. Respect OS accessibility and minimize transition effects. */
+@media (prefers-reduced-motion:reduce) {
+  :root body :is(.ui-dialog-overlay,.ui-dialog-content,.ui-alert-content,.ui-popover-content,.menu-drawer)[data-state] {
+    animation:none!important;
+    scale:1!important;
+    translate:none!important;
+  }
+}
