@@ -123,9 +123,9 @@ test('Light theme keeps one Folio visual system across every product workspace',
   const page=await context.newPage()
   await boot(page)
   const destinations=[
-    ['시장 요약','dashboard'],['발견','analysis'],['Thesis','thesis'],['여정','tracking'],
+    ['시장 요약','dashboard'],['발견','analysis'],['저널','notebook'],['여정','tracking'],
     ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
-    ['Portfolio','portfolio'],['매매 기록','journal'],['Leaderboard','leaderboard'],
+    ['Portfolio','portfolio'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
   const nav=page.locator('.sidebar nav')
