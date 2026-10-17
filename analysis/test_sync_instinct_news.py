@@ -28,5 +28,21 @@ class NewsValidationTests(unittest.TestCase):
         self.assertEqual(len(parse_file(body, NOW)), 1)
         with self.assertRaises(ValueError):
             parse_file(json.dumps({"version": 2, "items": [VALID]}).encode(), NOW)
+    def test_independent_trend_without_ticker(self):
+        trend = {k: v for k, v in VALID.items() if k != "ticker"}
+        trend.update(type="trend", market="GLOBAL", trend_topic="AI Infrastructure")
+        item = clean(trend, NOW)
+        self.assertEqual(item["type"], "trend")
+        self.assertEqual(item["trend_topic"], "AI Infrastructure")
+        self.assertNotIn("ticker", item)
+        self.assertEqual(len(parse_file(json.dumps({"version":1, "items":[trend]}).encode(), NOW)), 1)
+
+    def test_malformed_trend_rejected(self):
+        trend = {k: v for k, v in VALID.items() if k != "ticker"}
+        trend.update(type="trend", market="GLOBAL", trend_topic="AI Infrastructure")
+        self.assertIsNone(clean({**trend, "trend_topic":""}, NOW))
+        self.assertIsNone(clean({**trend, "market":"INVALID"}, NOW))
+        self.assertIsNone(clean({**trend, "source_url":"http://example.com/private"}, NOW))
+
 if __name__ == "__main__":
     unittest.main()
