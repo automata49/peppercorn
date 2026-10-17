@@ -92,7 +92,7 @@ test('GLOBAL TREND news is featured without ticker even outside leaderboard and 
     summary:'This separate company announcement must not be elevated to a Folio leader story.',
     source_name:'Example',source_url:'https://example.com/company/aem',published_at:stamp(-2)}
   ]
- }}}))
+ }}))
  await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
  const card=section.locator('article[data-kind="trend"]')
