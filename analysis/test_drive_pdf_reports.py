@@ -33,7 +33,7 @@ class DrivePDFReportsTest(unittest.TestCase):
         market = '미국 국채 금리는 4.2%로 상승했고 나스닥 지수는 1.4% 하락했다.'
         industry = '반도체 재고는 2026년 3분기에 전분기 대비 12% 감소했다.'
         stock = '엔비디아 매출은 전년 동기 대비 34% 증가했다.'
-        text = '\\n\\n'.join((intro, market, industry, stock))
+        text = '\n\n'.join((intro, market, industry, stock))
         lines = summarize_research(text, preferred=[intro, '이 리포트는 시장 전망을 설명합니다.'])
         self.assertEqual(lines, ['[시장] ' + market, '[산업] ' + industry, '[종목] ' + stock])
         for line in lines:
