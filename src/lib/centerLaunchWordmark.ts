@@ -14,6 +14,7 @@ export function launchPhysicalScreenShift(
 ): number {
   if (!iosStandalone) return 0
   const excludedTop = Math.max(0, safeTop, screenHeight - viewportHeight)
+  if (excludedTop === 0) return 0
   return -Math.min(48, excludedTop / 2)
 }
 
