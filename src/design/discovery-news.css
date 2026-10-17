@@ -26,3 +26,6 @@ html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:
  .discovery-news-copy h4{font-size:23px}
 }
 @media(orientation:landscape) and (max-height:600px){.discovery-news-story img{aspect-ratio:16/9}.discovery-news-stories{grid-auto-flow:initial;grid-auto-columns:initial;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}.discovery-news-story:nth-child(4){display:none}.discovery-news-copy h4{font-size:19px}.discovery-news-copy>p{font-size:13px}}
+
+/* Distinguish cross-market theme coverage without implying a leader classification. */
+.discovery-news-trend-tag{display:inline-block;margin-right:5px;font-size:10px;font-weight:700;letter-spacing:.11em;color:var(--folio-ink);border:1px solid currentColor;border-radius:3px;padding:1px 5px;vertical-align:baseline}
