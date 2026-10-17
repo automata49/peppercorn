@@ -1,0 +1,32 @@
+name: Rebaseline editorial page screenshots
+on:
+  push:
+    branches: [fix/page-heading-golden-snapshots-20261017]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get install -y fonts-noto-cjk
+      - name: Confirm title alignment on six viewports
+        run: npx playwright test tests/page-title-alignment.spec.ts
+      - name: Update approved page screenshots
+        run: npx playwright test tests/four-screen-visual.spec.ts --update-snapshots
+      - name: Commit refreshed image references
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A tests/four-screen-visual.spec.ts-snapshots
+          if ! git diff --cached --quiet; then
+            git commit -m "test: update approved editorial header snapshots [skip ci]"
+            git push origin HEAD:fix/page-heading-golden-snapshots-20261017
+          fi
