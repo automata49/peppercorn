@@ -1,3 +1,9 @@
+## 2026-10-17 — viewport bottom navigation, bounded cards and laser trends
+
+The app shell now fades without a y transform, so fixed compact navigation remains viewport-owned during launch and scrolling (including iOS containing-block behaviour). Discovery retains empty auto-fill tracks and caps stock cards at 360px; a single result cannot expand across the catalogue. Shared daily-close mini trends render a static coloured halo, beam and narrow light core on the same real path. KR/US colours, gaps, missing states, ranking and data remain unchanged.
+
+Build and harness passed. Ten new Light/Dark phone/iPad/desktop checks passed for singleton width, identical path geometry, overflow and bottom anchoring; the test additionally stresses a tall scroll surface. Eight Discover reference images were individually reviewed and updated for the intentional laser appearance only. The full 449-test browser suite is running; final validation and deployment are recorded in delivery. Physical iOS Safari is not available here.
+
 ## 2026-10-16 — decision queue and judgement chain
 
 DECISION-REVIEW-1 addresses conceptual duplication: Journey previously reused Journal's photo card/editor and saved outcome labels without a changed judgement. Journey now labels its first tab 재판단 and shows a compact priority queue with latest judgement, schedule/condition and distinct primary review versus original-record action. Linked Thesis/trading cards are collapsed source references. Journal gallery and original notebook body/hypothesis remain unchanged.

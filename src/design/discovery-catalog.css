@@ -1,3 +1,4 @@
+/* Keep empty grid tracks: a lone result must retain catalogue sizing. */
 /* Responsive discovery: persistent landscape/desktop sidebar and translucent stock cards. */
 .discovery-workspace{max-width:1280px}
 .discovery-stocks .folio-tabs-list{margin:8px 0 12px}
@@ -17,7 +18,7 @@ html body :is(.catalog-filter-drawer button,.catalog-filter-toggle):focus-visibl
 :root body :is(.catalog-filter-drawer,.shell .app-main .catalog-filter-sidebar) select{width:100%;min-height:44px;border:0;border-bottom:1px solid var(--folio-line);border-radius:0;background:transparent;color:var(--folio-ink);font:inherit;font-size:17px;padding:8px 0}
 .catalog-advanced summary{min-height:44px;padding:12px 0;font-size:17px;cursor:pointer}.catalog-advanced .lens-bar{display:grid;gap:8px}.catalog-show-results{width:100%;margin-top:20px;font-weight:700!important}
 .catalog-results{min-width:0;margin-top:24px}
-html body .shell .app-main .stock-card-grid.stock-trend-list{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))!important;gap:20px;max-height:none!important;overflow:visible!important;border:0!important;padding:0!important;margin:0!important;container-type:normal}
+html body .shell .app-main .stock-card-grid.stock-trend-list{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(min(100%,190px),1fr))!important;gap:20px;max-height:none!important;overflow:visible!important;border:0!important;padding:0!important;margin:0!important;container-type:normal}
 html body .shell .app-main .stock-card-grid.stock-trend-list .stock-trend-row{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:auto 64px auto;gap:12px;align-items:start;min-width:0;min-height:240px!important;padding:20px 20px 62px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
 html body .shell .app-main .stock-card-grid .stock-trend-row:hover{background:transparent!important;transform:none!important}.stock-card-grid .stock-trend-row:focus-visible{outline:2px solid var(--folio-ink);outline-offset:4px}
 .stock-card-grid .stock-trend-copy{grid-column:1!important;grid-row:1!important}.stock-card-grid .stock-trend-tags{margin-top:6px}
@@ -26,6 +27,7 @@ html body .shell .app-main .stock-card-grid .stock-trend-tags :is(i,small){borde
 .stock-card-grid .stock-mini-trend svg{height:64px;width:100%}
 .stock-card-grid .stock-trend-price{grid-column:1!important;grid-row:3!important;display:grid!important;gap:4px;text-align:left!important;justify-items:start!important}
 .stock-card-grid .stock-trend-price>b{font-size:22px!important}.stock-card-grid .stock-trend-price>small{font-size:14px!important}.stock-card-grid .empty{grid-column:1/-1}
+.stock-card-grid > :is(.stock-catalog-card,.stock-trend-row){width:100%;max-width:360px;justify-self:start}
 .discovery-catalog .recent-stocks{flex-wrap:nowrap;overflow-x:auto;max-width:100%;max-height:48px;margin:8px 0 0;gap:16px}
 .discovery-catalog .recent-stocks>span{flex-shrink:0}.discovery-catalog .recent-stocks button{white-space:nowrap;flex-shrink:0;min-height:44px;padding:8px 0!important;font-size:14px!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;color:var(--folio-ink)!important}
 .discovery-catalog .stock-search{z-index:3;padding:0!important;margin:0!important;border:0!important}.discovery-catalog .stock-search input{border:0!important;border-bottom:1px solid var(--folio-line)!important;border-radius:0!important;background:transparent!important;font-size:16px!important}.discovery-catalog .stock-search:has(.stock-search-results){position:relative}.discovery-catalog .stock-search-results{position:absolute;z-index:5;top:44px;left:0;right:0;max-height:280px}
