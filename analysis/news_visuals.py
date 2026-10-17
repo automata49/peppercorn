@@ -167,6 +167,11 @@ def apply_visuals(feed=FEED, assets=ASSETS, environ=None, generation=api_webp):
         if article.get("visual") != visual:
             article["visual"] = visual
             changed = True
+    # Only keep assets used by the current seven-day public feed.
+    active = {identity(a) for a in record["items"]}
+    for old in assets.iterdir():
+        if old.is_file() and re.fullmatch(r"[a-f0-9]{20}\.(?:svg|webp)", old.name) and old.stem not in active:
+            old.unlink()
     if changed:
         feed.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return changed
