@@ -6,6 +6,9 @@ const issuer=[['US','AAPL','Apple Newsroom','www.apple.com','Apple Park'],['US',
 const stories=issuer.map(([market,ticker,publisher,host,alt],i)=>({id:`${market}:${ticker}:test`,market,ticker,headline:`테스트 ${ticker} · 공식 발표의 변화`,summary:'테스트 요약 · 공개 자료에서 확인한 변화와 기업의 발표를 전달합니다.',summary_kind:'ai_draft',collected_at:stamp(),expires_at:stamp(24),generated_at:stamp(),model:'gemini-3.5-flash-lite',prompt_version:'folio-news-1',evidence:'An exact public source fragment',source:{id:`source-${i}`,title:`Public source ${ticker}`,publisher,url:`https://${host}/test-news`,published_at:stamp(-i*12-1)},image:{url:`https://upload.wikimedia.org/test-${ticker}.jpg`,page_url:`https://commons.wikimedia.org/wiki/File:Test_${ticker}.jpg`,license:'CC BY-SA 4.0',license_url:'https://creativecommons.org/licenses/by-sa/4.0/',creator:'Test photographer',kind:'related',alt}}))
 const feed={version:1,published_at:stamp(),ai_status:'enabled',items:stories}
 const rows=[...demoRows,...['NVDA','AMD'].map(ticker=>({...demoRows[0],id:ticker,ticker,name:ticker,market:'US'}))]
+test.beforeEach(async({page})=>{
+ await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{version:1,updated_at:stamp(),items:[]}}))
+})
 async function boot(page:Page,value:unknown=feed,reportedRows=rows){
  await page.clock.setFixedTime(new Date(now))
  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all')})
