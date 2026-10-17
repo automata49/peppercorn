@@ -34,8 +34,11 @@ def utc(s):
 def url_ok(value):
     if not isinstance(value, str) or len(value) > 2048:
         return False
-    p = urllib.parse.urlsplit(value)
-    if p.scheme != "https" or not p.hostname or p.username or p.password or p.port not in (None, 443):
+    try:
+        p = urllib.parse.urlsplit(value)
+        if p.scheme != "https" or not p.hostname or p.username or p.password or p.port not in (None, 443):
+            return False
+    except ValueError:
         return False
     host = p.hostname.lower()
     if "." not in host or host.endswith((".local", ".internal")) or host in ("drive.google.com", "docs.google.com", "files.instinct.com"):
