@@ -13,6 +13,11 @@ from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
+try:
+    from analysis.research_summary import summarize_research
+except ModuleNotFoundError:  # Allow python analysis/drive_pdf_reports.py as well as -m.
+    from research_summary import summarize_research
+
 FOLDER_ID = '1HdM3uXO3_cAnJS0igLlDIsCylch6KMey'
 
 
@@ -66,12 +71,9 @@ def extract(pdf, *, file_id, title, modified_at, summary=None):
         raise ValueError('Scanned PDF: OCR required before publishing a text summary')
     if len(text) > 500_000 or len(links) > 500:
         raise ValueError('Document exceeds text/link budget')
-    if summary is None:
-        # Cheap extractive fallback. No invented facts, recommendations or live model call.
-        paragraphs = [re.sub(r'\s+', ' ', p).strip() for p in re.split(r'\n\s*\n', text)]
-        summary = [p for p in paragraphs if 40 <= len(p) <= 580][:3]
-        if not summary:
-            summary = [re.sub(r'\s+', ' ', text[:500])]
+    # Always pick factual PDF excerpts, even if a custom summary is supplied.
+    # Custom text can prioritize a matching excerpt but cannot inject commentary.
+    summary = summarize_research(text, preferred=summary)
     if not isinstance(summary, list) or not 1 <= len(summary) <= 5 or any(not isinstance(s, str) or not s.strip() or len(s) > 600 for s in summary):
         raise ValueError('Summary must contain 1–5 bounded source-grounded strings')
     payload = dict(drive_file_id=file_id, folder_id=FOLDER_ID, title=title,
