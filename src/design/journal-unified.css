@@ -32,3 +32,6 @@
 .page-shell-analysis.obra-detail-shell .snapshot-section-head.position-head{border:0!important;background:transparent!important;box-shadow:none!important}
 @media(max-width:650px){.journal-financial-popover{width:min(340px,calc(100vw - 30px))}.folio-page-back{min-height:40px}.page-shell-analysis.obra-detail-shell .position-labels{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.folio-page-back,.journal-financial-options button{transition:none!important}}
+
+/* Page-entry Motion transforms must not create horizontal document scrolling. */
+html body .shell{overflow-x:clip;max-width:100%;}
