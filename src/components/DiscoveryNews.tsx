@@ -24,8 +24,9 @@ export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:Insight
    image:null
  }))
  const dedup=new Set<string>()
- const stories=[...fromDrive,...(feed?.items||[])].filter(item=>(market==='ALL'||item.market===market)&&rowByKey.has(item.market+':'+item.ticker)&&Date.parse(item.expires_at)>now&&now-Date.parse(item.source.published_at)<=7*86400_000)
-  .sort((a,b)=>Date.parse(b.source.published_at)-Date.parse(a.source.published_at)).filter(item=>{
+ const sourceStories=(feed?.items||[]).slice().sort((a,b)=>Date.parse(b.source.published_at)-Date.parse(a.source.published_at))
+ const stories=[...fromDrive,...sourceStories].filter(item=>(market==='ALL'||item.market===market)&&rowByKey.has(item.market+':'+item.ticker)&&Date.parse(item.expires_at)>now&&now-Date.parse(item.source.published_at)<=7*86400_000)
+  .filter(item=>{
    const key=item.market+':'+item.ticker+':'+item.source.url
    if(dedup.has(key))return false
    dedup.add(key);return true
