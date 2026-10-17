@@ -83,6 +83,10 @@ jobs:
         if: github.event_name != 'workflow_run'
         timeout-minutes: 3
         run: npx playwright test tests/journal-ai-entry.spec.ts
+      - name: Verify aligned editorial page headings
+        if: github.event_name != 'workflow_run'
+        timeout-minutes: 5
+        run: npx playwright test tests/page-title-alignment.spec.ts
       - name: Add legacy bundle aliases for cached iPad/PWA shells
         run: |
           python - <<'PY'
