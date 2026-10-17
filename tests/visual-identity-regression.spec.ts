@@ -58,21 +58,19 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     const desktopBrand=page.locator('.sidebar .folio-wordmark-system')
     const topbar=page.locator('.page-dashboard .topbar')
 
+    await expect(compactBrand).toHaveCount(0)
+    await expect(desktopBrand).toHaveCount(0)
     if(view.compact){
-      await expect(compactBrand).toBeVisible()
       await expect(topbar).toBeHidden()
       const box=await page.locator('.mobile-brandbar').boundingBox()
       expect(box).not.toBeNull()
       expect(box!.height).toBeGreaterThanOrEqual(59.5)
       expect(box!.height).toBeLessThanOrEqual(60.5)
-      await expect(compactBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-      await expect(compactBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
-    }else{
-      await expect(desktopBrand).toBeVisible()
-      await expect(topbar).toBeVisible()
-      await expect(desktopBrand.locator('.folio-wordmark-image-light')).toBeVisible()
-      await expect(desktopBrand.locator('.folio-wordmark-image-light')).toHaveAttribute('src','./folio-brand-wordmark-light.webp?v=u2')
-    }
+    }else await expect(topbar).toBeVisible()
+    await openPage(page,'오늘')
+    const homeBrand=view.compact?compactBrand:desktopBrand
+    await expect(homeBrand.locator('.folio-wordmark-image-light')).toBeVisible()
+    await openPage(page,'시장 요약')
 
     await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
     if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
