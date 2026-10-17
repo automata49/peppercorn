@@ -90,3 +90,37 @@ npm run build
 Production acceptance still requires valid Google Drive OAuth secrets, a
 valid Instinct file, a successful scheduled sync and a deployed Folio read.
 Optional AI generation additionally requires the paid image API key.
+
+## TREND-NEWS-1 — source-backed trends outside the leaderboard
+
+Instinct may put `type: "trend"` entries in the **same**
+`Folio-News-YYYY-MM-DD.json` alongside the existing ticker articles.
+Stock news has no `type` or uses `"stock"`; it still must have an
+exact US or KR ticker. Trend news uses the shape:
+
+    {
+      "type": "trend",
+      "market": "GLOBAL",
+      "trend_topic": "AI Infrastructure",
+      "headline": "Verified news headline",
+      "summary": "한국어로 일어난 사건과 산업 변화 내용을 2~3문장으로",
+      "source_name": "Original publisher",
+      "source_url": "https://publisher.example/article",
+      "published_at": "2026-10-17T09:00:00Z"
+    }
+
+The trend market is GLOBAL / US / KR. Ticker is omitted; Folio **must not
+invent one or require it to match the leaderboard**. It shows a TREND
+label and a topic in MARKET & COMPANIES and links to the publisher rather
+than offering "종목 보기". Up to two trends can take slots in the four
+story cards; the remaining slots prioritize stocks. GLOBAL trends remain
+visible under both KR and US market filters. Conceptual editorial art is
+also generated for trend articles.
+
+Instinct editorial selection: timely, original, verifiable change in
+technologies, adoption, investment, regulation, supply chains, sector
+demand, or capital flows; not hype, isolated stock movement, advertising,
+or speculative price predictions. Cite a direct dated article and clearly
+distinguish confirmed facts from forecasts. Keep factual summary under
+320 chars, title under 120, topic 3–80 chars, last seven days only.
+Never include private research or copyright-protected full text.
