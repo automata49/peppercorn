@@ -68,7 +68,7 @@ def clean(raw, now):
         ticker = raw.get("ticker")
         if market not in ("KR", "US") or not isinstance(ticker, str):
             return None
-        if not re.fullmatch(r"\\d{6}" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,11}", ticker):
+        if not re.fullmatch(r"\d{6}" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,11}", ticker):
             return None
     for field, lo, hi in (("headline", 5, 120), ("summary", 10, 320), ("source_name", 2, 100)):
         value = raw.get(field)
