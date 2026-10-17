@@ -199,4 +199,4 @@ for(const label of ["['today','home','오늘']","['analysis','search','발견']"
 assert(mainEntry.includes("import './design/lifetime.css'"),'Lifetime component styles must load.');
 for(const dependency of ['motion','@tiptap/react','@tiptap/starter-kit','lightweight-charts','@radix-ui/react-tabs','@radix-ui/react-slot','class-variance-authority'])assert(pkg.dependencies[dependency],'Missing approved UI dependency '+dependency);
 
-assert(app.includes('<img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"/>')&&app.includes('},2000)'), 'Launch must show canonical wordmark for 2000ms.');
+assert(app.includes('className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx"')&&app.includes('centerLaunchWordmark(event.currentTarget)')&&app.includes('},2000)'), 'Launch must show the canonical optically centered wordmark for 2000ms.');
