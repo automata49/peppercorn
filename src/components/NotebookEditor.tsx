@@ -28,13 +28,14 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
  const active=useRef<{id:number;start:InkPoint;points:InkStroke;before:InkStroke[];next:InkStroke[];kind:Tool|'move';selection:number[]}|null>(null)
  function activeAICommand(instance:Editor):AICommand|null{
   if(!aiRequestRef.current||!instance.state.selection.empty)return null
-  const {$from,from}=instance.state.selection
-  const before=$from.parent.textBetween(0,$from.parentOffset,'','')
-  const at=before.lastIndexOf('@')
-  if(at<0||(at>0&&!/\\s/.test(before[at-1])))return null
-  const after=before.slice(at+1)
-  if(after.length>1800||after.includes('\\n'))return null
-  return {from:from-after.length-1,to:from,question:after.replace(/^\\s*(?:AI\\s+)?/i,'').trim()}
+  const {$from}=instance.state.selection
+  const paragraph=$from.parent.textContent
+  const at=paragraph.lastIndexOf('@')
+  if(at<0||$from.parentOffset<at)return null
+  const after=paragraph.slice(at+1)
+  if(after.length>1800||after.includes('\n'))return null
+  // Full paragraph range accommodates IME and contenteditable caret quirks.
+  return {from:$from.start()+at,to:$from.start()+paragraph.length,question:after.replace(/^\s*(?:AI\s+)?/i,'').trim()}
  }
  async function submitAI(instance:Editor,command:AICommand){
   if(aiBusyRef.current||!aiRequestRef.current||!command.question)return
@@ -64,7 +65,7 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
    void submitAI(editor,command)
    return true
   }
- },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor));setAIError('')},onSelectionUpdate:({editor})=>setAICommand(activeAICommand(editor))})
+ },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor));setAIError('')}})
  const inserted=useRef<number>(0)
  useEffect(()=>{if(!editor||!insertSnippet||insertSnippet.id===inserted.current)return;inserted.current=insertSnippet.id;editor.chain().focus().insertContent(insertSnippet.text.split('\n').filter(Boolean).map(text=>({type:'paragraph',content:[{type:'text',text}]}))).run()},[editor,insertSnippet])
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false}},[])
