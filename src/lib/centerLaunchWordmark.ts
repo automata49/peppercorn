@@ -2,7 +2,40 @@
  * Align visible wordmark ink, not the padded bitmap's bounding box.
  * Percent-based offsets follow the image when the viewport rotates/resizes.
  */
+/**
+ * iOS installed PWAs using an opaque native status bar start below the physical
+ * top edge. A 100dvh fixed layer is centered in the *content* viewport, so its
+ * logo lands about half the status-bar height below the phone's screen center.
+ * Compensate only in iOS standalone mode; normal browser and desktop views
+ * should keep their existing visual-viewport centering.
+ */
+export function launchPhysicalScreenShift(
+  iosStandalone: boolean, safeTop: number, screenHeight: number, viewportHeight: number,
+): number {
+  if (!iosStandalone) return 0
+  const excludedTop = Math.max(0, safeTop, screenHeight - viewportHeight)
+  return -Math.min(48, excludedTop / 2)
+}
+
+function readSafeAreaTop(): number {
+  const probe=document.createElement('div')
+  probe.style.cssText='position:fixed;pointer-events:none;visibility:hidden;padding-top:var(--folio-launch-safe-top,env(safe-area-inset-top,0px))'
+  document.body.appendChild(probe)
+  const inset=parseFloat(getComputedStyle(probe).paddingTop)||0
+  probe.remove()
+  return inset
+}
+
+function centerOnPhysicalScreen(image:HTMLImageElement):void {
+  const device=/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)
+  const installed=window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator&{standalone?:boolean}).standalone===true
+  const safeTop=device&&installed?readSafeAreaTop():0
+  const shift=launchPhysicalScreenShift(device&&installed,safeTop,window.screen.height,window.innerHeight)
+  image.style.setProperty('--launch-physical-y',shift.toFixed(2)+'px')
+}
+
 export function centerLaunchWordmark(image: HTMLImageElement): void {
+  centerOnPhysicalScreen(image)
   const width=image.naturalWidth,height=image.naturalHeight
   if(!width||!height)return
   try {
