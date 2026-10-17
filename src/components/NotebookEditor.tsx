@@ -128,8 +128,8 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
     {aiCommand&&<div className="notebook-inline-ai" role="status" aria-label="노트 AI 명령">
      <span><b>@ AI</b> {aiCommand.question||'질문을 입력하고 Enter를 누르세요.'}</span>
      <div>
-      <Button size="sm" disabled={aiBusy||!aiCommand.question} onMouseDown={e=>e.preventDefault()} onClick={()=>{if(editor)void submitAI(editor,aiCommand)}}>{aiBusy?'AI 작성 중…':'노트에 작성 ↵'}</Button>
-      <Button size="sm" variant="ghost" disabled={aiBusy} onMouseDown={e=>e.preventDefault()} onClick={()=>{editor?.chain().focus().deleteRange({from:aiCommand.from,to:aiCommand.to}).run();setAICommand(null)}}>취소</Button>
+      <Button disabled={aiBusy||!aiCommand.question} onMouseDown={e=>e.preventDefault()} onClick={()=>{if(editor)void submitAI(editor,aiCommand)}}>{aiBusy?'AI 작성 중…':'노트에 작성 ↵'}</Button>
+      <Button variant="ghost" disabled={aiBusy} onMouseDown={e=>e.preventDefault()} onClick={()=>{editor?.chain().focus().deleteRange({from:aiCommand.from,to:aiCommand.to}).run();setAICommand(null)}}>취소</Button>
      </div>
     </div>}
     {aiBusy&&<p className="notebook-ai-progress" role="status">AI가 노트에 넣을 초안을 작성 중입니다…</p>}
