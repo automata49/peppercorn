@@ -19,6 +19,7 @@ import './design/discovery-catalog.css'
 import './design/discovery-news.css'
 import './design/photography.css'
 import './design/journal-unified.css'
+import './design/interaction-motion.css'
 
 class AppErrorBoundary extends Component<{children:ReactNode},{error:Error|null}> {
   state:{error:Error|null}={error:null}
