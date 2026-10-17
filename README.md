@@ -119,3 +119,8 @@ Legacy snapshot before rebuild:
 ## Engineering harness
 
 Claude Code and Codex share [the engineering contract](docs/harness/CONTRACT.md), [setup and validation](docs/harness/README.md), and [task handoff](docs/harness/HANDOFF.md). Run `npm run verify` before delivery. AI Analyst evaluation is offline until a real provider is connected and validated.
+
+
+### Folio UI verification (2026-10-17)
+
+The unified Journal/Thesis/투자일지 and 재검토 flow shares account-backed notebook history; original legacy rows remain intact. The Today editorial layout, non-Home wordmark removal, and Analysis/Financial typography are covered by Playwright UI tests. Four-screen light/dark snapshots were refreshed in the pinned CI Chromium/font environment; treat subsequent snapshot differences as changes requiring review, not automatic acceptance.
