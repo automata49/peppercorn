@@ -27,7 +27,12 @@ jobs:
           GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
           GOOGLE_DRIVE_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
           GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
-        run: python analysis/sync_instinct_news.py
+        run: |
+          if [ -n "$GOOGLE_DRIVE_CLIENT_ID" ] && [ -n "$GOOGLE_DRIVE_CLIENT_SECRET" ] && [ -n "$GOOGLE_DRIVE_REFRESH_TOKEN" ]; then
+            python analysis/sync_instinct_news.py
+          else
+            echo "::warning::Google Drive OAuth is not configured. Using last approved committed news snapshot."
+          fi
       - name: Generate cached visual assets
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
