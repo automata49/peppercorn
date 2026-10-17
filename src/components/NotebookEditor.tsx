@@ -55,12 +55,13 @@ export function NotebookEditor({value,onChange,label='기록 본문',children,on
  }
  const editor=useEditor({shouldRerenderOnTransaction:true,extensions:[StarterKit.configure({link:false})],content:cleanDocument(value.body),editorProps:{
   attributes:{class:'journal-prose',role:'textbox','aria-label':label,'aria-multiline':'true'},
-  handleKeyDown:(view,event)=>{
+  handleKeyDown:(_view,event)=>{
    if(event.key!=='Enter'||event.shiftKey||event.isComposing||aiBusyRef.current)return false
-   const command=activeAICommand(view.editor)
+   if(!editor)return false
+   const command=activeAICommand(editor)
    if(!command?.question)return false
    event.preventDefault()
-   void submitAI(view.editor,command)
+   void submitAI(editor,command)
    return true
   }
  },onUpdate:({editor})=>{changeRef.current({body:editor.getJSON(),text:editor.getText()});setAICommand(activeAICommand(editor));setAIError('')},onSelectionUpdate:({editor})=>setAICommand(activeAICommand(editor))})
