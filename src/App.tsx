@@ -685,6 +685,9 @@ export default function App(){
   })
   const [page,setPage]=useState('today')
   const pageStackRef=useRef<string[]>([])
+  const previousPageRef=useRef(page)
+  const suppressStackRef=useRef(false)
+  useEffect(()=>{if(previousPageRef.current!==page){if(!suppressStackRef.current)pageStackRef.current.push(previousPageRef.current);previousPageRef.current=page;suppressStackRef.current=false}},[page])
   const edgeSwipeRef=useRef<{x:number;y:number}|null>(null)
   const [analysisDetail,setAnalysisDetail]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
@@ -1157,14 +1160,13 @@ export default function App(){
   }
 
   const navigatePage=(next:string)=>{
-    if(next!==page)pageStackRef.current.push(page)
     if(next==='analysis'){setAnalysisDetail(false);setQuery('');setSector(null)}
     setPage(next)
     window.scrollTo({top:0,behavior:'instant'})
   }
   const goBackPage=()=>{
     if(page==='analysis'&&analysisDetail){setAnalysisDetail(false);return}
-    setPage(pageStackRef.current.pop()||'today');window.scrollTo({top:0,behavior:'instant'})
+    suppressStackRef.current=true;setPage(pageStackRef.current.pop()||'today');window.scrollTo({top:0,behavior:'instant'})
   }
   const openAnalysisStock=(row:LeaderRow)=>{
     setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview')
