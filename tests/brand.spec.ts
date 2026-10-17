@@ -33,11 +33,29 @@ for(const view of views){
   expect(Math.abs(cover!.y)).toBeLessThan(2)
   expect(Math.abs(cover!.width-view.width)).toBeLessThan(2)
   expect(Math.abs(cover!.height-view.height)).toBeLessThan(2)
-  const frame=await wordmark.boundingBox()
-  expect(frame).not.toBeNull()
-  // Check both axes against the viewport, not only against the overlay box.
-  expect(Math.abs(frame!.x+frame!.width/2-view.width/2)).toBeLessThan(2)
-  expect(Math.abs(frame!.y+frame!.height/2-view.height/2)).toBeLessThan(2)
+  await expect.poll(()=>wordmark.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true)
+  const ink=await wordmark.evaluate((el:HTMLImageElement)=>{
+    const scale=Math.min(1,640/Math.max(el.naturalWidth,el.naturalHeight))
+    const canvas=document.createElement('canvas')
+    canvas.width=Math.round(el.naturalWidth*scale)
+    canvas.height=Math.round(el.naturalHeight*scale)
+    const ctx=canvas.getContext('2d',{willReadFrequently:true})!
+    ctx.drawImage(el,0,0,canvas.width,canvas.height)
+    const rgba=ctx.getImageData(0,0,canvas.width,canvas.height).data
+    let x0=canvas.width,y0=canvas.height,x1=-1,y1=-1
+    for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++){
+      const n=4*(y*canvas.width+x)
+      if(rgba[n+3]>70&&Math.min(rgba[n],rgba[n+1],rgba[n+2])<185){
+        x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)
+      }
+    }
+    const box=el.getBoundingClientRect()
+    return {x:box.x+box.width*(x0+x1+1)/(2*canvas.width),
+      y:box.y+box.height*(y0+y1+1)/(2*canvas.height),detected:x1>=0&&y1>=0}
+  })
+  expect(ink.detected).toBe(true)
+  expect(Math.abs(ink.x-view.width/2)).toBeLessThan(2)
+  expect(Math.abs(ink.y-view.height/2)).toBeLessThan(2)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-launch.png`})
   await expect(launch).toHaveCount(0,{timeout:15000});await openPage(page,'시장 요약')
 
