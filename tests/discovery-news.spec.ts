@@ -51,3 +51,25 @@ test('Instinct Drive news matches Folio leader classification and leaves researc
  await expect(section).not.toContainText('Invalid story URL')
  await expect(section.getByRole('link',{name:'Instinct provided leadership stock news 원문 열기'})).toHaveAttribute('href','https://www.apple.com/newsroom/2026/10/test')
 })
+
+test('generated editorial image uses source-grounded labeling and falls back when unavailable',async({page})=>{
+ const visualPath='data/news-assets/'+'a'.repeat(20)+'.svg'
+ await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{
+  version:1,updated_at:stamp(),items:[{
+   market:'US',ticker:'AAPL',headline:'A factual product platform announcement',
+   summary:'The company announced a new platform for enterprises.',
+   source_name:'Example Newsroom',source_url:'https://example.com/press/aapl',
+   published_at:stamp(-1),
+   visual:{kind:'illustration',url:visualPath,alt:'Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님',credit:'Folio 편집 일러스트',topic:'ai'}
+  }]
+ }}}))
+ await page.route('**/data/news-assets/**',r=>r.fulfill({status:404}))
+ const selected=rows.map(r=>r.ticker==='AAPL'?{...r,leadership_class:'핵심 주도'}:r)
+ await boot(page,feed,selected)
+ const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
+ const first=section.locator('.discovery-news-story').first()
+ await expect(first).toContainText('Folio 편집 일러스트 · 실제 기사 사진 아님')
+ await expect(first.locator('img')).toHaveAttribute('src',new RegExp('news-assets/'+ 'a'.repeat(20)+'.svg'))
+ await expect(first.locator('img')).toHaveAttribute('src',/folio-(?:brand|retro|vivid)/)
+ await expect(first).toContainText('Folio 이미지 · 원문 사진 아님')
+})
