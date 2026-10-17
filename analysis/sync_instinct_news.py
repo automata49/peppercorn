@@ -51,14 +51,25 @@ def url_ok(value):
 
 
 def clean(raw, now):
-    """Reject unsupported fields by reconstructing the public article from an allowlist."""
+    """Publish only permitted fields, with strict stock/trend identity separation."""
     if not isinstance(raw, dict):
         return None
-    market, ticker = raw.get("market"), raw.get("ticker")
-    if market not in ("KR", "US") or not isinstance(ticker, str):
+    news_type = raw.get("type", "stock")
+    if news_type not in ("stock", "trend"):
         return None
-    if not re.fullmatch(r"\d{6}" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,11}", ticker):
-        return None
+    market = raw.get("market")
+    if news_type == "trend":
+        if market not in ("GLOBAL", "US", "KR"):
+            return None
+        topic = raw.get("trend_topic")
+        if not isinstance(topic, str) or not 3 <= len(topic.strip()) <= 80:
+            return None
+    else:
+        ticker = raw.get("ticker")
+        if market not in ("KR", "US") or not isinstance(ticker, str):
+            return None
+        if not re.fullmatch(r"\\d{6}" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,11}", ticker):
+            return None
     for field, lo, hi in (("headline", 5, 120), ("summary", 10, 320), ("source_name", 2, 100)):
         value = raw.get(field)
         if not isinstance(value, str) or not lo <= len(value.strip()) <= hi:
@@ -71,9 +82,13 @@ def clean(raw, now):
         return None
     if not -timedelta(hours=1) <= now - published <= timedelta(days=7):
         return None
-    return {k: raw[k].strip() if k != "published_at" else published.isoformat().replace("+00:00", "Z")
-            for k in ("market", "ticker", "headline", "summary", "source_name", "source_url", "published_at")}
-
+    common = {k: raw[k].strip() for k in ("headline", "summary", "source_name", "source_url")}
+    common.update(market=market, published_at=published.isoformat().replace("+00:00", "Z"))
+    if news_type == "trend":
+        common.update(type="trend", trend_topic=topic.strip())
+    else:
+        common.update(ticker=ticker)
+    return common
 
 def parse_file(data, now):
     if len(data) > MAX_FILE:
@@ -144,7 +159,7 @@ def main():
     # Prefer most recently published news, unique by market+ticker+publisher URL.
     dedup = {}
     for a in articles:
-        key = (a["market"], a["ticker"], a["source_url"])
+        key = (a.get("type", "stock"), a["market"], a.get("ticker", a.get("trend_topic")), a["source_url"])
         dedup[key] = a
     selected = sorted(dedup.values(), key=lambda a: a["published_at"], reverse=True)[:MAX_ITEMS]
     previous = json.loads(TARGET.read_text()) if TARGET.exists() else None
