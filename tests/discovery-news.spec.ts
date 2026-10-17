@@ -62,7 +62,7 @@ test('generated editorial image uses source-grounded labeling and falls back whe
    published_at:stamp(-1),
    visual:{kind:'illustration',url:visualPath,alt:'Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님',credit:'Folio 편집 일러스트',topic:'ai'}
   }]
- }}}))
+ }}))
  await page.route('**/data/news-assets/**',r=>r.fulfill({status:200,contentType:'image/svg+xml',body:'<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800"><rect width="1200" height="800" fill="#eee"/></svg>'}))
  const selected=rows.map(r=>r.ticker==='AAPL'?{...r,leadership_class:'핵심 주도'}:r)
  await boot(page,feed,selected)
