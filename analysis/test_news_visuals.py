@@ -55,6 +55,18 @@ class NewsIllustrationTests(unittest.TestCase):
             self.assertFalse(apply_visuals(feed, assets, environ={"OPENAI_API_KEY": "test"}, generation=fake))
             self.assertEqual(len(calls), 1)
 
+    def test_trend_art_without_ticker(self):
+        trend = {k:v for k,v in ARTICLE.items() if k != "ticker"}
+        trend.update(type="trend",market="GLOBAL",trend_topic="AI Infrastructure")
+        with tempfile.TemporaryDirectory() as tmp:
+            feed=Path(tmp)/"news.json"
+            assets=Path(tmp)/"assets"
+            feed.write_text(json.dumps({"version":1,"items":[trend]}))
+            self.assertTrue(apply_visuals(feed,assets,environ={}))
+            row=json.loads(feed.read_text())["items"][0]
+            self.assertEqual(row["visual"]["kind"],"illustration")
+            self.assertTrue((assets/(identity(trend)+".svg")).exists())
+
     def test_empty_feed(self):
         with tempfile.TemporaryDirectory() as tmp:
             feed = Path(tmp) / "absent.json"
