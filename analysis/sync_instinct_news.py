@@ -148,7 +148,9 @@ def main():
         dedup[key] = a
     selected = sorted(dedup.values(), key=lambda a: a["published_at"], reverse=True)[:MAX_ITEMS]
     previous = json.loads(TARGET.read_text()) if TARGET.exists() else None
-    if previous and previous.get("items") == selected:
+    # Exclude derived visual metadata when determining source news changes.
+    prior_items = [{k: v for k, v in row.items() if k != "visual"} for row in previous.get("items", [])] if previous else None
+    if prior_items == selected:
         print("Unchanged:", len(selected), "items")
         return
     TARGET.parent.mkdir(parents=True, exist_ok=True)
