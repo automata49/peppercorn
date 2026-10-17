@@ -21,7 +21,7 @@ export function ReflectionPanel({entry,onSave,onDirty}:{entry:JournalEntry;onDir
   const review:Reflection={at,outcome,result:result.trim(),lesson:lesson.trim(),nextAction:nextAction.trim(),previousJudgement:previous,judgement:outcome==='revise'?judgement.trim():previous,trigger:outcome==='close'?'':trigger.trim(),nextReviewDate:outcome==='close'?'':reviewDate,...(hasNote?{note}:{})}
   try{await onSave({...entry,reviewDate:outcome==='close'?'':reviewDate,updatedAt:at,reflections:[...(entry.reflections||[]),review],revisions:[...entry.revisions,{at:entry.updatedAt,snapshot:snapshot(entry)}]})}catch(error){setError((error as Error).message)}finally{setBusy(false)}
  }
- return <section className="reflection-panel decision-review" aria-label="투자 판단 회고">
+ return <section className="reflection-panel decision-review" aria-label="투자 판단 재검토">
   <div className="notebook-heading"><h3>{entry.title}</h3><Button disabled={busy||photoBusy} onClick={()=>void save()}>{busy?'판단 저장 중…':'판단 저장'}</Button></div>
   {error&&<p role="alert">{error}</p>}
   <div inert={busy}>
