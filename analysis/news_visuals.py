@@ -48,7 +48,7 @@ def category(article):
 
 
 def identity(article):
-    canonical = {key: article[key] for key in ("market", "ticker", "headline", "summary", "source_url")}
+    canonical = {key: article.get(key) for key in ("type", "market", "ticker", "trend_topic", "headline", "summary", "source_url")}
     # Avoid changing the image path when timestamps alone change.
     value = json.dumps(canonical, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(value).hexdigest()[:20]
@@ -87,7 +87,7 @@ def abstract_shapes(topic):
 
 def svg_for(article, topic):
     bg, accent, secondary, label = COLORS[topic]
-    safe = html.escape(article["ticker"][:14])
+    safe = html.escape(article.get("ticker") or article.get("trend_topic", "TREND")[:24])
     # No third-party logos, claimed product photos, or unverified chart values.
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800" role="img" aria-label="Folio conceptual {label} illustration">'
             f'<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="{bg}"/><stop offset="1" stop-color="#FFFDF8"/></linearGradient>'
