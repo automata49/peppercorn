@@ -144,7 +144,8 @@ def apply_visuals(feed=FEED, assets=ASSETS, environ=None, generation=api_webp):
     changed = False
     new_images = 0
     for article in record["items"]:
-        if not all(k in article for k in ("market", "ticker", "headline", "summary", "source_url")):
+        identity_field = "trend_topic" if article.get("type") == "trend" else "ticker"
+        if not all(k in article for k in ("market", identity_field, "headline", "summary", "source_url")):
             raise ValueError("Missing sanitized fields")
         topic, name = category(article), identity(article)
         vector = assets / (name + ".svg")
