@@ -24,7 +24,7 @@ jobs:
   build:
     if: >-
       (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
-      || (github.event_name != 'workflow_run' && github.actor != 'github-actions[bot]')
+      || (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.actor != 'github-actions[bot]'))
     runs-on: ubuntu-24.04
     steps:
       # One-time recovery: retire the earlier deployment runs blocked on full UI tests.
@@ -59,7 +59,7 @@ jobs:
       - if: github.event_name != 'workflow_run'
         run: python -m pytest -q analysis/tests
       - if: github.event_name != 'workflow_run'
-        run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights
+        run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights analysis.test_sync_instinct_news analysis.test_news_visuals
       - if: github.event_name != 'workflow_run'
         run: npm run harness:check
       - if: github.event_name != 'workflow_run'
@@ -191,13 +191,18 @@ jobs:
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
           mkdir -p data
-          for feed in leader-insights premium-insights; do
+          for feed in leader-insights premium-insights instinct-leader-news; do
             if [ -f "dist/data/$feed.json" ]; then
               cp "dist/data/$feed.json" "data/$feed.json"
             else
               rm -f "data/$feed.json"
             fi
           done
+          # GitHub Pages may serve this root mirror, not only the artifact.
+          if [ -d dist/data/news-assets ]; then
+            mkdir -p data/news-assets
+            cp -R dist/data/news-assets/. data/news-assets/
+          fi
           # Keep every active Folio identity asset at the branch root too. GitHub Pages can
           # publish the root sync after the Actions artifact deploy, so omitting these files
           # leaves the live shell with broken wordmark / launch / motif image URLs.
@@ -243,7 +248,10 @@ jobs:
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
           git add fonts
-          for feed in leader-insights premium-insights; do
+          if [ -d data/news-assets ]; then
+            git add -A -- data/news-assets
+          fi
+          for feed in leader-insights premium-insights instinct-leader-news; do
             if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
               git add -A -- "data/$feed.json"
             fi
