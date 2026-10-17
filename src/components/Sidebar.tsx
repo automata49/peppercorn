@@ -8,13 +8,11 @@ const pages:[string,AppIconName,string][]=[
   ['analysis','search','발견'],
   ['notebook','journal','저널'],
   ['tracking','watchlist','여정'],
-  ['thesis','journal','Thesis'],
   ['dashboard','analysis','시장 요약'],
   ['signal','sectors','시장 신호'],
   ['temperature','temperature','시장 온도계'],
   ['watchlist','watchlist','Watchlist'],
   ['portfolio','portfolio','Portfolio'],
-  ['journal','journal','매매 기록'],
   ['research','journal','리서치 노트'],
   ['leaderboard','leaderboard','Leaderboard'],
   ['universe','universe','Universe'],
@@ -23,7 +21,7 @@ const pages:[string,AppIconName,string][]=[
 const pageGroups=[
   ['핵심',['today','analysis','notebook','tracking']],
   ['시장',['dashboard','signal','temperature']],
-  ['기록과 추적',['thesis','research','watchlist','portfolio','journal']],
+  ['기록과 추적',['research','watchlist','portfolio']],
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 
@@ -102,7 +100,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch
   </div>
   return <>
     <header className="sidebar desktop-navigation">
-      <div className="brand folio-brand"><FolioBrand/></div>
+      <div className="brand folio-brand">{page==='today'?<FolioBrand/>:<span className="folio-nav-heading">나의 투자 노트</span>}</div>
       {navigation}
       {stockActions}
       <button className="sidebar-tools" onClick={()=>setOpen(true)} aria-haspopup="dialog" aria-expanded={open}><AppIcon name="menu"/>도구 및 설정</button>
@@ -114,7 +112,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch
 
     <div className="mobile-brandbar">
       <button className="mobile-brand-home" onClick={()=>setPage('today')} aria-label="오늘로 이동">
-        <span className="folio-brand"><FolioBrand/></span>
+        <span className="folio-brand">{page==='today'?<FolioBrand/>:<AppIcon name="home"/>}</span>
       </button>
       <div className="mobile-brand-actions">{stockActions}</div>
     </div>
@@ -130,7 +128,7 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="menu-drawer">
         <div className="menu-drawer-head">
-          <DialogTitle className="brand folio-brand"><FolioBrand/></DialogTitle>
+          <DialogTitle className="brand folio-brand">메뉴</DialogTitle>
           <DialogClose asChild><button className="menu-drawer-close" aria-label="메뉴 닫기"><AppIcon name="close"/></button></DialogClose>
         </div>
         <DialogDescription className="sr-only">페이지와 화면 테마를 선택하세요.</DialogDescription>
