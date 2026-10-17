@@ -31,7 +31,7 @@ jobs:
           node supabase/tests/notebook.verify.mjs
       - run: python -m pytest -q analysis/fundamentals
       - run: python -m pytest -q analysis/tests
-      - run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights
+      - run: python -m unittest analysis.test_leader_insights analysis.test_premium_insights analysis.test_sync_instinct_news analysis.test_news_visuals
       - run: npm run harness:check
       - run: npm run test:position-db
       - run: npm run test:etf-rs
