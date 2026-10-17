@@ -12,10 +12,12 @@ on:
 permissions:
   contents: write
   pages: write
+  actions: write
   id-token: write
 
+# Keep the release pipeline independent of older hung full-suite runs.
 concurrency:
-  group: pages
+  group: pages-folio-publish-v2
   cancel-in-progress: true
 
 jobs:
@@ -25,6 +27,16 @@ jobs:
       || (github.event_name != 'workflow_run' && github.actor != 'github-actions[bot]')
     runs-on: ubuntu-24.04
     steps:
+      # One-time recovery: retire the earlier deployment runs blocked on full UI tests.
+      # The prior group ("pages") cannot be canceled by a new concurrency group.
+      - name: Retire stuck legacy web deployments
+        if: github.event_name != 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for id in 38988264869 38990154700; do
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/actions/runs/${id}/cancel" >/dev/null 2>&1 || true
+          done
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
