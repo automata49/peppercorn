@@ -20,6 +20,10 @@ jobs:
       - name: Confirm title alignment on six viewports
         run: npx playwright test tests/page-title-alignment.spec.ts
       - name: Update approved page screenshots
+        env:
+          # CI's normal no-rebaseline guard stays enabled in all release/test workflows.
+          # Only this ephemeral, reviewed baseline refresh explicitly opts out.
+          CI: ''
         run: npx playwright test tests/four-screen-visual.spec.ts --update-snapshots
       - name: Commit refreshed image references
         run: |
