@@ -160,3 +160,37 @@ html body .shell .app-main .section-heading>img{display:block;width:100%;height:
 @media(max-width:1023px) and (orientation:portrait){.journey-review .journal-heading-actions>p{display:none}}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.decision-queue--card .decision-queue-item{background:var(--folio-paper)}}
 @media(prefers-reduced-transparency:reduce){.decision-queue--card .decision-queue-item{background:var(--folio-paper)}}
+
+
+/* PAGE-HEADING-ALIGN-1: Discovery, Journal and Journey share an exact
+   editorial title origin regardless of image height or editor actions.
+   Today's photographic hero remains intentionally independent. */
+html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace){
+  box-sizing:border-box;
+  width:100%;
+  max-width:1280px;
+  margin-inline:auto;
+  padding-top:24px;
+}
+html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace) > .section-heading{
+  margin-block:0 24px;
+  align-items:start;
+}
+html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace) > .section-heading > div{
+  min-width:0;
+  margin:0;
+  padding:0;
+  align-self:start;
+}
+html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace) > .section-heading > div > .journey-kicker{
+  display:block;
+  margin:0;
+}
+html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace) > .section-heading > img{
+  align-self:start;
+}
+@media(max-width:650px){
+  html body .shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace){
+    padding-top:16px;
+  }
+}
