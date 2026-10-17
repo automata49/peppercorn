@@ -85,3 +85,35 @@
     translate:none!important;
   }
 }
+
+/* Launch is centered in the visual viewport. Compensate for uneven white/transparent
+   padding inside the supplied raster; corrections are percentages so rotation stays aligned. */
+.launch-overlay.launch-wordmark-only{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  display:grid!important;
+  place-items:center!important;
+  background:#fff!important;
+}
+.launch-overlay.launch-wordmark-only > .launch-wordmark{
+  position:absolute!important;
+  top:50%!important;
+  left:50%!important;
+  margin:0!important;
+  transform:translate(calc(-50% + var(--launch-optical-x,0%)),calc(-50% + var(--launch-optical-y,0%)))!important;
+  transform-origin:center center;
+}
+
+/* Keep photographic cards on a composited paint layer while the single shared
+   frame morphs. Avoid nested, competing image/title layout projections. */
+.home-motion-card > img,.home-detail-cover > img{
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+@media(prefers-reduced-motion:reduce){
+  .home-motion-card,.home-detail{transition:none!important}
+}
