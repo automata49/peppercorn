@@ -85,14 +85,7 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
     <blockquote>“{thought.thought}”</blockquote>
     <figcaption>— {thought.name} <span>· 한국어 번역·의역</span></figcaption>
    </figure>
-   <div className="home-portrait" aria-label={thought.name+' 펜 스케치 스타일 초상'}>
-    <svg className="home-portrait-filter" aria-hidden="true" width="0" height="0" focusable="false"><defs>
-     <filter id="folio-pencil-portrait" colorInterpolationFilters="sRGB">
-      <feColorMatrix type="saturate" values="0" result="gray"/>
-      <feConvolveMatrix in="gray" order="3" kernelMatrix="0 -1 0 -1 4 -1 0 -1 0" result="edges"/>
-      <feComponentTransfer in="edges"><feFuncR type="linear" slope="-2.8" intercept="1"/><feFuncG type="linear" slope="-2.8" intercept="1"/><feFuncB type="linear" slope="-2.8" intercept="1"/></feComponentTransfer>
-     </filter>
-    </defs></svg>
+   <div className="home-portrait" aria-label={thought.name+" 사진"}>
     <span className="home-portrait-placeholder" aria-hidden="true">{thought.name}</span>
     <img key={thought.person} src={portraitUrl(thought)} alt="" decoding="async" loading="eager" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.opacity='0'}}/>
     <a href={thought.photoPage} target="_blank" rel="noopener noreferrer" title={thought.credit} aria-label={thought.name+' 사진 출처 · '+thought.credit}>이미지 출처</a>
