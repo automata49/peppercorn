@@ -1161,7 +1161,7 @@ export default function App(){
   }
 
   const navigatePage=(next:string)=>{
-    if(next==='analysis'){setAnalysisDetail(false);setQuery('');setSector(null);if(page!=='analysis')changeStockSize('large')}
+    if(next==='analysis'){setAnalysisDetail(false);setQuery('');setSector(null)}
     setPage(next)
     window.scrollTo({top:0,behavior:'instant'})
   }
