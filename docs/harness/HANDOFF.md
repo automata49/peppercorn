@@ -925,3 +925,10 @@ Implemented with existing assets and components. Validation and deployment pendi
 - Approved request: rename the Today home hero from 나의 여정 to 오늘, make the supplied motto a single line, and show one daily rotating sourced Korean quote under it beside a pen-sketch portrait of Buffett / Munger / Sagan / Dawkins. MARKET & COMPANIES prioritizes large-cap stories on first entry, with reversible choices and unchanged independent stock browsing preferences.
 - Source of truth: `src/lib/dailyQuotes.ts` (24 source-linked paraphrases, day boundary Asia/Seoul), `src/components/QuotePortrait.tsx` (original vector vignettes, not locked brand assets), `src/components/LifestyleHome.tsx`, `src/design/lifestyle-home.css`, `src/components/DiscoveryNews.tsx`, `src/design/discovery-news.css`. Feed facts, rights and private records remain unchanged; there is no AI service request or server cost to rotate the quote.
 - Updated behavioral regression: Today masthead, quote provenance/day rollover, right-side sketch and seven portrait/landscape viewports; news default large/small/all filters and persistent catalog isolation. Visual regression baseline for Today must be regenerated and reviewed on the pinned CI environment before merge; do not claim device Safari verification from Chromium.
+
+
+### Visual candidate and CI evidence
+
+- One-off pinned Ubuntu 24.04 / Chromium / Noto CJK screenshot generation passed, then `npm run test:four-screens` passed against the updated 8 Today Light/Dark baseline images; workflow deleted itself, no automatic baseline updates remain in deploy.
+- Reviewed `today-light-phone-390-linux.png` and `today-light-ipad-834-linux.png`: single-line motto, daily quote and source beneath it, right-side sketch, retained four image covers and bottom navigation; no visible horizontal clipping in these snapshots. Landscape visual regression is pinned and separately subject to Playwright viewport/overflow assertions; physical Safari not tested.
+- Production deploy only after current-head CI completion and merge.
