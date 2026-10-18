@@ -139,3 +139,14 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
  .lifestyle-home .home-daily-quote blockquote{font-size:13px}
  .lifestyle-home .home-portrait{width:116px;min-width:0}
 }
+
+
+/* MARKET-COMPANIES-LARGECAP-1: open on the leadership-universe large caps. */
+.discovery-news-size{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0 clamp(16px,2vw,24px)}
+.discovery-news-size button{min-height:44px;min-width:66px;padding:9px 18px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--folio-muted);font:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s ease,color .2s ease}
+.discovery-news-size button[aria-pressed="true"]{background:var(--folio-ink);color:var(--folio-paper)}
+.discovery-news-size button:hover:not([aria-pressed="true"]){background:var(--folio-surface-2);color:var(--folio-ink)}
+.discovery-news-size button:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
+.discovery-news-empty{font-size:14px;line-height:1.6;color:var(--folio-muted);padding:10px 0 22px}
+@media(max-width:580px){.discovery-news-size{gap:2px}.discovery-news-size button{min-width:58px;padding:8px 12px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.discovery-news-size button{transition:none}}
