@@ -88,3 +88,54 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
  .lifestyle-home .home-motion-card .home-cover-copy p{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.lifestyle-home .home-motion-card{scroll-behavior:auto}}
+
+
+/* TODAY-DAILY-THOUGHT-1 — Sketch editorial masthead, preserving the four photo Motion covers. */
+.lifestyle-home .home-heading{
+ display:grid;grid-template-columns:minmax(0,1fr) clamp(148px,22vw,260px);
+ grid-template-areas:"intro art" "quote art";align-items:center;
+ column-gap:clamp(12px,3vw,36px);row-gap:clamp(10px,1.9svh,22px);
+ width:min(91%,1040px);text-align:left;pointer-events:auto;
+}
+.home-heading-intro{grid-area:intro;min-width:0}
+.lifestyle-home .home-heading-intro h2{margin:8px 0 6px}
+.lifestyle-home .home-manifesto{white-space:nowrap;letter-spacing:-.055em;font-size:clamp(11px,1.65vw,19px);line-height:1.5;margin:0}
+.home-daily-quote{grid-area:quote;min-width:0;max-width:700px;margin:0}
+.home-daily-quote blockquote{font-family:var(--folio-editorial-font);font-weight:var(--folio-editorial-weight);font-size:clamp(13px,1.6vw,21px);line-height:1.5;letter-spacing:-.035em;word-break:keep-all;overflow-wrap:anywhere;margin:0}
+.home-daily-quote figcaption{font-size:clamp(11px,1vw,13px);line-height:1.5;margin-top:8px}
+.home-daily-quote figcaption span{opacity:.8;font-size:.88em}
+.home-portrait{grid-area:art;position:relative;isolation:isolate;align-self:center;justify-self:end;width:100%;aspect-ratio:1/1.04;overflow:hidden;border-radius:48% 48% 20% 20%;background:#f7f3e9;box-shadow:0 9px 45px #0002}
+.home-portrait:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(9deg,transparent 0 4px,rgba(48,44,36,.035) 4.2px 4.5px);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
+.home-portrait-filter{position:absolute;pointer-events:none}
+.home-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:url("#folio-pencil-portrait");mix-blend-mode:multiply;opacity:.9;mask-image:linear-gradient(#000 76%,transparent 100%)}
+.home-portrait-placeholder{position:absolute;inset:42% 4% auto;text-align:center;font-size:13px;font-family:var(--folio-editorial-font);color:#62594c}
+.home-portrait>a{position:absolute;bottom:5px;right:12px;z-index:3;font-size:9px;line-height:20px;color:#51483e;text-shadow:none;opacity:.75;text-decoration:underline;text-underline-offset:2px}
+.home-portrait>a:focus-visible{outline:2px solid #51483e;outline-offset:2px}
+@media(orientation:landscape){
+ .lifestyle-home .home-heading{top:clamp(16px,4svh,40px);max-height:90%;text-shadow:0 2px 12px #000a}
+ .lifestyle-home .home-portrait{width:min(100%,30svh,240px);min-width:120px;text-shadow:none}
+}
+@media(orientation:portrait){
+ .lifestyle-home .home-heading{position:static;translate:none;width:100%;max-height:none;
+  display:grid;grid-template-columns:minmax(0,1fr) clamp(94px,27vw,180px);
+  grid-template-areas:"intro intro" "quote art";row-gap:clamp(14px,3vw,24px);column-gap:12px;
+  margin:0 0 24px;color:var(--folio-ink);text-shadow:none}
+ .lifestyle-home .home-heading-intro h2{margin:10px 0 6px}
+ .lifestyle-home .home-manifesto{font-size:clamp(11px,3.3vw,18px);color:var(--folio-muted);letter-spacing:-.055em}
+ .lifestyle-home .home-daily-quote{align-self:center}
+ .lifestyle-home .home-daily-quote blockquote{font-size:clamp(13px,2.9vw,19px);line-height:1.55}
+ .lifestyle-home .home-daily-quote figcaption{font-size:11px;color:var(--folio-muted)}
+ .lifestyle-home .home-portrait{width:100%;align-self:start;box-shadow:none}
+}
+@media(max-width:360px) and (orientation:portrait){
+ .lifestyle-home .home-heading{grid-template-columns:minmax(0,1fr) 80px;column-gap:8px}
+ .lifestyle-home .home-manifesto{font-size:10.5px}
+ .lifestyle-home .home-daily-quote blockquote{font-size:12px}
+}
+@media(orientation:landscape) and (max-height:460px){
+ .lifestyle-home .home-heading{top:14px;row-gap:6px;grid-template-columns:minmax(0,1fr) 116px}
+ .lifestyle-home .home-heading-intro h2{font-size:clamp(30px,3.8vw,43px);margin:3px 0}
+ .lifestyle-home .home-manifesto{font-size:13px}
+ .lifestyle-home .home-daily-quote blockquote{font-size:13px}
+ .lifestyle-home .home-portrait{width:116px;min-width:0}
+}
