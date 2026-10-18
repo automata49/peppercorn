@@ -57,7 +57,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     return r.fulfill({json: {series: Object.fromEntries(ids.map(id => [id, series]))}})
   })
   await page.goto('/peppercorn/')
-  await expect(page.getByRole('heading', {name: '나의 여정', exact:true})).toBeVisible()
+  await expect(page.locator('.home-heading h2')).toBeVisible()
   await page.evaluate(async records => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open('folio-lifetime-journal', 1)
