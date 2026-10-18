@@ -14,7 +14,7 @@ async function boot(page:Page,data=rows,notes=research){
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:{}}}))
- await page.goto('/peppercorn/');await expect(page.getByRole('heading',{name:'나의 여정',exact:true})).toBeVisible()
+ await page.goto('/peppercorn/');await expect(page.locator('.home-heading h2')).toHaveText('오늘')
 }
 test('public research isolation keeps explicit issuer, date and rejected-state gates',async()=>{
  const {leaderObservation}=await import('../src/lib/leaderObservation')
