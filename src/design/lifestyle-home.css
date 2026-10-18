@@ -90,7 +90,7 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 @media(prefers-reduced-motion:reduce){.lifestyle-home .home-motion-card{scroll-behavior:auto}}
 
 
-/* TODAY-DAILY-THOUGHT-1 — Sketch editorial masthead, preserving the four photo Motion covers. */
+/* TODAY-DAILY-THOUGHT-1 — Natural portrait editorial masthead; preserve the four Motion covers. */
 .lifestyle-home .home-heading{
  display:grid;grid-template-columns:minmax(0,1fr) clamp(148px,22vw,260px);
  grid-template-areas:"intro art" "quote art";align-items:center;
@@ -104,12 +104,10 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 .home-daily-quote blockquote{font-family:var(--folio-editorial-font);font-weight:var(--folio-editorial-weight);font-size:clamp(13px,1.6vw,21px);line-height:1.5;letter-spacing:-.035em;word-break:keep-all;overflow-wrap:anywhere;margin:0}
 .home-daily-quote figcaption{font-size:clamp(11px,1vw,13px);line-height:1.5;margin-top:8px}
 .home-daily-quote figcaption span{opacity:.8;font-size:.88em}
-.home-portrait{grid-area:art;position:relative;isolation:isolate;align-self:center;justify-self:end;width:100%;aspect-ratio:1/1.04;overflow:hidden;border-radius:48% 48% 20% 20%;background:#f7f3e9;box-shadow:0 9px 45px #0002}
-.home-portrait:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(9deg,transparent 0 4px,rgba(48,44,36,.035) 4.2px 4.5px);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
-.home-portrait-filter{position:absolute;pointer-events:none}
-.home-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:grayscale(1) contrast(1.72) brightness(1.18);mix-blend-mode:multiply;opacity:.9;mask-image:linear-gradient(#000 76%,transparent 100%)}
+.home-portrait{grid-area:art;position:relative;isolation:isolate;align-self:center;justify-self:end;width:100%;aspect-ratio:1/1.04;overflow:hidden;border-radius:18px;background:#f7f3e9;box-shadow:0 9px 45px #0002}
+.home-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:none;mix-blend-mode:normal;opacity:1;mask-image:none}
 .home-portrait-placeholder{position:absolute;inset:42% 4% auto;text-align:center;font-size:13px;font-family:var(--folio-editorial-font);color:#62594c}
-.home-portrait>a{position:absolute;bottom:5px;right:12px;z-index:3;font-size:9px;line-height:20px;color:#51483e;text-shadow:none;opacity:.75;text-decoration:underline;text-underline-offset:2px}
+.home-portrait>a{position:absolute;bottom:6px;right:6px;z-index:3;padding:2px 7px;border-radius:8px;background:rgba(255,255,255,.85);font-size:9px;line-height:20px;color:#51483e;text-shadow:none;text-decoration:underline;text-underline-offset:2px}
 .home-portrait>a:focus-visible{outline:2px solid #51483e;outline-offset:2px}
 @media(orientation:landscape){
  .lifestyle-home .home-heading{top:clamp(16px,4svh,40px);max-height:90%;text-shadow:0 2px 12px #000a}
