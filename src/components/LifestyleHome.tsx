@@ -3,7 +3,7 @@ import { SourceReports } from './SourceReports'
 import type { ReportController } from '../lib/sourceReports'
 import { instrumentLabel } from '../lib/instrumentLabel'
 import { useVisualStyle, coverPhoto } from './VisualStyle'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import type { EditableRow, LeaderRow } from '../types'
@@ -16,7 +16,7 @@ import { AppIcon } from './AppIcon'
 import { leaderObservation } from './TodayLeaders'
 import { calendarDate } from '../lib/journalGallery'
 import { useCardDismiss } from '../lib/useCardDismiss'
-import { dailyThought,portraitUrl } from '../lib/dailyThought'
+import { dailyThought,koreaDayNumber,portraitUrl } from '../lib/dailyThought'
 
 type Section = 'today' | 'discover' | 'journal' | 'journey'
 type Props = { reports:ReportController; entries: JournalEntry[]; leaders: LeaderRow[]; research: EditableRow[]; theses: EditableRow[]; trades: EditableRow[]; insights: InsightsFeed | null; source: string; navigate: (page: string) => void; onSelect: (row: LeaderRow) => void; onMenu:()=>void }
@@ -33,7 +33,21 @@ function SourceStory({item}:{item:LeaderInsight}){
 /** The fixed home is an overview of the user's journey. Public drafts never edit private records. */
 export function LifestyleHome({ reports, entries, leaders, research, theses, trades, insights, source, navigate, onSelect, onMenu }: Props) {
  const {photoStyle}=useVisualStyle()
- const thought=dailyThought()
+ const [quoteClock,setQuoteClock]=useState(()=>new Date())
+ const thought=dailyThought(quoteClock)
+ useEffect(()=>{
+  let timeout:number
+  const update=()=>{
+   const now=new Date()
+   setQuoteClock(now)
+   const nextKoreanMidnight=(koreaDayNumber(now)+1)*86400000-9*3600000
+   timeout=window.setTimeout(update,Math.max(1000,nextKoreanMidnight-Date.now()+200))
+  }
+  update()
+  const onResume=()=>{if(!document.hidden){window.clearTimeout(timeout);update()}}
+  document.addEventListener('visibilitychange',onResume)
+  return()=>{window.clearTimeout(timeout);document.removeEventListener('visibilitychange',onResume)}
+ },[])
  const [selected, setSelected] = useState<Section | null>(null)
  const [failedPhotos, setFailedPhotos] = useState<Set<string>>(() => new Set())
  const dismiss = useCardDismiss(!!selected, () => setSelected(null))
