@@ -4,32 +4,12 @@
  * One stable thought per Korea calendar day; zero runtime AI/network calls.
  */
 export type Thinker='buffett'|'munger'|'sagan'|'dawkins'
-export type DailyThought={person:Thinker;name:string;thought:string;portrait:string;credit:string;photoPage:string}
-const portraits:Record<Thinker,Pick<DailyThought,'name'|'portrait'|'credit'|'photoPage'>>={
- buffett:{
-  name:'워런 버핏',
-  portrait:'Warren_Buffett_in_2010_(cropped).jpg',
-  credit:'미국 백악관 · Public Domain',
-  photoPage:'https://commons.wikimedia.org/wiki/File:Warren_Buffett_in_2010_(cropped).jpg'
- },
- munger:{
-  name:'찰리 멍거',
-  portrait:'Charlie_Munger.jpg',
-  credit:'Nick J Webb · CC BY 2.0',
-  photoPage:'https://commons.wikimedia.org/wiki/File:Charlie_Munger.jpg'
- },
- sagan:{
-  name:'칼 세이건',
-  portrait:'Sagan_large.jpg',
-  credit:'NASA/JPL-Caltech · Public Domain',
-  photoPage:'https://commons.wikimedia.org/wiki/File:Sagan_large.jpg'
- },
- dawkins:{
-  name:'리처드 도킨스',
-  portrait:'RichardDawkinds20090929.jpg',
-  credit:'Michael Willems · CC BY 3.0',
-  photoPage:'https://commons.wikimedia.org/wiki/File:RichardDawkinds20090929.jpg'
- }
+export type DailyThought={person:Thinker;name:string;thought:string}
+const names:Record<Thinker,string>={
+ buffett:'워런 버핏',
+ munger:'찰리 멍거',
+ sagan:'칼 세이건',
+ dawkins:'리처드 도킨스'
 }
 const words:Record<Thinker,readonly string[]>={
  buffett:[
@@ -70,8 +50,5 @@ export function dailyThought(date=new Date()):DailyThought{
  const day=((diff%16)+16)%16
  const person=people[day%4]
  const turn=Math.floor(day/4)
- return {...portraits[person],person,thought:words[person][turn]}
-}
-export function portraitUrl(item:DailyThought):string{
- return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(item.portrait)+'?width=560'
+ return {person,name:names[person],thought:words[person][turn]}
 }
