@@ -107,7 +107,7 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 .home-portrait{grid-area:art;position:relative;isolation:isolate;align-self:center;justify-self:end;width:100%;aspect-ratio:1/1.04;overflow:hidden;border-radius:48% 48% 20% 20%;background:#f7f3e9;box-shadow:0 9px 45px #0002}
 .home-portrait:after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(9deg,transparent 0 4px,rgba(48,44,36,.035) 4.2px 4.5px);mask-image:linear-gradient(180deg,#000 70%,transparent 100%)}
 .home-portrait-filter{position:absolute;pointer-events:none}
-.home-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:url("#folio-pencil-portrait");mix-blend-mode:multiply;opacity:.9;mask-image:linear-gradient(#000 76%,transparent 100%)}
+.home-portrait img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 28%;filter:grayscale(1) contrast(1.72) brightness(1.18);mix-blend-mode:multiply;opacity:.9;mask-image:linear-gradient(#000 76%,transparent 100%)}
 .home-portrait-placeholder{position:absolute;inset:42% 4% auto;text-align:center;font-size:13px;font-family:var(--folio-editorial-font);color:#62594c}
 .home-portrait>a{position:absolute;bottom:5px;right:12px;z-index:3;font-size:9px;line-height:20px;color:#51483e;text-shadow:none;opacity:.75;text-decoration:underline;text-underline-offset:2px}
 .home-portrait>a:focus-visible{outline:2px solid #51483e;outline-offset:2px}
@@ -154,3 +154,6 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 /* The editorial overlay must not steal clicks from the existing Motion cover. */
 .lifestyle-home .home-heading{pointer-events:none}
 .lifestyle-home .home-portrait>a{pointer-events:auto}
+
+/* Editorial contrast on varied hero photographs without introducing new panels. */
+@media(orientation:landscape){.lifestyle-home .home-motion-card.home-today:after{background:linear-gradient(90deg,rgba(12,13,13,.72) 0%,rgba(12,13,13,.46) 44%,rgba(12,13,13,.08) 83%),linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.2))}}
