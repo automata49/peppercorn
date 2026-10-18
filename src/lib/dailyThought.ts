@@ -20,9 +20,9 @@ const portraits:Record<Thinker,Pick<DailyThought,'name'|'portrait'|'credit'|'pho
  },
  sagan:{
   name:'칼 세이건',
-  portrait:'P-13734B_Carl_Sagan.jpg',
+  portrait:'Sagan_large.jpg',
   credit:'NASA/JPL-Caltech · Public Domain',
-  photoPage:'https://commons.wikimedia.org/wiki/File:P-13734B_Carl_Sagan.jpg'
+  photoPage:'https://commons.wikimedia.org/wiki/File:Sagan_large.jpg'
  },
  dawkins:{
   name:'리처드 도킨스',
