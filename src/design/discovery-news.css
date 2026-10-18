@@ -29,3 +29,12 @@ html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:
 
 /* Distinguish cross-market theme coverage without implying a leader classification. */
 .discovery-news-trend-tag{display:inline-block;margin-right:5px;font-size:10px;font-weight:700;letter-spacing:.11em;color:var(--folio-ink);border:1px solid currentColor;border-radius:3px;padding:1px 5px;vertical-align:baseline}
+
+
+/* MARKET-COMPANIES-SIZE-20261018: independent news selection, large cap on first load. */
+.discovery-news-controls{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;margin:-5px 0 22px;min-width:0}
+html body .discovery-news-controls button{min-height:44px;padding:9px 12px;background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0;color:var(--folio-muted);font:inherit;font-size:13px;font-weight:550;cursor:pointer}
+html body .discovery-news-controls button.on{border-bottom-color:var(--folio-ink);color:var(--folio-ink);font-weight:700}
+.discovery-news-controls>span{font-size:11px;line-height:1.5;color:var(--folio-muted);margin-left:auto}
+.discovery-news-empty{font-size:13px;line-height:1.7;color:var(--folio-muted);margin:10px 0 24px}
+@media(max-width:767px),(orientation:portrait){.discovery-news-controls{gap:0 4px;margin-top:0}.discovery-news-controls>span{flex:0 0 100%;margin:4px 0 0}}
