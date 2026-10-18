@@ -154,14 +154,19 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         await expect(page.locator('.home-heading h2')).toHaveText('오늘')
         await expect(page.locator('.home-manifesto')).toHaveText('세상을 발견하고, 나의 시간을 기록하다.')
         await expect(page.locator('.home-daily-quote')).toContainText('한국어 번역·의역')
-        await expect(page.locator('.home-portrait img')).toHaveCSS('filter','none')
-        await expect(page.locator('.home-portrait svg')).toHaveCount(0)
-        const overlap = await page.evaluate(() => {
-          const text = document.querySelector('.home-daily-quote')!.getBoundingClientRect()
-          const photo = document.querySelector('.home-portrait')!.getBoundingClientRect()
-          return photo.left + 1 < text.right && photo.right > text.left + 1 && photo.top + 1 < text.bottom && photo.bottom > text.top + 1
+        await expect(page.locator('.home-portrait')).toHaveCount(0)
+        const layout = await page.evaluate(() => {
+          const intro = document.querySelector('.home-manifesto')!.getBoundingClientRect()
+          const quote = document.querySelector('.home-daily-quote')!.getBoundingClientRect()
+          return {
+            belowIntro: quote.top >= intro.bottom - 1,
+            quoteVisible: quote.width > 0 && quote.height > 0,
+            fitsViewport: Math.max(intro.right,quote.right) <= innerWidth + 1
+          }
         })
-        expect(overlap).toBe(false)
+        expect(layout.belowIntro).toBe(true)
+        expect(layout.quoteVisible).toBe(true)
+        expect(layout.fitsViewport).toBe(true)
         await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
       } else {
         await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
