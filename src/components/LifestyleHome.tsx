@@ -16,7 +16,7 @@ import { AppIcon } from './AppIcon'
 import { leaderObservation } from './TodayLeaders'
 import { calendarDate } from '../lib/journalGallery'
 import { useCardDismiss } from '../lib/useCardDismiss'
-import { dailyThought,koreaDayNumber,portraitUrl } from '../lib/dailyThought'
+import { dailyThought,koreaDayNumber } from '../lib/dailyThought'
 
 type Section = 'today' | 'discover' | 'journal' | 'journey'
 type Props = { reports:ReportController; entries: JournalEntry[]; leaders: LeaderRow[]; research: EditableRow[]; theses: EditableRow[]; trades: EditableRow[]; insights: InsightsFeed | null; source: string; navigate: (page: string) => void; onSelect: (row: LeaderRow) => void; onMenu:()=>void }
@@ -85,11 +85,6 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
     <blockquote>“{thought.thought}”</blockquote>
     <figcaption>— {thought.name} <span>· 한국어 번역·의역</span></figcaption>
    </figure>
-   <div className="home-portrait" aria-label={thought.name+" 사진"}>
-    <span className="home-portrait-placeholder" aria-hidden="true">{thought.name}</span>
-    <img key={thought.person} src={portraitUrl(thought)} alt="" decoding="async" loading="eager" referrerPolicy="no-referrer" onError={e=>{e.currentTarget.style.opacity='0'}}/>
-    <a href={thought.photoPage} target="_blank" rel="noopener noreferrer" title={thought.credit} aria-label={thought.name+' 사진 출처 · '+thought.credit}>이미지 출처</a>
-   </div>
   </header>
   <div className="home-motion-cards">{covers.map(c => <motion.button key={c.key} layoutId={`home-frame-${c.key}`} transition={transition} className={`home-motion-card home-${c.key}`} type="button" aria-label={`${c.label} 카드 열기`} onClick={() => { focus.current = document.activeElement as HTMLElement; setSelected(c.key) }}>{cover(c)}</motion.button>)}</div>
   
