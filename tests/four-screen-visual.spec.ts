@@ -147,7 +147,25 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       // Keep the approved snapshots focused on the otherwise unchanged reading surfaces.
       // A style tag inserted on Journal persists through the following Journey screenshot.
       if (screen.name === 'journal') await page.addStyleTag({content:'.journal-heading-actions{display:contents!important}.journal-view-toggle{display:none!important}'})
-      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+      if (screen.name === 'today') {
+        // TODAY-DAILY-THOUGHT-1 deliberately changes the masthead across each day.
+        // Do not overwrite the user-approved original four-screen baseline automatically.
+        // Capture the new composition for human sign-off; gate the layout semantically.
+        await expect(page.locator('.home-heading h2')).toHaveText('오늘')
+        await expect(page.locator('.home-manifesto')).toHaveText('세상을 발견하고, 나의 시간을 기록하다.')
+        await expect(page.locator('.home-daily-quote')).toContainText('한국어 번역·의역')
+        await expect(page.locator('.home-portrait img')).toHaveCSS('filter','none')
+        await expect(page.locator('.home-portrait svg')).toHaveCount(0)
+        const overlap = await page.evaluate(() => {
+          const text = document.querySelector('.home-daily-quote')!.getBoundingClientRect()
+          const photo = document.querySelector('.home-portrait')!.getBoundingClientRect()
+          return photo.left + 1 < text.right && photo.right > text.left + 1 && photo.top + 1 < text.bottom && photo.bottom > text.top + 1
+        })
+        expect(overlap).toBe(false)
+        await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
+      } else {
+        await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+      }
     }
     await context.close()
   })
