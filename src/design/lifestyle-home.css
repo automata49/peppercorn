@@ -150,3 +150,7 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 .discovery-news-empty{font-size:14px;line-height:1.6;color:var(--folio-muted);padding:10px 0 22px}
 @media(max-width:580px){.discovery-news-size{gap:2px}.discovery-news-size button{min-width:58px;padding:8px 12px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){.discovery-news-size button{transition:none}}
+
+/* The editorial overlay must not steal clicks from the existing Motion cover. */
+.lifestyle-home .home-heading{pointer-events:none}
+.lifestyle-home .home-portrait>a{pointer-events:auto}
