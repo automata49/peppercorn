@@ -148,3 +148,11 @@ Generate candidates locally with `npm run test:four-screens -- --update-snapshot
 2. Run `npm run harness:check`, `npm run build`, `npm run test:identity`, `npm run test:four-screens` and relevant/full `npm run test:ui`.
 3. Inspect phone/iPad/desktop renders, record exact outcomes in HANDOFF and separate device limits from verified behavior.
 4. Reviewers use this contract and the current source. Historical HANDOFF entries and superseded Home rules never override it.
+
+
+## TODAY-QUOTE-20261018 / MARKET-COMPANIES-SIZE-20261018
+
+- Today Home masthead is **오늘** (not 나의 여정). Its motto is exactly `세상을 발견하고, 나의 시간을 기록하다.` on one line. Immediately below: one short Korean editorial paraphrase each Seoul-calendar day, cycling Warren Buffett → Charlie Munger → Carl Sagan → Richard Dawkins, with a visible original-source link and an original pen-and-ink portrait of the relevant person on the right. The 24 curated entries are source-linked and repeat after the corpus is exhausted. This is a deterministic offline fallback, not a claim of a new externally generated quote every day indefinitely.
+- This changes only the Today masthead. The approved Motion home cards, user imagery and brand wordmark remain untouched. At 320/390 portrait, 834 iPad portrait, 844/1194 phone/tablet landscape and 1366/1440 wide views: preserve the one-line motto, a legible quote, the right-hand sketch, the original four-card layout and no overflow. Quote/date stability uses Asia/Seoul even on foreign device clocks and updates without reload.
+- MARKET & COMPANIES news has its own **대형주 (default) / 중소형주 / 전체** controls independent of the persisted discovery stock-size choice. It reuses existing market-cap / 20-day trading-value size classification, does not alter leader scoring, and never removes GLOBAL trend articles because of size. When a market has no size observations, label that limitation without silently hiding its news. Empty selections show an explicit message.
+- Required verification: `tests/daily-quote.spec.ts`, `tests/patagonia-home.spec.ts`, `tests/discovery-news.spec.ts`, `npm run harness:check`, `npm run build`, `npm run test:identity`, `npm run test:four-screens`, `npm run test:ui`. Refresh the four-screen Today snapshots on the pinned runner only after visual inspection; do not blanket-mask changed regions.

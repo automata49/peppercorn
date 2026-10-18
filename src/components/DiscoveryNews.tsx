@@ -1,8 +1,9 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useMemo,useState} from 'react'
 import type {LeaderRow,Market} from '../types'
 import type {InsightsFeed,InsightImage} from '../lib/leaderInsights'
 import {loadInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/instinctLeaderNews'
 import {coverPhoto,useVisualStyle} from './VisualStyle'
+import {stockSizes} from '../lib/stockSize'
 
 const classes=new Set(['핵심 주도','주도 후보','강세 전환','조정 중'])
 type NewsStory={
@@ -15,6 +16,8 @@ export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:Insight
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
+ const [newsSize,setNewsSize]=useState<'large'|'small'|'all'>('large')
+ const sizes=useMemo(()=>stockSizes(rows),[rows])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
  const visible=(m:'KR'|'US'|'GLOBAL')=>market==='ALL'||m==='GLOBAL'||market===m
@@ -52,16 +55,30 @@ export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:Insight
  })
  // Trend is allocated its own editorial space; a missing ticker never suppresses it.
  const trends=unique(fresh(fromDrive.filter(item=>item.kind==='trend'))).slice(0,2)
- const stock=unique(fresh([...fromDrive.filter(item=>item.kind==='stock'),...rss]))
+ const allStock=unique(fresh([...fromDrive.filter(item=>item.kind==='stock'),...rss]))
+ const stock=allStock.filter(item=>{
+  if(newsSize==='all')return true
+  const row=item.row
+  if(!row||row.asset_class!=='Equity')return false
+  const info=sizes[row.market]
+  // If no size measurements exist, preserve news coverage rather than silently marking unknown stocks as large.
+  if(!info.basis)return newsSize==='large'
+  return info.known.has(row.id)&&(newsSize==='large'?info.large.has(row.id):!info.large.has(row.id))
+ })
  const stories=[...trends,...stock.slice(0,Math.max(0,4-trends.length))]
- if(!stories.length)return null
+ if(!trends.length&&!allStock.length)return null
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
   <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>최근 7일 · 출처 확인</span></header>
+  <div className="discovery-news-controls" role="group" aria-label="뉴스 종목 규모">
+   {([['large','대형주'],['small','중소형주'],['all','전체']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={newsSize===value} className={newsSize===value?'on':''} onClick={()=>setNewsSize(value)}>{label}</button>)}
+   <span>기본 대형주 · 규모 데이터가 없는 시장은 뉴스 범위를 유지</span>
+  </div>
+  {!stories.length&&<p className="discovery-news-empty" role="status">이 분류의 최근 뉴스가 없습니다. 다른 규모를 선택해 보세요.</p>}
   <div className="discovery-news-stories" role="list">{stories.map(item=>{
    const image=item.image&&!failed.has(item.image.url)?item.image:null
    const visual=item.visual&&!failed.has(item.visual.url)?item.visual:undefined
-   return <article className="discovery-news-story" role="listitem" key={item.id} data-market={item.market} data-kind={item.kind}>
+   return <article className="discovery-news-story" role="listitem" key={item.id} data-market={item.market} data-kind={item.kind} data-stock-size={item.row?(sizes[item.row.market].large.has(item.row.id)?'large':'other'):'trend'}>
     <figure><a href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.headline+' 원문 열기'}><img src={visual?import.meta.env.BASE_URL+visual.url:image?.url||coverPhoto('discover',photoStyle)} alt={visual?.alt||image?.alt||''} loading="lazy" referrerPolicy="no-referrer" onError={()=>{if(visual)setFailed(old=>new Set([...old,visual.url]));else if(image)setFailed(old=>new Set([...old,image.url]))}}/></a>
      <figcaption>{visual?<span>{visual.credit} · 실제 기사 사진 아님</span>:image?<><span>{image.kind==='original'?'원문 사진':'관련 사진 · 원문 사진 아님'}</span><a href={image.page_url} target="_blank" rel="noopener noreferrer">{image.creator}</a><a href={image.license_url} target="_blank" rel="noopener noreferrer">{image.license}</a></>:<span>Folio 이미지 · 원문 사진 아님</span>}</figcaption>
     </figure>

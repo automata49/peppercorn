@@ -88,3 +88,35 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
  .lifestyle-home .home-motion-card .home-cover-copy p{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.lifestyle-home .home-motion-card{scroll-behavior:auto}}
+
+
+/* TODAY-QUOTE-20261018: a sourced daily thought below the single-line motto.
+   Do not move the four Motion cards or the locked Folio brand artwork. */
+.lifestyle-home .home-heading .home-tagline{white-space:nowrap;max-width:100%;font-size:clamp(12px,1.45vw,20px);letter-spacing:-.045em;line-height:1.4}
+.lifestyle-home .home-daily-quote{width:min(100%,650px);margin:clamp(12px,1.8svh,20px) auto 0;display:grid;grid-template-columns:minmax(0,1fr) clamp(70px,10vw,118px);align-items:center;gap:clamp(10px,2vw,20px);text-align:left;min-width:0;min-height:86px;text-shadow:none}
+.lifestyle-home .home-quote-copy{min-width:0}
+.lifestyle-home .home-heading .home-quote-line{font-family:var(--folio-editorial-font);font-size:clamp(12px,1.3vw,18px);font-weight:500;line-height:1.45;letter-spacing:-.055em;margin:0 0 9px;color:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lifestyle-home .home-quote-copy a{position:relative;z-index:4;pointer-events:auto;font-size:clamp(10px,.95vw,12px);letter-spacing:-.02em;line-height:1.5;color:inherit;text-decoration:underline;text-underline-offset:3px;opacity:.9}
+.lifestyle-home .home-quote-copy a:focus-visible{outline:2px solid currentColor;outline-offset:4px}
+.lifestyle-home .home-quote-portrait{width:100%;height:auto;max-height:120px;overflow:hidden;border-radius:6px 6px 20px 6px;background:rgba(252,247,237,.88);filter:drop-shadow(0 2px 10px #0002)}
+@media (orientation:portrait){
+ .lifestyle-home .home-daily-quote{margin:16px 0 0;grid-template-columns:minmax(0,1fr) clamp(66px,15vw,118px);gap:clamp(8px,2vw,18px);min-height:74px}
+ .lifestyle-home .home-heading .home-quote-line{font-size:clamp(11px,1.75vw,16px);color:var(--folio-ink)}
+ .lifestyle-home .home-quote-copy a{color:var(--folio-muted)}
+ .lifestyle-home .home-heading .home-tagline{font-size:clamp(11px,2.35vw,18px);color:var(--folio-ink)}
+}
+@media (max-width:580px) and (orientation:portrait){
+ .lifestyle-home .home-heading h2{margin:12px 0}
+ .lifestyle-home .home-heading .home-tagline{font-size:clamp(11px,2.85vw,14px)}
+ .lifestyle-home .home-daily-quote{grid-template-columns:minmax(0,1fr) clamp(68px,20vw,90px);min-height:74px;gap:9px;margin-top:12px}
+ .lifestyle-home .home-heading .home-quote-line{font-size:clamp(10px,2.6vw,12px);margin-bottom:6px;letter-spacing:-.06em}
+ .lifestyle-home .home-quote-copy a{font-size:10px}
+}
+@media (orientation:landscape) and (max-height:600px){
+ .lifestyle-home .home-motion-cards{grid-template-rows:minmax(310px,80svh) clamp(220px,28vw,340px)}
+ .lifestyle-home .home-heading{top:12px}
+ .lifestyle-home .home-heading h2{font-size:clamp(32px,4.1vw,46px);margin:4px 0}
+ .lifestyle-home .home-daily-quote{min-height:70px;margin-top:8px;grid-template-columns:minmax(0,1fr) 80px}
+ .lifestyle-home .home-quote-portrait{max-height:88px}
+ .lifestyle-home .home-heading .home-quote-line{font-size:clamp(11px,1.6vw,14px)}
+}
