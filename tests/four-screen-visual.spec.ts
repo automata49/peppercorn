@@ -57,7 +57,7 @@ async function boot(page: Page, theme: 'light' | 'dark') {
     return r.fulfill({json: {series: Object.fromEntries(ids.map(id => [id, series]))}})
   })
   await page.goto('/peppercorn/')
-  await expect(page.getByRole('heading', {name: '나의 여정', exact:true})).toBeVisible()
+  await expect(page.locator('.home-heading h2')).toBeVisible()
   await page.evaluate(async records => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open('folio-lifetime-journal', 1)
@@ -147,7 +147,30 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       // Keep the approved snapshots focused on the otherwise unchanged reading surfaces.
       // A style tag inserted on Journal persists through the following Journey screenshot.
       if (screen.name === 'journal') await page.addStyleTag({content:'.journal-heading-actions{display:contents!important}.journal-view-toggle{display:none!important}'})
-      await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+      if (screen.name === 'today') {
+        // TODAY-DAILY-THOUGHT-1 deliberately changes the masthead across each day.
+        // Do not overwrite the user-approved original four-screen baseline automatically.
+        // Capture the new composition for human sign-off; gate the layout semantically.
+        await expect(page.locator('.home-heading h2')).toHaveText('오늘')
+        await expect(page.locator('.home-manifesto')).toHaveText('세상을 발견하고, 나의 시간을 기록하다.')
+        await expect(page.locator('.home-daily-quote')).toContainText('한국어 번역·의역')
+        await expect(page.locator('.home-portrait')).toHaveCount(0)
+        const layout = await page.evaluate(() => {
+          const intro = document.querySelector('.home-manifesto')!.getBoundingClientRect()
+          const quote = document.querySelector('.home-daily-quote')!.getBoundingClientRect()
+          return {
+            belowIntro: quote.top >= intro.bottom - 1,
+            quoteVisible: quote.width > 0 && quote.height > 0,
+            fitsViewport: Math.max(intro.right,quote.right) <= innerWidth + 1
+          }
+        })
+        expect(layout.belowIntro).toBe(true)
+        expect(layout.quoteVisible).toBe(true)
+        expect(layout.fitsViewport).toBe(true)
+        await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
+      } else {
+        await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+      }
     }
     await context.close()
   })

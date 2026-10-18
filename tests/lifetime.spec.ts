@@ -10,7 +10,7 @@ async function setup(page:Page){
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>{const ids=new URL(r.request().url()).searchParams.get('ids')!.split(',');return r.fulfill({json:{series:Object.fromEntries(ids.map(id=>[id,[['2026-10-01',100],['2026-10-02',105],['2026-10-05',102]]]))}})})
  await page.goto('/peppercorn/')
- await expect(page.getByRole('heading',{name:'나의 여정',exact:true})).toBeVisible()
+ await expect(page.locator('.home-heading h2')).toBeVisible()
 }
 async function compose(page:Page,title:string){const questions=page.locator('.journal-questions');if(await questions.getAttribute('open')===null)await questions.locator(':scope>summary').click();await page.getByRole('textbox',{name:'기록 제목'}).fill(title);await page.getByRole('textbox',{name:'기록 본문'}).fill('관찰: 수요가 늘었다. 해석과 증거는 구분한다.');await page.getByLabel('질문에 대한 나의 답').fill('반대 증거도 확인한다.')}
 for(const width of [390,834,1366,1440])test(`lifetime ${width}: create, ink, revisit, revise and keyboard tabs`,async({browser})=>{

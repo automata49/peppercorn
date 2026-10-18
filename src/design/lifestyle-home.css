@@ -88,3 +88,71 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
  .lifestyle-home .home-motion-card .home-cover-copy p{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){.lifestyle-home .home-motion-card{scroll-behavior:auto}}
+
+
+/* TODAY-DAILY-THOUGHT-2 — typography-only daily quote, no portrait/media. */
+.lifestyle-home .home-heading{
+ display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+ gap:clamp(9px,1.8svh,19px);
+ width:min(88%,900px);max-width:calc(100% - 24px);
+ text-align:left;pointer-events:none;
+}
+.lifestyle-home .home-heading-intro{min-width:0;width:100%}
+.lifestyle-home .home-heading-intro h2{margin:8px 0 7px}
+.lifestyle-home .home-heading .home-manifesto{
+ margin:0;color:inherit;
+ white-space:nowrap;letter-spacing:-.05em;line-height:1.5;
+ font-size:clamp(12px,1.5vw,19px);
+}
+.lifestyle-home .home-daily-quote{min-width:0;max-width:100%;margin:0}
+.lifestyle-home .home-daily-quote blockquote{
+ margin:0;font-family:var(--folio-editorial-font);
+ font-weight:var(--folio-editorial-weight);
+ font-size:clamp(13px,1.6vw,21px);line-height:1.5;
+ letter-spacing:-.03em;word-break:keep-all;overflow-wrap:anywhere;
+}
+.lifestyle-home .home-daily-quote figcaption{font-size:clamp(11px,1vw,13px);line-height:1.5;margin-top:8px}
+.lifestyle-home .home-daily-quote figcaption span{opacity:.8;font-size:.88em}
+@media(orientation:landscape){
+ .lifestyle-home .home-heading{top:clamp(16px,4svh,40px);max-height:90%;text-shadow:0 2px 12px #000a}
+}
+@media(orientation:portrait){
+ .lifestyle-home .home-heading{
+  position:static;translate:none;width:100%;max-width:100%;
+  max-height:none;align-items:flex-start;gap:12px;
+  margin:0 0 24px;color:var(--folio-ink);text-shadow:none;
+ }
+ .lifestyle-home .home-heading-intro h2{margin:10px 0 7px}
+ .lifestyle-home .home-heading .home-manifesto{
+  font-size:clamp(11.5px,3.25vw,18px);color:var(--folio-muted)
+ }
+ .lifestyle-home .home-daily-quote blockquote{font-size:clamp(14px,3vw,19px);line-height:1.55}
+ .lifestyle-home .home-daily-quote figcaption{font-size:11px;color:var(--folio-muted)}
+}
+@media(max-width:360px) and (orientation:portrait){
+ .lifestyle-home .home-heading .home-manifesto{font-size:11px}
+ .lifestyle-home .home-daily-quote blockquote{font-size:13px}
+}
+@media(orientation:landscape) and (max-height:460px){
+ .lifestyle-home .home-heading{top:14px;gap:5px}
+ .lifestyle-home .home-heading-intro h2{font-size:clamp(30px,3.8vw,43px);margin:3px 0}
+ .lifestyle-home .home-heading .home-manifesto{font-size:13px}
+ .lifestyle-home .home-daily-quote blockquote{font-size:13px}
+ .lifestyle-home .home-daily-quote figcaption{margin-top:3px}
+}
+
+/* MARKET-COMPANIES-LARGECAP-1: open on the leadership-universe large caps. */
+.discovery-news-size{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0 clamp(16px,2vw,24px)}
+.discovery-news-size button{min-height:44px;min-width:66px;padding:9px 18px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--folio-muted);font:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s ease,color .2s ease}
+.discovery-news-size button[aria-pressed="true"]{background:var(--folio-ink);color:var(--folio-paper)}
+.discovery-news-size button:hover:not([aria-pressed="true"]){background:var(--folio-surface-2);color:var(--folio-ink)}
+.discovery-news-size button:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
+.discovery-news-empty{font-size:14px;line-height:1.6;color:var(--folio-muted);padding:10px 0 22px}
+@media(max-width:580px){.discovery-news-size{gap:2px}.discovery-news-size button{min-width:58px;padding:8px 12px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){.discovery-news-size button{transition:none}}
+
+/* The editorial overlay must not steal clicks from the existing Motion cover. */
+.lifestyle-home .home-heading{pointer-events:none}
+
+/* Editorial contrast on varied hero photographs without introducing new panels. */
+@media(orientation:landscape){.lifestyle-home .home-motion-card.home-today:after{background:linear-gradient(90deg,rgba(12,13,13,.72) 0%,rgba(12,13,13,.46) 44%,rgba(12,13,13,.08) 83%),linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.2))}}

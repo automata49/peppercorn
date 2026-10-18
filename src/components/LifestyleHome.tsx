@@ -3,7 +3,7 @@ import { SourceReports } from './SourceReports'
 import type { ReportController } from '../lib/sourceReports'
 import { instrumentLabel } from '../lib/instrumentLabel'
 import { useVisualStyle, coverPhoto } from './VisualStyle'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'motion/react'
 import type { EditableRow, LeaderRow } from '../types'
@@ -16,6 +16,7 @@ import { AppIcon } from './AppIcon'
 import { leaderObservation } from './TodayLeaders'
 import { calendarDate } from '../lib/journalGallery'
 import { useCardDismiss } from '../lib/useCardDismiss'
+import { dailyThought,koreaDayNumber } from '../lib/dailyThought'
 
 type Section = 'today' | 'discover' | 'journal' | 'journey'
 type Props = { reports:ReportController; entries: JournalEntry[]; leaders: LeaderRow[]; research: EditableRow[]; theses: EditableRow[]; trades: EditableRow[]; insights: InsightsFeed | null; source: string; navigate: (page: string) => void; onSelect: (row: LeaderRow) => void; onMenu:()=>void }
@@ -32,6 +33,21 @@ function SourceStory({item}:{item:LeaderInsight}){
 /** The fixed home is an overview of the user's journey. Public drafts never edit private records. */
 export function LifestyleHome({ reports, entries, leaders, research, theses, trades, insights, source, navigate, onSelect, onMenu }: Props) {
  const {photoStyle}=useVisualStyle()
+ const [quoteClock,setQuoteClock]=useState(()=>new Date())
+ const thought=dailyThought(quoteClock)
+ useEffect(()=>{
+  let timeout:number
+  const update=()=>{
+   const now=new Date()
+   setQuoteClock(now)
+   const nextKoreanMidnight=(koreaDayNumber(now)+1)*86400000-9*3600000
+   timeout=window.setTimeout(update,Math.max(1000,nextKoreanMidnight-Date.now()+200))
+  }
+  update()
+  const onResume=()=>{if(!document.hidden){window.clearTimeout(timeout);update()}}
+  document.addEventListener('visibilitychange',onResume)
+  return()=>{window.clearTimeout(timeout);document.removeEventListener('visibilitychange',onResume)}
+ },[])
  const [selected, setSelected] = useState<Section | null>(null)
  const [failedPhotos, setFailedPhotos] = useState<Set<string>>(() => new Set())
  const dismiss = useCardDismiss(!!selected, () => setSelected(null))
@@ -57,9 +73,19 @@ export function LifestyleHome({ reports, entries, leaders, research, theses, tra
  const active = covers.find(c => c.key === selected)
  function go(page: string) { setSelected(null); navigate(page) }
  function cover(c: typeof covers[number]) { return <><img decoding="async" src={c.image} draggable={false} onError={() => { if (c.image !== c.fallback) setFailedPhotos(old => new Set([...old, c.image])) }} style={{ objectPosition: c.position }} alt=""/><div className="home-cover-copy"><h3>{c.label}</h3><p title={c.summary}>{c.summary}</p><span className="home-story-action" aria-hidden="true">{c.key==='today'?'오늘의 이야기':c.key==='discover'?'기업 발견하기':c.key==='journal'?'기록 모아보기':'여정 돌아보기'} →</span></div></> }
- return <LayoutGroup id="lifestyle-home"><section className="lifetime-workspace lifetime-today lifestyle-home" aria-label="나의 여정 한눈에">
+ return <LayoutGroup id="lifestyle-home"><section className="lifetime-workspace lifetime-today lifestyle-home" aria-label="오늘 한눈에">
 
-  <header className="lifetime-heading home-heading"><time>{new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}</time><h2>나의 여정</h2><p>세상을 발견하고,<br/>나의 시간을 기록하다.</p></header>
+  <header className="lifetime-heading home-heading">
+   <div className="home-heading-intro">
+    <time>{new Date().toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'long',timeZone:'Asia/Seoul'})}</time>
+    <h2>오늘</h2>
+    <p className="home-manifesto">세상을 발견하고, 나의 시간을 기록하다.</p>
+   </div>
+   <figure className="home-daily-quote" aria-label="오늘의 어록">
+    <blockquote>“{thought.thought}”</blockquote>
+    <figcaption>— {thought.name} <span>· 한국어 번역·의역</span></figcaption>
+   </figure>
+  </header>
   <div className="home-motion-cards">{covers.map(c => <motion.button key={c.key} layoutId={`home-frame-${c.key}`} transition={transition} className={`home-motion-card home-${c.key}`} type="button" aria-label={`${c.label} 카드 열기`} onClick={() => { focus.current = document.activeElement as HTMLElement; setSelected(c.key) }}>{cover(c)}</motion.button>)}</div>
   
   <p className="home-journey-state">{entries.length ? `${entries.length}개의 기록 · 투자 가설 ${theses.filter(t => t.ticker).length}개 · 다시 볼 생각 ${due.length}개` : '사진 한 장, 작은 발견 하나에서 시작하는 나의 여정.'}</p>
