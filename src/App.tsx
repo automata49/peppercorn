@@ -1446,7 +1446,7 @@ export default function App(){
           <section className="catalog-filter-rails" aria-label="Filter & Sort">
             <FilterWheel label="분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
-            <FilterWheel label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
+            <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'||analysisScope===v?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
             <FilterWheel label="섹터" value={sector||''} onChange={v=>setSector(v||null)} options={[{value:'',label:'전체 섹터'},...allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=>({value:g.key,label:(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}))]}/>
           </section>
           <div className="catalog-topline">
