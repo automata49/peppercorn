@@ -19,16 +19,15 @@ function ReportReader({report,controller}:{report:ReportController['items'][numb
   {!!detail.links.length&&<details><summary>리포트 출처 · {detail.links.length}개</summary><ul>{detail.links.map((l,i)=><li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label||l.url} ↗</a></li>)}</ul></details>}
  </div>
 }
-export function SourceReports({controller,view}:{controller:ReportController;view:'summary'|'journal'}){
+export function SourceReports({controller}:{controller:ReportController}){
  const [open,setOpen]=useState<string|null>(null)
  useEffect(()=>setOpen(null),[controller.uid])
  if(!controller.uid)return null
  if(!controller.items.length&&!controller.error)return null
- const items=view==='summary'?controller.items.slice(0,1):controller.items
- return <section className="home-digest source-reports" aria-label={view==='summary'?'오늘의 리서치 리포트':'저널 리서치 리포트'}>
-  <h4>{view==='summary'?'오늘의 리서치':'리서치 리포트'}</h4>
+ return <section className="home-digest source-reports" aria-label="Folio 리서치 리포트">
+  <h4>리서치 리포트</h4>
   {controller.error&&<p role="status">{controller.error} <Button variant="ghost" onClick={controller.refresh}>다시 시도</Button></p>}
-  {items.map(r=><article key={r.drive_file_id}>
+  {controller.items.map(r=><article key={r.drive_file_id}>
    <h5>{r.title}</h5><time>{new Date(r.source_modified_at).toLocaleString('ko-KR')} · PDF 수정 시각</time>
    <ul>{r.summary.map((line,i)=><li key={i}>{line}</li>)}</ul>
    <div className="source-report-actions"><Button variant="ghost" aria-expanded={open===r.drive_file_id} onClick={()=>setOpen(open===r.drive_file_id?null:r.drive_file_id)}>{open===r.drive_file_id?'전문 접기':'전문·차트 읽기'}</Button><a href={r.source_url} target="_blank" rel="noopener noreferrer">원본 PDF ↗</a></div>
