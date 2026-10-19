@@ -47,22 +47,18 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
  await openPage(page,'탐색')
  await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(6)
  await openFilters(page)
- await expect(page.locator('.analysis-scope')).toHaveCSS('border-top-width','0px')
- await expect(page.locator('.analysis-scope')).toHaveCSS('gap','0px')
- for(const button of await page.locator('.analysis-scope button').all()){
-  await checkLeadership(button,true)
-  if(await button.getAttribute('aria-pressed')==='true')await button.click()
-  await expect(button).toHaveAttribute('aria-pressed','false')
+ const leadership=page.locator('[data-wheel="주도 분류"]')
+ await expect(leadership).toBeVisible()
+ const all=leadership.getByRole('button',{name:'전체',exact:true})
+ await all.click()
+ await expect(all).toHaveAttribute('aria-pressed','true')
+ for(const label of ['핵심 주도','주도 후보','강세 전환','조정 중']){
+  const button=leadership.getByRole('button',{name:label,exact:true})
+  await expect(button).toHaveCSS('border-radius','0px')
+  await expect(button).toHaveCSS('border-top-width','0px')
   await button.click()
   await expect(button).toHaveAttribute('aria-pressed','true')
-  await checkLeadership(button,true)
-  const ink=await button.evaluate(e=>{
-   const probe=document.createElement('span');probe.style.color='var(--folio-ink)';e.append(probe)
-   const expected=getComputedStyle(probe).color;probe.remove();return expected
-  })
-  await expect(button).toHaveCSS('color',ink)
-  if(width===390&&await button.textContent()==='핵심 주도')await page.screenshot({path:`test-results/leadership-selected-${theme}.png`})
-  await button.click();await expect(button).toHaveAttribute('aria-pressed','false')
+  await all.click()
  }
  if(width===390)await page.screenshot({path:`test-results/leadership-explore-${theme}.png`})
  await closeFilters(page)

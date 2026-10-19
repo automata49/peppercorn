@@ -33,7 +33,7 @@ for(const width of [390,834,1366,1440])test(`document pages ${width}: source tab
  await expect(page.getByRole('link',{name:/출처 확인/})).toHaveAttribute('href','https://www.apple.com/newsroom/')
  await page.getByRole('button',{name:'AAPL · 기업 살펴보기 →'}).click()
  await expect(page.locator('.analysis-body')).toBeVisible()
- await page.getByRole('button',{name:'← 탐색 목록',exact:true}).click()
+ await page.getByRole('button',{name:'뒤로 가기'}).click()
  await expect(page.getByRole('tab',{name:'주제',exact:true})).toHaveAttribute('aria-selected','true')
  await page.getByRole('tab',{name:'시장 신호',exact:true}).click()
  await expect(page.locator('.dashboard-sector-panel')).toBeVisible()

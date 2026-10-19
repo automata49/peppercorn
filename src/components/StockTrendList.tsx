@@ -4,10 +4,23 @@ import type {LeaderRow} from '../types'
 import {usePriceHistory} from '../lib/priceHistory'
 const pct=(v:number|null|undefined)=>v==null||!Number.isFinite(v)?'—':(v>=0?'+':'')+(v*100).toFixed(1)+'%'
 import {miniTrend} from '../lib/miniTrend'
-export function StockTrendList({rows,onSelect,getClass,onAddToBasket,isInBasket,className='',emptyLabel='선택한 범위와 필터에 맞는 종목이 없습니다.'}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;getClass:(row:LeaderRow)=>string;onAddToBasket?:(row:LeaderRow)=>void;isInBasket?:(row:LeaderRow)=>boolean;className?:string;emptyLabel?:string}){
+export function StockTrendList({rows,onSelect,getClass,onAddToBasket,isInBasket,className='',view='cards',emptyLabel='선택한 범위와 필터에 맞는 종목이 없습니다.'}:{rows:LeaderRow[];onSelect:(row:LeaderRow)=>void;getClass:(row:LeaderRow)=>string;onAddToBasket?:(row:LeaderRow)=>void;isInBasket?:(row:LeaderRow)=>boolean;className?:string;view?:'cards'|'list';emptyLabel?:string}){
  const [limit,setLimit]=useState(20)
  const shown=rows.slice(0,limit)
- const hist=usePriceHistory(shown.map(r=>r.id),shown.length>0)
+ const hist=usePriceHistory(shown.map(r=>r.id),view==='cards'&&shown.length>0)
+
+ if(view==='list')return <><div className={'stock-compact-list '+className} role="list" aria-label="분석 종목 목록">
+  <div className="stock-compact-head" aria-hidden="true"><span>종목명</span><span>Ticker</span><span>현재가</span><span>RS순위</span><span/></div>
+  {shown.map(row=>{
+    const price=row.price==null?'—':(row.market==='US'?'$':'₩')+new Intl.NumberFormat(row.market==='US'?'en-US':'ko-KR',{minimumFractionDigits:row.market==='US'?2:0,maximumFractionDigits:row.market==='US'?2:0}).format(row.price)
+    return <div key={row.market+'|'+row.ticker} className="stock-compact-row" role="listitem" data-market={row.market}>
+      <button className="stock-compact-main" type="button" onClick={()=>onSelect(row)} aria-label={row.name+' '+row.ticker+' '+price+' RS '+(row.rs_rank==null?'정보 없음':Math.round(row.rs_rank))+' 종목 상세 보기'}>
+        <strong title={row.name||row.ticker}>{row.name||row.ticker}</strong><span className="stock-compact-ticker" title={row.ticker}>{row.ticker}</span><span className="stock-compact-price">{price}</span><span className="stock-compact-rs">{row.rs_rank==null?'—':Math.round(row.rs_rank)}</span>
+      </button>{onAddToBasket&&<button type="button" className="stock-compact-basket" aria-label={row.ticker+' '+(isInBasket?.(row)?'장바구니 담김':'장바구니 담기')} aria-pressed={!!isInBasket?.(row)} onClick={()=>onAddToBasket(row)}><AppIcon name="basket"/></button>}
+    </div>
+  })}
+  {!rows.length&&<p className="empty">{emptyLabel}</p>}
+ </div>{limit<rows.length&&<button type="button" className="secondary-action stock-trend-more" onClick={()=>setLimit(n=>n+20)}>더 보기 · {Math.min(20,rows.length-limit)}종목</button>}</>
  return <><div className={'stock-trend-list decision-list '+className} role="list" aria-label="분석 종목 목록">{shown.map(row=>{
   const trend=miniTrend(hist.get(row.id))
   const change=row.return_20d

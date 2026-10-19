@@ -63,14 +63,14 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
  await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  await category.getByRole('button',{name:'전체',exact:true}).click()
  const scope=page.getByRole('group',{name:'주도 분류'})
- await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중'])
+ await expect(scope.getByRole('button')).toHaveText(['전체','핵심 주도','주도 후보','강세 전환','조정 중'])
  // Category and leadership are independent axes: changing size/asset category preserves the active leadership class.
  await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(6)
  await scope.getByRole('button',{name:'핵심 주도',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20)
  for(const [label,count] of [['핵심 주도',6],['주도 후보',6],['강세 전환',4],['조정 중',4]] as const){const button=scope.getByRole('button',{name:label,exact:true});await button.click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(count);await button.click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(20)}
  await expect(page.locator('.analysis-idea-list svg[role=img]')).toHaveCount(20)
  await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(18)
- await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await expect(page.locator('.analysis-price-momentum')).toBeVisible();await page.getByRole('button',{name:'← 탐색 목록'}).click();await openFilters(page)
+ await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await expect(page.locator('.analysis-price-momentum')).toBeVisible();await page.getByRole('button',{name:'뒤로 가기'}).click();await openFilters(page)
  await expect(page.getByRole('button',{name:'중소형주',exact:true})).toHaveAttribute('aria-pressed','true')
  await page.screenshot({path:`test-results/stock-trends-${width}.png`,fullPage:true})
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
@@ -81,7 +81,7 @@ for(const width of [390,834,1366,1440])test(`stock rows ${width}: default large 
 test('fallback basis and empty history are explicit, unknown size only appears in all',async({page})=>{
  const data=rows.map(r=>({...r,market_cap:null,traded_value_20d:r.id.endsWith('-0')?null:r.traded_value_20d}))
  await boot(page,data,{missing:true});await openPage(page,'탐색');await openFilters(page)
- await expect(page.locator('.stock-size-basis summary')).toContainText('시가총액 대체')
+ await expect(page.locator('[data-wheel="분류"]')).toBeVisible()
  const scope=page.getByRole('group',{name:'주도 분류'});const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  await expect(page.locator('.analysis-idea-list .stock-trend-missing').first()).toHaveText('이력 없음')
  await page.getByRole('button',{name:'중소형주',exact:true}).click();await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(16)
@@ -105,8 +105,8 @@ test('ETF is a first-class classification and does not use equity leadership cla
  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click()
  await expect(page.locator('.analysis-idea-list .stock-trend-row')).toHaveCount(2)
  const leadershipButtons=page.getByRole('group',{name:'주도 분류'}).getByRole('button')
- await expect(leadershipButtons).toHaveCount(4)
- for(const button of await leadershipButtons.all())await expect(button).toBeDisabled()
+ await expect(leadershipButtons).toHaveCount(5)
+ for(const button of await leadershipButtons.all())if(await button.textContent()!=='전체')await expect(button).toBeDisabled()
  await expect(page.locator('.analysis-idea-list .stock-trend-tags i')).toHaveText(['ETF','ETF'])
 })
 
@@ -129,7 +129,8 @@ test('pending list history is shared with detail and invalidated refresh rejects
  release();await (await firstResponse).finished()
  await expect(page.locator('.analysis-price-momentum svg[role=img]').first()).toBeVisible()
  const refreshCount=batches.length
- await page.getByRole('button',{name:'← 탐색 목록'}).click()
+ await page.getByRole('button',{name:'뒤로 가기'}).click()
+ await openPage(page,'탐색')
  await expect(page.locator('.analysis-idea-list svg[role=img]').first()).toBeVisible()
  await expect(page.locator('.analysis-idea-list svg[role=img] path').first()).toHaveAttribute('d',miniTrend({dates,closes:dates.map((_,i)=>100+i)})!.path)
  // A new reader uses refreshed cache, rather than replaying the old pending request.
