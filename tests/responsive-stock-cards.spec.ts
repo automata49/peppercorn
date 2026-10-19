@@ -19,8 +19,7 @@ for(const [device,width,height] of screens)for(const theme of ['light','dark'])t
  for(const [w,h] of [[width,height],[height,width]]){
   await page.setViewportSize({width:w,height:h});await openPage(page,'탐색')
   await openFilters(page)
-  const core=page.locator('.analysis-scope button').first()
-  if(await core.getAttribute('aria-pressed')==='true')await core.click()
+  await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
   await closeFilters(page)
   const list=page.locator('.analysis-idea-list')
   await expect(list.locator('.stock-trend-row')).toHaveCount(3)
