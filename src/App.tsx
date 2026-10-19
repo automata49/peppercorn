@@ -23,7 +23,6 @@ import { CHART_SESSIONS } from './lib/rsChart'
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
-import { FolioWordmark } from './components/FolioWordmark'
 import { AppIcon } from './components/AppIcon'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
@@ -736,13 +735,6 @@ export default function App(){
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [catalogFiltersOpen,setCatalogFiltersOpen]=useState(false)
-  const [pinnedFilters,setPinnedFilters]=useState(()=>window.matchMedia('(min-width: 1024px), (min-width: 480px) and (orientation: landscape)').matches)
-  useEffect(()=>{
-    const media=window.matchMedia('(min-width: 1024px), (min-width: 480px) and (orientation: landscape)')
-    const change=()=>{setPinnedFilters(media.matches);setCatalogFiltersOpen(false)}
-    media.addEventListener('change',change)
-    return ()=>media.removeEventListener('change',change)
-  },[])
   const [catalogSort,setCatalogSort]=useState<'rs'|'return'|'name'>('rs')
   const [catalogView,setCatalogView]=useState<'list'|'cards'>(()=>{
     try{return localStorage.getItem('folio-catalog-view')==='cards'?'cards':'list'}catch{return 'list'}
@@ -1441,6 +1433,7 @@ export default function App(){
       <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected?.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
       <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
     </div>
+    const wheelLeadershipOptions=[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const
     const catalogFilterControls=<>
       <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
       <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
@@ -1453,7 +1446,7 @@ export default function App(){
           <section className="catalog-filter-rails" aria-label="Filter & Sort">
             <FilterWheel label="분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
-            <FilterWheel label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},{value:'core',label:'핵심 주도',disabled:stockSize==='etf'},{value:'candidates',label:'주도 후보',disabled:stockSize==='etf'},{value:'turns',label:'강세 전환',disabled:stockSize==='etf'},{value:'corrections',label:'조정 중',disabled:stockSize==='etf'}]}/>
+            <FilterWheel label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
             <FilterWheel label="섹터" value={sector||''} onChange={v=>setSector(v||null)} options={[{value:'',label:'전체 섹터'},...allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=>({value:g.key,label:(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}))]}/>
           </section>
           <div className="catalog-topline">
