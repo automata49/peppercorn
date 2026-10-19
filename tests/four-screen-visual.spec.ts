@@ -121,11 +121,9 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       await expect(page.locator(screen.selector)).toBeVisible()
       if (screen.name === 'today') await expect(page.locator('.home-motion-card')).toHaveCount(4)
       if (screen.name === 'discover') {
-        const pinned=await page.locator('.catalog-filter-sidebar').count();const toggle=page.getByRole('button', {name:'Filter & Sort'});if(!pinned){if(view.touch)await toggle.tap();else await toggle.click()}
-        const active = page.locator('.analysis-scope button[aria-pressed=true]')
-        if (await active.count()) { if (view.touch) await active.tap(); else await active.click() }
-        const close=page.getByRole('button', {name:'필터 닫기'});if(!pinned){if(view.touch)await close.tap();else await close.click()}
-        await expect(page.locator('.analysis-idea-list .stock-trend-row').first()).toBeVisible()
+        await expect(page.locator('.catalog-wheel')).toHaveCount(4)
+        await expect(page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'})).toHaveAttribute('aria-pressed','true')
+        await expect(page.locator('.analysis-idea-list.stock-compact-list .stock-compact-row').first()).toBeVisible()
         await expect(page.locator('.catalog-filter-drawer.ui-dialog-content')).toHaveCount(0)
       }
       if (screen.name === 'journal') {
@@ -168,6 +166,10 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         expect(layout.quoteVisible).toBe(true)
         expect(layout.fitsViewport).toBe(true)
         await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
+      } else if (screen.name === 'discover') {
+        // The carousel + default compact list intentionally replace the previous card snapshot.
+        // Keep layout, overflow and control behavior as hard gates while collecting a new visual baseline.
+        await page.screenshot({path:`test-results/new-discover-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
       } else {
         await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
       }
