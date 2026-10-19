@@ -156,3 +156,8 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 
 /* Editorial contrast on varied hero photographs without introducing new panels. */
 @media(orientation:landscape){.lifestyle-home .home-motion-card.home-today:after{background:linear-gradient(90deg,rgba(12,13,13,.72) 0%,rgba(12,13,13,.46) 44%,rgba(12,13,13,.08) 83%),linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.2))}}
+
+/* Private PDFs live in MARKET & COMPANIES without affecting the stock-news layout. */
+.discovery-news-report-content{min-width:0;max-width:100%;padding:clamp(8px,1.5vw,16px) 0 clamp(16px,2vw,28px)}
+.discovery-news-report-content .source-reports{max-width:960px;margin:0}
+.discovery-news-report-content .source-reports article{border-top:1px solid var(--folio-border,rgba(120,110,100,.2));padding-block:20px}
