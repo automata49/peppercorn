@@ -3,6 +3,8 @@ import type {LeaderRow,Market} from '../types'
 import type {InsightsFeed,InsightImage} from '../lib/leaderInsights'
 import {loadInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/instinctLeaderNews'
 import {coverPhoto,useVisualStyle} from './VisualStyle'
+import {SourceReports} from './SourceReports'
+import type {ReportController} from '../lib/sourceReports'
 import {stockSizes,filterStockSize,type StockSize} from '../lib/stockSize'
 
 const classes=new Set(['핵심 주도','주도 후보','강세 전환','조정 중'])
@@ -12,11 +14,11 @@ type NewsStory={
  kind:'stock'|'trend';summary_kind:'source_excerpt'|'ai_draft'|'instinct';row?:LeaderRow;label:string
 }
 /** Public story coverage is independent of leader scoring; trend news never gets a made-up ticker. */
-export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:InsightsFeed|null;rows:LeaderRow[];market:Market|'ALL';getClass:(row:LeaderRow)=>string;onSelect:(row:LeaderRow)=>void}){
+export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{reports:ReportController;feed:InsightsFeed|null;rows:LeaderRow[];market:Market|'ALL';getClass:(row:LeaderRow)=>string;onSelect:(row:LeaderRow)=>void}){
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
  // MARKET & COMPANIES opens on large caps, regardless of previously saved catalogue filters.
- const [newsSize,setNewsSize]=useState<Extract<StockSize,'large'|'small'|'all'>>('large')
+ const [newsTab,setNewsTab]=useState<'reports'|Extract<StockSize,'large'|'small'|'all'>>('large')
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
@@ -57,16 +59,19 @@ export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:Insight
  const trends=unique(fresh(fromDrive.filter(item=>item.kind==='trend'))).slice(0,2)
  const sizes=stockSizes(rows)
  const newsStock=unique(fresh([...fromDrive.filter(item=>item.kind==='stock'),...rss]))
- const stock=newsStock.filter(item=>item.row&&filterStockSize([item.row],newsSize,sizes).length>0)
+ const stock=newsStock.filter(item=>item.row&&filterStockSize([item.row],newsTab==='reports'?'large':newsTab,sizes).length>0)
  const stories=[...trends,...stock.slice(0,Math.max(0,4-trends.length))]
- if(!stories.length&&!newsStock.length)return null
+ if(!stories.length&&!newsStock.length&&!reports.uid)return null
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
-  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>최근 7일 · 출처 확인</span></header>
+  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>{newsTab==='reports'?'Google Drive · PDF 리포트':'최근 7일 · 출처 확인'}</span></header>
   <div className="discovery-news-size" role="group" aria-label="MARKET & COMPANIES 종목 규모">
-   {([['large','대형주'],['small','중소형주'],['all','전체']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={newsSize===value} onClick={()=>setNewsSize(value)}>{label}</button>)}
+   {([['reports','리포트'],['large','대형주'],['small','중소형주'],['all','전체']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={newsTab===value} onClick={()=>setNewsTab(value)}>{label}</button>)}
   </div>
-  {!stories.length&&<p className="discovery-news-empty" role="status">최근 7일에 해당하는 {newsSize==='large'?'대형주':newsSize==='small'?'중소형주':'전체 종목'} 뉴스가 없습니다. 다른 분류를 선택해 보세요.</p>}
+  {newsTab==='reports'?<div className="discovery-news-report-content">
+   {!reports.uid?<p className="discovery-news-empty" role="status">로그인 후 Folio 리서치 리포트를 볼 수 있습니다.</p>:!reports.items.length&&!reports.error?<p className="discovery-news-empty" role="status">등록된 리서치 리포트가 없습니다.</p>:<SourceReports controller={reports}/>}
+  </div>:<>
+  {!stories.length&&<p className="discovery-news-empty" role="status">최근 7일에 해당하는 {newsTab==='large'?'대형주':newsTab==='small'?'중소형주':'전체 종목'} 뉴스가 없습니다. 다른 분류를 선택해 보세요.</p>}
   <div className="discovery-news-stories" role="list">{stories.map(item=>{
    const image=item.image&&!failed.has(item.image.url)?item.image:null
    const visual=item.visual&&!failed.has(item.visual.url)?item.visual:undefined
@@ -82,6 +87,6 @@ export function DiscoveryNews({feed,rows,market,getClass,onSelect}:{feed:Insight
      <div className="discovery-news-actions"><a href={item.url} target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a>{item.row&&<button type="button" onClick={()=>onSelect(item.row!)}>종목 보기 →</button>}</div>
     </div>
    </article>
-  })}</div>
+  })}</div></>}
  </section>
 }
