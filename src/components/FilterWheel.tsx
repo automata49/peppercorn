@@ -1,7 +1,7 @@
 import {useEffect,useRef} from 'react'
 
 export type FilterWheelOption = {value:string;label:string;disabled?:boolean}
-export function FilterWheel({label,value,options,onChange}:{label:string;value:string;options:FilterWheelOption[];onChange:(value:string)=>void}){
+export function FilterWheel({label,value,options,onChange,className=''}:{label:string;value:string;options:FilterWheelOption[];onChange:(value:string)=>void;className?:string}){
   const viewport=useRef<HTMLDivElement>(null)
   const settle=useRef<ReturnType<typeof setTimeout>|null>(null)
   const autoScroll=useRef(false)
@@ -43,7 +43,7 @@ export function FilterWheel({label,value,options,onChange}:{label:string;value:s
       <button type="button" aria-label={label+' 이전 선택'} disabled={!options.slice(0,index).some(o=>!o.disabled)} onClick={()=>step(-1)}>‹</button>
       <button type="button" aria-label={label+' 다음 선택'} disabled={!options.slice(index+1).some(o=>!o.disabled)} onClick={()=>step(1)}>›</button>
     </div></div>
-    <div className="catalog-wheel-track" ref={viewport} onScroll={settleScroll} role="group" aria-label={label}>
+    <div className={'catalog-wheel-track '+className} ref={viewport} onScroll={settleScroll} role="group" aria-label={label}>
       {options.map((option,i)=><button key={option.value} data-wheel-index={i} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>onChange(option.value)}>{option.label}</button>)}
     </div>
   </div>
