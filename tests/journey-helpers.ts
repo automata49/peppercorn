@@ -31,7 +31,7 @@ export async function pickFirstStock(page:Page){
 export async function backToExplore(page:Page){await page.getByRole('button',{name:'뒤로 가기'}).click()}
 
 export async function openFilters(page:Page){
- if(!await page.locator('.catalog-filter-drawer.ui-dialog-content').count())await page.getByRole('button',{name:/정렬 · 상세/}).click()
+ await expect(page.locator('.catalog-filter-rails')).toBeVisible()
 }
 export async function closeFilters(page:Page){
  if(await page.locator('.catalog-filter-drawer.ui-dialog-content').count())await page.getByRole('button',{name:'필터 닫기'}).click()
