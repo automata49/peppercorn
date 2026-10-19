@@ -32,8 +32,20 @@ test('shared page headings and rotation keep dimensions and filter state',async(
  const measures=[]
  for(const label of ['발견','저널','여정']){await openPage(page,label);const heading=page.locator('.section-heading');measures.push(await heading.evaluate(el=>{const img=el.querySelector('img')!,title=el.querySelector('h2')!;return {imageWidth:img.getBoundingClientRect().width,imageHeight:img.getBoundingClientRect().height,fontSize:getComputedStyle(title).fontSize}}))}
  expect(measures[1]).toEqual(measures[0]);expect(measures[2]).toEqual(measures[0])
- await openPage(page,'발견');await openFilters(page);await page.getByRole('button',{name:'종목명 순',exact:true}).click();await page.setViewportSize({width:1194,height:834});await expect(page.locator('.catalog-filter-sidebar')).toBeVisible();await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true')
- await page.setViewportSize({width:834,height:1194});await expect(page.locator('.catalog-filter-drawer')).toHaveCount(0);await openFilters(page);await expect(page.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true')
+ await openPage(page,'발견');await openFilters(page)
+ const market=page.locator('[data-wheel="시장"]')
+ await market.getByRole('button',{name:'KR',exact:true}).click()
+ await page.getByRole('button',{name:/정렬 · 상세/}).click()
+ await page.getByRole('button',{name:'종목명 순',exact:true}).click()
+ await closeFilters(page)
+ await page.setViewportSize({width:1194,height:834})
+ await expect(page.locator('.catalog-filter-rails')).toBeVisible()
+ await expect(market.getByRole('button',{name:'KR',exact:true})).toHaveAttribute('aria-pressed','true')
+ await page.setViewportSize({width:834,height:1194})
+ await expect(page.locator('.catalog-filter-rails')).toBeVisible()
+ await expect(market.getByRole('button',{name:'KR',exact:true})).toHaveAttribute('aria-pressed','true')
+ await page.getByRole('button',{name:/정렬 · 상세/}).click()
+ await expect(page.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true')
 })
 test('basket retains unavailable instruments without presenting saved prices as current',async({page})=>{
  await page.addInitScript(()=>localStorage.setItem('folio-stock-basket',JSON.stringify([{market:'US',ticker:'OLD',name:'이전 종목',price:123}])))
