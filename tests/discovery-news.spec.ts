@@ -10,10 +10,16 @@ test.beforeEach(async({page})=>{
  await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{version:1,updated_at:stamp(),items:[]}}))
 })
 async function openNewsPage(page:Page){
- const mobile=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
- if(await mobile.isVisible())await mobile.click()
- else await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
- await expect(page.locator('.discovery-workspace')).toBeVisible()
+ // Reload rehydrates the local app shell before binding nav actions.
+ await expect(page.locator('.shell:not([inert])')).toBeVisible()
+ for(let attempt=0;attempt<3;attempt++){
+  if(await page.locator('.discovery-workspace').isVisible())return
+  const mobile=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
+  if(await mobile.isVisible())await mobile.click()
+  else await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
+  try{await expect(page.locator('.discovery-workspace')).toBeVisible({timeout:2200});return}catch{}
+ }
+ await expect(page.locator('.discovery-workspace')).toBeVisible({timeout:10000})
 }
 async function boot(page:Page,value:unknown=feed,reportedRows=rows){
  await page.clock.setFixedTime(new Date(now))
