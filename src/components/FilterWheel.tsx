@@ -6,6 +6,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   const settle=useRef<ReturnType<typeof setTimeout>|null>(null)
   const autoScroll=useRef(false)
   const manualPauseUntil=useRef(0)
+  const userScrolling=useRef(false)
   const active=options.findIndex(option=>option.value===value)
   const index=active<0?0:active
 
@@ -22,7 +23,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   useEffect(()=>()=>{if(settle.current)clearTimeout(settle.current)},[])
 
   const settleScroll=()=>{
-    if(autoScroll.current||Date.now()<manualPauseUntil.current)return
+    if(autoScroll.current||!userScrolling.current||Date.now()<manualPauseUntil.current)return
     if(settle.current)clearTimeout(settle.current)
     settle.current=setTimeout(()=>{
       const rail=viewport.current
@@ -31,13 +32,14 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
       const nearest=options.map((option,i)=>({option,i,button:rail.querySelector<HTMLButtonElement>(`[data-wheel-index="${i}"]`)}))
         .filter(item=>!item.option.disabled&&item.button)
         .sort((a,b)=>Math.abs((a.button!.offsetLeft+a.button!.clientWidth/2)-center)-Math.abs((b.button!.offsetLeft+b.button!.clientWidth/2)-center))[0]
+      userScrolling.current=false
       if(nearest&&nearest.option.value!==value)onChange(nearest.option.value)
     },160)
   }
   return <div className="catalog-wheel" data-wheel={label}>
     <div className="catalog-wheel-heading"><span>{label}</span></div>
-    <div className={'catalog-wheel-track '+className} ref={viewport} onPointerDown={()=>{autoScroll.current=false;manualPauseUntil.current=0}} onScroll={settleScroll} role="group" aria-label={label}>
-      {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>{manualPauseUntil.current=Date.now()+420;if(settle.current)clearTimeout(settle.current);onChange(option.value)}}>{option.label}</button>)}
+    <div className={'catalog-wheel-track '+className} ref={viewport} onPointerDown={()=>{autoScroll.current=false;manualPauseUntil.current=0;userScrolling.current=true}} onWheel={()=>{autoScroll.current=false;manualPauseUntil.current=0;userScrolling.current=true}} onScroll={settleScroll} role="group" aria-label={label}>
+      {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>{userScrolling.current=false;manualPauseUntil.current=Date.now()+420;if(settle.current)clearTimeout(settle.current);onChange(option.value)}}>{option.label}</button>)}
     </div>
   </div>
 }
