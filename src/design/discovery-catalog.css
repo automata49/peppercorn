@@ -141,3 +141,54 @@ html body .shell .app-main .stock-compact-basket{grid-column:6}
  html body .shell .app-main .stock-compact-basket{width:28px;padding:4px}
 }
 @media(prefers-reduced-motion:reduce){html body .shell .app-main .catalog-wheel-track button{transition:none}}
+
+
+/* DISCOVERY-ROW-20261020: recent-search editorial geometry, fixed labels, tactile Cover Flow. */
+.catalog-carousel-layout .catalog-filter-rails{gap:0!important;margin:0 0 22px!important}
+.catalog-carousel-layout .catalog-wheel{grid-template-columns:clamp(72px,12%,116px) minmax(0,1fr)!important;gap:clamp(8px,2vw,22px)!important;min-height:62px!important;padding:6px 0!important}
+.catalog-carousel-layout .catalog-wheel-heading{display:flex!important;align-items:center;justify-content:flex-start;min-height:48px;margin:0!important;font-size:clamp(14px,1.5vw,18px)!important;font-weight:730!important;white-space:nowrap;color:var(--folio-ink)!important}
+.catalog-carousel-layout .catalog-wheel-track,.catalog-carousel-layout .catalog-wheel-track.analysis-scope{height:55px!important;min-height:55px!important;gap:clamp(12px,2.4vw,26px)!important;scroll-snap-type:x mandatory;scroll-padding-inline:24px;mask-image:linear-gradient(to right,transparent,#000 4%,#000 95%,transparent)}
+.catalog-carousel-layout .catalog-wheel-track:before,.catalog-carousel-layout .catalog-wheel-track:after{flex-basis:14px!important;min-width:14px}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{height:49px!important;min-height:49px!important;min-width:max-content;padding:8px 3px!important;box-shadow:none!important;border-radius:0!important;background:transparent!important;letter-spacing:-.015em;transform-origin:center;will-change:transform,opacity}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"]{background:transparent!important;box-shadow:none!important;transform:perspective(480px) rotateY(0deg) translateZ(10px) scale(1.04)}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-1"]{transform:perspective(480px) rotateY(25deg) scale(.96);opacity:.77}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="1"]{transform:perspective(480px) rotateY(-25deg) scale(.96);opacity:.77}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-2"],html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-3"]{transform:perspective(480px) rotateY(37deg) scale(.9);opacity:.48}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="2"],html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="3"]{transform:perspective(480px) rotateY(-37deg) scale(.9);opacity:.48}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track.analysis-scope button{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important}
+.catalog-carousel-layout .catalog-wheel-heading+.catalog-wheel-track{min-width:0}
+@media(max-width:680px){
+ .catalog-carousel-layout .catalog-wheel{grid-template-columns:65px minmax(0,1fr)!important;gap:8px!important;min-height:57px!important}
+ .catalog-carousel-layout .catalog-wheel-heading{font-size:14px!important;min-height:44px}
+ .catalog-carousel-layout .catalog-wheel-track,.catalog-carousel-layout .catalog-wheel-track.analysis-scope{height:51px!important;min-height:51px!important;gap:14px!important}
+ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{min-height:44px!important;height:44px!important;font-size:clamp(14px,4vw,17px)!important}
+}
+
+/* FOLIO-STOCK-LIST-READABILITY: prioritize full company names on narrow phones. */
+.catalog-carousel-layout .stock-compact-main strong{font-size:clamp(17px,1.65vw,20px)!important;line-height:1.32;font-weight:760;letter-spacing:-.025em}
+.catalog-carousel-layout .stock-compact-row{min-height:66px}
+.catalog-carousel-layout .stock-compact-head,.catalog-carousel-layout .stock-compact-row{grid-template-columns:minmax(0,2.2fr) minmax(42px,.52fr) minmax(78px,.88fr) minmax(72px,.85fr) 48px 36px;column-gap:clamp(4px,.9vw,12px)}
+@media(max-width:680px){
+ .catalog-carousel-layout .stock-compact-head{display:none!important}
+ .catalog-carousel-layout .stock-compact-row{display:grid!important;grid-template-columns:minmax(0,1fr) 32px!important;gap:4px 5px;padding:7px 0 8px;min-height:83px}
+ html body .shell .app-main .catalog-carousel-layout .stock-compact-main{grid-column:1!important;grid-row:1!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(84px,auto) 42px!important;grid-template-rows:auto auto!important;align-items:center;gap:3px 8px!important;min-height:74px;padding:5px 0!important}
+ .catalog-carousel-layout .stock-compact-main strong{grid-column:1/3;grid-row:1;overflow:hidden;text-overflow:ellipsis;min-width:0;white-space:nowrap;font-size:clamp(17px,4.65vw,19px)!important;line-height:1.3}
+ .catalog-carousel-layout .stock-compact-ticker{grid-column:3;grid-row:1;justify-self:end;max-width:100%;font-size:11px}
+ .catalog-carousel-layout .stock-compact-price{grid-column:1;grid-row:2;text-align:left;font-size:15px!important}
+ .catalog-carousel-layout .stock-compact-change{grid-column:2;grid-row:2;text-align:right;justify-content:flex-end;font-size:13px!important}
+ .catalog-carousel-layout .stock-compact-rs{grid-column:3;grid-row:2;text-align:right;font-size:13px!important}
+ html body .shell .app-main .catalog-carousel-layout .stock-compact-basket{grid-column:2!important;grid-row:1!important;align-self:start;width:32px}
+ .catalog-carousel-layout .stock-compact-main strong[title]{text-decoration:none}
+}
+@media(max-width:350px){html body .shell .app-main .catalog-carousel-layout .stock-compact-main{grid-template-columns:minmax(0,1fr) 76px 36px!important;gap:3px 5px!important}.catalog-carousel-layout .stock-compact-main strong{font-size:17px!important}}
+@media(prefers-reduced-motion:reduce){html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{transition:none!important;will-change:auto}}
+
+
+/* FOLIO-LASER-DEPTH-20261020: data geometry unchanged; optical layers only. */
+.stock-card-grid .stock-mini-trend{overflow:visible;padding:5px 1px 0;background:radial-gradient(ellipse at 50% 56%,color-mix(in srgb,var(--folio-ink) 4%,transparent),transparent 73%);isolation:isolate}
+.stock-card-grid .stock-mini-trend svg{height:64px;width:100%;overflow:visible}
+.stock-mini-trend svg .trend-laser-depth{stroke:color-mix(in srgb,var(--folio-ink) 50%,transparent);stroke-width:7;opacity:.25;transform:translate(0,2.3px);filter:blur(1.6px)}
+.stock-mini-trend svg .trend-laser-glow{stroke:currentColor;stroke-width:9;opacity:.42;filter:blur(3px)}
+.stock-mini-trend svg .trend-laser-beam{stroke:currentColor;stroke-width:3.4;opacity:1;filter:drop-shadow(0 1.4px 1px color-mix(in srgb,var(--folio-ink) 36%,transparent)) drop-shadow(0 0 2px currentColor)}
+.stock-mini-trend svg .trend-laser-core{stroke:color-mix(in srgb,white 86%,currentColor);stroke-width:1.1;opacity:.92;filter:drop-shadow(0 0 1px white)}
+@media(prefers-reduced-transparency:reduce){.stock-mini-trend svg .trend-laser-glow,.stock-mini-trend svg .trend-laser-beam,.stock-mini-trend svg .trend-laser-core,.stock-mini-trend svg .trend-laser-depth{filter:none}}

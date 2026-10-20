@@ -1,6 +1,6 @@
 import {test,expect,type Page} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
-import {openPage,openFilters,closeFilters} from './journey-helpers'
+import {openFilters,closeFilters} from './journey-helpers'
 const now=new Date('2026-10-15T08:00:00Z').getTime(),stamp=(hours=0)=>new Date(now+hours*3600_000).toISOString()
 const issuer=[['US','AAPL','Apple Newsroom','www.apple.com','Apple Park'],['US','NVDA','NVIDIA Newsroom','nvidianews.nvidia.com','Nvidia headquarters'],['KR','000660','SK hynix Newsroom','news.skhynix.com','SK Hynix'],['US','AMD','AMD Investor Relations','ir.amd.com','AMD headquarters']]
 const stories=issuer.map(([market,ticker,publisher,host,alt],i)=>({id:`${market}:${ticker}:test`,market,ticker,headline:`테스트 ${ticker} · 공식 발표의 변화`,summary:'테스트 요약 · 공개 자료에서 확인한 변화와 기업의 발표를 전달합니다.',summary_kind:'ai_draft',collected_at:stamp(),expires_at:stamp(24),generated_at:stamp(),model:'gemini-3.5-flash-lite',prompt_version:'folio-news-1',evidence:'An exact public source fragment',source:{id:`source-${i}`,title:`Public source ${ticker}`,publisher,url:`https://${host}/test-news`,published_at:stamp(-i*12-1)},image:{url:`https://upload.wikimedia.org/test-${ticker}.jpg`,page_url:`https://commons.wikimedia.org/wiki/File:Test_${ticker}.jpg`,license:'CC BY-SA 4.0',license_url:'https://creativecommons.org/licenses/by-sa/4.0/',creator:'Test photographer',kind:'related',alt}}))
@@ -9,6 +9,18 @@ const rows=[...demoRows,...['NVDA','AMD'].map(ticker=>({...demoRows[0],id:ticker
 test.beforeEach(async({page})=>{
  await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{version:1,updated_at:stamp(),items:[]}}))
 })
+async function openNewsPage(page:Page){
+ // Reload rehydrates the local app shell before binding nav actions.
+ await expect(page.locator('.shell:not([inert])')).toBeVisible()
+ for(let attempt=0;attempt<3;attempt++){
+  if(await page.locator('.discovery-workspace').isVisible())return
+  const mobile=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
+  if(await mobile.isVisible())await mobile.click()
+  else await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
+  try{await expect(page.locator('.discovery-workspace')).toBeVisible({timeout:2200});return}catch{}
+ }
+ await expect(page.locator('.discovery-workspace')).toBeVisible({timeout:10000})
+}
 async function boot(page:Page,value:unknown=feed,reportedRows=rows){
  await page.clock.setFixedTime(new Date(now))
  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all')})
@@ -16,12 +28,12 @@ async function boot(page:Page,value:unknown=feed,reportedRows=rows){
  await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows:reportedRows}}));await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}));await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}));await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:{}}}))
  await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:value}))
  await page.route('https://upload.wikimedia.org/**',r=>r.fulfill({path:'public/folio-brand-photography.webp'}))
- await page.goto('/peppercorn/');await openPage(page,'발견')
+ await page.goto('/peppercorn/');await openNewsPage(page)
 }
 for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900]])test(`news ${width}x${height}: responsive editorial, grounded sources, market filter and detail link`,async({page})=>{
  await page.setViewportSize({width,height});await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}),list=section.locator('.discovery-news-stories')
- await expect(section).toBeVisible();await expect(section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'대형주'})).toHaveAttribute('aria-pressed','true')
+ await expect(section).toBeVisible();await expect(section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
  await section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click()
  await expect(section.locator('article')).toHaveCount(4)
  await expect(section.locator('h4').first()).toHaveText(stories[0].headline);await expect(section).toContainText(stories[0].summary);await expect(section).toContainText('AI 요약 초안');await expect(section).toContainText('원문 사진 아님')
@@ -31,13 +43,13 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  await page.screenshot({path:`test-results/discovery-news-${width}-${height}.png`})
  await section.getByRole('button',{name:'종목 보기 →'}).first().click();await expect(page.locator('.hero-name')).toHaveText('Apple')
- await openPage(page,'발견');await openFilters(page);await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'KR',exact:true}).click();await closeFilters(page)
+ await openNewsPage(page);await openFilters(page);await page.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click();await closeFilters(page)
  await section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click()
  await expect(section.locator('article')).toHaveCount(1);await expect(section).toContainText('SK하이닉스')
 })
 test('expired news disappears and failed photos use labelled decorative art',async({page})=>{
- await boot(page);await page.route('https://upload.wikimedia.org/**',r=>r.fulfill({status:404,body:''}));await page.reload();await openPage(page,'발견');await page.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click();await expect(page.locator('.discovery-news-story img').first()).toHaveAttribute('src',/folio-retro-discover/);await expect(page.locator('.discovery-news-story').first()).toContainText('Folio 이미지 · 원문 사진 아님')
- await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openPage(page,'발견');await expect(page.locator('.discovery-news')).toHaveCount(0)
+ await boot(page);await page.route('https://upload.wikimedia.org/**',r=>r.fulfill({status:404,body:''}));await page.reload();await openNewsPage(page);await page.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click();await expect(page.locator('.discovery-news-story img').first()).toHaveAttribute('src',/folio-retro-discover/);await expect(page.locator('.discovery-news-story').first()).toContainText('Folio 이미지 · 원문 사진 아님')
+ await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openNewsPage(page);await expect(page.locator('.discovery-news')).toHaveCount(0)
 })
 
 test('Instinct Drive news matches Folio leader classification and leaves research separate',async({page})=>{
@@ -79,7 +91,7 @@ test('generated editorial image uses source-grounded labeling and falls back whe
  await expect(first).toContainText('Folio 편집 일러스트 · 실제 기사 사진 아님')
  await expect(first.locator('img')).toHaveAttribute('src',new RegExp('news-assets/'+ 'a'.repeat(20)+'.svg'))
  await page.route('**/data/news-assets/**',r=>r.fulfill({status:404}))
- await page.reload();await openPage(page,'발견')
+ await page.reload();await openNewsPage(page)
  await page.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click()
  const again=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}).locator('.discovery-news-story').first()
  await expect(again.locator('img')).toHaveAttribute('src',/folio-(?:brand|retro|vivid)/)
@@ -101,6 +113,7 @@ test('GLOBAL TREND news is featured without ticker even outside leaderboard and 
  }}))
  await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
+ await section.getByRole('button',{name:'전체',exact:true}).click()
  const card=section.locator('article[data-kind="trend"]')
  await expect(card).toHaveCount(1)
  await expect(card).toContainText('TREND')
@@ -110,7 +123,7 @@ test('GLOBAL TREND news is featured without ticker even outside leaderboard and 
  await expect(card.getByRole('link',{name:'원문 읽기 ↗'})).toHaveAttribute('href','https://example.com/research/ai-infrastructure')
  await expect(section).not.toContainText('A non-leading company announcement')
  await openFilters(page)
- await page.getByRole('group',{name:'탐색 시장'}).getByRole('button',{name:'KR',exact:true}).click()
+ await page.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click()
  await closeFilters(page)
  await expect(card).toBeVisible()
 })

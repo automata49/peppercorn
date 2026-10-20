@@ -17,8 +17,8 @@ type NewsStory={
 export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{reports:ReportController;feed:InsightsFeed|null;rows:LeaderRow[];market:Market|'ALL';getClass:(row:LeaderRow)=>string;onSelect:(row:LeaderRow)=>void}){
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
- // MARKET & COMPANIES opens on large caps, regardless of previously saved catalogue filters.
- const [newsTab,setNewsTab]=useState<'reports'|Extract<StockSize,'large'|'small'|'all'>>('large')
+ // A signed-in user's PDF research reports are the default editorial view.
+ const [newsTab,setNewsTab]=useState<'reports'|Extract<StockSize,'large'|'small'|'all'>>('reports')
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
