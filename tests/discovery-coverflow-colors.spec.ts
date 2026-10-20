@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
 
-test('three Cover Flow rows, tab-level Filter & Sort and KR/US price-return colors',async({page})=>{
+test('three vertical wheels, tab-level Filter & Sort and KR/US price-return colors',async({page})=>{
   await page.setViewportSize({width:390,height:844})
   await page.addInitScript(()=>{
     sessionStorage.setItem('peppercorn-intro-seen','1')
@@ -30,11 +30,11 @@ test('three Cover Flow rows, tab-level Filter & Sort and KR/US price-return colo
   const wheels=page.locator('.catalog-filter-rails > .catalog-wheel')
   await expect(wheels).toHaveCount(3)
   const boxes=await wheels.evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width}}))
-  expect(boxes[0].x).toBeCloseTo(boxes[1].x,0)
-  expect(boxes[1].x).toBeCloseTo(boxes[2].x,0)
-  expect(boxes[0].y).toBeLessThan(boxes[1].y)
-  expect(boxes[1].y).toBeLessThan(boxes[2].y)
-  await expect(page.locator('[data-wheel="분류"] [data-offset="-1"]').first()).toBeVisible()
+  expect(boxes[0].x).toBeLessThan(boxes[1].x)
+  expect(boxes[1].x).toBeLessThan(boxes[2].x)
+  expect(Math.abs(boxes[0].y-boxes[1].y)).toBeLessThan(4)
+  expect(Math.abs(boxes[1].y-boxes[2].y)).toBeLessThan(4)
+  await expect(page.locator('[data-wheel="종목 분류"] [data-offset="-1"]').first()).toBeVisible()
   await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
   const list=page.locator('.stock-compact-list')
   await expect(list.locator('.stock-compact-head')).toContainText('등락률')
