@@ -29,7 +29,7 @@ test('signed heatmap colours use the instrument market, zero/missing remain neut
 })
 for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as const)test(`${width} ${theme}: market colours, shared glass regions and unboxed metrics`,async({page})=>{
  await page.setViewportSize({width,height:1000})
- await page.addInitScript(t=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-theme',t)},theme)
+ await page.addInitScript(t=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-catalog-view','cards');localStorage.setItem('folio-theme',t)},theme)
  await page.route('**/data/leaderboard.json',r=>r.fulfill({status:404,body:''}))
  await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows}}))
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
