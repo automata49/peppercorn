@@ -79,7 +79,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
   // Leading stocks are a popup on every screen: no right-hand panel, a sector row opens the drill sheet.
   await expect(page.locator('.dashboard-stock-panel')).toHaveCount(0);
-  if(view.touch)await page.locator('.mobile-sector-list .decision-row').first().click();
+  if(view.width<=650)await page.locator('.mobile-sector-list .decision-row').first().click();
   else await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   const drill=page.locator('.drill-sheet');
   await expect(drill).toBeVisible();
@@ -189,10 +189,10 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.drill-sheet .leadership-section .snapshot-section-head .pill')).toHaveText('해당 없음');
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
-  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click();
+  await openPage(page,'발견');
   // ETF is a first-class Explore classification and ignores equity leadership tabs.
   await openFilters(page);
-  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();
+  await page.getByRole('group',{name:'분류',exact:true}).getByRole('button',{name:'ETF',exact:true}).click();
   await closeFilters(page);
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');
