@@ -1,0 +1,70 @@
+name: Verify Folio live Pages
+on:
+  workflow_run:
+    workflows: ['Deploy web app']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Verify production HTML, JS, CSS, PWA manifest and icon
+        env:
+          FOLIO_URL: https://automata49.github.io/peppercorn/
+          SOURCE_EVENT: ${{ github.event.workflow_run.event }}
+          SOURCE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          import time
+          from urllib.parse import urljoin
+          from urllib.request import Request, urlopen
+
+          base = os.environ["FOLIO_URL"]
+          expected = os.environ.get("SOURCE_SHA", "")[:12]
+          is_push = os.environ.get("SOURCE_EVENT") == "push"
+          failure = ""
+
+          def read(url):
+              req = Request(url, headers={
+                  "Cache-Control": "no-cache",
+                  "User-Agent": "Folio-Pages-Smoke/1.0",
+              })
+              with urlopen(req, timeout=15) as response:
+                  if response.status != 200:
+                      raise RuntimeError(f"HTTP {response.status}: {url}")
+                  return response.read()
+
+          for attempt in range(1, 13):
+              try:
+                  html = read(base + "?folio-smoke=" + str(attempt)).decode("utf-8")
+                  if "<title>Folio xx</title>" not in html:
+                      raise RuntimeError("Folio title missing")
+                  js = re.search(r'<script[^>]+src="([^"]*/assets/app-[^"]+\.js)"', html)
+                  css = re.search(r'<link[^>]+href="([^"]*/assets/app\.css[^"]*)"', html)
+                  if not js or not css:
+                      raise RuntimeError("Folio entry JS/CSS missing")
+                  if is_push and expected and ("v=" + expected) not in css.group(1):
+                      raise RuntimeError("Page is not yet serving the expected build " + expected)
+                  resources = [js.group(1), css.group(1), "manifest.webmanifest", "folio-b-icon-192.png"]
+                  for resource in resources:
+                      uri = urljoin(base, resource)
+                      if len(read(uri)) < 100:
+                          raise RuntimeError("Empty or truncated asset: " + uri)
+                  print("Live Pages smoke passed; source SHA:", expected or "manual")
+                  break
+              except Exception as error:
+                  failure = str(error)
+                  print(f"Attempt {attempt}/12: {failure}")
+                  if attempt < 12:
+                      time.sleep(10)
+          else:
+              raise SystemExit("Live Pages smoke FAILED: " + failure)
+          PY
