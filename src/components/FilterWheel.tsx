@@ -58,7 +58,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
       {options.map((option,i)=><button key={option.value} type="button" data-wheel-index={i}
         data-offset={Math.max(-3,Math.min(3,i-index))} aria-pressed={option.value===value}
         disabled={option.disabled} onClick={()=>{userScrolling.current=false;if(settle.current)clearTimeout(settle.current);onChange(option.value)}}>
-        {option.label}
+        <span className="catalog-wheel-option-label">{option.label}</span>
       </button>)}
     </div>
   </div>
