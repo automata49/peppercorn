@@ -35,7 +35,7 @@ test('shared page headings and rotation keep dimensions and filter state',async(
  await openPage(page,'발견');await openFilters(page)
  const market=page.locator('[data-wheel="시장"]')
  await market.getByRole('button',{name:'KR',exact:true}).click()
- await page.getByRole('button',{name:/정렬 · 상세/}).click()
+ await page.getByRole('button',{name:/Filter & Sort/}).click()
  await page.getByRole('button',{name:'종목명 순',exact:true}).click()
  await closeFilters(page)
  await page.setViewportSize({width:1194,height:834})
@@ -44,7 +44,7 @@ test('shared page headings and rotation keep dimensions and filter state',async(
  await page.setViewportSize({width:834,height:1194})
  await expect(page.locator('.catalog-filter-rails')).toBeVisible()
  await expect(market.getByRole('button',{name:'KR',exact:true})).toHaveAttribute('aria-pressed','true')
- await page.getByRole('button',{name:/정렬 · 상세/}).click()
+ await page.getByRole('button',{name:/Filter & Sort/}).click()
  await expect(page.getByRole('button',{name:'종목명 순',exact:true})).toHaveAttribute('aria-pressed','true')
 })
 test('basket retains unavailable instruments without presenting saved prices as current',async({page})=>{
