@@ -112,7 +112,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  })
 }
 
-test('Home ETF preview and 시장 신호 summary use the exact same ranked pool',async({page})=>{
+test('Home keeps ETF data secondary while Market Signal ranks the ETF Top 5',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.addInitScript(()=>{
@@ -123,11 +123,12 @@ test('Home ETF preview and 시장 신호 summary use the exact same ranked pool'
   await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
   const homeNames=await page.locator('.journey-today .stock-trend-copy>.stock-trend-name').allTextContents();
-  expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
+  // Home prioritizes market regime and leading equities; ETF ranking lives in Market Signal.
+  expect(homeNames).not.toContain('검증 ETF 5');
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
   await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호');
   const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
-  expect(signalNames).toEqual(homeNames);
+  expect(signalNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
 });
 
 test('Home ETF Top 5 matches 시장 신호 ETF Top 5 exactly',async({page})=>{
