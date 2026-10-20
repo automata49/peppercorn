@@ -11,6 +11,9 @@ on:
       - '.github/workflows/discovery-ui-gate.yml'
 permissions:
   contents: read
+concurrency:
+  group: folio-discovery-ui-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 jobs:
   verify:
     runs-on: ubuntu-24.04
