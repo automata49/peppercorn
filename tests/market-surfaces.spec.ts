@@ -60,6 +60,9 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
   await expect(button).toHaveAttribute('aria-pressed','true')
   await all.click()
  }
+ // Filter carousel auto-centering must not silently change the market.
+ await expect(page.locator('[data-wheel="시장"]').getByRole('button',{name:'전체',exact:true})).toHaveAttribute('aria-pressed','true')
+ await expect(all).toHaveAttribute('aria-pressed','true')
  if(width===390)await page.screenshot({path:`test-results/leadership-explore-${theme}.png`})
  await closeFilters(page)
  const colors=theme==='dark'?{KR:['#ff8580','#78b4ff'],US:['#72d5a2','#ff8580']}:{KR:['#b3261e','#1c5cab'],US:['#196b42','#b3261e']}
