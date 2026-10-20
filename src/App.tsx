@@ -897,7 +897,7 @@ export default function App(){
       if(!route)return
       const currentRoute=routeHistoryRef.current[routeIndexRef.current]
       // A second, nearly simultaneous iOS Back event must not skip Discover.
-      if(detailReturnedAtRef.current&&Date.now()-detailReturnedAtRef.current<850
+      if(detailReturnedAtRef.current&&Date.now()-detailReturnedAtRef.current<500
         &&currentRoute?.page==='analysis'&&!currentRoute.detail&&nav.index<routeIndexRef.current){
         detailReturnedAtRef.current=0
         window.history.forward()
