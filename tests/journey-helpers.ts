@@ -29,7 +29,11 @@ export async function openPage(page:Page,label:string){
    await toggle.getByRole('button',{name:'카드형'}).click()
  }
 }
-export async function openSignal(page:Page){await openPage(page,'시장 신호');await expect(page.locator('.dashboard-sector-panel')).toBeVisible()}
+export async function openSignal(page:Page){
+ await openPage(page,'발견')
+ await page.getByRole('tab',{name:'시장 신호',exact:true}).click()
+ await expect(page.locator('.dashboard-sector-panel')).toBeVisible()
+}
 export async function openLeaderTools(page:Page){await openSignal(page);await page.locator('.leader-tools-trigger').click()}
 export async function pickFirstStock(page:Page){
  await page.locator('[data-wheel="분류"]').getByRole('button',{name:'전체',exact:true}).click()
