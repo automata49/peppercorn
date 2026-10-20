@@ -121,7 +121,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       await expect(page.locator(screen.selector)).toBeVisible()
       if (screen.name === 'today') await expect(page.locator('.home-motion-card')).toHaveCount(4)
       if (screen.name === 'discover') {
-        await expect(page.locator('.catalog-wheel')).toHaveCount(4)
+        await expect(page.locator('.catalog-wheel')).toHaveCount(3)
         await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
         await expect(page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'})).toHaveAttribute('aria-pressed','true')
         await expect(page.locator('.analysis-idea-list.stock-compact-list .stock-compact-row').first()).toBeVisible()

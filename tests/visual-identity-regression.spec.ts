@@ -105,6 +105,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     const active=scope.locator('button[aria-pressed="true"]')
     if(await active.count())await active.first().click()
     await closeFilters(page)
+    await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'카드형'}).click()
     await page.locator('.analysis-idea-list .stock-trend-row').first().click()
     const analysis=page.locator('.analysis-page')
     await expect(analysis).toBeVisible()
