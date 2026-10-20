@@ -49,7 +49,7 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900
 })
 test('expired news disappears and failed photos use labelled decorative art',async({page})=>{
  await boot(page);await page.route('https://upload.wikimedia.org/**',r=>r.fulfill({status:404,body:''}));await page.reload();await openNewsPage(page);await page.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click();await expect(page.locator('.discovery-news-story img').first()).toHaveAttribute('src',/folio-retro-discover/);await expect(page.locator('.discovery-news-story').first()).toContainText('Folio 이미지 · 원문 사진 아님')
- await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openNewsPage(page);await expect(page.locator('.discovery-news')).toHaveCount(0)
+ await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openNewsPage(page);await expect(page.locator('.discovery-news')).toBeVisible();await expect(page.locator('.discovery-news-story')).toHaveCount(0);await expect(page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}).getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
 })
 
 test('Instinct Drive news matches Folio leader classification and leaves research separate',async({page})=>{
@@ -126,4 +126,14 @@ test('GLOBAL TREND news is featured without ticker even outside leaderboard and 
  await page.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click()
  await closeFilters(page)
  await expect(card).toBeVisible()
+})
+
+test('report-first stays visible for guests when both news feeds are empty',async({page})=>{
+ await boot(page,{...feed,items:[]})
+ const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
+ await expect(section).toBeVisible()
+ await expect(section.getByRole('button',{name:'리포트',exact:true})).toHaveAttribute('aria-pressed','true')
+ await expect(section).toContainText('로그인 후 Folio 리서치 리포트를 볼 수 있습니다.')
+ await section.getByRole('button',{name:'전체',exact:true}).click()
+ await expect(section).toContainText('최근 7일에 해당하는 전체 종목 뉴스가 없습니다.')
 })

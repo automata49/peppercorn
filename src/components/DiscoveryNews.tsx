@@ -61,7 +61,8 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
  const newsStock=unique(fresh([...fromDrive.filter(item=>item.kind==='stock'),...rss]))
  const stock=newsStock.filter(item=>item.row&&filterStockSize([item.row],newsTab==='reports'?'large':newsTab,sizes).length>0)
  const stories=[...trends,...stock.slice(0,Math.max(0,4-trends.length))]
- if(!stories.length&&!newsStock.length&&!reports.uid)return null
+ // Keep the report-first editorial surface visible even for signed-out users with no fresh news.
+ // Guests should see the login requirement rather than an entirely missing section.
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
   <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>{newsTab==='reports'?'Google Drive · PDF 리포트':'최근 7일 · 출처 확인'}</span></header>
