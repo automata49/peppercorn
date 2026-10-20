@@ -39,7 +39,7 @@ export async function openSignal(page:Page){
 }
 export async function openLeaderTools(page:Page){await openSignal(page);await page.locator('.leader-tools-trigger').click()}
 export async function pickFirstStock(page:Page){
- await page.locator('[data-wheel="분류"]').getByRole('button',{name:'전체',exact:true}).click()
+ await page.locator('[data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
  const cards=page.locator('.analysis-idea-list .stock-trend-row')
  if(await cards.count())await cards.first().click()
