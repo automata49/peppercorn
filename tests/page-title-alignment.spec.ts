@@ -31,6 +31,12 @@ for (const viewport of cases) {
    const kicker=heading.locator('.journey-kicker')
    const title=heading.locator('h2')
    await expect(title).toBeVisible()
+   // openPage may explicitly select card view in Discover; Playwright scrolls that
+   // below-the-fold control into view. Compare headings at a common scroll origin.
+   await page.evaluate(async()=>{
+     window.scrollTo({top:0,behavior:'instant'})
+     await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())))
+   })
    const marker=await kicker.boundingBox(),name=await title.boundingBox()
    expect(marker).toBeTruthy()
    expect(name).toBeTruthy()
