@@ -21,7 +21,7 @@ async function boot(page:Page,value:unknown=feed,reportedRows=rows){
 for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900]])test(`news ${width}x${height}: responsive editorial, grounded sources, market filter and detail link`,async({page})=>{
  await page.setViewportSize({width,height});await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}),list=section.locator('.discovery-news-stories')
- await expect(section).toBeVisible();await expect(section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'대형주'})).toHaveAttribute('aria-pressed','true')
+ await expect(section).toBeVisible();await expect(section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
  await section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'}).getByRole('button',{name:'전체'}).click()
  await expect(section.locator('article')).toHaveCount(4)
  await expect(section.locator('h4').first()).toHaveText(stories[0].headline);await expect(section).toContainText(stories[0].summary);await expect(section).toContainText('AI 요약 초안');await expect(section).toContainText('원문 사진 아님')
