@@ -18,6 +18,8 @@ test('current price refreshes from live quotes without touching daily metrics',a
   if(symbols.includes('247540.KQ'))quotes['247540.KQ']={price:210500,time:Date.UTC(2026,8,30,5,0),previous_close:200000,currency:'KRW'}
   return route.fulfill({json:{as_of:new Date().toISOString(),quotes,failed:[]}})
  })
+ // Fake polling time should not freeze the exit animation while navigating Discover tabs.
+ await page.emulateMedia({reducedMotion:'reduce'})
  await page.clock.install()
  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-catalog-view','cards')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
  await page.clock.runFor(6000)
