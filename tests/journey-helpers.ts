@@ -1,4 +1,12 @@
 import {expect,type Page} from '@playwright/test'
+export async function openStockSearch(page:Page){
+ const magnifier=page.locator('.mobile-brand-search:visible').first()
+ await expect(magnifier).toBeVisible()
+ await magnifier.click()
+ const dialog=page.getByRole('dialog',{name:'종목 검색'})
+ await expect(dialog).toBeVisible()
+ return dialog
+}
 export async function openPage(page:Page,label:string){
  await expect(page.locator('.shell:not([inert])')).toBeVisible()
  label=({홈:'시장 요약',탐색:'발견',추적:'여정',Journal:'매매 기록'} as Record<string,string>)[label]||label
