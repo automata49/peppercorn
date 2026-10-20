@@ -34,7 +34,9 @@ export async function openLeaderTools(page:Page){await openSignal(page);await pa
 export async function pickFirstStock(page:Page){
  await page.locator('[data-wheel="분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
- await page.locator('.analysis-idea-list .stock-trend-row').first().click()
+ const cards=page.locator('.analysis-idea-list .stock-trend-row')
+ if(await cards.count())await cards.first().click()
+ else await page.locator('.stock-compact-list .stock-compact-main').first().click()
 }
 export async function backToExplore(page:Page){await page.getByRole('button',{name:'뒤로 가기'}).click()}
 
