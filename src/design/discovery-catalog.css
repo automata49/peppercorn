@@ -203,3 +203,126 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
  .catalog-carousel-layout .catalog-wheel-track,.catalog-carousel-layout .catalog-wheel-track.analysis-scope{min-height:60px!important;height:60px!important}
  html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{min-height:54px!important;height:54px!important}
 }
+
+
+/* FOLIO-VERTICAL-WHEEL-20261020 · three independently scrollable picker columns. */
+.catalog-carousel-layout .catalog-filter-rails{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  align-items:start;
+  gap:clamp(8px,1.8vw,26px)!important;
+  margin:0 0 22px!important;
+}
+.catalog-carousel-layout .catalog-wheel{
+  display:flex!important;
+  flex-direction:column;
+  gap:4px!important;
+  min-height:0!important;
+  padding:0 clamp(1px,.7vw,12px) 0 0!important;
+  border:0!important;
+  min-width:0;
+}
+.catalog-carousel-layout .catalog-wheel:not(:last-child){
+  border-right:1px solid var(--folio-line)!important;
+}
+.catalog-carousel-layout .catalog-wheel-heading{
+  display:flex!important;
+  align-items:center;
+  justify-content:center!important;
+  min-height:30px!important;
+  margin:0!important;
+  font-size:clamp(12px,1.3vw,16px)!important;
+  text-align:center;
+  white-space:normal!important;
+  line-height:1.35;
+}
+.catalog-carousel-layout .catalog-wheel-track,
+.catalog-carousel-layout .catalog-wheel-track.analysis-scope{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  flex:0 0 auto;
+  box-sizing:border-box;
+  position:relative;
+  height:144px!important;
+  min-height:144px!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  padding:48px 0!important;
+  margin:0!important;
+  gap:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior-y:contain!important;
+  touch-action:pan-y!important;
+  scroll-snap-type:y mandatory!important;
+  scroll-padding-block:48px!important;
+  perspective:550px;
+  perspective-origin:50% 50%;
+  mask-image:linear-gradient(to bottom,transparent,#000 17%,#000 83%,transparent)!important;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.catalog-carousel-layout .catalog-wheel-track:before,
+.catalog-carousel-layout .catalog-wheel-track:after{content:none!important;display:none!important}
+.catalog-carousel-layout .catalog-wheel-track::-webkit-scrollbar{display:none}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
+  box-sizing:border-box;
+  flex:0 0 48px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  padding:5px 2px!important;
+  margin:0!important;
+  scroll-snap-align:center!important;
+  scroll-snap-stop:always;
+  font-size:clamp(12px,1.35vw,18px)!important;
+  line-height:1.2;
+  white-space:normal!important;
+  word-break:keep-all;
+  text-align:center;
+  opacity:.65;
+  transform-origin:center!important;
+  transform:perspective(520px) rotateX(0deg) scale(.91)!important;
+  transition:transform 230ms ease,opacity 230ms ease,color 180ms ease;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"]{
+  font-weight:780!important;
+  color:var(--folio-ink)!important;
+  transform:perspective(520px) rotateX(0deg) translateZ(14px) scale(1.03)!important;
+  opacity:1!important;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-1"]{
+  transform:perspective(520px) rotateX(-31deg) scale(.92)!important;opacity:.68;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="1"]{
+  transform:perspective(520px) rotateX(31deg) scale(.92)!important;opacity:.68;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-2"],
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="-3"]{
+  transform:perspective(520px) rotateX(-48deg) scale(.85)!important;opacity:.34;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="2"],
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset="3"]{
+  transform:perspective(520px) rotateX(48deg) scale(.85)!important;opacity:.34;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"]:after{
+  bottom:0!important;left:24%!important;right:24%!important;
+}
+@media(max-width:680px){
+  .catalog-carousel-layout .catalog-filter-rails{gap:5px!important}
+  .catalog-carousel-layout .catalog-wheel{padding-right:4px!important}
+  .catalog-carousel-layout .catalog-wheel-heading{font-size:12px!important;min-height:32px!important}
+  html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{font-size:clamp(12px,3.25vw,15px)!important}
+}
+@media(prefers-reduced-motion:reduce){
+  html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
+    transition:none!important;will-change:auto!important;
+  }
+}
