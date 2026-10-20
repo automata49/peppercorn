@@ -5,6 +5,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   const viewport=useRef<HTMLDivElement>(null)
   const settle=useRef<ReturnType<typeof setTimeout>|null>(null)
   const autoScroll=useRef(false)
+  const manualPauseUntil=useRef(0)
   const active=options.findIndex(option=>option.value===value)
   const index=active<0?0:active
 
@@ -21,7 +22,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   useEffect(()=>()=>{if(settle.current)clearTimeout(settle.current)},[])
 
   const settleScroll=()=>{
-    if(autoScroll.current)return
+    if(autoScroll.current||Date.now()<manualPauseUntil.current)return
     if(settle.current)clearTimeout(settle.current)
     settle.current=setTimeout(()=>{
       const rail=viewport.current
@@ -35,8 +36,8 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   }
   return <div className="catalog-wheel" data-wheel={label}>
     <div className="catalog-wheel-heading"><span>{label}</span></div>
-    <div className={'catalog-wheel-track '+className} ref={viewport} onPointerDown={()=>{autoScroll.current=false}} onScroll={settleScroll} role="group" aria-label={label}>
-      {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>onChange(option.value)}>{option.label}</button>)}
+    <div className={'catalog-wheel-track '+className} ref={viewport} onPointerDown={()=>{autoScroll.current=false;manualPauseUntil.current=0}} onScroll={settleScroll} role="group" aria-label={label}>
+      {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>{manualPauseUntil.current=Date.now()+420;if(settle.current)clearTimeout(settle.current);onChange(option.value)}}>{option.label}</button>)}
     </div>
   </div>
 }
