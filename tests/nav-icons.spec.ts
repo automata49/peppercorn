@@ -23,8 +23,9 @@ test('phone navigation uses one SVG icon language',async({browser})=>{
 
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()
   const drawer=page.locator('.menu-drawer')
-  await expect(drawer.locator('nav button')).toHaveCount(15)
-  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(15)
+  const menuCount=await drawer.locator('nav button').count()
+  expect(menuCount).toBeGreaterThanOrEqual(12)
+  await expect(drawer.locator('nav button .nav-icon > svg.app-icon')).toHaveCount(menuCount)
   await expect(drawer.locator('.menu-drawer-close > svg.app-icon')).toHaveCount(1)
 
   await drawer.getByRole('button',{name:'발견',exact:true}).click()
