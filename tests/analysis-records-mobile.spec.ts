@@ -1,4 +1,4 @@
-import {openPage} from './journey-helpers'
+import {openPage,pickFirstStock} from './journey-helpers'
 import { test, expect } from '@playwright/test'
 import { demoRows } from '../src/data/mock'
 
@@ -14,7 +14,11 @@ test('phone analysis records are secondary and editable on demand',async({browse
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   await boot(page)
-  await openPage(page,'Thesis')
+  // Thesis is reached from a selected stock; it is no longer a top-level menu entry.
+  await openPage(page,'발견')
+  await pickFirstStock(page)
+  await page.locator('.analysis-actionbar').getByRole('button',{name:/Thesis/}).click()
+  await expect(page.locator('.page-thesis')).toBeVisible()
   const records=page.locator('.analysis-records-disclosure')
   await expect(records).not.toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeVisible()
@@ -28,7 +32,11 @@ test('phone analysis records are secondary and editable on demand',async({browse
 test('desktop analysis records stay open without an extra disclosure header',async({page})=>{
   await page.setViewportSize({width:1440,height:900})
   await boot(page)
-  await openPage(page,'Thesis')
+  // Thesis is reached from a selected stock; it is no longer a top-level menu entry.
+  await openPage(page,'발견')
+  await pickFirstStock(page)
+  await page.locator('.analysis-actionbar').getByRole('button',{name:/Thesis/}).click()
+  await expect(page.locator('.page-thesis')).toBeVisible()
   const records=page.locator('.analysis-records-disclosure')
   await expect(records).toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeHidden()
