@@ -182,3 +182,13 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track.analysi
 }
 @media(max-width:350px){html body .shell .app-main .catalog-carousel-layout .stock-compact-main{grid-template-columns:minmax(0,1fr) 76px 36px!important;gap:3px 5px!important}.catalog-carousel-layout .stock-compact-main strong{font-size:17px!important}}
 @media(prefers-reduced-motion:reduce){html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{transition:none!important;will-change:auto}}
+
+
+/* FOLIO-LASER-DEPTH-20261020: data geometry unchanged; optical layers only. */
+.stock-card-grid .stock-mini-trend{overflow:visible;padding:5px 1px 0;background:radial-gradient(ellipse at 50% 56%,color-mix(in srgb,var(--folio-ink) 4%,transparent),transparent 73%);isolation:isolate}
+.stock-card-grid .stock-mini-trend svg{height:64px;width:100%;overflow:visible}
+.stock-mini-trend svg .trend-laser-depth{stroke:color-mix(in srgb,var(--folio-ink) 50%,transparent);stroke-width:7;opacity:.25;transform:translate(0,2.3px);filter:blur(1.6px)}
+.stock-mini-trend svg .trend-laser-glow{stroke:currentColor;stroke-width:9;opacity:.42;filter:blur(3px)}
+.stock-mini-trend svg .trend-laser-beam{stroke:currentColor;stroke-width:3.4;opacity:1;filter:drop-shadow(0 1.4px 1px color-mix(in srgb,var(--folio-ink) 36%,transparent)) drop-shadow(0 0 2px currentColor)}
+.stock-mini-trend svg .trend-laser-core{stroke:color-mix(in srgb,white 86%,currentColor);stroke-width:1.1;opacity:.92;filter:drop-shadow(0 0 1px white)}
+@media(prefers-reduced-transparency:reduce){.stock-mini-trend svg .trend-laser-glow,.stock-mini-trend svg .trend-laser-beam,.stock-mini-trend svg .trend-laser-core,.stock-mini-trend svg .trend-laser-depth{filter:none}}
