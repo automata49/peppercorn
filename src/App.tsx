@@ -693,7 +693,6 @@ export default function App(){
   const navigationIdRef=useRef('folio-'+Math.random().toString(36).slice(2))
   const edgeSwipeRef=useRef<{x:number;y:number}|null>(null)
   const lastBackRequestRef=useRef(0)
-  const detailReturnedAtRef=useRef(0)
   const [analysisDetail,setAnalysisDetail]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
   const [tradeDrafts,setTradeDrafts]=useState<Record<string,EditableRow>>({})
@@ -895,17 +894,8 @@ export default function App(){
       if(nav?.id!==navigationIdRef.current||!Number.isInteger(nav.index))return
       const route=routeHistoryRef.current[nav.index]
       if(!route)return
-      const currentRoute=routeHistoryRef.current[routeIndexRef.current]
-      // A second, nearly simultaneous iOS Back event must not skip Discover.
-      if(detailReturnedAtRef.current&&Date.now()-detailReturnedAtRef.current<500
-        &&currentRoute?.page==='analysis'&&!currentRoute.detail&&nav.index<routeIndexRef.current){
-        detailReturnedAtRef.current=0
-        window.history.forward()
-        return
-      }
-      if(currentRoute?.page==='analysis'&&currentRoute.detail&&route.page==='analysis'&&!route.detail)
-        detailReturnedAtRef.current=Date.now()
-      else if(route.page!=='analysis')detailReturnedAtRef.current=0
+      // Restore the target entry directly; history.forward on a second
+      // popstate left Safari's native stack out of sync with the UI.
       routeIndexRef.current=nav.index
       // Keep the route guard armed only if the keyed screen actually changes.
       restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':'list')
@@ -1204,9 +1194,25 @@ export default function App(){
   }
   const goBackPage=()=>{
     const now=Date.now()
-    if(now-lastBackRequestRef.current<700)return
+    if(now-lastBackRequestRef.current<250)return
     lastBackRequestRef.current=now
-    if(routeIndexRef.current>0){window.history.back();return}
+    if(routeIndexRef.current>0){
+      const previousIndex=routeIndexRef.current-1
+      const previous=routeHistoryRef.current[previousIndex]
+      if(previous){
+        // Restore the originating list/page at once even if iOS popstate is slow.
+        // Native Back/Forward still use the matching folioNav entry.
+        routeIndexRef.current=previousIndex
+        routeKeyRef.current=previous.page+'|'+(previous.detail?'detail':'list')
+        restoringRouteRef.current=true
+        setPage(previous.page)
+        setAnalysisDetail(previous.detail)
+        if(previous.stock)setSelected(previous.stock)
+        window.scrollTo({top:0,behavior:'instant'})
+        window.history.back()
+        return
+      }
+    }
     if(analysisDetail){setAnalysisDetail(false);return}
     if(page!=='today')setPage('today')
     window.scrollTo({top:0,behavior:'instant'})
@@ -1459,8 +1465,8 @@ export default function App(){
       {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog catalog-carousel-layout">
         <div className="catalog-products">
           <section className="catalog-filter-rails" aria-label="Filter & Sort">
-            <FilterWheel label="분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
+            <FilterWheel label="종목 분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
             <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'||analysisScope===v?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
           </section>
           <div className="catalog-topline">
@@ -1596,7 +1602,7 @@ export default function App(){
     <DialogTrigger asChild><button type="button" className="catalog-filter-toggle" aria-expanded={catalogFiltersOpen}>Filter &amp; Sort <span aria-hidden="true">⌄</span></button></DialogTrigger>
     <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
       <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
-      <DialogDescription className="sr-only">섹터, 정렬 및 상세 조건을 선택하세요. 분류, 시장, 주도 분류는 종목 목록 위에서 앨범처럼 넘길 수 있습니다.</DialogDescription>
+      <DialogDescription className="sr-only">섹터, 정렬 및 상세 조건을 선택하세요. 시장, 종목 분류, 주도 분류는 종목 목록 위에서 위아래로 돌려 선택할 수 있습니다.</DialogDescription>
       <section><h3>섹터</h3><select aria-label="탐색 섹터" value={sector||''} onChange={event=>setSector(event.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=><option key={g.key} value={g.key}>{(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}</option>)}</select></section>
       <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
       <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
