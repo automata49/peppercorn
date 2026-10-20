@@ -23,14 +23,17 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
   for(const selector of ['.dashboard-sector-panel','.temp-card']){
     const node=page.locator(selector).first()
     await expect(node).toBeVisible()
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+    // Signal metrics use borderless editorial rows, with a bottom rule instead of boxed glass.
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
     expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
   }
 
   const explore=page.locator('.dashboard-explore')
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderBottomWidth))).toBeGreaterThan(0)
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   await pickFirstStock(page)
