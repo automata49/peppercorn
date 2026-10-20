@@ -129,7 +129,7 @@ test('recent stocks appear only in the header search dialog and not in Discover'
   await expect(page.locator('.stock-compact-list')).toBeVisible()
   await expect(page.locator('.analysis-finder .recent-stocks')).toHaveCount(0)
   await expect(page.locator('.analysis-finder input[type="search"]')).toHaveCount(0)
-  await page.locator('.mobile-brand-search').click()
+  await page.locator('.mobile-brand-search:visible').first().click()
   const dialog=page.getByRole('dialog',{name:'종목 검색'})
   await expect(dialog).toBeVisible()
   await expect(dialog.locator('.recent-stocks')).toContainText(recentLabel||'')
