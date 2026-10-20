@@ -24,6 +24,9 @@ export async function openPage(page:Page,label:string){
  // Older detail/chart regressions opt into the retained card view explicitly.
  // The customer-facing default remains the compact one-line list.
  if(label==='발견'){
+   const stocks=page.getByRole('tab',{name:'종목',exact:true})
+   await expect(stocks).toBeVisible()
+   if(await stocks.getAttribute('aria-selected')!=='true')await stocks.click()
    const toggle=page.getByRole('group',{name:'종목 보기 방식'})
    await expect(toggle).toBeVisible()
    await toggle.getByRole('button',{name:'카드형'}).click()
@@ -42,7 +45,10 @@ export async function pickFirstStock(page:Page){
  if(await cards.count())await cards.first().click()
  else await page.locator('.stock-compact-list .stock-compact-main').first().click()
 }
-export async function backToExplore(page:Page){await page.getByRole('button',{name:'뒤로 가기'}).click()}
+export async function backToExplore(page:Page){
+ await page.getByRole('button',{name:'뒤로 가기'}).click()
+ await expect(page.locator('.discovery-workspace .catalog-filter-rails')).toBeVisible({timeout:8000})
+}
 
 export async function openFilters(page:Page){
  await expect(page.locator('.catalog-filter-rails')).toBeVisible()
