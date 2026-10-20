@@ -18,19 +18,19 @@ async function setup(page:Page,snapshot:{status:number;age_h?:number}){
 }
 test('fresh snapshot is used without calling the live function',async({page})=>{
   const calls=await setup(page,{status:200,age_h:2})
-  await expect(page.locator('.stock-list .stock-trend-row b').first()).toContainText('SNAP')
+  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('SNAP')
   expect(calls).toEqual({live:0,snapshot:1})
   await page.getByRole('button',{name:'시장 데이터 새로고침'}).click()
-  await expect(page.locator('.stock-list .stock-trend-row b').first()).toContainText('LIVE')
+  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('LIVE')
   expect(calls.live).toBe(1)
 })
 test('stale or missing snapshot falls back to the live function',async({page})=>{
   const stale=await setup(page,{status:200,age_h:30})
-  await expect(page.locator('.stock-list .stock-trend-row b').first()).toContainText('LIVE')
+  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('LIVE')
   expect(stale.live).toBe(1)
 })
 test('missing snapshot falls back to the live function',async({page})=>{
   const missing=await setup(page,{status:404})
-  await expect(page.locator('.stock-list .stock-trend-row b').first()).toContainText('LIVE')
+  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('LIVE')
   expect(missing.live).toBe(1)
 })

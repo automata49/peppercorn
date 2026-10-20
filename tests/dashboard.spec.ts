@@ -15,11 +15,11 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // Sector and ETF tools remain in the secondary Market Signal workspace.
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
-  if(view.touch){
+  if(view.width<=650){
     await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
     await expect(page.locator('.mobile-sector-list')).toBeVisible();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
-    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정']);
+
     if(view.width<=650){
       await expect(page.locator('.toolbar input')).toBeVisible();
       await expect(page.locator('.topbar p')).toBeHidden();
@@ -28,6 +28,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
     await expect(page.locator('.mobile-sector-list')).toBeHidden();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeVisible();
   }
+  if(view.touch)await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정'])
   const etfPanel=page.locator('.dashboard-etf-panel');
   const etfRows=etfPanel.locator('.stock-row');
   await expect(etfRows).toHaveCount(5);
@@ -78,7 +79,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy();
   // Leading stocks are a popup on every screen: no right-hand panel, a sector row opens the drill sheet.
   await expect(page.locator('.dashboard-stock-panel')).toHaveCount(0);
-  if(view.touch)await page.locator('.mobile-sector-list .decision-row').first().click();
+  if(view.width<=650)await page.locator('.mobile-sector-list .decision-row').first().click();
   else await page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr').first().click();
   const drill=page.locator('.drill-sheet');
   await expect(drill).toBeVisible();
@@ -112,7 +113,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
  })
 }
 
-test('Home ETF preview and 시장 신호 summary use the exact same ranked pool',async({page})=>{
+test('Home keeps ETF data secondary while Market Signal ranks the ETF Top 5',async({page})=>{
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}));
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows,...etfs]}}));
   await page.addInitScript(()=>{
@@ -123,11 +124,12 @@ test('Home ETF preview and 시장 신호 summary use the exact same ranked pool'
   await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약');
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000});
   const homeNames=await page.locator('.journey-today .stock-trend-copy>.stock-trend-name').allTextContents();
-  expect(homeNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
+  // Home prioritizes market regime and leading equities; ETF ranking lives in Market Signal.
+  expect(homeNames).not.toContain('검증 ETF 5');
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
   await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호');
   const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
-  expect(signalNames).toEqual(homeNames);
+  expect(signalNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
 });
 
 test('Home ETF Top 5 matches 시장 신호 ETF Top 5 exactly',async({page})=>{
@@ -187,10 +189,10 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await expect(page.locator('.drill-sheet .leadership-section .snapshot-section-head .pill')).toHaveText('해당 없음');
   await page.getByRole('button',{name:'닫기',exact:true}).click();
   // Analysis checklist: SPY has no IBD history, fails the Trend Template, ranks below QQQ among ETFs.
-  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click();
+  await openPage(page,'발견');
   // ETF is a first-class Explore classification and ignores equity leadership tabs.
   await openFilters(page);
-  await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'ETF',exact:true}).click();
+  await page.getByRole('group',{name:'분류',exact:true}).getByRole('button',{name:'ETF',exact:true}).click();
   await closeFilters(page);
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');

@@ -4,7 +4,7 @@ import {openPage} from './journey-helpers'
 import {demoRows} from '../src/data/mock'
 const rows=demoRows.map((r,i)=>({...r,leadership_class:'핵심 주도',rs_rank:99-i}))
 async function boot(page:Page){
- await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-theme','light')})
+ await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-theme','light');localStorage.setItem('folio-catalog-view','cards')})
  await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows}}))
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))

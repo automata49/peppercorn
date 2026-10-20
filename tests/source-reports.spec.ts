@@ -33,7 +33,7 @@ for(const width of [390,834,1440])test(`Reports move to MARKET & COMPANIES ${wid
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
  const tabs=section.getByRole('group',{name:'MARKET & COMPANIES 종목 규모'})
  await expect(tabs.locator('button').first()).toHaveText('리포트')
- await expect(tabs.getByRole('button',{name:'대형주'})).toHaveAttribute('aria-pressed','true')
+ await expect(tabs.getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
  await tabs.getByRole('button',{name:'리포트'}).click()
  const reports=section.getByRole('region',{name:'Folio 리서치 리포트'})
  await expect(reports).toContainText(report.title);await expect(reports).toContainText(report.summary[0]);expect(detailRequests).toBe(0)

@@ -192,3 +192,14 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track.analysi
 .stock-mini-trend svg .trend-laser-beam{stroke:currentColor;stroke-width:3.4;opacity:1;filter:drop-shadow(0 1.4px 1px color-mix(in srgb,var(--folio-ink) 36%,transparent)) drop-shadow(0 0 2px currentColor)}
 .stock-mini-trend svg .trend-laser-core{stroke:color-mix(in srgb,white 86%,currentColor);stroke-width:1.1;opacity:.92;filter:drop-shadow(0 0 1px white)}
 @media(prefers-reduced-transparency:reduce){.stock-mini-trend svg .trend-laser-glow,.stock-mini-trend svg .trend-laser-beam,.stock-mini-trend svg .trend-laser-core,.stock-mini-trend svg .trend-laser-depth{filter:none}}
+
+
+/* Cover Flow remains a 44px+ physical touch target even for tilted neighbors. */
+.catalog-carousel-layout .catalog-wheel-track,
+.catalog-carousel-layout .catalog-wheel-track.analysis-scope{min-height:61px!important;height:61px!important}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{min-height:54px!important;height:54px!important}
+@media(max-width:680px){
+ .catalog-carousel-layout .catalog-wheel{min-height:64px!important}
+ .catalog-carousel-layout .catalog-wheel-track,.catalog-carousel-layout .catalog-wheel-track.analysis-scope{min-height:60px!important;height:60px!important}
+ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{min-height:54px!important;height:54px!important}
+}

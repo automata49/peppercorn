@@ -32,7 +32,7 @@ for(const entryMode of ['canonical','cached-app-url','historical-alias'])test(`p
  await openPage(page,'발견')
  await openFilters(page)
  const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click()
- await page.getByRole('group',{name:'분류'}).getByRole('button',{name:'전체',exact:true}).click()
+ await page.getByRole('group',{name:'분류',exact:true}).getByRole('button',{name:'전체',exact:true}).click()
  await closeFilters(page)
  await page.locator('.analysis-idea-list .stock-trend-row').first().click()
  await page.getByRole('tab',{name:'Analysis',exact:true}).click()

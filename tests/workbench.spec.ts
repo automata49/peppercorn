@@ -1,4 +1,4 @@
-import {backToExplore,openPage,pickFirstStock} from './journey-helpers'
+import {backToExplore,openPage,pickFirstStock,openStockSearch} from './journey-helpers'
 import {test,expect,type Page} from '@playwright/test'
 import {choseong,matchScore,searchRows} from '../src/lib/search'
 import {fundamentalChecks,quadrant,swingChecks} from '../src/lib/checkup'
@@ -63,6 +63,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
   const page=await context.newPage()
   await open(page)
+  await openStockSearch(page)
   const search=page.getByRole('combobox',{name:'종목 검색'})
   await search.fill('ㅈㅇㅆ')
   await expect(page.locator('.stock-search-results [role=option]')).toHaveCount(1)
@@ -70,13 +71,13 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const card=page.locator('.analysis-body')
   await expect(card.locator('.hero-name')).toContainText('지엔씨에너지')
   await expect(card.locator('.folio-insight')).toBeVisible()
-  await backToExplore(page)
+  await backToExplore(page);await openStockSearch(page)
   await expect(page.locator('.recent-stocks button')).toHaveText(['지엔씨에너지'])
   // Enter picks the best match (ticker prefix).
   await search.fill('ok')
   await search.press('Enter')
   await expect(card.locator('.hero-name')).toContainText('Oklo')
-  await backToExplore(page)
+  await backToExplore(page);await openStockSearch(page)
   await search.fill('대덕')
   await page.locator('.stock-search-results [role=option]').first().click()
   await expect(card.locator('.hero-name')).toContainText('대덕전자')
@@ -113,7 +114,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(sheet.locator('tbody tr').filter({hasText:'ROE'}).locator('.mark-dot')).toHaveAttribute('aria-label','미달')
   // Compare two stocks.
   await card.getByRole('button',{name:'비교에 추가'}).click()
-  await backToExplore(page);await search.fill('OKLO');await search.press('Enter');await detailTabs.getByRole('tab',{name:'Thesis'}).click()
+  await backToExplore(page);await openStockSearch(page);await search.fill('OKLO');await search.press('Enter');await detailTabs.getByRole('tab',{name:'Thesis'}).click()
   await card.getByRole('button',{name:'비교에 추가'}).click()
   await detailTabs.getByRole('tab',{name:'Overview'}).click()
   const compare=card.locator('.compare-view')
@@ -147,7 +148,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   }
   if(await side.isVisible())await side.getByRole('button',{name:'발견',exact:true}).click()
   else await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
-  await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
+  await openStockSearch(page);await page.getByRole('combobox',{name:'종목 검색'}).fill('대덕');await page.getByRole('combobox',{name:'종목 검색'}).press('Enter')
   const body=page.locator('.analysis-body')
   await expect(body.locator('.hero-meta')).toHaveText('KR · 353200 · KOSPI · Semiconductors')
   await expect(body.locator('.hero-price')).toHaveText('110원')

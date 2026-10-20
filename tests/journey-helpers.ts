@@ -1,4 +1,12 @@
 import {expect,type Page} from '@playwright/test'
+export async function openStockSearch(page:Page){
+ const magnifier=page.locator('.mobile-brand-search:visible').first()
+ await expect(magnifier).toBeVisible()
+ await magnifier.click()
+ const dialog=page.getByRole('dialog',{name:'종목 검색'})
+ await expect(dialog).toBeVisible()
+ return dialog
+}
 export async function openPage(page:Page,label:string){
  await expect(page.locator('.shell:not([inert])')).toBeVisible()
  label=({홈:'시장 요약',탐색:'발견',추적:'여정',Journal:'매매 기록'} as Record<string,string>)[label]||label
@@ -16,19 +24,31 @@ export async function openPage(page:Page,label:string){
  // Older detail/chart regressions opt into the retained card view explicitly.
  // The customer-facing default remains the compact one-line list.
  if(label==='발견'){
+   const stocks=page.getByRole('tab',{name:'종목',exact:true})
+   await expect(stocks).toBeVisible()
+   if(await stocks.getAttribute('aria-selected')!=='true')await stocks.click()
    const toggle=page.getByRole('group',{name:'종목 보기 방식'})
    await expect(toggle).toBeVisible()
    await toggle.getByRole('button',{name:'카드형'}).click()
  }
 }
-export async function openSignal(page:Page){await openPage(page,'시장 신호');await expect(page.locator('.dashboard-sector-panel')).toBeVisible()}
+export async function openSignal(page:Page){
+ await openPage(page,'발견')
+ await page.getByRole('tab',{name:'시장 신호',exact:true}).click()
+ await expect(page.locator('.dashboard-sector-panel')).toBeVisible()
+}
 export async function openLeaderTools(page:Page){await openSignal(page);await page.locator('.leader-tools-trigger').click()}
 export async function pickFirstStock(page:Page){
  await page.locator('[data-wheel="분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
- await page.locator('.analysis-idea-list .stock-trend-row').first().click()
+ const cards=page.locator('.analysis-idea-list .stock-trend-row')
+ if(await cards.count())await cards.first().click()
+ else await page.locator('.stock-compact-list .stock-compact-main').first().click()
 }
-export async function backToExplore(page:Page){await page.getByRole('button',{name:'뒤로 가기'}).click()}
+export async function backToExplore(page:Page){
+ await page.getByRole('button',{name:'뒤로 가기'}).click()
+ await expect(page.locator('.discovery-workspace .catalog-filter-rails')).toBeVisible({timeout:8000})
+}
 
 export async function openFilters(page:Page){
  await expect(page.locator('.catalog-filter-rails')).toBeVisible()

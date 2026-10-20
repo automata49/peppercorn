@@ -29,7 +29,7 @@ test('signed heatmap colours use the instrument market, zero/missing remain neut
 })
 for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as const)test(`${width} ${theme}: market colours, shared glass regions and unboxed metrics`,async({page})=>{
  await page.setViewportSize({width,height:1000})
- await page.addInitScript(t=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-theme',t)},theme)
+ await page.addInitScript(t=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-catalog-view','cards');localStorage.setItem('folio-theme',t)},theme)
  await page.route('**/data/leaderboard.json',r=>r.fulfill({status:404,body:''}))
  await page.route('**/functions/v1/leaderboard?*',r=>r.fulfill({json:{rows}}))
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
@@ -60,6 +60,9 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
   await expect(button).toHaveAttribute('aria-pressed','true')
   await all.click()
  }
+ // Filter carousel auto-centering must not silently change the market.
+ await expect(page.locator('[data-wheel="시장"]').getByRole('button',{name:'전체',exact:true})).toHaveAttribute('aria-pressed','true')
+ await expect(all).toHaveAttribute('aria-pressed','true')
  if(width===390)await page.screenshot({path:`test-results/leadership-explore-${theme}.png`})
  await closeFilters(page)
  const colors=theme==='dark'?{KR:['#ff8580','#78b4ff'],US:['#72d5a2','#ff8580']}:{KR:['#b3261e','#1c5cab'],US:['#196b42','#b3261e']}

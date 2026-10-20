@@ -23,16 +23,20 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
   for(const selector of ['.dashboard-sector-panel','.temp-card']){
     const node=page.locator(selector).first()
     await expect(node).toBeVisible()
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+    // Signal metrics use borderless editorial rows instead of imposing decorative boxes.
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+    expect(parseFloat(await node.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
     expect(await node.evaluate(e=>getComputedStyle(e).boxShadow)).toBe('none')
   }
 
   const explore=page.locator('.dashboard-explore')
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBeGreaterThan(0)
-  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)
+  expect(parseFloat(await explore.evaluate(e=>getComputedStyle(e).borderRadius))).toBe(0)
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
+  // Discover preserves the active Market Signal tab; switch explicitly to stocks.
+  await page.getByRole('tab',{name:'종목',exact:true}).click()
+  await expect(page.locator('.catalog-filter-rails')).toBeVisible()
   await pickFirstStock(page)
   const primary=page.locator('.analysis-main.analysis-price-momentum')
   await expect(primary).toHaveCount(1)

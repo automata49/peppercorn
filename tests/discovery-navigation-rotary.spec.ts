@@ -27,6 +27,11 @@ for(const [width,height] of [[390,844],[834,1194],[1440,900]]){
     const page=await context.newPage();await boot(page);await discover(page)
     const wheels=page.locator('.catalog-wheel')
     await expect(wheels).toHaveCount(3)
+    // Auto-centering is presentation only and must never select KR or US on load.
+    const allMarket=page.locator('[data-wheel="시장"]').getByRole('button',{name:'전체',exact:true})
+    await expect(allMarket).toHaveAttribute('aria-pressed','true')
+    await page.waitForTimeout(650)
+    await expect(allMarket).toHaveAttribute('aria-pressed','true')
     await expect(page.locator('.catalog-wheel-arrows')).toHaveCount(0)
     await expect(wheels.locator('.catalog-wheel-heading')).toHaveText(['분류','시장','주도 분류'])
     const tabs=page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')
