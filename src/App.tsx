@@ -692,6 +692,8 @@ export default function App(){
   const restoringRouteRef=useRef(false)
   const navigationIdRef=useRef('folio-'+Math.random().toString(36).slice(2))
   const edgeSwipeRef=useRef<{x:number;y:number}|null>(null)
+  const lastBackRequestRef=useRef(0)
+  const detailReturnedAtRef=useRef(0)
   const [analysisDetail,setAnalysisDetail]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
   const [tradeDrafts,setTradeDrafts]=useState<Record<string,EditableRow>>({})
@@ -877,7 +879,7 @@ export default function App(){
   },[])
   useEffect(()=>{
     const key=page+'|'+(analysisDetail?'detail':'list')
-    if(routeKeyRef.current===key)return
+    if(routeKeyRef.current===key){restoringRouteRef.current=false;return}
     routeKeyRef.current=key
     if(restoringRouteRef.current){restoringRouteRef.current=false;return}
     routeHistoryRef.current=routeHistoryRef.current.slice(0,routeIndexRef.current+1)
@@ -893,8 +895,20 @@ export default function App(){
       if(nav?.id!==navigationIdRef.current||!Number.isInteger(nav.index))return
       const route=routeHistoryRef.current[nav.index]
       if(!route)return
+      const currentRoute=routeHistoryRef.current[routeIndexRef.current]
+      // A second, nearly simultaneous iOS Back event must not skip Discover.
+      if(detailReturnedAtRef.current&&Date.now()-detailReturnedAtRef.current<850
+        &&currentRoute?.page==='analysis'&&!currentRoute.detail&&nav.index<routeIndexRef.current){
+        detailReturnedAtRef.current=0
+        window.history.forward()
+        return
+      }
+      if(currentRoute?.page==='analysis'&&currentRoute.detail&&route.page==='analysis'&&!route.detail)
+        detailReturnedAtRef.current=Date.now()
+      else if(route.page!=='analysis')detailReturnedAtRef.current=0
       routeIndexRef.current=nav.index
-      restoringRouteRef.current=true
+      // Keep the route guard armed only if the keyed screen actually changes.
+      restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':'list')
       setPage(route.page)
       setAnalysisDetail(route.detail)
       if(route.stock)setSelected(route.stock)
@@ -1189,6 +1203,9 @@ export default function App(){
     window.scrollTo({top:0,behavior:'instant'})
   }
   const goBackPage=()=>{
+    const now=Date.now()
+    if(now-lastBackRequestRef.current<700)return
+    lastBackRequestRef.current=now
     if(routeIndexRef.current>0){window.history.back();return}
     if(analysisDetail){setAnalysisDetail(false);return}
     if(page!=='today')setPage('today')
@@ -1450,7 +1467,6 @@ export default function App(){
               <div className="catalog-view-toggle" role="group" aria-label="종목 보기 방식"><button type="button" aria-pressed={catalogView==='list'} onClick={()=>setCatalogView('list')}>목록형</button><button type="button" aria-pressed={catalogView==='cards'} onClick={()=>setCatalogView('cards')}>카드형</button></div>
             </div>
           </div>
-          <StockSearch rows={leaders} recent={recentStocks} onPick={pickStock}/>
           <div className="catalog-results"><StockTrendList key={market+'|'+analysisScope+'|'+stockSize+'|'+sector+'|'+JSON.stringify(lensFilter)+'|'+catalogSort+'|'+catalogView} rows={catalogRows} view={catalogView} onSelect={pickStock} onAddToBasket={addToBasket} isInBasket={basketHas} getClass={displayClass} className={'stock-list analysis-idea-list '+(catalogView==='cards'?'stock-card-grid':'stock-inline-list')}/></div>
         </div>
       </div>}
