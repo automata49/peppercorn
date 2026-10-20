@@ -44,7 +44,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
       <button type="button" aria-label={label+' 다음 선택'} disabled={!options.slice(index+1).some(o=>!o.disabled)} onClick={()=>step(1)}>›</button>
     </div></div>
     <div className={'catalog-wheel-track '+className} ref={viewport} onScroll={settleScroll} role="group" aria-label={label}>
-      {options.map((option,i)=><button key={option.value} data-wheel-index={i} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>onChange(option.value)}>{option.label}</button>)}
+      {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>onChange(option.value)}>{option.label}</button>)}
     </div>
   </div>
 }
