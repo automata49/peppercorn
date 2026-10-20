@@ -192,7 +192,7 @@ test('ETF detail shows ETF-only ranks, Trend Template, verdict and action guide'
   await openPage(page,'발견');
   // ETF is a first-class Explore classification and ignores equity leadership tabs.
   await openFilters(page);
-  await page.getByRole('group',{name:'분류',exact:true}).getByRole('button',{name:'ETF',exact:true}).click();
+  await page.getByRole('group',{name:'종목 분류',exact:true}).getByRole('button',{name:'ETF',exact:true}).click();
   await closeFilters(page);
   await page.locator('.stock-list button').filter({hasText:'SPY'}).click();
   await expect(page.locator('.analysis-card .hero-name')).toContainText('SPY ETF');

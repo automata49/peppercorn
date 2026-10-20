@@ -326,3 +326,38 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[
     transition:none!important;will-change:auto!important;
   }
 }
+
+
+/* Preserve physical 48px picker targets: 3D art belongs to text, not hit areas. */
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button,
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"],
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[data-offset]{
+  transform:none!important;
+  height:48px!important;min-height:48px!important;
+}
+.catalog-carousel-layout .catalog-wheel-option-label{
+  display:inline-block;
+  max-width:100%;
+  pointer-events:none;
+  transform:perspective(520px) rotateX(0deg) scale(.91);
+  transform-origin:center;
+  transition:transform 230ms ease,opacity 230ms ease;
+}
+.catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"] .catalog-wheel-option-label{
+  transform:perspective(520px) translateZ(14px) scale(1.03);
+}
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="-1"] .catalog-wheel-option-label{
+  transform:perspective(520px) rotateX(-31deg) scale(.92);
+}
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="1"] .catalog-wheel-option-label{
+  transform:perspective(520px) rotateX(31deg) scale(.92);
+}
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="-2"] .catalog-wheel-option-label,
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="-3"] .catalog-wheel-option-label{
+  transform:perspective(520px) rotateX(-48deg) scale(.85);
+}
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="2"] .catalog-wheel-option-label,
+.catalog-carousel-layout .catalog-wheel-track button[data-offset="3"] .catalog-wheel-option-label{
+  transform:perspective(520px) rotateX(48deg) scale(.85);
+}
+@media(prefers-reduced-motion:reduce){.catalog-carousel-layout .catalog-wheel-option-label{transition:none!important}}
