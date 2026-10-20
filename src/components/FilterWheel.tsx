@@ -35,7 +35,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   }
   return <div className="catalog-wheel" data-wheel={label}>
     <div className="catalog-wheel-heading"><span>{label}</span></div>
-    <div className={'catalog-wheel-track '+className} ref={viewport} onScroll={settleScroll} role="group" aria-label={label}>
+    <div className={'catalog-wheel-track '+className} ref={viewport} onPointerDown={()=>{autoScroll.current=false}} onScroll={settleScroll} role="group" aria-label={label}>
       {options.map((option,i)=><button key={option.value} data-wheel-index={i} data-offset={Math.max(-3,Math.min(3,i-index))} type="button" aria-pressed={option.value===value} disabled={option.disabled} onClick={()=>onChange(option.value)}>{option.label}</button>)}
     </div>
   </div>
