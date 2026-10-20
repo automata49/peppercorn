@@ -1212,6 +1212,8 @@ export default function App(){
     window.scrollTo({top:0,behavior:'instant'})
   }
   const openAnalysisStock=(row:LeaderRow)=>{
+    // A new stock detail is a fresh navigation, not a duplicate Back tap.
+    lastBackRequestRef.current=0
     setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview')
     setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}))
     setPage('analysis');window.scrollTo({top:0,behavior:'instant'})
