@@ -93,3 +93,51 @@ html body .shell .app-main .stock-compact-basket{display:grid;grid-column:5;plac
 .stock-compact-main:focus-visible,.stock-compact-basket:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
 @media(max-width:680px){.catalog-filter-rails{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:16px}.catalog-wheel{padding-bottom:4px}.catalog-wheel-track{gap:20px;min-height:46px}.catalog-wheel-track:before,.catalog-wheel-track:after{flex-basis:22px}.catalog-carousel-layout .catalog-topline{align-items:center}.catalog-toolbar{gap:12px}.stock-compact-head,.stock-compact-row{grid-template-columns:minmax(0,1fr) minmax(44px,61px) minmax(65px,80px) 38px 32px;column-gap:5px}.stock-compact-head{font-size:10px;padding-left:2px;padding-right:0}.stock-compact-row{min-height:55px;padding-left:2px;padding-right:0}.stock-compact-main strong{font-size:14px}.stock-compact-ticker{font-size:10px}.stock-compact-price{font-size:12px}.stock-compact-rs{font-size:13px}html body .shell .app-main .stock-compact-basket{width:32px;padding:5px}}
 @media(prefers-reduced-motion:reduce){html body .shell .app-main .catalog-wheel-track button{transition:none}}
+
+
+/* FOLIO-COVERFLOW-2: one column, three wide interactive Cover Flow selection rows. */
+.catalog-carousel-layout .catalog-filter-rails{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important;width:100%;margin:4px 0 22px}
+.catalog-carousel-layout .catalog-wheel{display:grid;grid-template-columns:clamp(92px,16vw,156px) minmax(0,1fr);align-items:center;column-gap:clamp(8px,2vw,26px);min-height:80px;border-bottom:1px solid var(--folio-line);padding:5px 0;min-width:0}
+.catalog-carousel-layout .catalog-wheel-heading{display:flex;flex-wrap:wrap;gap:0 10px;min-width:0;margin:0;align-content:center;font-size:clamp(12px,1.2vw,15px);color:var(--folio-ink)}
+.catalog-carousel-layout .catalog-wheel-arrows{display:flex;gap:0}
+html body .shell .app-main .catalog-wheel-arrows button{width:32px;height:38px;min-height:38px;font-size:25px}
+.catalog-carousel-layout .catalog-wheel-track{height:68px;min-height:68px;min-width:0;perspective:600px;perspective-origin:50% 50%;align-items:center;gap:clamp(8px,1.4vw,23px);scroll-snap-type:x mandatory}
+.catalog-carousel-layout .catalog-wheel-track.analysis-scope{display:flex!important;width:100%!important;max-width:100%!important;grid-template-columns:none!important;overflow-x:auto!important;border:0!important;border-radius:0!important}
+.catalog-carousel-layout .catalog-wheel-track:before,.catalog-carousel-layout .catalog-wheel-track:after{flex-basis:clamp(16px,23%,190px)}
+html body .shell .app-main .catalog-wheel-track button{display:grid;place-items:center;position:relative;min-height:48px;padding:10px 9px!important;font-size:clamp(14px,1.55vw,19px)!important;transform-style:preserve-3d;transform-origin:center;transition:transform 280ms cubic-bezier(.2,.72,.24,1),opacity 280ms ease,color 220ms ease}
+html body .shell .app-main .catalog-wheel-track button[aria-pressed="true"]{transform:perspective(500px) rotateY(0deg) translateZ(24px) scale(1.09);font-weight:750!important;text-decoration:none;opacity:1}
+html body .shell .app-main .catalog-wheel-track button[data-offset="-1"]{transform:perspective(500px) rotateY(36deg) scale(.9);opacity:.72}
+html body .shell .app-main .catalog-wheel-track button[data-offset="1"]{transform:perspective(500px) rotateY(-36deg) scale(.9);opacity:.72}
+html body .shell .app-main .catalog-wheel-track button[data-offset="-2"],
+html body .shell .app-main .catalog-wheel-track button[data-offset="-3"]{transform:perspective(500px) rotateY(48deg) scale(.82);opacity:.45}
+html body .shell .app-main .catalog-wheel-track button[data-offset="2"],
+html body .shell .app-main .catalog-wheel-track button[data-offset="3"]{transform:perspective(500px) rotateY(-48deg) scale(.82);opacity:.45}
+html body .shell .app-main .catalog-wheel-track button[aria-pressed="true"]::after{content:"";position:absolute;bottom:2px;left:22%;right:22%;height:2px;border-radius:10px;background:currentColor}
+.discovery-tabbar{display:flex;align-items:center;justify-content:space-between;min-width:0;gap:clamp(6px,2vw,28px);border-bottom:1px solid var(--folio-line);margin:0 0 20px}
+.discovery-tabbar .folio-tabs-list{display:flex;flex:0 1 auto;min-width:0;flex-wrap:nowrap;gap:clamp(8px,2.4vw,28px);margin:0!important}
+.discovery-tabbar .folio-tabs-trigger{min-width:0;white-space:nowrap;padding-inline:0!important}
+html body .shell .app-main .discovery-tabbar .catalog-filter-toggle{display:inline-flex;align-items:center;justify-content:flex-end;flex-shrink:0;gap:5px;min-height:44px;padding:6px 0!important;border:0!important;background:transparent!important;color:var(--folio-ink)!important;font-size:clamp(12px,1.2vw,15px)!important;font-weight:600!important;white-space:nowrap}
+.discovery-tabbar .catalog-filter-toggle>span{font-size:16px}
+.discovery-tabbar .catalog-filter-toggle:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
+.catalog-carousel-layout .catalog-toolbar{gap:14px}
+.stock-compact-head,.stock-compact-row{grid-template-columns:minmax(0,1fr) minmax(46px,86px) minmax(72px,124px) minmax(74px,112px) 54px 44px}
+html body .shell .app-main .stock-compact-main{grid-column:1/6}
+.stock-compact-change{display:inline-flex;justify-content:flex-end;align-items:baseline;gap:4px;white-space:nowrap;text-align:right;font-size:clamp(12px,1.25vw,15px);font-weight:720;font-variant-numeric:tabular-nums}
+.stock-compact-change small{font-size:10px;font-weight:450;color:var(--folio-muted)!important}
+.stock-compact-head>span:nth-child(5){text-align:right}
+html body .shell .app-main .stock-compact-basket{grid-column:6}
+@media(max-width:680px){
+ .catalog-carousel-layout .catalog-wheel{grid-template-columns:76px minmax(0,1fr);column-gap:8px;min-height:69px}
+ .catalog-carousel-layout .catalog-wheel-heading{font-size:12px;gap:0}
+ .catalog-carousel-layout .catalog-wheel-track{height:61px;min-height:61px;gap:9px}
+ .catalog-carousel-layout .catalog-wheel-track:before,.catalog-carousel-layout .catalog-wheel-track:after{flex-basis:12px}
+ html body .shell .app-main .catalog-wheel-track button{font-size:14px!important;min-height:44px;padding:9px 5px!important}
+ .discovery-tabbar .folio-tabs-list{gap:clamp(8px,2vw,14px)}
+ .discovery-tabbar .folio-tabs-trigger{font-size:clamp(12px,3.2vw,14px)!important}
+ .stock-compact-head,.stock-compact-row{grid-template-columns:minmax(0,1fr) minmax(39px,54px) minmax(62px,81px) minmax(62px,82px) 30px 28px;column-gap:3px}
+ .stock-compact-change{font-size:11px;gap:2px}
+ .stock-compact-change small{font-size:9px}
+ .stock-compact-rs{font-size:12px}
+ html body .shell .app-main .stock-compact-basket{width:28px;padding:4px}
+}
+@media(prefers-reduced-motion:reduce){html body .shell .app-main .catalog-wheel-track button{transition:none}}
