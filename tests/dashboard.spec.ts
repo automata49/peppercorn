@@ -15,11 +15,11 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   // Sector and ETF tools remain in the secondary Market Signal workspace.
   await expect(page.locator('.focus-sector-table thead th')).toHaveText(['섹터','RS 순위','주도','등락 20D','등락 50D','52W 근접']);
   await expect(page.locator('.dashboard-sector-panel .dashboard-sector-table tbody tr')).toHaveCount(2);
-  if(view.touch){
+  if(view.width<=650){
     await expect(page.locator('.mobile-sector-list .decision-row')).toHaveCount(2);
     await expect(page.locator('.mobile-sector-list')).toBeVisible();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeHidden();
-    await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정']);
+
     if(view.width<=650){
       await expect(page.locator('.toolbar input')).toBeVisible();
       await expect(page.locator('.topbar p')).toBeHidden();
@@ -28,6 +28,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
     await expect(page.locator('.mobile-sector-list')).toBeHidden();
     await expect(page.locator('.dashboard-sector-table-wrap')).toBeVisible();
   }
+  if(view.touch)await expect(page.locator('.mobile-bottom-nav b')).toHaveText(['오늘','발견','저널','여정'])
   const etfPanel=page.locator('.dashboard-etf-panel');
   const etfRows=etfPanel.locator('.stock-row');
   await expect(etfRows).toHaveCount(5);
