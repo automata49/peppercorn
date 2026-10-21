@@ -102,8 +102,9 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }
     await openFilters(page)
     const scope=page.locator('.analysis-scope')
-    const active=scope.locator('button[aria-pressed="true"]')
-    if(await active.count())await active.first().click()
+    // Active leadership selection is now idempotent. Choose the explicit 전체
+    // category when the visual baseline needs the complete fixture list.
+    await scope.getByRole('button',{name:'전체',exact:true}).click()
     await closeFilters(page)
     await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'카드형'}).click()
     await page.locator('.analysis-idea-list .stock-trend-row').first().click()
