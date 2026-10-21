@@ -39,7 +39,7 @@ for (const viewport of [{width:390,height:844},{width:834,height:1194},{width:14
   expect(names['ui-dialog-content']).toEqual(['folio-surface-in','folio-surface-out'])
   expect(names['ui-alert-content']).toEqual(['folio-surface-in','folio-surface-out'])
   expect(names['ui-popover-content']).toEqual(['folio-popover-in','folio-popover-out'])
-  expect(names['catalog-filter-drawer ui-dialog-content']).toEqual(['folio-panel-in','folio-panel-out'])
+  expect(names['catalog-filter-drawer ui-dialog-content']).toEqual(['folio-filter-right-enter','folio-filter-right-exit'])
   if(viewport.width===390) {
    await openPage(page,'발견')
    const toggle=page.locator('.catalog-filter-toggle')
@@ -47,7 +47,7 @@ for (const viewport of [{width:390,height:844},{width:834,height:1194},{width:14
    await toggle.click()
    const panel=page.locator('.catalog-filter-drawer.ui-dialog-content')
    await expect(panel).toBeVisible()
-   expect(await panel.evaluate(el=>getComputedStyle(el).animationName)).toBe('folio-panel-in')
+   expect(await panel.evaluate(el=>getComputedStyle(el).animationName)).toBe('folio-filter-right-enter')
    await page.getByRole('button',{name:'필터 닫기'}).click()
    await expect(panel).toHaveCount(0)
   }
