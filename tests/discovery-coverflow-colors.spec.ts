@@ -23,9 +23,11 @@ test('three vertical wheels, tab-level Filter & Sort and KR/US price-return colo
   const tabs=page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')
   await expect(tabs).toHaveText(['시장 신호','종목','주제'])
   const filter=page.getByRole('button',{name:/Filter & Sort/})
-  const tabBox=(await tabs.last().boundingBox())!,filterBox=(await filter.boundingBox())!
-  expect(filterBox.x).toBeGreaterThan(tabBox.x)
-  expect(Math.abs(filterBox.y+filterBox.height/2-tabBox.y-tabBox.height/2)).toBeLessThan(20)
+  const heading=page.locator('.catalog-section-heading h2')
+  await expect(heading).toHaveText('주도 종목')
+  const headingBox=(await heading.boundingBox())!,filterBox=(await filter.boundingBox())!
+  expect(filterBox.x).toBeGreaterThan(headingBox.x)
+  expect(Math.abs(filterBox.y+filterBox.height/2-headingBox.y-headingBox.height/2)).toBeLessThan(20)
 
   const wheels=page.locator('.catalog-filter-rails > .catalog-wheel')
   await expect(wheels).toHaveCount(3)
