@@ -1,3 +1,13 @@
+## DISCOVERY-WORKFLOW-20261021 — approved workflow (2026-10-21)
+
+Folio flow: Today → Discover (Market Signal / Stocks / Topics) → Stock Detail → Watchlist / Thesis → Journal / Journey. MARKET & COMPANIES and the account-private source PDF reports belong to Discover > Market Signal, not Stocks. News keeps an independent market (ALL/KR/US) and category (reports default/large/small/all) vertical picker and saved selections. Do not substitute stock-screen filters or display guessed news.
+
+Stocks has one editorial heading 주도 종목, with a right-hand Filter & Sort trigger opening a right-side sheet; that sheet exposes market, asset category, leadership class, sector, sort, advanced lens and persistence after app restart. Three wheels in portrait/landscape/desktop must scroll vertically with 48px physical targets, native snap, readable Folio type, true center selection and 3D perspective limited to inner text. Liquid glass highlights selection without obstructing interaction, reduced motion and reduced transparency must work. On ETF, disable equities-only leadership classes. Market news has two independently controlled wheels.
+
+The stock detail Back button, iOS edge swipe and browser Back share one browser-history mechanism and restore the originating page without a delayed jump to Today; no extra optimistic route change. Overview drops the redundant tagline. Basket, Watchlist and Thesis actions are inline accessible controls (48px touch height) and persist selected instruments through guest/local or signed-in workspace sync, showing an error if workspace isn't ready. List/card controls are aligned with the list content. Menu groups correspond to core paths: 핵심, 저널 · 여정, 시장, 데이터 · 도구.
+
+Existing Journal cards open a read-only full record with explicit 수정 to enter the editor; new entries enter the editor directly. Preserve Tiptap rich body, photos, ink, history and cloud ownership. Responsive validation: 390x844 phone, 834x1194 iPad portrait, 1194x834 landscape, 1440x900 desktop, light/dark, including wheel gesture, preference reload, action storage, stable detail Back and Journal read/edit. All conflicting older layout rules are superseded for these features.
+
 ## WORKFLOW-20261021 — approved UI acceptance
 
 Discover: MARKET & COMPANIES now belongs to Market Signal, with independent market and classification vertical wheels (report-first default). Stocks uses a one-row market/category/leadership vertical picker beneath the 주도 종목 heading, and a right-aligned Filter & Sort button opening a right-side drawer. The drawer edits all classifications, sector, sort and advanced filters. Settings persist through reopening the app.
