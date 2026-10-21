@@ -1206,6 +1206,22 @@ export default function App(){
     setAnalysisDeleteTarget(null)
   }
 
+  const discoveryFilters=<Dialog open={catalogFiltersOpen} onOpenChange={setCatalogFiltersOpen}>
+    <DialogTrigger asChild><button type="button" className="catalog-filter-toggle" aria-expanded={catalogFiltersOpen}>Filter &amp; Sort <span aria-hidden="true">⌄</span></button></DialogTrigger>
+    <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
+      <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
+      <DialogDescription className="sr-only">섹터, 정렬 및 상세 조건을 선택하세요. 시장, 종목 분류, 주도 분류는 종목 목록 위에서 위아래로 돌려 선택할 수 있습니다.</DialogDescription>
+      <section><h3>시장</h3><div className="catalog-filter-options" role="group" aria-label="필터 시장">{([['ALL','전체'],['KR','KR'],['US','US']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={market===v} onClick={()=>setMarket(v)}>{label}</button>)}</div></section>
+      <section><h3>종목 분류</h3><div className="catalog-filter-options" role="group" aria-label="필터 종목 분류">{([['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={stockSize===v} onClick={()=>changeStockSize(v)}>{label}</button>)}</div></section>
+      <section><h3>주도 분류</h3><div className="catalog-filter-options" role="group" aria-label="필터 주도 분류">{([['all','전체'],['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([v,label])=><button type="button" key={v} disabled={stockSize==='etf'&&v!=='all'} aria-pressed={(analysisScope||'all')===v} onClick={()=>setAnalysisScope(v==='all'?null:v)}>{label}</button>)}</div></section>
+      <section><h3>보기</h3><div className="catalog-filter-options" role="group" aria-label="필터 보기 방식">{([['list','목록형'],['cards','카드형']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={catalogView===v} onClick={()=>setCatalogView(v)}>{label}</button>)}</div></section>
+      <section><h3>섹터</h3><select aria-label="탐색 섹터" value={sector||''} onChange={event=>setSector(event.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=><option key={g.key} value={g.key}>{(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}</option>)}</select></section>
+      <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
+      <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
+      <DialogClose asChild><button type="button" className="catalog-show-results">설정 저장 · 종목 보기</button></DialogClose>
+      <p className="catalog-saved-hint">선택 사항은 이 기기에 자동 저장됩니다.</p>
+    </DialogContent>
+  </Dialog>
   const navigatePage=(next:string)=>{
     if(next==='analysis'){setQuery('');setSector(null)}
     if(next!==page||analysisDetail)setAnalysisDetail(false)
@@ -1620,22 +1636,7 @@ export default function App(){
 
 
   if(page==='signal')content=<><DiscoveryNews reports={sourceReports} feed={leaderInsights} rows={leaders} market={market} getClass={displayClass} onSelect={openAnalysisStock}/>{content}</>
-  const discoveryFilters=<Dialog open={catalogFiltersOpen} onOpenChange={setCatalogFiltersOpen}>
-    <DialogTrigger asChild><button type="button" className="catalog-filter-toggle" aria-expanded={catalogFiltersOpen}>Filter &amp; Sort <span aria-hidden="true">⌄</span></button></DialogTrigger>
-    <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
-      <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
-      <DialogDescription className="sr-only">섹터, 정렬 및 상세 조건을 선택하세요. 시장, 종목 분류, 주도 분류는 종목 목록 위에서 위아래로 돌려 선택할 수 있습니다.</DialogDescription>
-      <section><h3>시장</h3><div className="catalog-filter-options" role="group" aria-label="필터 시장">{([['ALL','전체'],['KR','KR'],['US','US']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={market===v} onClick={()=>setMarket(v)}>{label}</button>)}</div></section>
-      <section><h3>종목 분류</h3><div className="catalog-filter-options" role="group" aria-label="필터 종목 분류">{([['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={stockSize===v} onClick={()=>changeStockSize(v)}>{label}</button>)}</div></section>
-      <section><h3>주도 분류</h3><div className="catalog-filter-options" role="group" aria-label="필터 주도 분류">{([['all','전체'],['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([v,label])=><button type="button" key={v} disabled={stockSize==='etf'&&v!=='all'} aria-pressed={(analysisScope||'all')===v} onClick={()=>setAnalysisScope(v==='all'?null:v)}>{label}</button>)}</div></section>
-      <section><h3>보기</h3><div className="catalog-filter-options" role="group" aria-label="필터 보기 방식">{([['list','목록형'],['cards','카드형']] as const).map(([v,label])=><button type="button" key={v} aria-pressed={catalogView===v} onClick={()=>setCatalogView(v)}>{label}</button>)}</div></section>
-      <section><h3>섹터</h3><select aria-label="탐색 섹터" value={sector||''} onChange={event=>setSector(event.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=><option key={g.key} value={g.key}>{(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}</option>)}</select></section>
-      <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
-      <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
-      <DialogClose asChild><button type="button" className="catalog-show-results">설정 저장 · 종목 보기</button></DialogClose>
-      <p className="catalog-saved-hint">선택 사항은 이 기기에 자동 저장됩니다.</p>
-    </DialogContent>
-  </Dialog>
+
   if(page==='analysis'&&!analysisDetail){
     if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}/>
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
