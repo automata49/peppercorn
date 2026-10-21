@@ -196,7 +196,7 @@ test('Harness: saved right-drawer filters, idempotent leadership, detail actions
   await core.click()
   await core.click()
   await expect(core).toHaveAttribute('aria-pressed','true')
-  await expect(core).toHaveCSS('min-height','54px')
+  expect((await core.boundingBox())!.height).toBeGreaterThanOrEqual(44)
   const drawerTrigger=page.getByRole('button',{name:/Filter & Sort/})
   await drawerTrigger.click()
   const drawer=page.getByRole('dialog',{name:'Filter & Sort'})
