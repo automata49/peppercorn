@@ -72,6 +72,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({hideWeak:false,sepaOnly:false,growthOnly:false}))})
   await page.goto('http://127.0.0.1:4173/peppercorn/')
   await openLeaderTools(page)
+  await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
   await expect(page.locator('.drill-sheet')).toHaveCount(0)
   const scope=page.locator('[data-wheel="주도 분류"]')
   await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중','전체'])

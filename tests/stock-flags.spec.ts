@@ -55,6 +55,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await openSignal(page)
   await expect(page.locator('.dashboard-sector-table')).toContainText('Information Technology')
   await openLeaderTools(page)
+  await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
   const list=page.locator('.analysis-idea-list .stock-compact-main')
   await expect(list).toHaveCount(2)
   await list.filter({hasText:'Kodiak'}).click()
