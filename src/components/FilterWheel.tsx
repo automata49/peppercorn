@@ -52,6 +52,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
     <div className={'catalog-wheel-track '+className} ref={viewport}
       role="group" aria-label={label}
       onPointerDown={()=>{autoScroll.current=false;userScrolling.current=true}}
+      onTouchStart={()=>{autoScroll.current=false;userScrolling.current=true}}
       onWheel={()=>{autoScroll.current=false;userScrolling.current=true}}
       onScroll={settleScroll}
       onKeyDown={e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();changeStep(e.key==='ArrowDown'?1:-1)}}}>
