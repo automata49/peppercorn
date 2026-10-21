@@ -29,3 +29,19 @@ html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:
 
 /* Distinguish cross-market theme coverage without implying a leader classification. */
 .discovery-news-trend-tag{display:inline-block;margin-right:5px;font-size:10px;font-weight:700;letter-spacing:.11em;color:var(--folio-ink);border:1px solid currentColor;border-radius:3px;padding:1px 5px;vertical-align:baseline}
+
+
+/* Market Signal news uses two independent vertical picker columns. */
+.discovery-news-wheels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,28px);max-width:720px;margin:0 0 26px}
+.discovery-news-wheels .catalog-wheel{display:flex;flex-direction:column;min-width:0;border:0;padding:0;margin:0}
+.discovery-news-wheels .catalog-wheel-heading{display:flex;align-items:center;justify-content:center;min-height:34px;margin:0;text-align:center;font-size:16px;font-weight:750}
+.discovery-news-wheels .catalog-wheel-track{position:relative;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:0!important;height:168px!important;min-height:168px!important;padding:60px 0!important;box-sizing:border-box;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior-y:contain;touch-action:pan-y;scroll-snap-type:y mandatory!important;scroll-padding-block:60px!important;mask-image:linear-gradient(to bottom,transparent,#000 17%,#000 83%,transparent);scrollbar-width:none;-webkit-overflow-scrolling:touch;perspective:550px}
+.discovery-news-wheels .catalog-wheel-track:before,.discovery-news-wheels .catalog-wheel-track:after{display:none!important;content:none!important}
+.discovery-news-wheels .catalog-wheel-track::-webkit-scrollbar{display:none}
+.discovery-news-wheels .catalog-wheel-track button{position:relative;isolation:isolate;box-sizing:border-box;display:flex!important;justify-content:center!important;align-items:center!important;flex:0 0 48px!important;height:48px!important;min-height:48px!important;width:100%;max-width:100%;scroll-snap-align:center!important;scroll-snap-stop:always;min-width:0!important;padding:5px!important;margin:0!important;border:0!important;transform:none!important;background:transparent!important;box-shadow:none!important;white-space:normal!important;word-break:keep-all;text-align:center;font-size:clamp(16px,1.6vw,21px);opacity:.66}
+.discovery-news-wheels .catalog-wheel-track button[aria-pressed="true"]{opacity:1}
+.discovery-news-wheels .catalog-wheel-track button[data-offset="-1"] .catalog-wheel-option-label{transform:perspective(520px) rotateX(-30deg) scale(.93)}
+.discovery-news-wheels .catalog-wheel-track button[data-offset="1"] .catalog-wheel-option-label{transform:perspective(520px) rotateX(30deg) scale(.93)}
+.discovery-news-wheels .catalog-wheel-track button[data-offset="-2"] .catalog-wheel-option-label,.discovery-news-wheels .catalog-wheel-track button[data-offset="-3"] .catalog-wheel-option-label{transform:perspective(520px) rotateX(-46deg) scale(.87)}
+.discovery-news-wheels .catalog-wheel-track button[data-offset="2"] .catalog-wheel-option-label,.discovery-news-wheels .catalog-wheel-track button[data-offset="3"] .catalog-wheel-option-label{transform:perspective(520px) rotateX(46deg) scale(.87)}
+@media(max-width:680px){.discovery-news-wheels{max-width:100%;gap:12px}.discovery-news-wheels .catalog-wheel-track button{font-size:17px!important}}
