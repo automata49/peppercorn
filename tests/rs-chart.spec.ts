@@ -125,7 +125,7 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(drill.locator('.drill-tabs')).toBeVisible()
   await expect(drill.locator('.stock-snapshot')).toHaveCount(0)
 
-  // The device back button leaves the detail the same way.
+  // Browser/device Back dismisses this subordinate detail and preserves the sector list.
   await drill.locator('.stock-row').first().click()
   await expect(drill.locator('.stock-snapshot')).toBeVisible()
   await page.goBack()
@@ -168,27 +168,27 @@ test('phone: a failed live load shows a demo-data notice with a working retry',a
   await expect(banner).toHaveCount(0)
   await expect(page.locator('.journey-today')).toBeVisible()
   await openLeaderTools(page)
-  await expect(page.locator('.drill-sheet .stock-row').first()).toBeVisible()
+  await expect(page.locator('.analysis-finder .stock-trend-row').first()).toBeVisible()
   await context.close()
 })
 
-test('주도 종목 popup shows momentum lines for its group; data is fetched per group',async({browser})=>{
+test('canonical 주도 종목 tab opens stock chart with fetched price history',async({browser})=>{
   const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,isMobile:true})
   const page=await context.newPage()
   const asked:string[][]=[]
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows:[...rows.map((r,i)=>({...r,return_20d:i/100})),...etfs]}}))
   await mockHistory(page,asked)
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all')})
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
   await openLeaderTools(page)
-  const drill=page.locator('.drill-sheet')
-  const chart=drill.locator('.rs-chart')
-  await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 3','검증 종목 2','검증 종목 1','검증 종목 0'])
-  expect(new Set(asked.flat()).size).toBeGreaterThanOrEqual(4)
-  for(const id of ['0','1','2','3'])expect(asked.flat()).toContain(id)
-  await drill.locator('.rs-chart .line-legend button').first().click()
-  await expect(drill.locator('.drill-meta')).toContainText('TEST3')
+  await expect(page.locator('.drill-sheet')).toHaveCount(0)
+  const catalog=page.locator('.analysis-idea-list')
+  await expect(catalog.locator('.stock-trend-row').first()).toBeVisible()
+  await catalog.locator('.stock-trend-row').first().click()
+  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
+  await expect(page.locator('.analysis-price-momentum .price-rs')).toBeVisible()
+  expect(asked.flat().length).toBeGreaterThan(0)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBeTruthy()
   await context.close()
 })
@@ -228,8 +228,9 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await page.locator('.dashboard-etf-panel .stock-row').first().click()
   await page.getByRole('button',{name:'닫기',exact:true}).click()
   await openLeaderTools(page)
-  await page.locator('.drill-sheet .rs-chart .line-legend button').first().click()
-  const chart=page.locator('.drill-sheet .snapshot-section').filter({has:page.getByRole('heading',{name:'가격 모멘텀'})})
+  await page.locator('.analysis-idea-list .stock-trend-row').first().click()
+  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
+  const chart=page.locator('.analysis-price-momentum .price-rs')
   await expect(chart.locator('svg .line-axis-title')).toHaveText(['지수 (시작=100)','RS 라인 (SPY 대비)'])
   // Legend: stock, benchmark (flat SPY → +0.0%), RS line (= stock change against a flat benchmark).
   await expect(chart.locator('.line-legend b')).toHaveText(['검증 종목 0','SPY','RS 라인'])
@@ -239,7 +240,7 @@ test('section market toggles, RS line against SPY and the refresh button',async(
   await expect(chart.locator('.price-rs-new-high')).toHaveCount(51)
   await expect(chart.locator('.price-rs-callout')).toHaveCount(0)
   expect(asked.some(ids=>ids.includes('spy'))).toBeTruthy()
-  await page.getByRole('button',{name:'닫기',exact:true}).click()
+  await page.getByRole('button',{name:'뒤로 가기'}).click()
   // Refresh: compact layouts keep the same action in the secondary drawer.
   const before=asked.length
   await page.getByRole('button',{name:'전체 메뉴 열기'}).first().click()

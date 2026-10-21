@@ -31,7 +31,7 @@ for(const entryMode of ['canonical','cached-app-url','historical-alias'])test(`p
  await expect(page.getByRole('dialog')).toHaveCount(0)
  await openPage(page,'발견')
  await openFilters(page)
- const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click()
+ await page.locator('.analysis-scope').getByRole('button',{name:'전체',exact:true}).click()
  await page.getByRole('group',{name:'종목 분류',exact:true}).getByRole('button',{name:'전체',exact:true}).click()
  await closeFilters(page)
  await page.locator('.analysis-idea-list .stock-trend-row').first().click()

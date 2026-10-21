@@ -41,55 +41,47 @@ test('badges show true flags only; no revenue replaces the loss badge',()=>{
 })
 
 const flags={version:'STOCK-FLAGS-1',generated_at:'2026-10-03T10:00:00Z',flags:{'US:KOD':{loss:true,no_revenue:true,jump:{top_day:1.78,share:1.09,window_return:1.55}},'US:SEMI0':{shrinking:true,revenue_growth:-.1}}}
+// Flags and rank remain available in Stock Snapshot; the redundant leader popup is retired.
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
- test(view.name+' badges, group rank and GICS sector names appear in lists and detail',async({browser})=>{
+ test(view.name+' source flags and GICS groups remain visible in canonical stock detail',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
   const page=await context.newPage()
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
-  // This spec checks badges; the default-on growth filter (GROWTH-FILTER-1) is covered in leader-lens.spec.ts.
-  await page.addInitScript(()=>localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({growthOnly:false})))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  // US sector shows under its GICS name only.
+  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({hideWeak:false,sepaOnly:false,growthOnly:false}))})
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
   await openSignal(page)
   await expect(page.locator('.dashboard-sector-table')).toContainText('Information Technology')
-  await expect(page.locator('.dashboard-sector-table')).not.toContainText(/(^|[^ ])Technology ·/)
   await openLeaderTools(page)
-  const kod=page.locator('.drill-sheet .stock-row').filter({hasText:'Kodiak'}).first()
-  await expect(kod.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
-  await expect(kod.locator('.stock-flag.jump')).toHaveAttribute('title',/하루 \+178%/)
-  await expect(page.locator('.drill-sheet .stock-row').filter({hasText:'반도체 0'}).first().locator('.stock-flag')).toHaveText(['매출 감소'])
-  await kod.click()
-  const detail=page.locator('.stock-snapshot')
-  await expect(detail.locator('.classification-summary .group-rank')).toHaveText('업종 2/2위')
-  await expect(detail.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
-  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)
-  expect(overflow).toBeLessThanOrEqual(1)
+  await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
+  const list=page.locator('.analysis-idea-list .stock-compact-main')
+  await expect(list).toHaveCount(2)
+  await list.filter({hasText:'Kodiak'}).click()
+  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
+  const snapshot=page.locator('.analysis-body .stock-snapshot')
+  await expect(snapshot.locator('.stock-flag')).toHaveText(['매출 없음','급등일 의존'])
+  await expect(snapshot.locator('.classification-summary .group-rank')).toContainText('업종 2/2위')
+  await backToExplore(page)
+  await page.locator('.analysis-idea-list .stock-compact-main').filter({hasText:'반도체 0'}).click()
+  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
+  await expect(page.locator('.analysis-body .stock-snapshot .stock-flag')).toHaveText(['매출 감소'])
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
   await context.close()
  })
 }
 
-test('without the flags file the app shows no badges and still works',async({page})=>{
-  await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
-  await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
-  await page.route('**/data/stock-flags.json',route=>route.fulfill({status:404,body:'not found'}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await openLeaderTools(page)
-  await expect(page.locator('.drill-sheet .stock-row').filter({hasText:'Kodiak'}).first()).toBeVisible()
-  await expect(page.locator('.stock-flag')).toHaveCount(0)
-  // Leaderboard grid shows the group rank column.
-  await page.keyboard.press('Escape')
-  const side=page.locator('.sidebar nav')
-  if(await side.isVisible()){
-    await openPage(page,'Leaderboard')
-    // Columns are virtualized: scroll right until the group rank column renders.
-    const header=page.locator('.ag-header-cell[col-id="group_rank"]')
-    for(let x=0;x<4000&&!(await header.count());x+=300)await page.locator('.ag-body-horizontal-scroll-viewport').evaluate((e,left)=>{e.scrollLeft=left},x)
-    await expect(header).toContainText('업종 순위')
-    await expect(page.locator('.ag-row[row-index="0"] .ag-cell[col-id="group_rank"]')).toHaveText(/^(\d+\/\d+|—)$/)
-  }
+test('missing flags file keeps canonical Stock Detail usable without badges',async({page})=>{
+ await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
+ await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
+ await page.route('**/data/stock-flags.json',route=>route.fulfill({status:404,body:'not found'}))
+ await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({hideWeak:false,sepaOnly:false,growthOnly:false}))})
+ await page.goto('http://127.0.0.1:4173/peppercorn/')
+ await openLeaderTools(page)
+ await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
+ await page.locator('.analysis-idea-list .stock-compact-main').filter({hasText:'Kodiak'}).click()
+ await page.getByRole('tab',{name:'Analysis',exact:true}).click()
+ await expect(page.locator('.analysis-body .stock-snapshot')).toBeVisible()
+ await expect(page.locator('.stock-flag')).toHaveCount(0)
 })

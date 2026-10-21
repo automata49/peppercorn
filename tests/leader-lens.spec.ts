@@ -60,61 +60,30 @@ test('growth and SEPA badges come first and name the period',()=>{
 })
 
 const flags={version:'STOCK-FLAGS-1',generated_at:'2026-10-03T10:00:00Z',growth_period:{US:'CY2026Q2'},flags:{'US:KOD':{loss:true,no_revenue:true},'US:SEMI0':{sepa:true,growth:{rev:.35,eps:.6}}}}
+// The full-metrics summary popup was retired. Canonical Browse owns the leader wheel.
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
- test(view.name+' leader popup reads top-down, filters by filings and lists large-cap leaders',async({browser})=>{
+ test(view.name+' leader classification remains readable in canonical Stocks tab',async({browser})=>{
   const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:view.touch})
   const page=await context.newPage()
   await page.route('**/functions/v1/leaderboard?*',route=>route.fulfill({json:{rows}}))
   await page.route('**/functions/v1/price-history?*',route=>route.fulfill({json:{series:{}}}))
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.route('**/data/stock-flags.json',route=>route.fulfill({json:flags}))
-  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
+  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({hideWeak:false,sepaOnly:false,growthOnly:false}))})
+  await page.goto('http://127.0.0.1:4173/peppercorn/')
   await openLeaderTools(page)
-  const sheet=page.locator('.drill-sheet')
-  const names=()=>sheet.locator('.stock-row .stock-id b').allTextContents()
-  // GROWTH-FILTER-1 is on by default: only the stock with quarterly growth shows; the classification count stays.
-  await expect(sheet.locator('.summary-tabs button')).toHaveCount(5)
-  await expect(sheet.locator('.lens-chip',{hasText:'실적 성장만'})).toHaveAttribute('aria-pressed','true')
-  expect(await names()).toEqual(['반도체 0'])
-  await expect(sheet.locator('.drill-note')).toContainText('필터로 5종목 제외')
-  await expect(sheet.locator('.drill-note')).toContainText('전체 분류 6종목')
-  await sheet.locator('.lens-chip',{hasText:'실적 성장만'}).click()
-  // 업종별 (default view): the top-ranked group and its stocks come first; the group chip shows its rank.
-  await expect(sheet.locator('.lens-group').nth(1)).toContainText('Semiconductors')
-  await expect(sheet.locator('.lens-group').nth(1)).toContainText('1위')
-  await expect(sheet.locator('.lens-group').nth(1)).toHaveClass(/top/)
-  expect(await names()).toEqual(['반도체 0','반도체 1','반도체 2','반도체 3','반도체 4','Kodiak'])
-  await expect(sheet.locator('.stock-row').first().locator('.group-rank-mini')).toHaveText(' · 업종 1위')
-  // Choosing a group narrows the list to it.
-  await sheet.locator('.lens-group').filter({hasText:'Biotechnology'}).click()
-  expect(await names()).toEqual(['Kodiak'])
-  await sheet.locator('.lens-group').first().click()
-  // RS순 keeps the former order (KOD first).
-  await sheet.locator('.lens-bar button',{hasText:'RS순'}).click()
-  expect((await names())[0]).toBe('Kodiak')
-  // Filters: loss/no revenue hidden, then SEPA only.
-  await sheet.locator('.lens-chip',{hasText:'적자·매출 없음 제외'}).click()
-  expect(await names()).not.toContain('Kodiak')
-  await expect(sheet.locator('.drill-note')).toContainText('필터로 1종목 제외')
-  await sheet.locator('.lens-chip',{hasText:'SEPA 충족만'}).click()
-  expect(await names()).toEqual(['반도체 0'])
-  await expect(sheet.locator('.stock-row').first().locator('.stock-flag')).toHaveText(['SEPA','매출 +35%'])
-  await sheet.locator('.lens-chip',{hasText:'SEPA 충족만'}).click()
-  await sheet.locator('.lens-chip',{hasText:'적자·매출 없음 제외'}).click()
-  // 대형 주도주 tab: the mega-cap below RS 95 appears with the rule explained.
-  await sheet.locator('.summary-tabs button',{hasText:'대형 주도주'}).click()
-  await expect(sheet.locator('.lens-explain')).toContainText('BIGCAP-1')
-  expect(await names()).toEqual(['대형 반도체'])
-  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)
-  expect(overflow).toBeLessThanOrEqual(1)
-  // The choice is remembered on this device.
-  await page.reload();await openPage(page,'시장 요약')
-  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
-  await openLeaderTools(page)
-  await page.locator('.drill-sheet .summary-tabs button',{hasText:'대형 주도주'}).click()
-  await expect(page.locator('.drill-sheet .summary-tabs button[aria-selected="true"]')).toContainText('대형 주도주')
-  await expect(page.locator('.drill-sheet .lens-bar button[aria-pressed="true"]',{hasText:'RS순'})).toHaveCount(1)
+  await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
+  await expect(page.locator('.drill-sheet')).toHaveCount(0)
+  const scope=page.locator('[data-wheel="주도 분류"]')
+  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중','전체'])
+  await expect(scope.getByRole('button',{name:'핵심 주도',exact:true})).toHaveAttribute('aria-pressed','true')
+  const list=page.locator('.analysis-idea-list')
+  await expect(list.locator('.stock-compact-row')).toHaveCount(6)
+  await scope.getByRole('button',{name:'전체',exact:true}).click()
+  await expect(list.locator('.stock-compact-row')).toHaveCount(12)
+  await scope.getByRole('button',{name:'핵심 주도',exact:true}).click()
+  await expect(list.locator('.stock-compact-row')).toHaveCount(6)
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBeTruthy()
   await context.close()
  })
 }

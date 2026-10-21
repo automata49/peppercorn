@@ -130,7 +130,7 @@ assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)
 assert(stockSizeFilter.includes("STOCK_CATEGORY_LABELS=[['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']]"),'Explore category order must remain 대형주 / 중소형주 / 전체 / ETF.');
 assert(stockSizeFilter.includes('stock-size-equities')&&stockSizeFilter.includes('stock-size-divider')&&stockSizeFilter.includes('stock-size-etf'),'Category control must keep equities grouped, a visible divider, and a separate ETF pebble.');
 assert(stockSize.includes("export type StockSize='large'|'small'|'etf'|'all'")&&stockSize.includes("if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')"),'ETF must remain a first-class Explore category.');
-assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']]"),'Equity leadership labels must be exactly 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.');
+assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중'],['all','전체']]"),'Equity leadership wheel must list 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 / 전체.');
 assert(!app.includes("['position','Position']"),'Position must not return as an Explore category.');
 assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product label must not return.');
 assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
@@ -140,7 +140,7 @@ assert(sidebar.includes("['signal','sectors','시장 신호']"),'The former Mark
 assert(app.includes("const etfRows=useMemo(()=>marketRows.filter(r=>r.asset_class==='ETF'),[marketRows])")&&app.includes("const todayLeaderRows=(stockSize==='etf'?rankedEtfRows:")&&app.includes('const todayRows=todayLeaderRows')&&app.includes('<EtfRsChart rows={rankedEtfRows.slice(0,5)}')&&!app.includes('etfMkt'),'Home ETF and 시장 신호 chart/list must share the same global-market ranked Top 5 without an independent ETF market state.');
 assert(app.includes('dashboard-explore dashboard-explore-expanded')&&!app.includes('<details className="dashboard-explore"'),'Core ETF exploration must remain expanded, not hidden in a disclosure.');
 assert(app.includes('sector-heat-disclosure signal-expanded-block')&&!app.includes('<details className="dashboard-disclosure sector-heat-disclosure"'),'Core sector map must remain expanded, not hidden in a disclosure.');
-assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약')&&app.includes("setSectorMkt(market);setPage('signal')"),'Home 오늘의 시장 must summarize the full market-signal path, reset the sector page to the same global market, and its 전체 보기 must open 시장 신호.');
+assert(app.includes('aria-label="시장 신호 요약"')&&app.includes('onClick={openMarketSignal}')&&app.includes('시장 폭 → 섹터 → ETF 요약')&&app.includes("setSectorMkt(market);setDiscoverTab('signal');setPage('analysis')"),'Home 오늘의 시장 must summarize the full market-signal path, reset the sector page to the same global market, and its 전체 보기 must open 시장 신호.');
 assert(app.includes('aria-label="오늘의 주도주"')&&app.includes('<h2>오늘의 주도주</h2>'),'Home leader preview must use the canonical 오늘의 주도주 title.');
 assert(app.indexOf('className="journey-today"')<app.indexOf('className="journey-classes"'),'오늘의 주도주 must appear above the four leadership-class buttons.');
 for(const selector of ['.page-analysis','.page-thesis','.page-tracking','.page-leaderboard','.page-universe','.page-temperature','.page-settings']){

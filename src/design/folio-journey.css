@@ -707,3 +707,24 @@
   border:0!important;
   box-shadow:none!important;
 }
+
+/* EDITORIAL-COMPARE-20261021: attributes run down rows, instruments across columns. */
+.vertical-compare{width:100%;min-width:0}
+.vertical-compare-viewport{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.vertical-compare-table{border-collapse:separate;border-spacing:0;min-width:max-content;width:100%;table-layout:fixed;color:var(--folio-ink);font-size:clamp(13px,1.25vw,15px)}
+.vertical-compare-table th,.vertical-compare-table td{border-bottom:1px solid var(--folio-line);padding:10px;min-width:160px;vertical-align:middle}
+.vertical-compare-table thead th{position:sticky;top:0;background:var(--folio-paper);z-index:2;vertical-align:bottom;text-align:left;font-weight:740}
+.vertical-compare-table thead th small{display:block;font-weight:450;color:var(--folio-muted);margin-top:4px}
+.vertical-compare-table .vertical-compare-field{position:sticky;left:0;min-width:110px;width:clamp(110px,20vw,205px);max-width:205px;z-index:3;background:var(--folio-paper);box-shadow:1px 0 0 var(--folio-line);font-weight:620;white-space:normal}
+.vertical-compare-table td{width:clamp(160px,22vw,270px);max-width:270px;white-space:normal;overflow-wrap:anywhere}
+.vertical-compare-table input,.vertical-compare-table select,.vertical-compare-table textarea{box-sizing:border-box;width:100%;min-height:44px;padding:9px;border:1px solid var(--folio-line);border-radius:10px;background:var(--folio-paper);color:var(--folio-ink);font:inherit;font-size:16px}
+.vertical-compare-table textarea{min-height:66px;resize:vertical}
+.vertical-compare-readonly{font-variant-numeric:tabular-nums}
+.vertical-compare-pages{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;color:var(--folio-muted);font-size:13px}
+.vertical-compare-pages button{min-height:44px;min-width:62px;color:var(--folio-ink);border:1px solid var(--folio-line);border-radius:10px;background:transparent}
+.vertical-compare-pages button:disabled{opacity:.35}
+@media(max-width:680px){
+ .vertical-compare-table .vertical-compare-field{min-width:105px;width:105px;max-width:105px}
+ .vertical-compare-table th,.vertical-compare-table td{min-width:170px;padding:8px}
+ .vertical-compare-table .vertical-compare-field{min-width:105px}
+}
