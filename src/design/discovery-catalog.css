@@ -531,3 +531,15 @@ html body .shell .app-main .analysis-finder .catalog-wheel-track.analysis-scope 
   opacity:1!important;
 }
 
+
+/* Specificity repair: old .analysis-scope grid rules in folio-pebble.css
+   were overriding flex, laying all five wheel options across one clipped row. */
+:root body .shell .app-main .catalog-carousel-layout .catalog-wheel-track.analysis-scope{
+  display:flex!important;
+  flex-direction:column!important;
+  flex-wrap:nowrap!important;
+  grid-template-columns:none!important;
+  align-items:stretch!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
