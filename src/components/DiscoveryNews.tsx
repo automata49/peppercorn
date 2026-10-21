@@ -20,7 +20,7 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
  // A signed-in user's PDF research reports are the default editorial view.
  const [newsTab,setNewsTab]=useState<'reports'|'news'>('reports')
- const [newsMarket,setNewsMarket]=useState<'ALL'|Market>(()=>{try{const v=localStorage.getItem('folio-news-market');return v==='KR'||v==='US'?v:'ALL'}catch{return 'ALL'}})
+ const [newsMarket,setNewsMarket]=useState<'ALL'|Market>(()=>{try{const v=localStorage.getItem('folio-news-market');return v==='KR'||v==='US'?v:market}catch{return market}})
  const [newsSize,setNewsSize]=useState<StockSize>(()=>{try{const v=localStorage.getItem('folio-news-size');return v==='small'||v==='all'||v==='etf'?v:'large'}catch{return 'large'}})
  useEffect(()=>{try{localStorage.setItem('folio-news-market',newsMarket);localStorage.setItem('folio-news-size',newsSize)}catch{}},[newsMarket,newsSize])
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
