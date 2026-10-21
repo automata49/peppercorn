@@ -753,7 +753,7 @@ export default function App(){
   const [catalogFiltersOpen,setCatalogFiltersOpen]=useState(false)
   const [catalogSort,setCatalogSort]=useState<'rs'|'return'|'name'>(()=>readDiscoverPreference('sort',['rs','return','name'],'rs') as 'rs'|'return'|'name')
   const [catalogView,setCatalogView]=useState<'list'|'cards'>(()=>{
-    return readDiscoverPreference('view',['cards','list'],'list') as 'list'|'cards'
+    return readDiscoverPreference('view',['cards','list'],localStorage.getItem('folio-catalog-view')==='cards'?'cards':'list') as 'list'|'cards'
   })
   useEffect(()=>{try{localStorage.setItem('folio-catalog-view',catalogView)}catch{}},[catalogView])
   const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|null>(()=>readDiscoverScope())
