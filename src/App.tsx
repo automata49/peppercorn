@@ -678,6 +678,20 @@ function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
   </form>
 }
 
+const DISCOVER_SETTINGS_KEY='folio-discover-settings-v2'
+const readDiscoverSettings=():Record<string,unknown>=>{
+  try{const raw=localStorage.getItem(DISCOVER_SETTINGS_KEY);const parsed=raw?JSON.parse(raw):{};return parsed&&typeof parsed==='object'&&!Array.isArray(parsed)?parsed:{}}catch{return {}}
+}
+const readDiscoverPreference=(field:string,valid:readonly string[],fallback:string):string=>{
+  const value=readDiscoverSettings()[field]
+  return typeof value==='string'&&valid.includes(value)?value:fallback
+}
+const readDiscoverSector=():string|null=>{const value=readDiscoverSettings().sector;return typeof value==='string'&&value.length<200?value:null}
+const readDiscoverScope=():'core'|'candidates'|'turns'|'corrections'|null=>{
+  const value=readDiscoverSettings().scope
+  return value===null?null:(['core','candidates','turns','corrections'].includes(String(value))?value as 'core'|'candidates'|'turns'|'corrections':'core')
+}
+
 export default function App(){
   const [editorialStyle,setEditorialStyle]=useEditorialStyle()
   const reduceLaunchMotion=useReducedMotion()
@@ -709,14 +723,15 @@ export default function App(){
   const refreshingRef=useRef(false)
   const sourceRef=useRef<'demo'|'supabase'>('demo')
   const lastLoadRef=useRef(0)
-  const [market,setMarket]=useState<'ALL'|Market>('ALL')
-  const [stockSize,setStockSize]=useState<StockSize>(readStockSize)
+  const [market,setMarket]=useState<'ALL'|Market>(()=>readDiscoverPreference('market',['ALL','KR','US'],'ALL') as 'ALL'|Market)
+  const [stockSize,setStockSize]=useState<StockSize>(()=>readDiscoverPreference('stockSize',['large','small','all','etf'],readStockSize()) as StockSize)
   const changeStockSize=(value:StockSize)=>{setStockSize(value);try{localStorage.setItem(STOCK_SIZE_STORAGE,value)}catch{}}
   const [query,setQuery]=useState('')
-  const [sector,setSector]=useState<string|null>(null)
+  const [sector,setSector]=useState<string|null>(()=>readDiscoverSector())
   const [leaderMkt,setLeaderMkt]=useState<MarketFilter>('ALL')
   const [sectorMkt,setSectorMkt]=useState<MarketFilter>('ALL')
-  useEffect(()=>{setLeaderMkt(market);setSectorMkt(market);setSector(null)},[market])
+  const marketReadyRef=useRef(false)
+  useEffect(()=>{setLeaderMkt(market);setSectorMkt(market);if(marketReadyRef.current)setSector(null);else marketReadyRef.current=true},[market])
   const [sectorKeySelected,setSectorKeySelected]=useState<string|null>(null)
   const [sectorSummaryOpen,setSectorSummaryOpen]=useState(false)
   const [marketMetricsOpen,setMarketMetricsOpen]=useState(false)
@@ -736,13 +751,15 @@ export default function App(){
   const [selected,setSelected]=useState<LeaderRow|null>(null)
   const [position,setPosition]=useState<PositionLoad&{loading:boolean}>({rows:new Map(),status:'unavailable',updatedAt:null,loading:true})
   const [catalogFiltersOpen,setCatalogFiltersOpen]=useState(false)
-  const [catalogSort,setCatalogSort]=useState<'rs'|'return'|'name'>('rs')
+  const [catalogSort,setCatalogSort]=useState<'rs'|'return'|'name'>(()=>readDiscoverPreference('sort',['rs','return','name'],'rs') as 'rs'|'return'|'name')
   const [catalogView,setCatalogView]=useState<'list'|'cards'>(()=>{
-    try{return localStorage.getItem('folio-catalog-view')==='cards'?'cards':'list'}catch{return 'list'}
+    return readDiscoverPreference('view',['cards','list'],'list') as 'list'|'cards'
   })
   useEffect(()=>{try{localStorage.setItem('folio-catalog-view',catalogView)}catch{}},[catalogView])
-  const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|null>('core')
+  const [analysisScope,setAnalysisScope]=useState<'core'|'candidates'|'turns'|'corrections'|null>(()=>readDiscoverScope())
   const [analysisSection,setAnalysisSection]=useState<'overview'|'analysis'|'financials'|'thesis'>('overview')
+  const [detailActionError,setDetailActionError]=useState('')
+  useEffect(()=>{try{localStorage.setItem(DISCOVER_SETTINGS_KEY,JSON.stringify({market,stockSize,scope:analysisScope,sector,sort:catalogSort,view:catalogView}))}catch{/* disabled storage */}},[market,stockSize,analysisScope,sector,catalogSort,catalogView])
   const [analysisRecordsOpen,setAnalysisRecordsOpen]=useState(()=>{try{return !window.matchMedia('(max-width: 650px)').matches}catch{return true}})
   const [recentStocks,setRecentStocks]=useState<RecentStock[]>(()=>readRecent())
   // Compare tray (<=4 stocks), remembered per device as a convenience.
@@ -897,8 +914,10 @@ export default function App(){
       // Restore the target entry directly; history.forward on a second
       // popstate left Safari's native stack out of sync with the UI.
       routeIndexRef.current=nav.index
-      // Keep the route guard armed only if the keyed screen actually changes.
-      restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':'list')
+      // Popstate owns the route. Align the key before state renders so the
+      // route-writing effect cannot push a second entry or bounce to Today.
+      routeKeyRef.current=route.page+'|'+(route.detail?'detail':'list')
+      restoringRouteRef.current=false
       setPage(route.page)
       setAnalysisDetail(route.detail)
       if(route.stock)setSelected(route.stock)
@@ -1196,23 +1215,10 @@ export default function App(){
     const now=Date.now()
     if(now-lastBackRequestRef.current<250)return
     lastBackRequestRef.current=now
-    if(routeIndexRef.current>0){
-      const previousIndex=routeIndexRef.current-1
-      const previous=routeHistoryRef.current[previousIndex]
-      if(previous){
-        // Restore the originating list/page at once even if iOS popstate is slow.
-        // Native Back/Forward still use the matching folioNav entry.
-        routeIndexRef.current=previousIndex
-        routeKeyRef.current=previous.page+'|'+(previous.detail?'detail':'list')
-        restoringRouteRef.current=true
-        setPage(previous.page)
-        setAnalysisDetail(previous.detail)
-        if(previous.stock)setSelected(previous.stock)
-        window.scrollTo({top:0,behavior:'instant'})
-        window.history.back()
-        return
-      }
-    }
+    // One physical gesture = one browser Back. Do not change route refs or
+    // render an optimistic page before popstate: Safari would otherwise
+    // replay a stale entry and jump from the origin list to Today.
+    if(routeIndexRef.current>0){window.history.back();return}
     if(analysisDetail){setAnalysisDetail(false);return}
     if(page!=='today')setPage('today')
     window.scrollTo({top:0,behavior:'instant'})
@@ -1220,7 +1226,7 @@ export default function App(){
   const openAnalysisStock=(row:LeaderRow)=>{
     // A new stock detail is a fresh navigation, not a duplicate Back tap.
     lastBackRequestRef.current=0
-    setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview')
+    setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview');setDetailActionError('')
     setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}))
     setPage('analysis');window.scrollTo({top:0,behavior:'instant'})
   }
@@ -1449,9 +1455,20 @@ export default function App(){
     const compareRows=compareKeys.map(k=>leaders.find(r=>keyOf(r)===k)).filter((r):r is LeaderRow=>!!r)
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
-    const addWatch=()=>{if(selected&&!inWatch)addTickerRecord('watchlist',selected.market+':'+selected.ticker)}
+    const addWatch=()=>{
+      if(!selected||inWatch)return
+      if(session&&!cloudReadyRef.current.resources.has('watchlist')){setDetailActionError('관심종목 동기화 준비 중입니다. 다시 시도해 주세요.');return}
+      updateWatch([{id:crypto.randomUUID(),market:selected.market,ticker:selected.ticker,name:selected.name,priority:'B'},...watch])
+      setDetailActionError('')
+    }
     const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
-    const goJudgement=()=>{if(selected&&!record)recordAnalysis(selected,false,false);setAnalysisSection('thesis');setPage('thesis');window.scrollTo({top:0,behavior:'instant'})}
+    const goJudgement=()=>{
+      if(!selected)return
+      if(session&&!cloudReadyRef.current.resources.has('analysis')){setDetailActionError('Thesis 동기화 준비 중입니다. 다시 시도해 주세요.');return}
+      if(!record)recordAnalysis(selected,false,false)
+      setDetailActionError('')
+      setAnalysisSection('thesis');setPage('thesis');window.scrollTo({top:0,behavior:'instant'})
+    }
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     const detailActions=<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
       <Button variant="secondary" aria-pressed={!!selected&&basketHas(selected)} onClick={()=>{if(selected)addToBasket(selected)}}><AppIcon name="basket"/>{selected&&basketHas(selected)?'장바구니 담김':'장바구니 담기'}</Button>
@@ -1464,10 +1481,11 @@ export default function App(){
       {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={goBackPage}/>}
       {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog catalog-carousel-layout">
         <div className="catalog-products">
-          <section className="catalog-filter-rails" aria-label="Filter & Sort">
+          <header className="catalog-section-heading"><h2>주도 종목</h2><button type="button" className="catalog-filter-inline" aria-haspopup="dialog" aria-expanded={catalogFiltersOpen} onClick={()=>setCatalogFiltersOpen(true)}>Filter &amp; Sort</button></header>
+          <section className="catalog-filter-rails" aria-label="주도 종목 분류">
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
             <FilterWheel label="종목 분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
-            <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'||analysisScope===v?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
+            <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
           </section>
           <div className="catalog-topline">
             <span className="catalog-result-count" aria-live="polite">{catalogRows.length.toLocaleString('ko-KR')}종목 · {catalogSort==='rs'?'RS 순':catalogSort==='return'?'20D 등락 순':'종목명 순'}</span>
@@ -1490,6 +1508,7 @@ export default function App(){
           </nav>}
           <div className="analysis-secondary" id="detail-panel" role={page==='analysis'?'tabpanel':undefined} aria-labelledby={page==='analysis'?'detail-tab-'+analysisSection:undefined}>
             {page==='analysis'&&analysisSection==='overview'&&<ObraOverview>{detailActions}</ObraOverview>}
+            {page==='analysis'&&analysisSection==='overview'&&detailActionError&&<p role="alert" className="detail-action-error">{detailActionError}</p>}
             {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)} compact/></section>
               <section className="analysis-block overview-checkup"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
@@ -1519,6 +1538,7 @@ export default function App(){
             </div>}
           </div>
           {page==='analysis'&&analysisSection!=='overview'&&detailActions}
+          {page==='analysis'&&analysisSection!=='overview'&&detailActionError&&<p role="alert" className="detail-action-error">{detailActionError}</p>
           {page==='analysis'&&analysisSection==='analysis'&&<section className="obra-market-details" aria-label="종목 비교와 출처"><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
         </div>
       </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
@@ -1598,15 +1618,17 @@ export default function App(){
   }
 
 
-  const discoveryFilters=<Dialog open={catalogFiltersOpen} onOpenChange={open=>{setCatalogFiltersOpen(open);if(open&&discoverTab!=='stocks')setDiscoverTab('stocks')}}>
-    <DialogTrigger asChild><button type="button" className="catalog-filter-toggle" aria-expanded={catalogFiltersOpen}>Filter &amp; Sort <span aria-hidden="true">⌄</span></button></DialogTrigger>
-    <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
+  const discoveryFilters=<Dialog open={catalogFiltersOpen} onOpenChange={setCatalogFiltersOpen}>
+     <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
       <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
-      <DialogDescription className="sr-only">섹터, 정렬 및 상세 조건을 선택하세요. 시장, 종목 분류, 주도 분류는 종목 목록 위에서 위아래로 돌려 선택할 수 있습니다.</DialogDescription>
+      <DialogDescription className="sr-only">시장, 종목 분류, 주도 분류, 섹터, 정렬 및 상세 조건을 설정하고 저장합니다.</DialogDescription>
+      <section><h3>시장</h3><div className="catalog-sort" role="group" aria-label="필터 시장">{(['ALL','KR','US'] as const).map(v=><button key={v} type="button" aria-pressed={market===v} onClick={()=>setMarket(v)}>{v==='ALL'?'전체':v}</button>)}</div></section>
+      <section><h3>종목 분류</h3><div className="catalog-sort" role="group" aria-label="필터 종목 분류">{([['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']] as const).map(([v,label])=><button key={v} type="button" aria-pressed={stockSize===v} onClick={()=>changeStockSize(v)}>{label}</button>)}</div></section>
+      <section><h3>주도 분류</h3><div className="catalog-sort" role="group" aria-label="필터 주도 분류">{([['all','전체'],['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const).map(([v,label])=><button key={v} type="button" disabled={stockSize==='etf'&&v!=='all'} aria-pressed={(analysisScope||'all')===v} onClick={()=>setAnalysisScope(v==='all'?null:v)}>{label}</button>)}</div></section>
       <section><h3>섹터</h3><select aria-label="탐색 섹터" value={sector||''} onChange={event=>setSector(event.target.value||null)}><option value="">전체 섹터</option>{allSectorRows.filter(g=>market==='ALL'||g.market===market).map(g=><option key={g.key} value={g.key}>{(market==='ALL'?g.market+' · ':'')+sectorName(g.market,g.sector)}</option>)}</select></section>
       <section><h3>정렬</h3><div className="catalog-sort" role="group" aria-label="종목 정렬">{([['rs','RS 높은 순'],['return','20D 등락 높은 순'],['name','종목명 순']] as const).map(([key,label])=><button type="button" key={key} aria-pressed={catalogSort===key} onClick={()=>setCatalogSort(key)}>{label}</button>)}</div></section>
       <details className="catalog-advanced"><summary>상세 조건</summary><LensBar view={leaderView} setView={setLeaderView} filter={lensFilter} setFilter={setLensFilter} flagsReady={!!flagFile} showView={false}/></details>
-      <DialogClose asChild><button type="button" className="catalog-show-results">종목 보기</button></DialogClose>
+      <DialogClose asChild><button type="button" className="catalog-show-results">설정 저장 · 종목 보기</button></DialogClose>
     </DialogContent>
   </Dialog>
   if(page==='analysis'&&!analysisDetail){
@@ -1614,9 +1636,9 @@ export default function App(){
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
       <SectionHeading kind="discover" kicker="DISCOVER" title="변화하는 세상을 읽다" description="기업을 발견하고, 나의 관점으로 남기는 시간."/>
       <Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}>
-        <div className="discovery-tabbar"><TabsList aria-label="발견 영역"><TabsTrigger value="signal">시장 신호</TabsTrigger><TabsTrigger value="stocks">종목</TabsTrigger><TabsTrigger value="topics">주제</TabsTrigger></TabsList>{discoveryFilters}</div>
-        {discoverTab==='stocks'&&<DiscoveryNews reports={sourceReports} feed={leaderInsights} rows={leaders} market={market} getClass={displayClass} onSelect={openAnalysisStock}/>}
-        {(['signal','stocks','topics'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&content}</TabsContent>)}
+        <div className="discovery-tabbar"><TabsList aria-label="발견 영역"><TabsTrigger value="signal">시장 신호</TabsTrigger><TabsTrigger value="stocks">종목</TabsTrigger><TabsTrigger value="topics">주제</TabsTrigger></TabsList></div>
+        {(['signal','stocks','topics'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&<>{content}{tab==='signal'&&<DiscoveryNews reports={sourceReports} feed={leaderInsights} rows={leaders} market={market} getClass={displayClass} onSelect={openAnalysisStock}/>}</>}</TabsContent>)}
+        {discoveryFilters}
       </Tabs>
     </section>
   }
