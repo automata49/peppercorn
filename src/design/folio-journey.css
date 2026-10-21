@@ -733,9 +733,9 @@
 /* FOLIO-MARKET-EDITORIAL-20261021: exact type hierarchy of MARKET & COMPANIES.
    Keep existing Sector / ETF data, panel actions and accessibility semantics. */
 .discovery-home .folio-editorial-map-heading .journey-kicker{
-  display:block;color:var(--folio-muted)!important;
+  display:block;color:var(--folio-coral)!important;
   font-size:clamp(11px,1vw,13px)!important;font-weight:750!important;
-  line-height:1.5!important;letter-spacing:.13em!important;
+  line-height:14px!important;letter-spacing:.13em!important;
   text-transform:none;
 }
 .discovery-home .folio-editorial-map-heading h2,
