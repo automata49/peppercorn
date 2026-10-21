@@ -23,9 +23,9 @@ test('three vertical wheels, tab-level Filter & Sort and KR/US price-return colo
   const tabs=page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')
   await expect(tabs).toHaveText(['시장 신호','종목','주제'])
   const filter=page.getByRole('button',{name:/Filter & Sort/})
-  const tabBox=(await tabs.last().boundingBox())!,filterBox=(await filter.boundingBox())!
-  expect(filterBox.x).toBeGreaterThan(tabBox.x)
-  expect(Math.abs(filterBox.y+filterBox.height/2-tabBox.y-tabBox.height/2)).toBeLessThan(20)
+  const heading=(await page.locator('.catalog-heading-row h2').boundingBox())!,filterBox=(await filter.boundingBox())!
+  expect(filterBox.x).toBeGreaterThan(heading.x+heading.width)
+  expect(Math.abs(filterBox.y+filterBox.height/2-heading.y-heading.height/2)).toBeLessThan(22)
 
   const wheels=page.locator('.catalog-filter-rails > .catalog-wheel')
   await expect(wheels).toHaveCount(3)
@@ -57,6 +57,6 @@ test('three vertical wheels, tab-level Filter & Sort and KR/US price-return colo
   await page.getByRole('button',{name:'필터 닫기'}).click()
   await tabs.first().click()
   await expect(page.getByRole('tab',{name:'시장 신호'})).toHaveAttribute('aria-selected','true')
-  await expect(filter).toBeVisible()
+  await expect(filter).toHaveCount(0)
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
 })
