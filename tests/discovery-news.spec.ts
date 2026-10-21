@@ -121,9 +121,7 @@ test('GLOBAL TREND news is featured without ticker even outside leaderboard and 
  await expect(card.getByRole('button',{name:'종목 보기 →'})).toHaveCount(0)
  await expect(card.getByRole('link',{name:'원문 읽기 ↗'})).toHaveAttribute('href','https://example.com/research/ai-infrastructure')
  await expect(section).not.toContainText('A non-leading company announcement')
- await openFilters(page)
- await page.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click()
- await closeFilters(page)
+ await section.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click()
  await expect(card).toBeVisible()
 })
 
