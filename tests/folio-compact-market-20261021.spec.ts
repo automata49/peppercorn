@@ -40,7 +40,9 @@ for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]]){
    })
    expect(design).toEqual(canonical)
   }
-  await expect(page.locator('.dashboard-sector-table')).toBeVisible()
+  await expect(page.locator('.dashboard-sector-panel')).toBeVisible()
+  if(width<=650)await expect(page.locator('.mobile-sector-list')).toBeVisible()
+  else await expect(page.locator('.dashboard-sector-table')).toBeVisible()
   await expect(page.locator('.sector-heat')).toBeVisible()
   await expect(page.locator('.dashboard-etf-industry-panel')).toBeVisible()
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
