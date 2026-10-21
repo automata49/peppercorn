@@ -728,3 +728,22 @@
  .vertical-compare-table th,.vertical-compare-table td{min-width:170px;padding:8px}
  .vertical-compare-table .vertical-compare-field{min-width:105px}
 }
+
+
+/* FOLIO-MARKET-EDITORIAL-20261021: exact type hierarchy of MARKET & COMPANIES.
+   Keep existing Sector / ETF data, panel actions and accessibility semantics. */
+.discovery-home .folio-editorial-map-heading .journey-kicker{
+  display:block;color:var(--folio-coral)!important;
+  font-size:clamp(11px,1vw,13px)!important;font-weight:750!important;
+  line-height:14px!important;letter-spacing:.13em!important;
+  text-transform:none;
+}
+.discovery-home .folio-editorial-map-heading h2,
+.discovery-home .folio-editorial-map-heading h3{
+  margin:8px 0 0!important;color:var(--folio-ink)!important;
+  font-family:inherit!important;font-size:clamp(22px,2.5vw,32px)!important;
+  font-weight:550!important;line-height:1.2!important;letter-spacing:-.035em!important;
+}
+.discovery-home .folio-editorial-map-heading p{margin-top:8px}
+.discovery-home .signal-expanded-head .folio-editorial-map-heading{min-width:0}
+.discovery-home .signal-etf-head{padding:0}

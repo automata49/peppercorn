@@ -95,3 +95,11 @@ Use for read-only identity, responsive UI and completion review. Read CONTRACT, 
 6. Return severity, file, reproducible evidence, exact executed checks and outstanding acceptance IDs. Physical Safari/Pencil claims require device evidence. Stay read-only and never approve unrun checks.
 
 - ComparisonSheet typed input preservation: null→number inputs must remain numeric for score formulas, true/false selector values must remain booleans, and '관리' deletion retains its confirmation modal and cloud sync. Regression test on analysis records.
+
+## FOLIO-COMPACT-MARKET-20261021 — approved refinement
+- Reference surfaces are iPhone and iPad **portrait**; preserve native wheel vertical gesture, independent column scrolling, fixed selected indicator, 44px minimum hit rows, keyboard access, reduced motion/transparency, with correct landscape/desktop adaptation.
+- All vertical wheels (Stock filters and News filters) use a **128px** scrolling viewport on portrait, **136px** on wide layouts; selection center uses matching padding, not a clipped decorative scale. Compress heading and inter-row whitespace but never touch target size.
+- Discover → Market Signal removes the **MARKET MAP / 시장 신호 / 주도 종목 →** redundant hero row entirely. Discover tab remains the single navigation route.
+- Match MARKET & COMPANIES / 시장과 기업의 새 소식 font metrics exactly for **Sector Leaders / 주도 섹터**, **SECTOR MAP / 시장 지표 · 섹터 히트맵**, and **ETF MAP / ETF 주도 산업** (eyebrow, headline, spacing and responsive scale). Maintain semantic headings without duplicate ETF industry heading.
+- Remove the top-level ETF / "홈과 동일한 … ETF RS 순위를 이어서 봅니다" copy, but retain ETF industry heatmap, ranked top-five list, data source, dialogs and all selection mechanics.
+- Gates: mobile 390, iPad 834 portrait, 1194 landscape, desktop 1440; verify selected wheel and touch targets/independent scrolling, typography parity, no page overflow, absent duplicate row/copy and unchanged map + ETF interactions. Bypass no existing checks; add only targeted regressions.

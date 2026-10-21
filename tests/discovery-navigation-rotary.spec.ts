@@ -231,3 +231,31 @@ test('Harness: saved right-drawer filters, idempotent leadership, detail actions
   await expect(page.locator('.stock-compact-list')).toBeVisible()
   await expect(page.locator('.page-today')).toHaveCount(0)
 })
+
+
+test('compact wheels preserve active selection, 44px hit areas and independent scroll on all viewports',async({page})=>{
+ for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]]){
+  await page.setViewportSize({width,height})
+  await boot(page);await discover(page)
+  const wheels=page.locator('.analysis-finder .catalog-wheel')
+  await expect(wheels).toHaveCount(3)
+  for(const wheel of await wheels.all()){
+   const viewport=wheel.locator('.catalog-wheel-track')
+   const metrics=await viewport.evaluate(el=>({height:el.getBoundingClientRect().height,scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,axis:getComputedStyle(el).touchAction}))
+   expect(metrics.height).toBeLessThanOrEqual(width>=1100?137:129)
+   expect(metrics.height).toBeGreaterThanOrEqual(120)
+   // On wide layouts every visible option may fit; scrolling is only required when clipped.
+   expect(metrics.scrollHeight).toBeGreaterThanOrEqual(metrics.clientHeight)
+   expect(metrics.axis).toContain('pan-y')
+   const direction=await viewport.evaluate(el=>getComputedStyle(el).flexDirection)
+   expect(direction).toBe('column')
+   expect((await wheel.locator('.catalog-wheel-selection').boundingBox())!.height).toBeLessThanOrEqual(50)
+   for(const button of await wheel.getByRole('button').all())expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  }
+  const market=page.locator('.analysis-finder [data-wheel="시장"]')
+  await market.getByRole('button',{name:'US',exact:true}).click()
+  await expect(market.getByRole('button',{name:'US',exact:true})).toHaveAttribute('aria-pressed','true')
+  await expect(page.locator('.analysis-finder [data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true})).toHaveAttribute('aria-pressed','true')
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
+ }
+})
