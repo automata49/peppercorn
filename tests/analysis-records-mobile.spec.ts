@@ -25,7 +25,7 @@ test('phone analysis records are secondary and editable on demand',async({browse
   await expect(records.locator('.analysis-records-note')).toBeHidden()
   await records.locator(':scope > summary').click()
   await expect(records).toHaveAttribute('open','')
-  await expect(records.locator('.ag-root')).toBeVisible()
+  await expect(records.locator('.vertical-compare-table, .empty').first()).toBeVisible()
   await context.close()
 })
 
@@ -41,5 +41,5 @@ test('desktop analysis records stay open without an extra disclosure header',asy
   await expect(records).toHaveAttribute('open','')
   await expect(records.locator(':scope > summary')).toBeHidden()
   await expect(records.locator('.analysis-records-note')).toBeVisible()
-  await expect(records.locator('.ag-root')).toBeVisible()
+  await expect(records.locator('.vertical-compare-table, .empty').first()).toBeVisible()
 })

@@ -16,7 +16,7 @@ for(const width of [390,834,1440])test(`basket ${width}: add, deduplicate, reloa
  await expect(header.getByRole('button',{name:'종목 검색',exact:true})).toBeVisible()
  await expect(page.getByRole('button',{name:'홈',exact:true})).toHaveCount(0)
  await header.getByRole('button',{name:'장바구니 0종목'}).click();await expect(page.getByRole('dialog')).toContainText('담아보세요');await page.keyboard.press('Escape')
- await openPage(page,'발견');await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click();await closeFilters(page)
+ await openPage(page,'발견');await openFilters(page);await page.locator('.analysis-scope').getByRole('button',{name:'전체',exact:true}).click();await closeFilters(page)
  const card=page.locator('.stock-catalog-card').first(),ticker=await card.locator('.stock-trend-ticker').textContent()
  await card.locator('.stock-basket-add').click();await expect(page.locator('.analysis-finder')).toBeVisible();await card.locator('.stock-basket-add').click();await expect(header.getByRole('button',{name:'장바구니 1종목'})).toBeVisible()
  await card.locator('.stock-trend-row').click();await expect(page.getByRole('button',{name:'장바구니 담김',exact:true})).toHaveAttribute('aria-pressed','true')

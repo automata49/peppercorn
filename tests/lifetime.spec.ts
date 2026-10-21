@@ -55,7 +55,7 @@ test('reduced motion, dirty dismissal, photo preview and real close-price chart'
  await expect(page.locator('.journal-cover')).toBeVisible()
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'기록 닫기'}).click();await expect(page.getByRole('dialog')).toBeVisible()
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.locator('.journal-gallery img').first()).toBeVisible()
- await openPage(page,'발견');await openFilters(page);const active=page.locator('.analysis-scope button[aria-pressed=true]');if(await active.count())await active.click();await page.getByRole('group',{name:'분류',exact:true}).getByRole('button',{name:'전체',exact:true}).click();await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await page.getByRole('tab',{name:'Analysis',exact:true}).click();await page.getByRole('button',{name:'종가 확대',exact:true}).click()
+ await openPage(page,'발견');await openFilters(page);await page.locator('.analysis-scope').getByRole('button',{name:'전체',exact:true}).click();await page.getByRole('group',{name:'종목 분류',exact:true}).getByRole('button',{name:'전체',exact:true}).click();await closeFilters(page);await page.locator('.analysis-idea-list .stock-trend-row').first().click();await page.getByRole('tab',{name:'Analysis',exact:true}).click();await page.getByRole('button',{name:'종가 확대',exact:true}).click()
  await expect(page.locator('.close-price-chart canvas').first()).toBeVisible();await expect(page.getByRole('slider',{name:'종가 날짜 탐색'})).toHaveAttribute('aria-valuetext',/102/)
  await page.getByRole('button',{name:'가격 · RS 비교',exact:true}).click();await expect(page.locator('.scrubbable-chart')).toBeVisible()
 })
