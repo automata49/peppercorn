@@ -1511,7 +1511,7 @@ export default function App(){
       {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={goBackPage}/>}
       {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog catalog-carousel-layout">
         <div className="catalog-products">
-          <div className="catalog-heading-row"><div className="folio-section-heading"><span className="journey-kicker">MARKET LEADERS</span><h2>주도 종목</h2></div>{discoveryFilters}</div>
+          <div className="catalog-heading-row"><div className="folio-editorial-map-heading"><span className="journey-kicker">MARKET LEADERS</span><h2>주도 종목</h2></div>{discoveryFilters}</div>
           <section className="catalog-filter-rails" aria-label="Filter & Sort">
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
             <FilterWheel label="종목 분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>

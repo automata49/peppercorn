@@ -37,7 +37,10 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
     const current=nearest()
     if(!current)return
     setPreview(current.i)
-    if(autoScroll.current||!userScrolling.current)return
+    // Native momentum scrolling may omit pointerdown (notably on iOS Safari).
+    // Ignore only programmatic recentering, not real scroll-driven changes.
+    if(autoScroll.current)return
+    userScrolling.current=true
     if(settle.current)clearTimeout(settle.current)
     settle.current=setTimeout(()=>{
       const item=nearest()

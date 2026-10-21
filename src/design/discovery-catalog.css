@@ -507,3 +507,40 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
  .catalog-carousel-layout .catalog-filter-rails{gap:6px!important}
  .catalog-carousel-layout .catalog-wheel-heading{min-height:28px!important}
 }
+
+
+/* FOLIO-MARKET-LEADERS-WHEEL-20261021: align Stock and Signal editorial titles. */
+.catalog-heading-row .folio-editorial-map-heading .journey-kicker{
+  display:block;color:var(--folio-coral)!important;
+  font-size:clamp(11px,1vw,13px)!important;font-weight:750!important;
+  line-height:14px!important;letter-spacing:.13em!important;text-transform:none;
+}
+.catalog-heading-row .folio-editorial-map-heading h2{
+  margin:8px 0 0!important;color:var(--folio-ink)!important;
+  font-family:inherit!important;font-size:clamp(22px,2.5vw,32px)!important;
+  font-weight:550!important;line-height:1.2!important;letter-spacing:-.035em!important;
+}
+/* Keep the compact 128px/136px picker, but expose adjacent leadership options. */
+.analysis-finder .catalog-wheel-track.analysis-scope{
+  -webkit-mask-image:none!important;mask-image:none!important;
+}
+html body .shell .app-main .analysis-finder .catalog-wheel-track.analysis-scope button:not(:disabled){
+  opacity:.86!important;
+}
+html body .shell .app-main .analysis-finder .catalog-wheel-track.analysis-scope button[aria-pressed="true"]{
+  opacity:1!important;
+}
+
+
+/* Specificity repair: old .analysis-scope grid rules in folio-pebble.css
+   were overriding flex, laying all five wheel options across one clipped row. */
+:root body .shell .app-main .catalog-carousel-layout .catalog-wheel-track.analysis-scope{
+  display:flex!important;
+  flex-direction:column!important;
+  flex-wrap:nowrap!important;
+  grid-template-columns:none!important;
+  gap:0!important;
+  align-items:stretch!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}

@@ -1,3 +1,10 @@
+## FOLIO-MARKET-LEADERS-WHEEL-20261021 — approved compact correction (2026-10-21)
+
+- Discover → 종목: MARKET LEADERS / 주도 종목 matches Market Signal's Sector Leaders / 주도 섹터 editorial typography (eyebrow, headline, scale, line height and spacing) while Filter & Sort remains right-aligned.
+- Leadership wheel ALWAYS renders all equity choices in order: 핵심 주도, 주도 후보, 강세 전환, 조정 중, 전체. Compact 128px portrait / 136px wide viewport shows a legible adjacent option and retains actual vertical scrolling to the last choice; never replace it with a one-label static display.
+- Native touch swipes, momentum/scroll settlement, click, ArrowUp/Down and persisted selection must update the same stock filter. A non-programmatic scroll must commit even when no pointerdown event was emitted. A programmatic recenter must not change the filter. ETF stays independent, with non-equity classifications disabled; no change to ranks, counts or market colours.
+- Regression: computed heading styles equal Signal; all five wheel DOM options exist and are scroll-reachable; active option is centered, swipe/click/keyboard select and refresh restore it at 390px, 834px, 1194px, 1440px; no page horizontal overflow. Preserve reduced-motion and minimum 44px touch target.
+
 ## FOLIO-WORKFLOW-20261021-B — approved revision (2026-10-21)
 
 1. Audit the app's page / section / subsection editorial hierarchy with one bilingual typography contract: uppercase English kicker, Korean heading, shared semantic h1/h2/h3 and spacing. Do not add duplicate page titles where SectionHeading already owns the region.
