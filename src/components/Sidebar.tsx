@@ -19,10 +19,10 @@ const pages:[string,AppIconName,string][]=[
   ['settings','settings','Settings']
 ]
 const pageGroups=[
-  ['핵심',['today','analysis','notebook','tracking']],
+  ['핵심',['today','analysis']],
+  ['저널 · 여정',['notebook','tracking']],
   ['시장',['dashboard','signal','temperature']],
-  ['기록과 추적',['research','watchlist','portfolio']],
-  ['전체 데이터',['leaderboard','universe','settings']]
+  ['데이터 · 도구',['research','watchlist','portfolio','leaderboard','universe','settings']]
 ] as const
 
 type ThemeMode='system'|'light'|'dark'
