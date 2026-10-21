@@ -1619,7 +1619,7 @@ export default function App(){
 
 
   const discoveryFilters=<Dialog open={catalogFiltersOpen} onOpenChange={setCatalogFiltersOpen}>
-     <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay">
+     <DialogContent className="catalog-filter-drawer" overlayClassName="catalog-filter-overlay" onCloseAutoFocus={e=>{e.preventDefault();document.querySelector<HTMLButtonElement>('.catalog-filter-inline')?.focus()}}>
       <header className="catalog-filter-heading"><DialogTitle>Filter &amp; Sort</DialogTitle><DialogClose asChild><button type="button" aria-label="필터 닫기">닫기 ×</button></DialogClose></header>
       <DialogDescription className="sr-only">시장, 종목 분류, 주도 분류, 섹터, 정렬 및 상세 조건을 설정하고 저장합니다.</DialogDescription>
       <section><h3>시장</h3><div className="catalog-sort" role="group" aria-label="필터 시장">{(['ALL','KR','US'] as const).map(v=><button key={v} type="button" aria-pressed={market===v} onClick={()=>setMarket(v)}>{v==='ALL'?'전체':v}</button>)}</div></section>
