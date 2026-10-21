@@ -1,9 +1,10 @@
 import {useState} from 'react'
 import type {ColDef} from 'ag-grid-community'
 import type {EditableRow} from '../types'
+type CompareRow=Record<string,string|number|boolean|null|undefined>
 
 /** A single edit surface for every account-scoped record list: fields down, records across. */
-export function ComparisonSheet({rows,columns,onChange,label}:{rows:EditableRow[];columns:ColDef<EditableRow>[];onChange:(next:EditableRow[])=>void;label:string}){
+export function ComparisonSheet({rows,columns,onChange,label}:{rows:CompareRow[];columns:ColDef<EditableRow>[];onChange:(next:EditableRow[])=>void;label:string}){
  const [requestedPage,setRequestedPage]=useState(0)
  const size=8,total=Math.max(1,Math.ceil(rows.length/size)),page=Math.min(requestedPage,total-1)
  const fields=columns.filter(col=>typeof col.field==='string'&&!!col.headerName)
@@ -14,9 +15,9 @@ export function ComparisonSheet({rows,columns,onChange,label}:{rows:EditableRow[
    const nextValue=text.trim()===''?null:numeric?Number(text):text
    if(numeric&&text.trim()!==''&&!Number.isFinite(nextValue as number))return
    if(String(previous??'')===String(nextValue??''))return
-   onChange(rows.map((row,i)=>i===index?{...row,[field]:nextValue}:row))
+   onChange(rows.map((row,i)=>(i===index?{...row,[field]:nextValue}:row) as EditableRow))
  }
- const display=(col:ColDef<EditableRow>,record:EditableRow)=>{
+ const display=(col:ColDef<EditableRow>,record:CompareRow)=>{
    const value=record[col.field!]
    if(typeof col.valueFormatter==='function'){
      try{return String(col.valueFormatter({value,data:record} as never)??'—')}catch{}
