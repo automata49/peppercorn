@@ -6,6 +6,7 @@ import {coverPhoto,useVisualStyle} from './VisualStyle'
 import {SourceReports} from './SourceReports'
 import type {ReportController} from '../lib/sourceReports'
 import {stockSizes,filterStockSize,type StockSize} from '../lib/stockSize'
+import {FilterWheel} from './FilterWheel'
 
 const classes=new Set(['핵심 주도','주도 후보','강세 전환','조정 중'])
 type NewsStory={
@@ -18,11 +19,17 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
  // A signed-in user's PDF research reports are the default editorial view.
- const [newsTab,setNewsTab]=useState<'reports'|Extract<StockSize,'large'|'small'|'all'>>('reports')
+ const [newsTab,setNewsTab]=useState<'reports'|Extract<StockSize,'large'|'small'|'all'>>(()=>{
+  try{const v=localStorage.getItem('folio-signal-news-size');return v==='reports'||v==='large'||v==='small'||v==='all'?v:'reports'}catch{return 'reports'}
+ })
+ const [newsMarket,setNewsMarket]=useState<Market|'ALL'>(()=>{
+  try{const v=localStorage.getItem('folio-signal-news-market');return v==='KR'||v==='US'||v==='ALL'?v:market}catch{return market}
+ })
+ useEffect(()=>{try{localStorage.setItem('folio-signal-news-size',newsTab);localStorage.setItem('folio-signal-news-market',newsMarket)}catch{}},[newsTab,newsMarket])
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
- const visible=(m:'KR'|'US'|'GLOBAL')=>market==='ALL'||m==='GLOBAL'||market===m
+ const visible=(m:'KR'|'US'|'GLOBAL')=>newsMarket==='ALL'||m==='GLOBAL'||newsMarket===m
  const fromDrive:NewsStory[]=instinct.flatMap((item,i)=>{
   if(!visible(item.market))return []
   const isTrend=item.type==='trend',row=!isTrend?lookup.get(item.market+':'+item.ticker):undefined
@@ -66,8 +73,9 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
   <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>{newsTab==='reports'?'Google Drive · PDF 리포트':'최근 7일 · 출처 확인'}</span></header>
-  <div className="discovery-news-size" role="group" aria-label="MARKET & COMPANIES 종목 규모">
-   {([['reports','리포트'],['large','대형주'],['small','중소형주'],['all','전체']] as const).map(([value,label])=><button key={value} type="button" aria-pressed={newsTab===value} onClick={()=>setNewsTab(value)}>{label}</button>)}
+  <div className="discovery-news-wheels" aria-label="시장과 기업의 새 소식 분류">
+   <FilterWheel label="시장" value={newsMarket} onChange={v=>setNewsMarket(v as Market|'ALL')} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
+   <FilterWheel label="종목 분류" value={newsTab} onChange={v=>setNewsTab(v as typeof newsTab)} options={[{value:'reports',label:'리포트'},{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'}]}/>
   </div>
   {newsTab==='reports'?<div className="discovery-news-report-content">
    {!reports.uid?<p className="discovery-news-empty" role="status">로그인 후 Folio 리서치 리포트를 볼 수 있습니다.</p>:!reports.items.length&&!reports.error?<p className="discovery-news-empty" role="status">등록된 리서치 리포트가 없습니다.</p>:<SourceReports controller={reports}/>}
