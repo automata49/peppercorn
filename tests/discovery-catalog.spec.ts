@@ -19,6 +19,7 @@ for(const [width,height] of [[390,844],[568,320],[844,390],[834,1194],[1194,834]
  await openFilters(page)
  await page.getByRole('button',{name:/Filter & Sort/}).click()
  await page.getByRole('button',{name:'종목명 순',exact:true}).click();await closeFilters(page)
+ await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'카드형'}).click()
  const card=page.locator('.stock-catalog-card').first();await expect(card).toBeVisible();await expect(page.locator('.catalog-result-count')).toContainText('종목명 순')
  expect(await card.evaluate(el=>getComputedStyle(el).borderRadius)).toBe('24px');expect(await card.evaluate(el=>getComputedStyle(el).backdropFilter)).toContain('blur')
  await page.getByRole('button',{name:/Filter & Sort/}).click();await page.keyboard.press('Escape');await expect(page.locator('.catalog-filter-drawer.ui-dialog-content')).toHaveCount(0);await expect(page.getByRole('button',{name:/Filter & Sort/})).toBeFocused()
