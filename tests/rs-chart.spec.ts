@@ -125,10 +125,10 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   await expect(drill.locator('.drill-tabs')).toBeVisible()
   await expect(drill.locator('.stock-snapshot')).toHaveCount(0)
 
-  // The drill's explicit back restores the sector list; page-level native Back is covered in navigation tests.
+  // Browser/device Back dismisses this subordinate detail and preserves the sector list.
   await drill.locator('.stock-row').first().click()
   await expect(drill.locator('.stock-snapshot')).toBeVisible()
-  await drill.locator('.drill-back').click()
+  await page.goBack()
   await expect(drill.locator('.stock-snapshot')).toHaveCount(0)
   await expect(drill.locator('.drill-tabs')).toBeVisible()
   await page.getByRole('button',{name:'닫기',exact:true}).click()

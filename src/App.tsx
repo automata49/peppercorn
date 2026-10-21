@@ -771,6 +771,7 @@ export default function App(){
   const drillRef=useRef<HTMLDivElement|null>(null)
   const detailReturnRef=useRef<{etfIndustry:string|null}|null>(null)
   const backFromDetailRef=useRef<()=>void>(()=>{})
+  const drillDetailHistoryRef=useRef(false)
   const launchRef=useRef<HTMLDivElement|null>(null)
   const analysisRecordsRef=useRef<HTMLDivElement|null>(null)
   const [scrollToAnalysis,setScrollToAnalysis]=useState(false)
@@ -883,7 +884,15 @@ export default function App(){
   },[drillOpen])
 
 
-  // Only full-page transitions create browser history entries. Drilling inside a dialog never changes the page stack.
+  // Modal stock detail adds one subordinate entry so device Back closes detail,
+  // leaving its parent sector/ETF list visible without affecting canonical page history.
+  useEffect(()=>{
+    if(!drillStock||drillDetailHistoryRef.current)return
+    try{
+      window.history.pushState({...window.history.state,folioDrillDetail:navigationIdRef.current},'')
+      drillDetailHistoryRef.current=true
+    }catch{}
+  },[drillStock])
   useEffect(()=>{
     try{window.history.replaceState({...window.history.state,folioNav:{id:navigationIdRef.current,index:0}},'')}catch{}
   },[])
@@ -899,6 +908,13 @@ export default function App(){
   },[page,analysisDetail,discoverTab,trackingTab])
   useEffect(()=>{
     const onPop=(event:PopStateEvent)=>{
+      // The preceding entry belongs to the current page. Resolve subordinate
+      // drill history before restoring any page/tab route.
+      if(drillDetailHistoryRef.current){
+        drillDetailHistoryRef.current=false
+        backFromDetailRef.current()
+        return
+      }
       const nav=event.state?.folioNav
       if(nav?.id!==navigationIdRef.current||!Number.isInteger(nav.index))return
       const route=routeHistoryRef.current[nav.index]
@@ -1632,8 +1648,6 @@ export default function App(){
   }
 
 
-  if(page==='signal')content=<><DiscoveryNews reports={sourceReports} feed={leaderInsights} rows={leaders} market={market} getClass={displayClass} onSelect={openAnalysisStock}/>{content}</>
-
   if(page==='analysis'&&!analysisDetail){
     if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}/>
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
@@ -1647,7 +1661,13 @@ export default function App(){
   const trackingContent=<section className="journey-workspace"><SectionHeading kind="journey" kicker="A LIFETIME IN PAGES" title="그때의 나, 지금의 나" description="가설과 투자 방향을 재점검하고, 새로운 증거에 대응합니다."/><Tabs value={trackingTab} onValueChange={value=>setTrackingTab(value as typeof trackingTab)}><TabsList className="journey-magazine-tabs" aria-label="여정 영역">{([['review','재검토'],['watchlist','관심종목'],['portfolio','보유종목']] as const).map(([key,label])=><TabsTrigger key={key} value={key}>{label}</TabsTrigger>)}</TabsList>{(['review','watchlist','portfolio'] as const).map(tab=><TabsContent key={tab} value={tab}>{trackingTab===tab&&content}</TabsContent>)}</Tabs></section>
   const pageTitle:Record<string,string>={today:'오늘',notebook:'저널',research:'리서치 노트',signal:'시장 신호',thesis:'투자 근거',tracking:'여정',dashboard:'시장 요약',leaderboard:'주도 순위',watchlist:'관심 종목',portfolio:'보유 종목',analysis:analysisDetail?'종목 상세':'발견',temperature:'시장 온도계',journal:'투자일지',universe:'종목 유니버스',settings:'환경 설정'}
   const pageKicker:Record<string,string>={today:'TODAY',notebook:'JOURNAL',research:'RESEARCH',signal:'MARKET SIGNAL',thesis:'THESIS',tracking:'JOURNEY',dashboard:'MARKET OVERVIEW',leaderboard:'LEADERBOARD',watchlist:'WATCHLIST',portfolio:'PORTFOLIO',analysis:analysisDetail?'STOCK DETAIL':'DISCOVER',temperature:'MARKET TEMPERATURE',journal:'TRADING JOURNAL',universe:'UNIVERSE',settings:'SETTINGS'}
-  const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
+  const closeDrill=()=>{
+    if(drillDetailHistoryRef.current){
+      drillDetailHistoryRef.current=false
+      try{window.history.back()}catch{}
+    }
+    detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)
+  }
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
     const ret=detailReturnRef.current;detailReturnRef.current=null
@@ -1711,7 +1731,7 @@ export default function App(){
     <DialogContent ref={drillRef} className="drill-sheet">
       <div className="drill-handle"/>
       <div className="drill-head">
-        <div>{drillStock&&<button type="button" className="drill-back" onClick={backFromDetail} aria-label={`종목 상세에서 ${detailBackLabel==='뒤로'?'나가기':detailBackLabel}`}>‹ {detailBackLabel}</button>}<small>{summaryTab?lensMarket:drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${summaryTabNames[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
+        <div>{drillStock&&<button type="button" className="drill-back" onClick={()=>{if(drillDetailHistoryRef.current)window.history.back();else backFromDetail()}} aria-label={`종목 상세에서 ${detailBackLabel==='뒤로'?'나가기':detailBackLabel}`}>‹ {detailBackLabel}</button>}<small>{summaryTab?lensMarket:drillStock?sectorName(drillStock.market,drillStock.sector):(drillSector?.market||'전체 시장')}</small><DialogTitle>{drillStock?drillStock.name:summaryTab?`주도 종목 · ${summaryTabNames[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목과 상세 리더십 지표</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       {drillStock?<div className="drill-stock-detail drill-content">
