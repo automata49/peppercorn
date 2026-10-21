@@ -1538,7 +1538,7 @@ export default function App(){
             </div>}
           </div>
           {page==='analysis'&&analysisSection!=='overview'&&detailActions}
-          {page==='analysis'&&analysisSection!=='overview'&&detailActionError&&<p role="alert" className="detail-action-error">{detailActionError}</p>
+          {page==='analysis'&&analysisSection!=='overview'&&detailActionError&&<p role="alert" className="detail-action-error">{detailActionError}</p>}
           {page==='analysis'&&analysisSection==='analysis'&&<section className="obra-market-details" aria-label="종목 비교와 출처"><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
         </div>
       </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
