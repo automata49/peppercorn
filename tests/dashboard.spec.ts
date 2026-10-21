@@ -127,7 +127,8 @@ test('Home keeps ETF data secondary while Market Signal ranks the ETF Top 5',asy
   // Home prioritizes market regime and leading equities; ETF ranking lives in Market Signal.
   expect(homeNames).not.toContain('검증 ETF 5');
   await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →',exact:true}).click();
-  await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호');
+  await expect(page.locator('.signal-journey-heading')).toHaveCount(0);
+  await expect(page.locator('.folio-editorial-map-heading h2').first()).toHaveText('주도 섹터');
   const signalNames=await page.locator('.dashboard-etf-panel .stock-id b').allTextContents();
   expect(signalNames).toEqual(['검증 ETF 5','검증 ETF 4','검증 ETF 3','검증 ETF 2','검증 ETF 1']);
 });
