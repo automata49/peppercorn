@@ -80,3 +80,14 @@ Six implementation stages: Folio-token shadcn-style Button/Slot/CVA primitives; 
 New lifetime entries are **device-local, account-scoped IndexedDB**, explicitly labelled, with JSON export/import; existing cloud workspaces are unchanged. No claim of cloud sync, OCR, native PencilKit or live AI. Pen/mouse ink is implemented; physical Apple Pencil/Safari fidelity requires device validation. Backup imports do not overwrite existing records. Per-entry atomic writes preserve other tabs and reject stale same-record edits. Notebook payload is limited before saving to preserve export/import round trips. Questions are editable answers from fixed prompts, not generated investment advice.
 
 Keep body content legible on Paper. Glass is for interactive controls and transient surfaces; existing analytical glass contracts remain. Minimum 44px controls, canonical 390/834/1366/1440 checks, supplied wordmark, default Light, Dark/System, and existing chart gap/RS rules remain acceptance criteria. New notebook tests cover create/reload/revision, concurrent tabs, backups, photo/ink, keyboard tabs, reduced motion and real-close chart.
+
+
+## FOLIO-WORKFLOW-20261021-B — latest contract (2026-10-21)
+- Mobile and iPad portrait are the reference view; preserve >=44px touch targets on landscape and desktop.
+- Discover opens at **시장 신호**, with single canonical **종목** tab for leadership; Market Signal's "주도 종목 →" targets that tab, not a duplicated metric overlay.
+- Browser Back, in-app Back, and edge gesture share one history index. Navigation entries include Discover and Journey tab state; modal drill navigation must never manipulate page history or redirect to Today.
+- Journey owns 재검토 / 관심 종목 (Watchlist) / 보유 종목 (Portfolio); menu shortcuts open those exact tabs and account records, never parallel versions.
+- Research, watchlist, portfolio, analysis records and trading journal share a vertically transposed editable comparison: field rows, instrument/record columns, read-only sourced attributes immutable, explicit edit commit and account sync.
+- All wheel options remain mounted, centered via vertical scroll, selected text contrast and neutral Liquid Glass, with opaque and reduced-motion fallbacks. Equity leadership order: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 / 전체. ETF remains class-independent.
+- Page, section and subsection labels share bilingual editorial hierarchy: uppercase English kicker, legible Korean heading, common type rhythm; preserve Today cover identity, no gratuitous duplicate headings.
+- Add workflow regression gates for default tabs, back-stack, wheel visibility, menu shortcuts, comparison orientation and persistency. No new AI ingestion, score calculations or copy of native Apple code.

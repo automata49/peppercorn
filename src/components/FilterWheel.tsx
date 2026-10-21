@@ -53,6 +53,8 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
   }
   return <div className="catalog-wheel" data-wheel={label}>
     <div className="catalog-wheel-heading"><span>{label}</span></div>
+    <div className="catalog-wheel-picker">
+    <div className="catalog-wheel-selection" aria-hidden="true"/>
     <div className={'catalog-wheel-track '+className} ref={viewport}
       role="group" aria-label={label}
       onPointerDown={()=>{autoScroll.current=false;userScrolling.current=true}}
@@ -64,6 +66,7 @@ export function FilterWheel({label,value,options,onChange,className=''}:{label:s
         disabled={option.disabled} onClick={()=>{userScrolling.current=false;setPreview(i);if(settle.current)clearTimeout(settle.current);onChange(option.value)}}>
         <span className="catalog-wheel-option-label">{option.label}</span>
       </button>)}
+    </div>
     </div>
   </div>
 }

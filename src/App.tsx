@@ -26,6 +26,7 @@ import { Sidebar } from './components/Sidebar'
 import { AppIcon } from './components/AppIcon'
 import { InstallApp } from './components/InstallApp'
 import { GridTable } from './components/GridTable'
+import { ComparisonSheet } from './components/ComparisonSheet'
 import { StockTrendList } from './components/StockTrendList'
 import { FilterWheel } from './components/FilterWheel'
 import { StockSizeFilter } from './components/StockSizeFilter'
@@ -689,7 +690,7 @@ export default function App(){
   })
   const [page,setPage]=useState('today')
   // Keep app routes in browser history so buttons, iOS gestures and Back agree.
-  const routeHistoryRef=useRef<{page:string;detail:boolean;stock:LeaderRow|null}[]>([{page:'today',detail:false,stock:null}])
+  const routeHistoryRef=useRef<{page:string;detail:boolean;stock:LeaderRow|null;discoverTab:'topics'|'stocks'|'signal';trackingTab:'review'|'watchlist'|'portfolio'}[]>([{page:'today',detail:false,stock:null,discoverTab:'signal',trackingTab:'review'}])
   const routeIndexRef=useRef(0)
   const routeKeyRef=useRef('today|list')
   const restoringRouteRef=useRef(false)
@@ -699,7 +700,7 @@ export default function App(){
   const [analysisDetail,setAnalysisDetail]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
   const [tradeDrafts,setTradeDrafts]=useState<Record<string,EditableRow>>({})
-  const [discoverTab,setDiscoverTab]=useState<'topics'|'stocks'|'signal'>('stocks')
+  const [discoverTab,setDiscoverTab]=useState<'topics'|'stocks'|'signal'>('signal')
   const [selectedRecordId,setSelectedRecordId]=useState<string|null>(null)
   const [trackingTab,setTrackingTab]=useState<'review'|'watchlist'|'portfolio'>('review')
   const workspacePage=page==='tracking'?trackingTab:page
@@ -770,8 +771,6 @@ export default function App(){
   const drillRef=useRef<HTMLDivElement|null>(null)
   const detailReturnRef=useRef<{etfIndustry:string|null}|null>(null)
   const backFromDetailRef=useRef<()=>void>(()=>{})
-  const detailHistoryRef=useRef(false)
-  const ignorePopRef=useRef(0)
   const launchRef=useRef<HTMLDivElement|null>(null)
   const analysisRecordsRef=useRef<HTMLDivElement|null>(null)
   const [scrollToAnalysis,setScrollToAnalysis]=useState(false)
@@ -884,32 +883,22 @@ export default function App(){
   },[drillOpen])
 
 
-  // The device back button/gesture leaves the stock detail the same way as the visible 뒤로 button.
-  const detailOpen=!!drillStock
-  useEffect(()=>{
-    if(detailOpen&&!detailHistoryRef.current){
-      try{window.history.pushState({...(window.history.state??{}),folioDetail:true},'');detailHistoryRef.current=true}catch{}
-    }else if(!detailOpen&&detailHistoryRef.current){
-      detailHistoryRef.current=false;ignorePopRef.current++;window.history.back()
-    }
-  },[detailOpen])
+  // Only full-page transitions create browser history entries. Drilling inside a dialog never changes the page stack.
   useEffect(()=>{
     try{window.history.replaceState({...window.history.state,folioNav:{id:navigationIdRef.current,index:0}},'')}catch{}
   },[])
   useEffect(()=>{
-    const key=page+'|'+(analysisDetail?'detail':'list')
+    const key=page+'|'+(analysisDetail?'detail':page==='analysis'?discoverTab:page==='tracking'?trackingTab:'list')
     if(routeKeyRef.current===key){restoringRouteRef.current=false;return}
     routeKeyRef.current=key
     if(restoringRouteRef.current){restoringRouteRef.current=false;return}
     routeHistoryRef.current=routeHistoryRef.current.slice(0,routeIndexRef.current+1)
-    routeHistoryRef.current.push({page,detail:analysisDetail,stock:analysisDetail?selected:null})
+    routeHistoryRef.current.push({page,detail:analysisDetail,stock:analysisDetail?selected:null,discoverTab,trackingTab})
     routeIndexRef.current=routeHistoryRef.current.length-1
     try{window.history.pushState({...window.history.state,folioNav:{id:navigationIdRef.current,index:routeIndexRef.current}},'')}catch{}
-  },[page,analysisDetail])
+  },[page,analysisDetail,discoverTab,trackingTab]
   useEffect(()=>{
     const onPop=(event:PopStateEvent)=>{
-      if(ignorePopRef.current>0){ignorePopRef.current--;return}
-      if(detailHistoryRef.current){detailHistoryRef.current=false;backFromDetailRef.current();return}
       const nav=event.state?.folioNav
       if(nav?.id!==navigationIdRef.current||!Number.isInteger(nav.index))return
       const route=routeHistoryRef.current[nav.index]
@@ -918,9 +907,11 @@ export default function App(){
       // popstate left Safari's native stack out of sync with the UI.
       routeIndexRef.current=nav.index
       // Keep the route guard armed only if the keyed screen actually changes.
-      restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':'list')
+      restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':route.page==='analysis'?route.discoverTab:route.page==='tracking'?route.trackingTab:'list')
       setPage(route.page)
       setAnalysisDetail(route.detail)
+      setDiscoverTab(route.discoverTab)
+      setTrackingTab(route.trackingTab)
       if(route.stock)setSelected(route.stock)
       window.scrollTo({top:0,behavior:'instant'})
     }
@@ -1222,7 +1213,11 @@ export default function App(){
       <p className="catalog-saved-hint">선택 사항은 이 기기에 자동 저장됩니다.</p>
     </DialogContent>
   </Dialog>
-  const navigatePage=(next:string)=>{
+  const navigatePage=(destination:string)=>{
+    // Canonical routes: menu shortcuts select tabs in their owning workspaces.
+    const next=destination==='watchlist'||destination==='portfolio'?'tracking':destination==='signal'?'analysis':destination
+    if(destination==='watchlist'||destination==='portfolio')setTrackingTab(destination)
+    if(destination==='signal'||destination==='analysis')setDiscoverTab('signal')
     if(next==='analysis'){setQuery('');setSector(null)}
     if(next!==page||analysisDetail)setAnalysisDetail(false)
     setPage(next)
@@ -1246,7 +1241,7 @@ export default function App(){
     setPage('analysis');window.scrollTo({top:0,behavior:'instant'})
   }
   const exploreClass=(scope:typeof analysisScope)=>{
-    setAnalysisScope(scope);setAnalysisDetail(false);setSector(null);setQuery('');setPage('analysis')
+    setAnalysisScope(scope);setAnalysisDetail(false);setDiscoverTab('stocks');setSector(null);setQuery('');setPage('analysis')
     window.scrollTo({top:0,behavior:'instant'})
   }
 
@@ -1265,14 +1260,14 @@ export default function App(){
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
     content=<LifetimeJournal session={session} financials={financialReferences} key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:session?enrichedAnalysis as EditableRow[]:(enrichedAnalysis as EditableRow[]).filter(r=>!initialAnalysis.some(seed=>seed.id===r.id)),trades:session?enrichedJournal:enrichedJournal.filter(r=>!initialJournal.some(seed=>seed.id===r.id)),insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
-    content=<><h2>리서치 노트</h2><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={600}/></>
+    content=<><div className="folio-section-heading"><span className="journey-kicker">RESEARCH NOTES</span><h2>리서치 노트</h2></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><ComparisonSheet rows={enrichedResearch} columns={researchCols} onChange={updateResearch} label="리서치 비교 및 편집"/></>
   }else if(page==='dashboard'){
     const todayRows=todayLeaderRows
     const sizePool=sizedRows(stockRows)
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
     const homeSector=buildSectors(marketRows).slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)[0]??null
     const homeEtf=rankedEtfRows[0]??null
-    const openMarketSignal=()=>{setSector(null);setSectorMkt(market);setPage('signal');window.scrollTo({top:0,behavior:'instant'})}
+    const openMarketSignal=()=>{setSector(null);setSectorMkt(market);setDiscoverTab('signal');setPage('analysis');window.scrollTo({top:0,behavior:'instant'})}
     content=<div className="journey-home">
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
       <section className="journey-market" aria-label="시장 신호 요약">
@@ -1297,7 +1292,7 @@ export default function App(){
     </div>
   }else if(page==='signal'||(page==='analysis'&&!analysisDetail&&discoverTab==='signal')){
     content=<div className="discovery-home">{filters}
-      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>시장 신호</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>showStockGroup('core')}>주도 종목 · 전체 지표 →</button></div>
+      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>시장 신호</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>{setDiscoverTab('stocks');setAnalysisDetail(false);setPage('analysis')}}>주도 종목 →</button></div>
 
       <section className="dashboard-lower-grid dashboard-sector-only">
         <div className="dashboard-left-column">
@@ -1424,7 +1419,7 @@ export default function App(){
         }))} onSelect={openStock}/>
       </section>
       <ProgressiveDisclosure key="watchlist-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
-        <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={watchCols} editable onChange={updateWatch} height={650}/></div>
+        <div className="panel workspace-grid-panel"><ComparisonSheet rows={rows} columns={watchCols} onChange={updateWatch} label="관심 종목 비교 및 편집"/></div>
       </ProgressiveDisclosure></>
   }else if(workspacePage==='portfolio'){
     const rows=enrich(portfolio)
@@ -1446,7 +1441,7 @@ export default function App(){
         }))} onSelect={openStock}/>
       </section>
       <ProgressiveDisclosure key="portfolio-table" title="전체 표 · 편집" meta={`${rows.length}종목`} className="workspace-table-disclosure">
-        <div className="panel workspace-grid-panel"><LiveGridTable rows={rows} columns={portfolioCols} editable onChange={updatePortfolio} height={650}/></div>
+        <div className="panel workspace-grid-panel"><ComparisonSheet rows={rows} columns={portfolioCols} onChange={updatePortfolio} label="보유 종목 비교 및 편집"/></div>
       </ProgressiveDisclosure></>
   }else if(page==='analysis'||page==='thesis'){
     const analysisClass={'core':'핵심 주도','candidates':'주도 후보','turns':'강세 전환'} as const
@@ -1494,17 +1489,17 @@ export default function App(){
       <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
       {actionNotice&&<span role="status" className="analysis-action-notice">{actionNotice}</span>}
     </div>
-    const wheelLeadershipOptions=[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']] as const
+    const wheelLeadershipOptions=[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중'],['all','전체']] as const
     const catalogRows=lens(scoped.filter(r=>!sector||sectorKey(r)===sector)).slice().sort((a,b)=>catalogSort==='name'?(a.name||a.ticker).localeCompare(b.name||b.ticker,'ko'):catalogSort==='return'?(b.return_20d??-Infinity)-(a.return_20d??-Infinity):(b.rs_rank??0)-(a.rs_rank??0))
     content=<><div className={'analysis-page'+(page==='analysis'&&analysisDetail?' obra-detail':'')}>
       {page==='analysis'&&analysisDetail&&<ObraMasthead label="종목 상세" onMenu={()=>setMenuOpen(true)} onBack={goBackPage}/>}
       {page==='analysis'&&!analysisDetail&&<div className="analysis-finder discovery-catalog catalog-carousel-layout">
         <div className="catalog-products">
-          <div className="catalog-heading-row"><h2>주도 종목</h2>{discoveryFilters}</div>
+          <div className="catalog-heading-row"><div className="folio-section-heading"><span className="journey-kicker">MARKET LEADERS</span><h2>주도 종목</h2></div>{discoveryFilters}</div>
           <section className="catalog-filter-rails" aria-label="Filter & Sort">
             <FilterWheel label="시장" value={market} onChange={v=>setMarket(v as 'ALL'|Market)} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
             <FilterWheel label="종목 분류" value={stockSize} onChange={v=>changeStockSize(v as StockSize)} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
-            <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={[{value:'all',label:'전체'},...wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'}))]}/>
+            <FilterWheel className="analysis-scope" label="주도 분류" value={stockSize==='etf'?'all':analysisScope||'all'} onChange={v=>setAnalysisScope(v==='all'?null:v as Exclude<typeof analysisScope,null>)} options={wheelLeadershipOptions.map(([value,label])=>({value,label,disabled:stockSize==='etf'&&value!=='all'}))}/>
           </section>
           <div className="catalog-topline">
             <span className="catalog-result-count" aria-live="polite">{catalogRows.length.toLocaleString('ko-KR')}종목 · {catalogSort==='rs'?'RS 순':catalogSort==='return'?'20D 등락 순':'종목명 순'}</span>
@@ -1564,13 +1559,13 @@ export default function App(){
         <ProgressiveDisclosure title="종목분석 기록 · 목록" meta={`${enrichedAnalysis.length}건`} className="workspace-table-disclosure analysis-records-disclosure" open={analysisRecordsOpen} onOpenChange={setAnalysisRecordsOpen}>
           <div className="page-note analysis-records-note"><b>기록 편집</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div>
           <TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/>
-          <div className="panel workspace-grid-panel"><GridTable rows={enrichedAnalysis} columns={analysisTableCols} editable onChange={updateAnalysis} height={560}/></div>
+          <div className="panel workspace-grid-panel"><ComparisonSheet rows={enrichedAnalysis} columns={analysisTableCols} onChange={updateAnalysis} label="종목 분석 비교 및 편집"/></div>
         </ProgressiveDisclosure>
       </div>}</>
   }else if(page==='temperature'){
     const tempFacts=[{label:'MA200 위 비율'+(market==='ALL'?'':' · '+market),value:ma200Rows.length?(ma200Breadth*100).toFixed(0)+'%':'—'},{label:'52W 고점 근접',value:high52Rows.length?(highNearShare*100).toFixed(0)+'%':'—'},{label:'상승/하락 (1W)',value:advanceCount+declineCount?(advanceDeclineRatio||0).toFixed(1)+' : 1':'—'}]
     content=<><MarketTemperature entries={tempEntries} onChange={updateTemperature} facts={tempFacts}/>
-      <details className="panel legacy-research"><summary>이전 Research 기록 ({research.length})</summary><p className="note">시장 온도계 이전의 Research 기록입니다. 지우지 않고 그대로 보관합니다.</p><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><GridTable rows={enrichedResearch} columns={researchCols} editable onChange={updateResearch} height={520}/></details></>
+      <details className="panel legacy-research"><summary>이전 Research 기록 ({research.length})</summary><p className="note">시장 온도계 이전의 Research 기록입니다. 지우지 않고 그대로 보관합니다.</p><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><ComparisonSheet rows={enrichedResearch} columns={researchCols} onChange={updateResearch} label="리서치 비교 및 편집"/></details></>
   }else if(workspacePage==='journal'){
     const journalSummary=enrichedJournal.filter(r=>r.ticker).slice(0,20)
     const linkedTrade=linkedTradeId?enrichedJournal.find(r=>String(r.id)===linkedTradeId):undefined
@@ -1600,7 +1595,7 @@ export default function App(){
         />
       </section>
       <ProgressiveDisclosure key="journal-table" title="전체 표 · 기록 편집" meta={`${enrichedJournal.length}건`} className="workspace-table-disclosure">
-        <div className="panel workspace-grid-panel"><GridTable rows={enrichedJournal} columns={journalCols} editable onChange={updateJournal} height={680}/></div>
+        <div className="panel workspace-grid-panel"><ComparisonSheet rows={enrichedJournal} columns={journalCols} onChange={updateJournal} label="투자일지 비교 및 편집"/></div>
       </ProgressiveDisclosure></>
   }else if(page==='universe'){
     const cols:ColDef<LeaderRow>[]=[{field:'market',headerName:'시장',width:75,flex:0},{field:'ticker',headerName:'Ticker',pinned:'left',width:100,flex:0},{field:'name',headerName:'종목명',pinned:'left',minWidth:160},{field:'exchange',headerName:'거래소',minWidth:100},{field:'sector',headerName:'섹터',minWidth:170},{field:'industry',headerName:'산업',minWidth:190},{field:'index_memberships',headerName:'지수 · 유니버스',minWidth:210,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'index_statuses',headerName:'구성 상태',minWidth:155,valueFormatter:p=>Array.isArray(p.value)?p.value.join(' · '):'—'},{field:'data_status',headerName:'시장 데이터',minWidth:110},{field:'classification_scheme',headerName:'분류 체계',minWidth:210},{field:'classification_as_of',headerName:'분류 기준일',minWidth:115}]
@@ -1648,7 +1643,8 @@ export default function App(){
     </section>
   }
   const trackingContent=<section className="journey-workspace"><SectionHeading kind="journey" kicker="A LIFETIME IN PAGES" title="그때의 나, 지금의 나" description="가설과 투자 방향을 재점검하고, 새로운 증거에 대응합니다."/><Tabs value={trackingTab} onValueChange={value=>setTrackingTab(value as typeof trackingTab)}><TabsList className="journey-magazine-tabs" aria-label="여정 영역">{([['review','재검토'],['watchlist','관심종목'],['portfolio','보유종목']] as const).map(([key,label])=><TabsTrigger key={key} value={key}>{label}</TabsTrigger>)}</TabsList>{(['review','watchlist','portfolio'] as const).map(tab=><TabsContent key={tab} value={tab}>{trackingTab===tab&&content}</TabsContent>)}</Tabs></section>
-  const pageTitle:Record<string,string>={today:'오늘',notebook:'저널',research:'리서치 노트',signal:'시장 신호',thesis:'Thesis',tracking:'여정',dashboard:'시장 요약',leaderboard:'Leaderboard',watchlist:'Watchlist',portfolio:'Portfolio',analysis:analysisDetail?'종목 상세':'발견',temperature:'시장 온도계',journal:'Trading Journal',universe:'Universe',settings:'Settings'}
+  const pageTitle:Record<string,string>={today:'오늘',notebook:'저널',research:'리서치 노트',signal:'시장 신호',thesis:'투자 근거',tracking:'여정',dashboard:'시장 요약',leaderboard:'주도 순위',watchlist:'관심 종목',portfolio:'보유 종목',analysis:analysisDetail?'종목 상세':'발견',temperature:'시장 온도계',journal:'투자일지',universe:'종목 유니버스',settings:'환경 설정'}
+  const pageKicker:Record<string,string>={today:'TODAY',notebook:'JOURNAL',research:'RESEARCH',signal:'MARKET SIGNAL',thesis:'THESIS',tracking:'JOURNEY',dashboard:'MARKET OVERVIEW',leaderboard:'LEADERBOARD',watchlist:'WATCHLIST',portfolio:'PORTFOLIO',analysis:analysisDetail?'STOCK DETAIL':'DISCOVER',temperature:'MARKET TEMPERATURE',journal:'TRADING JOURNAL',universe:'UNIVERSE',settings:'SETTINGS'}
   const closeDrill=()=>{detailReturnRef.current=null;setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)}
   // Back from the stock detail: to the list it was opened from (drill list or ETF dialog), else close the sheet.
   const backFromDetail=()=>{
@@ -1754,6 +1750,6 @@ export default function App(){
     </AlertDialogContent>
   </AlertDialog>
   // Fade only: transforming the shell makes fixed navigation relative to the document on iOS.
-  return <LiveQuoteProvider enabled={source==='supabase'}><motion.div initial={false} animate={{opacity:showIntro?0:1}} transition={{duration:reduceLaunchMotion?0:.4,ease:[.22,1,.36,1]}} inert={showIntro} data-market={market} className={'shell page-shell-'+page+(page==='analysis'&&analysisDetail?' obra-detail-shell':'')+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing} onSearch={()=>{headerActionRef.current=document.activeElement as HTMLElement;setStockSearchOpen(true)}} onBasket={()=>{headerActionRef.current=document.activeElement as HTMLElement;setBasketOpen(true)}} basketCount={basket.length}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title">{page!=='today'&&<button type="button" className="folio-page-back" aria-label="이전 페이지로 돌아가기" onClick={goBackPage}><AppIcon name="back"/> 뒤로</button>}<h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><AnimatePresence mode="wait" initial={false}><motion.div key={page+'-'+(analysisDetail?'detail':'list')+'-'+trackingTab} className="content" initial={reduceLaunchMotion?false:{opacity:0,x:14}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-12}} transition={{duration:reduceLaunchMotion?0:.22}} onTouchStart={e=>{const t=e.touches[0],target=e.target as HTMLElement;edgeSwipeRef.current=t&&t.clientX<32&&!target.closest('.catalog-wheel-track,.catalog-view-toggle,input,textarea,select,[role="tablist"],[data-no-edge-back]')?{x:t.clientX,y:t.clientY}:null}} onTouchEnd={e=>{const start=edgeSwipeRef.current,t=e.changedTouches[0];edgeSwipeRef.current=null;if(start&&t&&t.clientX-start.x>90&&Math.abs(t.clientY-start.y)<65&&(page!=='today'||analysisDetail))goBackPage()}}>{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</motion.div></AnimatePresence><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main><Dialog open={stockSearchOpen} onOpenChange={setStockSearchOpen}><DialogContent className="global-stock-dialog" onCloseAutoFocus={restoreHeaderFocus} onOpenAutoFocus={event=>{event.preventDefault();document.querySelector<HTMLInputElement>('.global-stock-dialog input')?.focus()}}><DialogTitle>종목 검색</DialogTitle><DialogDescription className="sr-only">종목명이나 코드를 입력해 상세 화면으로 이동하세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="검색 닫기"><AppIcon name="close"/></button></DialogClose><StockSearch rows={leaders} recent={recentStocks} onPick={row=>{setStockSearchOpen(false);openAnalysisStock(row)}}/></DialogContent></Dialog>
+  return <LiveQuoteProvider enabled={source==='supabase'}><motion.div initial={false} animate={{opacity:showIntro?0:1}} transition={{duration:reduceLaunchMotion?0:.4,ease:[.22,1,.36,1]}} inert={showIntro} data-market={market} className={'shell page-shell-'+page+(page==='analysis'&&analysisDetail?' obra-detail-shell':'')+(['today','notebook','tracking'].includes(page)||(page==='analysis'&&!analysisDetail)?' magazine-shell':'')}><Sidebar page={page} setPage={navigatePage} open={menuOpen} setOpen={setMenuOpen} onRefresh={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} refreshing={refreshing} onSearch={()=>{headerActionRef.current=document.activeElement as HTMLElement;setStockSearchOpen(true)}} onBasket={()=>{headerActionRef.current=document.activeElement as HTMLElement;setBasketOpen(true)}} basketCount={basket.length}/><main className={'app-main page-'+page}><header className="topbar"><button className="topbar-menu" onClick={()=>setMenuOpen(true)} aria-label="전체 메뉴 열기" aria-haspopup="dialog" aria-expanded={menuOpen}><AppIcon name="menu"/></button><button className="topbar-refresh" onClick={()=>{invalidatePriceHistory();void refreshLeaderboard(true)}} disabled={refreshing} aria-label="새로고침" title="데이터 새로고침">{refreshing?<span className="refreshing-mark">…</span>:<AppIcon name="refresh"/>}</button><div className="topbar-title">{page!=='today'&&<button type="button" className="folio-page-back" aria-label="이전 페이지로 돌아가기" onClick={goBackPage}><AppIcon name="back"/> 뒤로</button>}<span className="folio-page-eyebrow">{pageKicker[page]||'FOLIO'}</span><h1>{pageTitle[page]||page}</h1><p>발견하고, 기록하고, 다시 생각하다</p></div><div className="top-actions"><button className={'source '+source} aria-label="시장 데이터 새로고침" title={source==='demo'?'데모 데이터 · 라이브 연결 다시 시도':'시장 데이터 새로고침'} disabled={refreshing} onClick={()=>void refreshLeaderboard(true)}>{source==='supabase'?'● Supabase Live':'○ Demo / Local'} <span aria-hidden="true">↻</span></button><span className={'sync-state '+syncState}>{session?(syncState==='saving'?'☁ 저장 중':syncState==='loading'?'☁ 불러오는 중':syncState==='error'?'☁ 동기화 오류':'☁ 저장됨'):'기기 저장'}</span><InstallApp/><button onClick={()=>session?updateSession(null):setAuthOpen(true)}>{session?'로그아웃':'로그인'}</button><button onClick={()=>setPage('settings')}>환경 설정</button></div></header><AnimatePresence mode="wait" initial={false}><motion.div key={page+'-'+(analysisDetail?'detail':'list')+'-'+trackingTab} className="content" initial={reduceLaunchMotion?false:{opacity:0,x:14}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-12}} transition={{duration:reduceLaunchMotion?0:.22}} onTouchStart={e=>{const t=e.touches[0],target=e.target as HTMLElement;edgeSwipeRef.current=t&&t.clientX<32&&!target.closest('.catalog-wheel-track,.catalog-view-toggle,input,textarea,select,[role="tablist"],[data-no-edge-back]')?{x:t.clientX,y:t.clientY}:null}} onTouchEnd={e=>{const start=edgeSwipeRef.current,t=e.changedTouches[0];edgeSwipeRef.current=null;if(start&&t&&t.clientX-start.x>90&&Math.abs(t.clientY-start.y)<65&&(page!=='today'||analysisDetail))goBackPage()}}>{source==='demo'&&lastLoadRef.current>0&&<div className="demo-banner" role="status"><span>실시간 데이터에 연결하지 못해 <b>예시 데이터</b>를 표시하고 있습니다.{loadError&&<small> 원인: {loadError}</small>}</span><button type="button" onClick={()=>void refreshLeaderboard(true)} disabled={refreshing}>{refreshing?'연결 중…':'다시 연결'}</button></div>}{page==='tracking'?trackingContent:content}</motion.div></AnimatePresence><AuthModal open={authOpen} onClose={()=>{setAuthOpen(false);setAuthNotice(undefined)}} onAuthenticated={updateSession} notice={authNotice}/></main><Dialog open={stockSearchOpen} onOpenChange={setStockSearchOpen}><DialogContent className="global-stock-dialog" onCloseAutoFocus={restoreHeaderFocus} onOpenAutoFocus={event=>{event.preventDefault();document.querySelector<HTMLInputElement>('.global-stock-dialog input')?.focus()}}><DialogTitle>종목 검색</DialogTitle><DialogDescription className="sr-only">종목명이나 코드를 입력해 상세 화면으로 이동하세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="검색 닫기"><AppIcon name="close"/></button></DialogClose><StockSearch rows={leaders} recent={recentStocks} onPick={row=>{setStockSearchOpen(false);openAnalysisStock(row)}}/></DialogContent></Dialog>
     <Dialog open={basketOpen} onOpenChange={setBasketOpen}><DialogContent className="global-stock-dialog stock-basket-dialog" onCloseAutoFocus={restoreHeaderFocus}><DialogTitle>장바구니 · {basket.length}종목</DialogTitle>{basketState.error&&<div role="alert"><p>{basketState.error}</p><button onClick={()=>void basketState.retry()}>동기화 다시 시도</button></div>}<DialogDescription>담아둔 종목을 한곳에서 살펴보세요.</DialogDescription><DialogClose asChild><button className="stock-dialog-close" aria-label="장바구니 닫기"><AppIcon name="close"/></button></DialogClose>{basket.length?<ul className="stock-basket-list">{basket.map(row=><li key={row.market+'|'+row.ticker}><button type="button" disabled={!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)} onClick={()=>{const current=leaders.find(r=>r.market===row.market&&r.ticker===row.ticker);if(current){setBasketOpen(false);openAnalysisStock(current)}}}><b>{row.market==='US'?row.ticker:row.name||row.ticker}</b><small>{row.market} · {row.market==='US'?row.name:row.ticker}{!leaders.some(r=>r.market===row.market&&r.ticker===row.ticker)&&' · 현재 데이터 없음'}</small></button><button type="button" aria-label={`${row.ticker} 장바구니에서 삭제`} onClick={()=>setBasket(basket.filter(r=>r.market!==row.market||r.ticker!==row.ticker))}><AppIcon name="close"/></button></li>)}</ul>:<p className="basket-empty">발견 카드나 종목 상세에서 종목을 담아보세요.</p>}<p className="note">{session?'계정에 동기화됩니다.':'로그인 전에는 이 기기에 저장됩니다.'}</p></DialogContent></Dialog>{marketMetricsDialog}{sectorSummaryDialog}{etfSummaryDialog}{drillOverlay}{deleteDialog}</motion.div><AnimatePresence>{showIntro&&<motion.div key="launch" initial={{opacity:1}} exit={{opacity:0}} transition={{duration:reduceLaunchMotion?0:.35}} ref={launchRef} className="launch-overlay launch-wordmark-only" role="status" aria-label="Folio 시작 화면"><img className="launch-wordmark" src="./folio-brand-wordmark-light.webp?v=u2" alt="Folio xx" onLoad={event=>centerLaunchWordmark(event.currentTarget)}/></motion.div>}</AnimatePresence></LiveQuoteProvider>
 }

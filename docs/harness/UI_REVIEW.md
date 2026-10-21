@@ -1,3 +1,12 @@
+## FOLIO-WORKFLOW-20261021-B — approved revision (2026-10-21)
+
+1. Audit the app's page / section / subsection editorial hierarchy with one bilingual typography contract: uppercase English kicker, Korean heading, shared semantic h1/h2/h3 and spacing. Do not add duplicate page titles where SectionHeading already owns the region.
+2. Discover opens on 시장 신호. "주도 종목 →" switches to its canonical 종목 tab (not a duplicate full-metrics drill page). Direct Market Signal shortcuts also select this tab.
+3. Route all Journey Watchlist / Portfolio shortcuts into 여정 → 관심 종목 / 보유 종목; render the same underlying account-scoped records once. Store Discover/Journey tab state in route history so native and in-app Back restore the exact preceding view; no modal history push.
+4. Research, Watchlist, Portfolio, Thesis records and Trading Journal use shared vertical field-by-row / record-by-column comparison editing. Automatic/source values are read-only, input commits preserve IDs, units and cloud-sync pathways. More columns are horizontally scrollable; mobile retains >=44px controls.
+5. All vertical wheels use readable native-inspired Liquid Glass (CSS web approximation), visible selected preview, all options scrollable, keyboard/touch scrolling and reduced motion/transparency fallbacks. Equity leadership order is 핵심 주도, 주도 후보, 강세 전환, 조정 중, 전체; ETF is independent of equity leadership.
+6. Keep all existing market classifications, KR/US colors, rankings, source rights, Folio brand, journaling records and theme. Verify 390px iPhone, 834px iPad portrait, 1366px landscape, 1440px desktop; light/dark, long labels, tab/back/restoration, and source read-only editing. CI/browser emulator success is not real Safari certification.
+
 ## FOLIO-WORKFLOW-20261021 — latest user authority (2026-10-21)
 
 Discover / Market Signal / detail / Journal use one continuous reversible workflow: discover leaders → source and stock → save interest/Thesis → read original Journal → explicitly edit/review. Mobile and iPad portrait set the baseline; landscape/desktop reflow without smaller touch targets.

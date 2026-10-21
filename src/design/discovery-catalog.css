@@ -437,3 +437,39 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[
 @media(prefers-reduced-transparency:reduce){
   html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"]{background:var(--folio-paper)!important;backdrop-filter:none!important}
 }
+
+/* WORKFLOW-PICKER-20261021: native-inspired Liquid Glass for all vertical Folio pickers.
+   A web rendering approximation, not an Apple UIKit control. */
+.catalog-carousel-layout .catalog-wheel-picker{position:relative;width:100%;min-width:0;isolation:isolate}
+.catalog-carousel-layout .catalog-wheel-selection{
+  pointer-events:none;position:absolute;z-index:1;top:50%;left:1px;right:1px;
+  height:54px;transform:translateY(-50%);border-radius:16px;
+  background:color-mix(in srgb,var(--folio-paper) 39%,transparent);
+  border:1px solid color-mix(in srgb,var(--folio-ink) 9%,transparent);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,white 70%,transparent),0 4px 14px color-mix(in srgb,var(--folio-ink) 8%,transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(145%);backdrop-filter:blur(18px) saturate(145%);
+}
+.catalog-carousel-layout .catalog-wheel-track{position:relative;z-index:2;scrollbar-width:none}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[aria-pressed="true"]{
+  background:transparent!important;border:0!important;box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+.catalog-carousel-layout .catalog-wheel-track button[data-preview="true"] .catalog-wheel-option-label{
+  color:var(--folio-ink);font-weight:770;opacity:1
+}
+.catalog-carousel-layout .catalog-wheel-track button:not([data-preview="true"]) .catalog-wheel-option-label{opacity:.82}
+@media(prefers-reduced-transparency:reduce){
+ .catalog-carousel-layout .catalog-wheel-selection{background:var(--folio-paper);-webkit-backdrop-filter:none;backdrop-filter:none;border-color:var(--folio-line)}
+}
+@media(prefers-reduced-motion:reduce){
+ .catalog-carousel-layout .catalog-wheel-option-label{transform:none!important;transition:none!important}
+}
+.folio-page-eyebrow,.folio-section-heading>.journey-kicker{
+  display:block;color:var(--folio-muted);font-size:clamp(11px,1vw,13px);
+  font-weight:750;letter-spacing:.13em;text-transform:uppercase;line-height:1.5
+}
+.folio-section-heading{display:grid;gap:3px;min-width:0}
+.folio-section-heading>h2{margin:0}
+:is(.discovery-news-heading,.journal-review-heading,.signal-journey-heading) .journey-kicker{
+  font-size:clamp(11px,1vw,13px);font-weight:750;letter-spacing:.13em
+}
