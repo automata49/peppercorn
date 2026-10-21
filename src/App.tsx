@@ -896,7 +896,7 @@ export default function App(){
     routeHistoryRef.current.push({page,detail:analysisDetail,stock:analysisDetail?selected:null,discoverTab,trackingTab})
     routeIndexRef.current=routeHistoryRef.current.length-1
     try{window.history.pushState({...window.history.state,folioNav:{id:navigationIdRef.current,index:routeIndexRef.current}},'')}catch{}
-  },[page,analysisDetail,discoverTab,trackingTab]
+  },[page,analysisDetail,discoverTab,trackingTab])
   useEffect(()=>{
     const onPop=(event:PopStateEvent)=>{
       const nav=event.state?.folioNav
