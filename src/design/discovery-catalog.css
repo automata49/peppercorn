@@ -402,8 +402,8 @@ html body .shell .app-main .catalog-carousel-layout .catalog-view-toggle button{
   background:var(--folio-paper)!important;color:var(--folio-ink)!important
 }
 :root body .catalog-filter-drawer.ui-dialog-content[data-state="closed"]{animation:folio-filter-right-out 200ms ease-in both!important}
-@keyframes folio-filter-right-in{from{opacity:.85;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
-@keyframes folio-filter-right-out{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:.65}}
+@keyframes folio-filter-right-in{from{opacity:.85;translate:100% 0}to{opacity:1;translate:0 0}}
+@keyframes folio-filter-right-out{from{translate:0 0;opacity:1}to{translate:100% 0;opacity:.65}}
 .catalog-filter-drawer .catalog-sort{display:flex!important;flex-wrap:wrap;gap:8px 16px}
 :root body .catalog-filter-drawer .catalog-sort button{width:auto!important;min-height:44px!important;text-align:left;padding:8px 4px!important;font-size:16px!important}
 :root body .catalog-filter-drawer .catalog-show-results{width:100%;font-size:16px!important;min-height:52px;border-bottom:1px solid var(--folio-line)!important}
