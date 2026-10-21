@@ -33,7 +33,7 @@ for (const width of [390,834,1366,1440]) for (const style of ['modern','classic'
       const geometry=await button.boundingBox();expect(geometry!.height).toBeGreaterThanOrEqual(44)
       const visual=await button.evaluate(el=>{const s=getComputedStyle(el);return {foreground:s.color,background:s.backgroundColor,radius:s.borderRadius,weight:s.fontWeight}})
       expect(visual.foreground).not.toBe(visual.background)
-      expect(visual.radius).toBe('0px');expect(visual.weight).toBe('500')
+      expect(visual.radius).toBe('0px');expect(Number(visual.weight)).toBeGreaterThanOrEqual(600)
     }
     const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth)
     expect(overflow).toBe(false)

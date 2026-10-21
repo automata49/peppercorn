@@ -79,6 +79,7 @@ test('missing flags file keeps canonical Stock Detail usable without badges',asy
  await page.addInitScript(()=>{sessionStorage.setItem('peppercorn-intro-seen','1');localStorage.setItem('folio-stock-size','all');localStorage.setItem('peppercorn-leader-filter-v1',JSON.stringify({hideWeak:false,sepaOnly:false,growthOnly:false}))})
  await page.goto('http://127.0.0.1:4173/peppercorn/')
  await openLeaderTools(page)
+ await page.getByRole('group',{name:'종목 보기 방식'}).getByRole('button',{name:'목록형'}).click()
  await page.locator('.analysis-idea-list .stock-compact-main').filter({hasText:'Kodiak'}).click()
  await page.getByRole('tab',{name:'Analysis',exact:true}).click()
  await expect(page.locator('.analysis-body .stock-snapshot')).toBeVisible()
