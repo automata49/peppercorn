@@ -96,8 +96,9 @@ test('stock detail back and browser history return to exactly the prior screen',
   await expect(page.locator('.obra-masthead .folio-wordmark-system')).toHaveCount(0)
   await page.getByRole('button',{name:'뒤로 가기'}).click()
   await expect(page.locator('.stock-compact-list')).toBeVisible()
-  // A new deliberate browser Back should reach Journal; no stale
-  // history.forward interception can trap the user in Discover.
+  // Signal-first is a separate history entry. Back restores it before Journal.
+  await page.evaluate(()=>window.history.back())
+  await expect(page.getByRole('tab',{name:'시장 신호'})).toHaveAttribute('aria-selected','true')
   await page.evaluate(()=>window.history.back())
   await expect(page.locator('.page-notebook')).toBeVisible()
   await page.evaluate(()=>window.history.back())
@@ -114,6 +115,8 @@ test('edge swipe moves to the previous page without hijacking carousel controls'
     el.dispatchEvent(new TouchEvent('touchstart',{bubbles:true,touches:[begin],changedTouches:[begin]}))
     el.dispatchEvent(new TouchEvent('touchend',{bubbles:true,touches:[],changedTouches:[end]}))
   })
+  await expect(page.getByRole('tab',{name:'시장 신호'})).toHaveAttribute('aria-selected','true')
+  await page.evaluate(()=>window.history.back())
   await expect(page.locator('.page-today')).toBeVisible()
   await context.close()
 })

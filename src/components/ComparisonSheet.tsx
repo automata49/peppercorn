@@ -36,7 +36,7 @@ export function ComparisonSheet({rows,columns,onChange,label}:{rows:CompareRow[]
        <tbody>{fields.map(col=><tr key={col.field}>
          <th className="vertical-compare-field" scope="row">{col.headerName}</th>
          {records.map((record,i)=>{
-           const field=col.field!,index=page*size+i,readonly=col.editable===false||field==='id'
+           const field=col.field!,index=page*size+i,readonly=col.editable===false||['id','market','ticker','name','current_price'].includes(field)
            const raw=record[field],val=String(raw??'')
            const choices=(col.cellEditorParams as {values?:unknown[]}|undefined)?.values
            const key=String(record.id??index)+'|'+field

@@ -118,6 +118,11 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
     await boot(page, theme)
     for (const screen of screens) {
       await openScreen(page, screen.label, view.touch)
+      // Default Discover is Market Signal; select the existing stock-catalog regression surface explicitly.
+      if(screen.name==='discover'){
+        const stocks=page.getByRole('tab',{name:'종목',exact:true})
+        if(view.touch)await stocks.tap();else await stocks.click()
+      }
       await expect(page.locator(screen.selector)).toBeVisible()
       if (screen.name === 'today') await expect(page.locator('.home-motion-card')).toHaveCount(4)
       if (screen.name === 'discover') {
