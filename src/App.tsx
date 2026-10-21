@@ -1560,7 +1560,7 @@ export default function App(){
         </div>
       </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
       </div>
-      {page==='thesis'&&<div ref={analysisRecordsRef} className="records-anchor">
+      {(page==='thesis'||page==='analysis'&&analysisDetail&&analysisSection==='thesis')&&<div ref={analysisRecordsRef} className="records-anchor">
         <ProgressiveDisclosure title="종목분석 기록 · 목록" meta={`${enrichedAnalysis.length}건`} className="workspace-table-disclosure analysis-records-disclosure" open={analysisRecordsOpen} onOpenChange={setAnalysisRecordsOpen}>
           <div className="page-note analysis-records-note"><b>기록 편집</b><span>종목코드를 입력하면 현재가·산업·섹터·모멘텀·RS가 연결됩니다. '(공시)' 열은 SEC·DART 공시에서 자동으로 채워지는 읽기 전용 값이고, 옆의 입력 열은 내 판단용으로 그대로 둡니다. 자동 판정은 입력 열만 사용합니다.</span></div>
           <TickerEntry onAdd={ticker=>addTickerRecord('analysis',ticker)}/>
