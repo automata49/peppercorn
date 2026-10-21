@@ -48,7 +48,7 @@ for(const width of [390,834,1366,1440])test(`document pages ${width}: source tab
  await page.getByLabel('기록 사진',{exact:true}).setInputFiles(['public/folio-brand-photography.webp','public/folio-brand-typography.webp'])
  await expect(page.locator('.journal-photo-collage img')).toHaveCount(2)
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
- await page.getByRole('button',{name:'나의 투자 가설 기록 열기',exact:true}).click()
+ await page.getByRole('button',{name:'나의 투자 가설 기록 열기',exact:true}).click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();
  await expect(page.getByLabel('내 가설',{exact:true})).toHaveValue('가격보다 현금 흐름을 확인한다.')
  await expect(page.locator('.journal-photo-collage img')).toHaveCount(2)
  await page.getByLabel('내 가설',{exact:true}).fill('새 공시로 판단을 바꿨다.')
@@ -100,5 +100,5 @@ test('journal owns life records while journey reviews investment with long text 
  await expect(page.locator('.review-gallery-item .journal-story')).toHaveCount(0)
  expect(await page.locator('.decision-queue-judgement').first().textContent()).toHaveLength(180)
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
- await page.getByRole('button',{name:records[1].title+' 기록 열기',exact:true}).click();await expect(page.getByRole('textbox',{name:'기록 제목'})).toHaveValue(records[1].title)
+ await page.getByRole('button',{name:records[1].title+' 기록 열기',exact:true}).click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await expect(page.getByRole('textbox',{name:'기록 제목'})).toHaveValue(records[1].title)
 })
