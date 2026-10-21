@@ -38,7 +38,7 @@ test('current price refreshes from live quotes without touching daily metrics',a
  await page.clock.runFor(31_000)
  await expect(nvdaRow.locator('.stock-compact-price')).toHaveText('$130.00')
  await nvdaRow.locator('.stock-compact-main').click()
- await expect(page.locator('.live-badge').first()).toContainText('실시간')
+ await expect(page.locator('.hero-price.live-price')).toBeVisible();await expect(page.locator('.hero-change')).toContainText('실시간')
 })
 
 test('stock detail links to Finviz for US tickers and no longer to the Google Sheet',async({page})=>{
