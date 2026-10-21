@@ -130,7 +130,7 @@ assert(app.includes('<FolioInsight row={selected} position={positionOf(selected)
 assert(stockSizeFilter.includes("STOCK_CATEGORY_LABELS=[['large','대형주'],['small','중소형주'],['all','전체'],['etf','ETF']]"),'Explore category order must remain 대형주 / 중소형주 / 전체 / ETF.');
 assert(stockSizeFilter.includes('stock-size-equities')&&stockSizeFilter.includes('stock-size-divider')&&stockSizeFilter.includes('stock-size-etf'),'Category control must keep equities grouped, a visible divider, and a separate ETF pebble.');
 assert(stockSize.includes("export type StockSize='large'|'small'|'etf'|'all'")&&stockSize.includes("if(size==='etf')return rows.filter(r=>r.asset_class==='ETF')"),'ETF must remain a first-class Explore category.');
-assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중']]"),'Equity leadership labels must be exactly 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중.');
+assert(app.includes("[['core','핵심 주도'],['candidates','주도 후보'],['turns','강세 전환'],['corrections','조정 중'],['all','전체']]"),'Equity leadership wheel must list 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 / 전체.');
 assert(!app.includes("['position','Position']"),'Position must not return as an Explore category.');
 assert(!app.includes("Financial Snapshot · Position"),'Legacy Position product label must not return.');
 assert(journeyCss.includes('PRODUCT VISUAL IDENTITY — 2026-10-07'),'All-page Folio visual identity layer is missing.');
