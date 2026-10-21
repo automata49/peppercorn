@@ -50,7 +50,7 @@ test('journal glass separates thumbnails; pull and outside dismissal preserve di
  const context=await browser.newContext({viewport:{width:834,height:1000},hasTouch:true,reducedMotion:'reduce'}),page=await context.newPage();await boot(page)
  const entry:JournalEntry={...blankSnapshot(),id:'glass-entry',title:'나의 가설',kind:'investment',text:'원본 기록',body:{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'원본 기록'}]}]},createdAt:'2026-10-12T00:00:00Z',updatedAt:'2026-10-12T00:00:00Z',revisions:[]};await seed(page,[entry]);await openPage(page,'저널')
  const card=page.getByRole('button',{name:'나의 가설 기록 열기'});const glass=await card.evaluate(el=>({background:getComputedStyle(el).backgroundColor,blur:getComputedStyle(el).backdropFilter,shadow:getComputedStyle(el).boxShadow}));expect(glass.background).not.toBe('rgba(0, 0, 0, 0)');expect(glass.blur).toContain('blur(20px)');expect(glass.shadow).toContain('inset')
- await card.click();await page.getByLabel('기록 제목').fill('미저장 생각')
+ await card.click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await page.getByLabel('기록 제목').fill('미저장 생각')
  page.once('dialog',d=>d.dismiss());await pull(page,true);await expect(page.getByRole('dialog')).toBeVisible();await expect(page.getByLabel('기록 제목')).toHaveValue('미저장 생각')
  const box=(await page.getByRole('dialog').boundingBox())!;page.once('dialog',d=>d.dismiss());await page.mouse.click(box.x-8,box.y+200);await expect(page.getByRole('dialog')).toBeVisible()
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.getByRole('button',{name:'미저장 생각 기록 열기'})).toBeVisible();await context.close()

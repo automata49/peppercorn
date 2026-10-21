@@ -14,6 +14,7 @@ for(const [width,height] of [[390,844],[1440,900]])test(`linked trading journal 
  const source=page.getByRole('button',{name:/Apple · 투자일지 기록 열기/})
  await expect(source).toHaveCount(1)
  await source.click()
+ await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();
  await expect(page.getByLabel('기록 제목')).toHaveValue('Apple · 투자일지')
  await expect(page.getByLabel('내 가설')).toHaveValue('테스트 가설')
  await expect(page.getByRole('button',{name:'Financial 정보 불러오기'})).toBeVisible()

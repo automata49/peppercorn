@@ -21,7 +21,8 @@ const pages:[string,AppIconName,string][]=[
 const pageGroups=[
   ['핵심',['today','analysis','notebook','tracking']],
   ['시장',['dashboard','signal','temperature']],
-  ['기록과 추적',['research','watchlist','portfolio']],
+  ['저널 · 리서치',['research']],
+  ['여정 · 추적',['watchlist','portfolio']],
   ['전체 데이터',['leaderboard','universe','settings']]
 ] as const
 

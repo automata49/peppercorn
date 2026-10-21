@@ -51,6 +51,7 @@ for(const [width,height] of [[390,844],[834,1194],[1366,1024]]){
   expect(await grid.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(1)
   const first=page.getByRole('button',{name:'기록 1 기록 열기'})
   await first.click()
+  await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();
   await expect(page.getByLabel('기록 제목')).toHaveValue('기록 1')
   await page.keyboard.press('Escape')
   await page.getByLabel('내 기록 검색').fill('기록 2')

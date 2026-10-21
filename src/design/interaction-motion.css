@@ -50,12 +50,17 @@
   animation:folio-surface-out var(--folio-close-ms) var(--folio-close-ease) both;
   transform-origin:center;
 }
-/* Discovery's filter drawer keeps its left-edge layout; add the missing exit. */
+/* Discovery uses a right-edge drawer, including the matching reverse exit. */
+@keyframes folio-filter-right-enter{from{opacity:.5;translate:100% 0}to{opacity:1;translate:0 0}}
+@keyframes folio-filter-right-exit{from{opacity:1;translate:0 0}to{opacity:0;translate:100% 0}}
 :root body .catalog-filter-drawer.ui-dialog-content.ui-dialog-content.ui-dialog-content[data-state="open"] {
-  animation:folio-panel-in var(--folio-open-ms) var(--folio-open-ease) both;
+  animation:folio-filter-right-enter var(--folio-open-ms) var(--folio-open-ease) both!important;
 }
 :root body .catalog-filter-drawer.ui-dialog-content.ui-dialog-content.ui-dialog-content[data-state="closed"] {
-  animation:folio-panel-out var(--folio-close-ms) var(--folio-close-ease) both;
+  animation:folio-filter-right-exit var(--folio-close-ms) var(--folio-close-ease) both!important;
+}
+@media(prefers-reduced-motion:reduce){
+  :root body .catalog-filter-drawer.ui-dialog-content.ui-dialog-content.ui-dialog-content[data-state]{animation:none!important}
 }
 /* Menu uses the existing left/right keyframes, but matching timing curves. */
 :root body .menu-drawer[data-state="open"] {

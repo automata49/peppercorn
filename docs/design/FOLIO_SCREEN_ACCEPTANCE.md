@@ -1,3 +1,28 @@
+## FOLIO-WORKFLOW-20261021 — latest user authority (2026-10-21)
+
+Discover / Market Signal / detail / Journal use one continuous reversible workflow: discover leaders → source and stock → save interest/Thesis → read original Journal → explicitly edit/review. Mobile and iPad portrait set the baseline; landscape/desktop reflow without smaller touch targets.
+
+1. MARKET & COMPANIES / 시장과 기업의 새 소식 lives in 시장 신호, not above 주도 종목. Private PDF reports remain the default; public news adds independently persisted market and stock-category vertical wheels. Preserve report privacy and source provenance, expiry and original-image rights. The inline and direct Market Signal routes share the same editorial surface.
+2. Discover's stock list starts with one 주도 종목 title and right-aligned Filter & Sort above market / category / leadership vertical wheels. The **right-edge drawer** controls every filter: market, size, leadership, sector, local sort, list/cards, advanced lens. All selections persist per-device across reloads, with an explicit entire-market and entire-leadership choice. An active category tap is idempotent. A market change clears dependent sector state only after a real change.
+3. The selected wheel row has high-contrast neutral transparent Liquid Glass, with opaque fallback, 3D rotation and dynamic preview. All physical tap rectangles remain at least 44px even when label transforms; touch vertical scroll, ArrowUp/Down and scroll settle must work. Reduce motion when requested.
+4. Stock detail button Back, edge-swipe and native Back restore the exact previous route once. Popstate owns route restoration; do not create a duplicate navigation push or a delayed Today redirect.
+5. Overview's redundant introduction is removed. Stock detail's basket/interest/Thesis actions are unboxed, list-toggle-like editorial controls. Interest creates a real account-scoped watchlist record; Thesis creates or opens the selected stock's persisted analysis **inside its own Thesis tab**, preserving the original stock and no phantom navigation. Keep owner-read-before-write and show pending/error appropriately.
+6. Menu auxiliary destinations group as 저널 · 리서치 and 여정 · 추적. Journal cards first open a read-only record with rich text/photo/ink; a deliberate 수정 action enters the existing guarded editor, preserving revisions/backups/account sync.
+7. Do not alter market ranking/classification, ETF separateness, KR/US colours, source rights, private data, Today identity, or add extra AI/model/news ingestion for this UI request.
+
+Verification: harness:check, TS/Vite build, discovery/news/detail/Journal/menu interaction tests, four-screen snapshots (390/834/1366/1440 Light/Dark), orientation/overflow, reload and touch hit boxes. Simulator success never claims real Safari verification.
+
+### Acceptance IDs — FOLIO-WORKFLOW-20261021
+
+| ID | Acceptance |
+| --- | --- |
+| DISCOVER-W1 | 주도 종목 editorial heading and right Filter & Sort in one row; three readable wheels, glass selected state, >=44px hit boxes |
+| DISCOVER-W2 | All drawer selections persist across reload; market changes only clear incompatible sector; leadership press remains visible |
+| SIGNAL-W1 | MARKET & COMPANIES under Market Signal only, report-first, independent two news wheels, sources and permissions unchanged |
+| DETAIL-W1 | Native/visible/swipe Back to origin without delayed Today; interest and Thesis create account records, text-only action row |
+| JOURNAL-W1 | Original text, rich formatting, photos and ink first; explicit 수정 enters editor preserving data and dirty guard |
+| MENU-W1 | Submenu maps to Journal and Journey destinations |
+
 ## DECISION-REVIEW-1 — user direction (2026-10-16)
 
 Journey's first tab is 재판단. Journal owns original writing/photos; Journey uses one compact decision queue row per investment notebook ID, ordered by due date/state with no duplicated journal photo card. Source Thesis/trading journals are optional linked references, not another primary collection. Primary review opens a dedicated new evidence → maintain/revise/close → next condition/date flow. The latest explicit judgement becomes the next review's baseline; revised judgement must actually change. Store previous/current judgement, trigger and next review date in each dated reflection without rewriting the original hypothesis/body. Lessons, next action and Tiptap/photo/ink evidence notes are optional disclosures. Require new evidence and either condition or date for active decisions; close clears scheduling, retains history and supports explicit reopening. Today uses the same current judgement and due/closed state, so closed reviews do not appear in its reminders. Condition-only schedules remain planned; condition fulfillment is checked by the user, not monitored automatically. Compare timestamp instants when importing offset dates. Preserve version-1 backups, account synchronization, dirty guards, source links, asset disclosure, navigation and data/ranking. Earlier review-gallery/two-column/photo and duplicated original/current form rules are superseded on Journey only.

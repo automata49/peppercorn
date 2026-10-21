@@ -29,3 +29,21 @@ html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:
 
 /* Distinguish cross-market theme coverage without implying a leader classification. */
 .discovery-news-trend-tag{display:inline-block;margin-right:5px;font-size:10px;font-weight:700;letter-spacing:.11em;color:var(--folio-ink);border:1px solid currentColor;border-radius:3px;padding:1px 5px;vertical-align:baseline}
+
+/* Editorial report/news switch and shared two-axis rotary picker. */
+.discovery-news-modes{display:flex;align-items:center;gap:18px;margin:0 0 8px}
+html body .shell .app-main .discovery-news-modes button{
+  min-width:48px;min-height:44px;border:0!important;border-radius:0!important;
+  padding:8px 2px!important;color:var(--folio-muted)!important;background:transparent!important;
+  box-shadow:none!important;font-size:clamp(15px,1.5vw,18px)!important;
+}
+html body .shell .app-main .discovery-news-modes button[aria-pressed="true"]{
+  color:var(--folio-ink)!important;font-weight:760!important;text-decoration:underline;text-underline-offset:6px;
+}
+.discovery-news-filter-layout .catalog-filter-rails{
+  width:min(100%,700px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;margin:0 0 22px!important;
+}
+.discovery-news-filter-layout .catalog-wheel{min-width:0}
+.discovery-news-filter-layout .catalog-wheel-heading{font-weight:750!important}
+.discovery-news-filter-layout .catalog-wheel-track{min-width:0!important}
+@media(min-width:1024px){.discovery-news-filter-layout .catalog-filter-rails{max-width:640px}}
