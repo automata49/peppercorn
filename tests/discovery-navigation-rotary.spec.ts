@@ -201,8 +201,8 @@ test('Harness: saved right-drawer filters, idempotent leadership, detail actions
   await drawerTrigger.click()
   const drawer=page.getByRole('dialog',{name:'Filter & Sort'})
   await expect(drawer).toBeVisible()
-  const rect=(await drawer.boundingBox())!
-  expect(Math.abs(rect.x+rect.width-390)).toBeLessThanOrEqual(2)
+  // Drawer enters from the right with motion; assert the settled geometry.
+  await expect.poll(async()=>{const rect=await drawer.boundingBox();return rect?Math.abs(rect.x+rect.width-390):Infinity}).toBeLessThanOrEqual(2)
   await drawer.getByRole('group',{name:'필터 시장'}).getByRole('button',{name:'US'}).click()
   await drawer.getByRole('group',{name:'필터 주도 분류'}).getByRole('button',{name:'전체'}).click()
   await drawer.getByRole('group',{name:'필터 보기 방식'}).getByRole('button',{name:'목록형'}).click()
