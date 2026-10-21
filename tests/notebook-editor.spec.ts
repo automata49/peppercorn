@@ -28,7 +28,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  await page.screenshot({path:`test-results/notebook-${width}-${theme}.png`})
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
  const [entry]=await stored(page);expect(entry.paper).toBe('grid');expect(entry.text).toBe('노트에 남긴 생각');expect(entry.ink[0][0]).toMatchObject({tool:'pen',color:'blue',size:9})
- await page.reload();await openPage(page,'저널');await page.getByRole('button',{name:'나의 노트 기록 열기'}).click();await expect(page.locator('.notebook-paper-grid')).toBeVisible();await expect(page.locator('.notebook-ink path')).toHaveCount(1)
+ await page.reload();await openPage(page,'저널');await page.getByRole('button',{name:'나의 노트 기록 열기'}).click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await expect(page.locator('.notebook-paper-grid')).toBeVisible();await expect(page.locator('.notebook-ink path')).toHaveCount(1)
 })
 test('ink undo/redo, selection move/delete, eraser and photo survive backup',async({page})=>{
  await setup(page);await page.getByRole('button',{name:'형광펜',exact:true}).click();await draw(page)
@@ -60,10 +60,10 @@ test('tall imported ink stays visible after shortening text and reopening',async
   r.onsuccess=()=>{const t=r.result.transaction('notebooks','readwrite');t.objectStore('notebooks').put([{id:'tall',title:'긴 필기',body:{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'오래 남길 필기'}]}]},text:'오래 남길 필기',question:'질문',answer:'',ink:[[{x:100,y:1800,size:5,color:'blue',tool:'pen'},{x:300,y:1850}]],photos:[],kind:'life',ticker:'',reviewDate:'',place:'',expense:'',currency:'KRW',createdAt:'2026-10-01T00:00:00Z',updatedAt:'2026-10-01T00:00:00Z',revisions:[]}],'guest')}
  })
  await setup(page);page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'목록으로 돌아가기'}).click()
- await page.getByRole('button',{name:'긴 필기 기록 열기'}).click();await page.getByRole('textbox',{name:'기록 본문',exact:true}).fill('짧은 글')
+ await page.getByRole('button',{name:'긴 필기 기록 열기'}).click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await page.getByRole('textbox',{name:'기록 본문',exact:true}).fill('짧은 글')
  const svg=page.locator('.notebook-ink');await expect.poll(async()=>Number((await svg.getAttribute('viewBox'))?.split(' ')[3])).toBeGreaterThan(1900)
  await page.getByRole('button',{name:'페이지 저장',exact:true}).click();await expect(page.getByRole('dialog')).toHaveCount(0)
- await page.getByRole('button',{name:'긴 필기 기록 열기'}).click();await expect.poll(async()=>Number((await svg.getAttribute('viewBox'))?.split(' ')[3])).toBeGreaterThan(1900);await expect(svg.locator('path')).toHaveCount(1)
+ await page.getByRole('button',{name:'긴 필기 기록 열기'}).click();await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await expect.poll(async()=>Number((await svg.getAttribute('viewBox'))?.split(' ')[3])).toBeGreaterThan(1900);await expect(svg.locator('path')).toHaveCount(1)
 })
 test('pen pressure is retained, cancellation rolls back, and touch scroll does not draw',async({browser})=>{
  const context=await browser.newContext({viewport:{width:834,height:1000},hasTouch:true});const page=await context.newPage()
