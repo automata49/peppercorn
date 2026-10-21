@@ -1241,7 +1241,7 @@ export default function App(){
   const openAnalysisStock=(row:LeaderRow)=>{
     // A new stock detail is a fresh navigation, not a duplicate Back tap.
     lastBackRequestRef.current=0
-    setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview')
+    setActionNotice('');setSelectedRecordId(null);setSelected(row);setAnalysisDetail(true);setAnalysisSection('overview')
     setRecentStocks(pushRecent({market:row.market,ticker:row.ticker,name:row.name}))
     setPage('analysis');window.scrollTo({top:0,behavior:'instant'})
   }
@@ -1490,7 +1490,7 @@ export default function App(){
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     const detailActions=<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
       <Button variant="secondary" aria-pressed={!!selected&&basketHas(selected)} onClick={()=>{if(selected)addToBasket(selected)}}><AppIcon name="basket"/>{selected&&basketHas(selected)?'장바구니 담김':'장바구니 담기'}</Button>
-      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch||selected?.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
+      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
       <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
       {actionNotice&&<span role="status" className="analysis-action-notice">{actionNotice}</span>}
     </div>
@@ -1548,7 +1548,7 @@ export default function App(){
                 <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
                 <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
-                  <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch||selected.asset_class!=='Equity'} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
+                  <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
                   <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
                   {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
                 </div>
