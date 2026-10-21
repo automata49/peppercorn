@@ -38,9 +38,11 @@ for(const [width,height] of [[390,844],[834,1194],[1440,900]]){
     await expect(tabs).toHaveText(['시장 신호','종목','주제'])
     const action=page.getByRole('button',{name:/Filter & Sort/})
     await expect(action).toBeVisible()
-    const lastTab=(await tabs.last().boundingBox())!,actionBox=(await action.boundingBox())!
-    expect(actionBox.x).toBeGreaterThan(lastTab.x)
-    expect(Math.abs((actionBox.y+actionBox.height/2)-(lastTab.y+lastTab.height/2))).toBeLessThan(20)
+    const heading=page.locator('.catalog-section-heading h2')
+    await expect(heading).toHaveText('주도 종목')
+    const titleBox=(await heading.boundingBox())!,actionBox=(await action.boundingBox())!
+    expect(actionBox.x).toBeGreaterThan(titleBox.x)
+    expect(Math.abs((actionBox.y+actionBox.height/2)-(titleBox.y+titleBox.height/2))).toBeLessThan(20)
     const railBoxes=await wheels.evaluateAll(nodes=>nodes.map(n=>{const b=n.getBoundingClientRect();return {x:b.x,y:b.y,width:b.width}}))
     expect(railBoxes[0].x).toBeLessThan(railBoxes[1].x)
     expect(railBoxes[1].x).toBeLessThan(railBoxes[2].x)
