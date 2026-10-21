@@ -906,6 +906,8 @@ export default function App(){
       // Restore the target entry directly; history.forward on a second
       // popstate left Safari's native stack out of sync with the UI.
       routeIndexRef.current=nav.index
+      // Native Back dismisses any subordinate drill so it cannot trap the restored page.
+      setDrillStock(null);setDrillSectorKey(null);setSummaryTab(null)
       // Keep the route guard armed only if the keyed screen actually changes.
       restoringRouteRef.current=routeKeyRef.current!==route.page+'|'+(route.detail?'detail':route.page==='analysis'?route.discoverTab:route.page==='tracking'?route.trackingTab:'list')
       setPage(route.page)

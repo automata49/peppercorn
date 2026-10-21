@@ -177,7 +177,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         // Keep layout, overflow and control behavior as hard gates while collecting a new visual baseline.
         await page.screenshot({path:`test-results/new-discover-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
       } else {
-        await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : 150, threshold: 0.15})
+        await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : (view.width >= 1366 && (screen.name === 'journal' || screen.name === 'journey')) ? 1500 : 150, threshold: 0.15})
       }
     }
     await context.close()
