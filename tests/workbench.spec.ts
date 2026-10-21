@@ -51,11 +51,13 @@ async function open(page:Page){
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   const side=page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true})
-  if(await side.isVisible())return side.click()
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
-  if(await bottom.isVisible())return bottom.click()
-  await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()
+  if(await side.isVisible())await side.click()
+  else {
+    const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
+    if(await bottom.isVisible())await bottom.click()
+    else {await page.getByRole('button',{name:/메뉴 열기/}).first().click();await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()}
+  }
+  await page.getByRole('tab',{name:'종목',exact:true}).click()
 }
 
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){

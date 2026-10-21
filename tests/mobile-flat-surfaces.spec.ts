@@ -60,6 +60,7 @@ test('desktop major regions share Pebble glass',async({page})=>{
   expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
+  await page.getByRole('tab',{name:'종목',exact:true}).click()
   await pickFirstStock(page)
   const block=page.locator('.analysis-main.analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)

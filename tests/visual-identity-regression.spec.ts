@@ -100,6 +100,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }else{
       await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
     }
+    await page.getByRole('tab',{name:'종목',exact:true}).click()
     await openFilters(page)
     const scope=page.locator('.analysis-scope')
     // Active leadership selection is now idempotent. Choose the explicit 전체
@@ -124,8 +125,8 @@ test('Light theme keeps one Folio visual system across every product workspace',
   await boot(page)
   const destinations=[
     ['시장 요약','dashboard'],['발견','analysis'],['저널','notebook'],['여정','tracking'],
-    ['시장 신호','signal'],['시장 온도계','temperature'],['Watchlist','watchlist'],
-    ['Portfolio','portfolio'],['Leaderboard','leaderboard'],
+    ['시장 신호','analysis'],['시장 온도계','temperature'],['관심 종목 · Watchlist','tracking'],
+    ['보유 종목 · Portfolio','tracking'],['Leaderboard','leaderboard'],
     ['Universe','universe'],['Settings','settings']
   ] as const
   const nav=page.locator('.sidebar nav')

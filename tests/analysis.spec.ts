@@ -11,11 +11,13 @@ const position=[
 ]
 async function openAnalysis(page:Page){
   const side=page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true})
-  if(await side.isVisible()){await side.click();return}
-  const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
-  if(await bottom.isVisible()){await bottom.click();return}
-  await page.getByRole('button',{name:/메뉴 열기/}).first().click()
-  await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()
+  if(await side.isVisible())await side.click()
+  else {
+    const bottom=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
+    if(await bottom.isVisible())await bottom.click()
+    else {await page.getByRole('button',{name:/메뉴 열기/}).first().click();await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()}
+  }
+  await page.getByRole('tab',{name:'종목',exact:true}).click()
 }
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' stock analysis shows Analysis, Financials and Thesis',async({browser})=>{
@@ -31,11 +33,12 @@ for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-po
   const list=page.locator('.stock-list')
   await expect(list.locator('.stock-trend-row')).toHaveCount(10)
   const scope=browse.getByRole('group',{name:'주도 분류'})
-  await expect(scope.getByRole('button')).toHaveText(['전체','핵심 주도','주도 후보','강세 전환','조정 중'])
+  await expect(scope.getByRole('button')).toHaveText(['핵심 주도','주도 후보','강세 전환','조정 중','전체'])
   await expect(scope.getByRole('button',{name:'Position'})).toHaveCount(0)
   await scope.getByRole('button',{name:'핵심 주도',exact:true}).click()
+  await expect(list.locator('.stock-trend-row')).toHaveCount(10)
+  await scope.getByRole('button',{name:'전체',exact:true}).click()
   await expect(list.locator('.stock-trend-row')).toHaveCount(20)
-  await scope.getByRole('button',{name:'핵심 주도',exact:true}).click()
   await closeFilters(page)
   await list.locator('.stock-trend-row').filter({hasText:'TEST0'}).click()
   const card=page.locator('.analysis-body')
