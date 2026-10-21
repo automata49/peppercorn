@@ -1,3 +1,9 @@
+## 2026-10-21 — workflow consolidation (WORKFLOW-20261021)
+
+Approved scope: move Market & Companies into the Market Signal tab, give it independent market/category vertical wheels, put '주도 종목' and right-side Filter & Sort above Stocks' market/category/leadership wheels, and persist UI filters. Address leadership selection and delayed stock-detail Back navigation. Remove Overview boilerplate and boxed detail actions; repair Watch/Thesis persistence feedback. Reorganize menu to align Journal/Journey, with Journal cards opening in read mode and explicit edit. Portrait mobile and iPad are primary; scale responsibly to landscape and desktop.
+
+Implementation files: App, DiscoveryNews, FilterWheel styles, Sidebar, LifetimeJournal, ObraPage, CSS. Regression evidence is in GitHub Actions for the related PR. Do not equate merge or build with device-Safari verification. Preserve RLS/account guards, PDF report defaults, rank classification and revision history.
+
 ## 2026-10-17 — viewport bottom navigation, bounded cards and laser trends
 
 Release PR #187 merged as 47f0f85. A follow-up release record triggers the source build because the squash body inherited a documentation skip marker; branch-root Pages success alone does not prove the new bundle was published.
