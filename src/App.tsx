@@ -1310,13 +1310,11 @@ export default function App(){
     </div>
   }else if(page==='analysis'&&!analysisDetail&&discoverTab==='signal'){
     content=<div className="discovery-home">{filters}
-      <div className="journey-heading signal-journey-heading"><div><span className="signal-kicker">MARKET MAP</span><h2>시장 신호</h2></div><button className="dashboard-section-action leader-tools-trigger" onClick={()=>{setDiscoverTab('stocks');setAnalysisDetail(false);setPage('analysis')}}>주도 종목 →</button></div>
-
       <section className="dashboard-lower-grid dashboard-sector-only">
         <div className="dashboard-left-column">
         <div className="panel industry-panel dashboard-sector-panel focus-sector-panel">
           <div className="panel-head dashboard-sector-head">
-            <div><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
+            <div className="folio-editorial-map-heading"><span className="journey-kicker">Sector Leaders</span><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
             <div className="sector-actions">
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
@@ -1351,17 +1349,17 @@ export default function App(){
             onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
             emptyLabel="조건에 맞는 섹터가 없습니다."
           />
-          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head"><div><span>SECTOR MAP</span><h3>시장 지표 · 섹터 히트맵</h3></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
+          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR MAP</span><h3>시장 지표 · 섹터 히트맵</h3></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
         </div>
         </div>
       </section>
 
       <section className="dashboard-explore dashboard-explore-expanded" aria-label="ETF 시장 탐색">
-        <div className="signal-expanded-head signal-etf-head"><div><span>ETF MAP</span><h2>ETF</h2><p>홈과 동일한 {`${market==='ALL'?'전체 시장':market} ETF RS 순위`}를 이어서 봅니다.</p></div></div>
+        <div className="signal-expanded-head signal-etf-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">ETF MAP</span><h2>ETF 주도 산업</h2></div></div>
         <div className="dashboard-explore-body">
           <div className="panel dashboard-etf-industry-panel">
             <div className="panel-head dashboard-sector-head">
-              <div><h2>ETF 주도 산업</h2><p title={ETF_INDUSTRY_VERSION}>ETF 거래대금과 RS로 산업 흐름을 확인합니다.</p></div>
+              <div><p title={ETF_INDUSTRY_VERSION}>ETF 거래대금과 RS로 산업 흐름을 확인합니다.</p></div>
             </div>
             <div className="mini-segment etf-heat-periods" role="group" aria-label="RS 기간">{ETF_HEAT_PERIODS.map(([period])=><button key={period} type="button" className={etfHeatPeriod===period?'on':''} aria-pressed={etfHeatPeriod===period} onClick={()=>setEtfHeatPeriod(period)}>{period}</button>)}</div>
             <EtfIndustryHeatmap groups={etfIndustries} markets={market==='ALL'?['KR','US']:[market]} period={etfHeatPeriod} onSelect={openEtfIndustry}/>

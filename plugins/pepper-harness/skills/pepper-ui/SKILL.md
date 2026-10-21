@@ -84,10 +84,16 @@ Keep body content legible on Paper. Glass is for interactive controls and transi
 
 ## FOLIO-WORKFLOW-20261021-B — latest contract (2026-10-21)
 - Mobile and iPad portrait are the reference view; preserve >=44px touch targets on landscape and desktop.
-- Discover opens at **시장 신호**, with single canonical **종목** tab for leadership; Market Signal's "주도 종목 →" targets that tab, not a duplicated metric overlay.
+- Discover opens at **시장 신호**, with single canonical **종목** tab for leadership. The redundant MARKET MAP/시장 신호/주도 종목 → header is deleted; tabs own navigation.
 - Browser Back, in-app Back, and edge gesture share one history index. Navigation entries include Discover and Journey tab state; modal drill navigation must never manipulate page history or redirect to Today.
 - Journey owns 재검토 / 관심 종목 (Watchlist) / 보유 종목 (Portfolio); menu shortcuts open those exact tabs and account records, never parallel versions.
 - Research, watchlist, portfolio, analysis records and trading journal share a vertically transposed editable comparison: field rows, instrument/record columns, read-only sourced attributes immutable, explicit edit commit and account sync.
 - All wheel options remain mounted, centered via vertical scroll, selected text contrast and neutral Liquid Glass, with opaque and reduced-motion fallbacks. Equity leadership order: 핵심 주도 / 주도 후보 / 강세 전환 / 조정 중 / 전체. ETF remains class-independent.
 - Page, section and subsection labels share bilingual editorial hierarchy: uppercase English kicker, legible Korean heading, common type rhythm; preserve Today cover identity, no gratuitous duplicate headings.
 - Add workflow regression gates for default tabs, back-stack, wheel visibility, menu shortcuts, comparison orientation and persistency. No new AI ingestion, score calculations or copy of native Apple code.
+
+## FOLIO-COMPACT-MARKET-20261021 (supersedes prior Signal hero and wheel dimensions)
+- All portrait wheel viewports: 128px with 44px interactive rows and centered Liquid Glass selection; wide viewports: 136px and 48px rows. Keep pan-y, snap, correct settlement, 44px minimum hit targets and reduced-motion/transparency fallbacks.
+- Discover's Signal tab has no MARKET MAP title/button row; do not reintroduce a secondary Stocks CTA. Single navigation is the Discover tab switch.
+- Sector Leaders / 주도 섹터, SECTOR MAP / 시장 지표 · 섹터 히트맵, ETF MAP / ETF 주도 산업 exactly follow the MARKET & COMPANIES / 시장과 기업의 새 소식 editorial font scale, weights and eyebrow spacing. Remove double ETF h2 and the top-level '홈과 동일한 … ETF RS 순위' description.
+- Sector/ETF heatmaps, ranking data, click-through dialogs, summaries and market/stock filters remain untouched. Test 390, 834, 1194, 1440 px and include title parity, layout/scrolling and absence of redundant content.

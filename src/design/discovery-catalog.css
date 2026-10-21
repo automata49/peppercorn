@@ -473,3 +473,37 @@ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button[
 :is(.discovery-news-heading,.journal-review-heading,.signal-journey-heading) .journey-kicker{
   font-size:clamp(11px,1vw,13px);font-weight:750;letter-spacing:.13em
 }
+
+
+/* FOLIO-COMPACT-PICKER-20261021: portrait-first 128px scroll viewport instead of 180px.
+   Preserve 44px physical touch rows; scrolling/snap and backing semantics are unchanged. */
+.catalog-carousel-layout .catalog-filter-rails{margin-bottom:12px!important}
+.catalog-carousel-layout .catalog-wheel{gap:2px!important}
+.catalog-carousel-layout .catalog-wheel-heading{height:auto!important;min-height:28px!important}
+.catalog-carousel-layout .catalog-wheel-track,
+.catalog-carousel-layout .catalog-wheel-track.analysis-scope{
+  box-sizing:border-box!important;
+  height:128px!important;min-height:128px!important;max-height:128px!important;
+  padding:42px 0!important;scroll-padding-block:42px!important;
+  scroll-snap-type:y mandatory!important;overscroll-behavior-y:contain;
+}
+html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
+  height:44px!important;min-height:44px!important;flex:0 0 44px!important;
+  padding:4px 2px!important;scroll-snap-stop:normal!important;
+}
+.catalog-carousel-layout .catalog-wheel-selection{height:46px;border-radius:14px}
+@media(min-width:1100px){
+ .catalog-carousel-layout .catalog-wheel-track,
+ .catalog-carousel-layout .catalog-wheel-track.analysis-scope{
+   height:136px!important;min-height:136px!important;max-height:136px!important;
+   padding:44px 0!important;scroll-padding-block:44px!important;
+ }
+ html body .shell .app-main .catalog-carousel-layout .catalog-wheel-track button{
+   height:48px!important;min-height:48px!important;flex-basis:48px!important;
+ }
+ .catalog-carousel-layout .catalog-wheel-selection{height:50px}
+}
+@media(max-width:680px){
+ .catalog-carousel-layout .catalog-filter-rails{gap:6px!important}
+ .catalog-carousel-layout .catalog-wheel-heading{min-height:28px!important}
+}

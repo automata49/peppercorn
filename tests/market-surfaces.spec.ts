@@ -81,7 +81,8 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'] as co
   await backToExplore(page)
  }
  await openPage(page,'홈');await page.locator('.journey-market').getByRole('button',{name:'전체 보기 →'}).click()
- await expect(page.locator('.signal-journey-heading h2')).toHaveText('시장 신호')
+ await expect(page.locator('.signal-journey-heading')).toHaveCount(0)
+  await expect(page.locator('.dashboard-sector-panel')).toBeVisible()
  await expect(page.locator('.dashboard-explore-expanded')).toBeVisible()
  await page.locator('.market-metrics-trigger').click()
  const dialog=page.locator('.market-metrics-dialog')
