@@ -1,3 +1,11 @@
+## 2026-10-21 — discovery workflow and Journal reading
+
+Scope approved: relocate MARKET & COMPANIES and private PDF reports to Discover > Market Signal, add independent persisted market/category news wheels, retain report-first editorial default. Add editorial 주도 종목 and right Filter & Sort sheet to Stocks, persist all selections including view, market, leadership, sector, sort and advanced conditions; repair vertical picker center, Safari touch, 48px accessible targets and selected liquid-glass perspective treatment. Keep original news attribution.
+
+Unify stock-detail Back with browser history and preserve origin; remove Overview extra caption and action button boxes; ensure watchlist/Thesis write into workspace or report a visible error. Align menu groups to navigation tabs. Existing Journal cards open for reading before optional 수정 editing, retaining rich content and revision metadata.
+
+Release is not proven by code commit alone. Check build/harness, responsive discovery/news/detail/Journal UI regressions, PR merge, deploy workflow and live Pages smoke on released revision. Investigate failures rather than treating an active or failed CI run as success.
+
 ## 2026-10-21 — workflow consolidation (WORKFLOW-20261021)
 
 Approved scope: move Market & Companies into the Market Signal tab, give it independent market/category vertical wheels, put '주도 종목' and right-side Filter & Sort above Stocks' market/category/leadership wheels, and persist UI filters. Address leadership selection and delayed stock-detail Back navigation. Remove Overview boilerplate and boxed detail actions; repair Watch/Thesis persistence feedback. Reorganize menu to align Journal/Journey, with Journal cards opening in read mode and explicit edit. Portrait mobile and iPad are primary; scale responsibly to landscape and desktop.
