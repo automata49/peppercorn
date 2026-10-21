@@ -31,7 +31,7 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,102
   await expect(page.locator(label==='저널'?'.journal-albums .journal-story':'.decision-queue-item')).toHaveCount(1)
   await page.setViewportSize({width:height,height:width})
   await expect(page.getByLabel('내 기록 검색')).toHaveValue('기록 1');await expect(page.getByLabel('기록 연도',{exact:true})).toHaveValue('2026')
-  await card.click();await expect(page.getByRole('article',{name:'저널 읽기'})).toBeVisible();await expect(page.getByLabel('기록 제목')).toHaveCount(0);await page.getByRole('button',{name:'수정하기'}).click();await expect(page.getByLabel('기록 제목')).toHaveValue('기록 1');await page.keyboard.press('Escape');await expect(card).toBeFocused()
+  await card.click();await expect(page.getByRole('article',{name:'저널 읽기'})).toBeVisible();await expect(page.getByLabel('기록 제목')).toHaveCount(0);await page.getByRole('button',{name:'수정'}).click();await expect(page.getByLabel('기록 제목')).toHaveValue('기록 1');await page.keyboard.press('Escape');await expect(card).toBeFocused()
   await page.getByRole('button',{name:'검색·날짜 초기화'}).click();await page.setViewportSize({width,height})
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  }
