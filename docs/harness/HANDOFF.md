@@ -1,3 +1,7 @@
+## 2026-10-21 — Folio workflow refresh
+
+FOLIO-WORKFLOW-20261021 supersedes the older placement, left drawer and direct-edit Journal instructions. Follow user-approved stock→Thesis→watchlist/review workflow. Code targets App, News, FilterWheel, Sidebar, LifetimeJournal, Obra and Folio CSS. Validate CI and Pages separately; physical Safari remains open.
+
 ## 2026-10-17 — viewport bottom navigation, bounded cards and laser trends
 
 Release PR #187 merged as 47f0f85. A follow-up release record triggers the source build because the squash body inherited a documentation skip marker; branch-root Pages success alone does not prove the new bundle was published.
