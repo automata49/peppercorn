@@ -21,7 +21,7 @@ for(const width of [390,834,1366,1440])for(const theme of ['light','dark'])test(
  await openPage(page,'발견');await pickFirstStock(page)
  const overview=page.getByRole('tab',{name:'Overview',exact:true});await overview.focus();await overview.press('ArrowRight')
  await expect(page.getByRole('tab',{name:'Analysis',exact:true})).toBeFocused();await expect(page.getByRole('tabpanel')).toHaveAttribute('aria-labelledby','detail-tab-analysis');await expect(page.locator('.stock-snapshot')).toBeVisible();await expect(page.locator('.price-rs')).toHaveCount(1);await expect(page.locator('.checkup')).toHaveCount(0)
- await page.getByRole('tab',{name:'Financials',exact:true}).click();await expect(page.getByRole('heading',{name:'공시 펀더멘털'})).toBeVisible()
+ await page.getByRole('tab',{name:'Financials',exact:true}).click();await expect(page.getByRole('heading',{name:'공시 펀더멘털',exact:true})).toBeVisible()
  await page.getByRole('tab',{name:'Thesis',exact:true}).click();await expect(page.locator('.analysis-judgement')).toBeVisible()
  await page.getByRole('tab',{name:'Thesis',exact:true}).press('Home');await expect(overview).toBeFocused();await expect(page.locator('.folio-insight')).toBeVisible()
  await expect(page.locator('.price-rs')).toHaveCount(0);await expect(page.locator('.checkup')).toHaveCount(1);await expect(page.locator('.obra-thesis-preview')).toHaveCount(0)
