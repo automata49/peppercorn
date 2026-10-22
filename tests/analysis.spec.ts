@@ -17,7 +17,7 @@ async function openAnalysis(page:Page){
     if(await bottom.isVisible())await bottom.click()
     else {await page.getByRole('button',{name:/메뉴 열기/}).first().click();await page.locator('.menu-drawer').getByRole('button',{name:'발견',exact:true}).click()}
   }
-  await page.getByRole('tab',{name:'종목',exact:true}).click()
+  await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
 }
 for(const view of [{name:'phone',width:390,height:844,touch:true},{name:'ipad-portrait',width:834,height:1194,touch:true},{name:'ipad-landscape',width:1194,height:834,touch:true},{name:'ipad-pro',width:1366,height:1024,touch:true},{name:'desktop',width:1440,height:900,touch:false}]){
  test(view.name+' stock analysis shows Analysis, Financials and Thesis',async({browser})=>{

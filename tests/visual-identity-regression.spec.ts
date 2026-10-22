@@ -100,7 +100,7 @@ for(const view of VISUAL_IDENTITY_VIEWPORTS){
     }else{
       await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
     }
-    await page.getByRole('tab',{name:'종목',exact:true}).click()
+    await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
     await openFilters(page)
     const scope=page.locator('.analysis-scope')
     // Active leadership selection is now idempotent. Choose the explicit 전체

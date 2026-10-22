@@ -19,7 +19,7 @@ async function discover(page:Page){
   const nav=page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true})
   if(await nav.isVisible())await nav.click()
   else await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
-  await page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab',{name:'종목',exact:true}).click()
+  await page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab',{name:'종목 검토',exact:true}).click()
   await expect(page.locator('.catalog-filter-rails')).toBeVisible()
 }
 for(const [width,height] of [[390,844],[834,1194],[1440,900]]){

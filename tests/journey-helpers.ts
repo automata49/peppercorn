@@ -24,7 +24,7 @@ export async function openPage(page:Page,label:string){
  // Older detail/chart regressions opt into the retained card view explicitly.
  // The customer-facing default remains the compact one-line list.
  if(label==='발견'){
-   const stocks=page.getByRole('tab',{name:'종목',exact:true})
+   const stocks=page.getByRole('tab',{name:'종목 검토',exact:true})
    await expect(stocks).toBeVisible()
    if(await stocks.getAttribute('aria-selected')!=='true')await stocks.click()
    const toggle=page.getByRole('group',{name:'종목 보기 방식'})
@@ -37,7 +37,7 @@ export async function openSignal(page:Page){
  await page.getByRole('tab',{name:'시장 신호',exact:true}).click()
  await expect(page.locator('.dashboard-sector-panel')).toBeVisible()
 }
-export async function openLeaderTools(page:Page){await openSignal(page);await page.getByRole('tab',{name:'종목',exact:true}).click();await expect(page.locator('.analysis-finder')).toBeVisible()}
+export async function openLeaderTools(page:Page){await openSignal(page);await page.getByRole('tab',{name:'종목 검토',exact:true}).click();await expect(page.locator('.analysis-finder')).toBeVisible()}
 export async function pickFirstStock(page:Page){
  await page.locator('[data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await page.locator('[data-wheel="주도 분류"]').getByRole('button',{name:'전체',exact:true}).click()
