@@ -144,3 +144,11 @@ html body .shell .app-main .page-thesis .records-anchor{padding-top:0!important}
 @media(prefers-reduced-motion:reduce){
  html body .shell .app-main :is(.folio-research-list>button,.folio-research-add,.folio-research-field input){transition:none!important}
 }
+
+/* An archived thesis is also a writer and should not fall into the selector column. */
+@media(min-width:901px){
+ html body .shell .app-main .page-thesis .analysis-page>.archived-thesis{grid-column:2;grid-row:1;min-width:0;margin:0!important}
+}
+@media(max-width:900px){
+ html body .shell .app-main .page-thesis .analysis-page>.archived-thesis{width:100%;min-width:0}
+}
