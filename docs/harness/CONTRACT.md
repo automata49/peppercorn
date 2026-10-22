@@ -1,3 +1,10 @@
+## FOLIO-TOP-EDITORIAL-MASTHEAD-20261022 — latest page header authority (2026-10-22)
+
+- On phone and iPad portrait/compact landscape, Discover / Journal / Journey show the same canonical English kicker + Korean page-level title **at the screen's top masthead**. Do not repeat the visual page heading in the content hero; keep each page's image, caption where space allows and contextual actions.
+- Remove the redundant home glyph/shortcut from the **top** masthead on every non-Home destination. Today retains the canonical Folio wordmark. Keep the existing Today button in bottom navigation and desktop top navigation so direct Home navigation remains available.
+- Header stock-search and basket buttons retain 44px hit targets, accessible labels, saved basket and focus; fixed bottom tabs, safe-area padding, light/dark contrast, orientation/rotation and stock-detail back route must not regress. Stock detail uses its own back/stock heading rather than a false Discover masthead.
+- Single copy source: `src/components/SectionHeading.tsx` (`editorialPageHeadings`). 390/834/1194/1440px gate: title visible at top without clipped text, one visible bilingual title per page, no redundant home icon, search/basket and bottom Today navigation still functional. Desktop retains its horizontal app navigation and upper editorial section title.
+
 ## FOLIO-EDITORIAL-RESEARCH-THESIS-20261022 — approved design/workflow corrections
 
 1. One type scale: Folio Insight (FOLIO INSIGHT / 핵심 요약) defines Level-3 English kicker + Korean H3. The shared EditorialHeading must match on all stock-detail tabs, Research and Thesis: title 22–30px, kicker 10–12px, restrained 12px meta. Level-2 page section 26–38px, minor labels 13–16px. Semantic headings and accessible names are required in portrait and landscape.
