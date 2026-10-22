@@ -50,3 +50,7 @@ html body .journal-read-actions button{min-height:44px;padding:8px 0!important;b
 .journal-reader-ink{margin:24px 0;max-height:650px;overflow:auto;touch-action:pan-y}
 .journal-reader-investment{display:grid;gap:18px;margin:30px 0;border-top:1px solid var(--folio-line);padding-top:24px}
 .journal-reader-investment h3{font-size:16px;margin:0 0 8px}.journal-reader-investment p{margin:0;white-space:pre-wrap;line-height:1.75}
+
+/* JOURNAL-INK-READ-20261022: responsive stroke fit without rewriting saved coordinates. */
+.journal-page-reader .journal-reader-ink{max-height:min(75svh,900px);overflow:auto;overscroll-behavior:contain;touch-action:pan-y}
+.journal-page-reader .journal-reader-ink .ink-preview{display:block;width:100%;height:auto;max-height:none;overflow:visible}
