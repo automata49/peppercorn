@@ -1,3 +1,11 @@
+## FOLIO-INK-TABS-BACK-20261022 — approved responsive correction (2026-10-22)
+
+- Journal read-first ink preview frames actual stroke bounds, not the mostly-empty 1000-wide writing paper. Fit to available reading width and permit vertical scrolling for longer ink. Never resave, migrate or alter original stroke coordinates; thumbnail and editable paper views retain original geometry.
+- In stock Overview, basket / interest / Thesis actions follow content at the **same bottom position** as Analysis / Financials / Thesis. Preserve cloud-write guards, live state, selected instrument and existing Thesis routing.
+- Discover tabs show 시장 신호 / 종목 검토 / 리서치 기록, preserving their original signal / stocks / topics internal IDs, content and history. Discover and Journey (재검토 / 관심종목 / 보유종목) use stock-detail's flat three-column underline tabs, type >=15px on phone/iPad portrait, controls >=44px, visible keyboard focus and theme-aware ink.
+- One canonical page route owns Back. Popstate must not repaint the already-current route when closing a child drill, and page transitions should not wait in a blank state or remount because an unrelated tab changed. Edge-swipe, header button and native browser Back agree; preserve reduced-motion behavior and fixed navigation.
+- Regression: 390px phone, 834px portrait iPad, 1366px landscape, 1440px desktop; Light/Dark, tab selection and reload, journal ink legibility, long/short labels and page restoration. Chromium tests do not certify physical Safari. No source rights, user data, market classifications or rankings change.
+
 ## FOLIO-MARKET-LEADERS-WHEEL-20261021 — approved compact correction (2026-10-21)
 
 - Discover → 종목: MARKET LEADERS / 주도 종목 matches Market Signal's Sector Leaders / 주도 섹터 editorial typography (eyebrow, headline, scale, line height and spacing) while Filter & Sort remains right-aligned.

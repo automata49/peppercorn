@@ -169,7 +169,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
          {selected.entry.ticker&&<p className="journal-reader-meta">{selected.entry.ticker}</p>}
          {entryPhotos(selected.entry).length>0&&<div className="journal-reader-photos">{entryPhotos(selected.entry).map((src,i)=><img key={i} src={src} alt={selected.entry!.title+' 사진 '+(i+1)} loading="lazy"/>)}</div>}
          {selected.entry.body?.content?.some(node=>node.content?.length||node.type!=='paragraph')?<NotebookReadOnly body={selected.entry.body}/>:<p className="journal-reader-text">{selected.entry.text||selected.entry.answer||'본문이 없습니다.'}</p>}
-         {selected.entry.ink.length>0&&<div className="journal-reader-ink"><InkPreview strokes={selected.entry.ink}/></div>}
+         {selected.entry.ink.length>0&&<div className="journal-reader-ink"><InkPreview strokes={selected.entry.ink} fit/></div>}
          {selected.entry.kind==='investment'&&<div className="journal-reader-investment">
            {selected.entry.hypothesis&&<section><h3>내 가설</h3><p>{selected.entry.hypothesis}</p></section>}
            {selected.entry.counterEvidence&&<section><h3>반대 증거</h3><p>{selected.entry.counterEvidence}</p></section>}

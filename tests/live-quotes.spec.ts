@@ -49,7 +49,7 @@ test('stock detail links to Finviz for US tickers and no longer to the Google Sh
  await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all');localStorage.setItem('folio-catalog-view','cards')});await page.goto('http://127.0.0.1:4173/peppercorn/');await openPage(page,'시장 요약')
  await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
  await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
- await page.getByRole('tab',{name:'종목',exact:true}).click()
+ await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
  const list=page.locator('.stock-list')
  await openFilters(page)
  const scope=page.locator('.analysis-scope');const active=scope.locator('button[aria-pressed="true"]');if(await active.count())await active.first().click()

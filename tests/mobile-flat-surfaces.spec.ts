@@ -35,7 +35,7 @@ test('phone major regions use Pebble glass while metrics remain unboxed',async({
 
   await page.locator('.mobile-bottom-nav').getByRole('button',{name:'발견',exact:true}).click()
   // Discover preserves the active Market Signal tab; switch explicitly to stocks.
-  await page.getByRole('tab',{name:'종목',exact:true}).click()
+  await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
   await expect(page.locator('.catalog-filter-rails')).toBeVisible()
   await pickFirstStock(page)
   const primary=page.locator('.analysis-main.analysis-price-momentum')
@@ -60,7 +60,7 @@ test('desktop major regions share Pebble glass',async({page})=>{
   expect(parseFloat(await focus.evaluate(e=>getComputedStyle(e).borderRadius))).toBeGreaterThan(0)
 
   await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
-  await page.getByRole('tab',{name:'종목',exact:true}).click()
+  await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
   await pickFirstStock(page)
   const block=page.locator('.analysis-main.analysis-price-momentum').first()
   expect(parseFloat(await block.evaluate(e=>getComputedStyle(e).borderLeftWidth))).toBe(0)

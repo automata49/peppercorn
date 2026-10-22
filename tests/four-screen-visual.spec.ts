@@ -120,7 +120,7 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
       await openScreen(page, screen.label, view.touch)
       // Default Discover is Market Signal; select the existing stock-catalog regression surface explicitly.
       if(screen.name==='discover'){
-        const stocks=page.getByRole('tab',{name:'종목',exact:true})
+        const stocks=page.getByRole('tab',{name:'종목 검토',exact:true})
         if(view.touch)await stocks.tap();else await stocks.click()
       }
       await expect(page.locator(screen.selector)).toBeVisible()
@@ -137,6 +137,9 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         await expect(page.locator('.journal-albums .journal-gallery > button')).toHaveCount(3)
       }
       if (screen.name === 'journey') {
+        const tabs=page.locator('.journey-magazine-tabs .folio-tabs-trigger')
+        await expect(tabs).toHaveCount(3)
+        for(const tab of await tabs.all()){expect(parseFloat(await tab.evaluate(el=>getComputedStyle(el).fontSize))).toBeGreaterThanOrEqual(15);expect((await tab.boundingBox())!.height).toBeGreaterThanOrEqual(44)}
         await expect(page.locator('.review-gallery-item')).toHaveCount(1)
         await expect(page.locator('.decision-queue')).not.toContainText('바다 앞에서 생각한 긴 시간')
         await expect(page.locator('.decision-queue-item')).toHaveCount(1);await expect(page.locator('.review-gallery-item .journal-story')).toHaveCount(0)
@@ -172,10 +175,10 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         expect(layout.quoteVisible).toBe(true)
         expect(layout.fitsViewport).toBe(true)
         await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
-      } else if (screen.name === 'discover') {
+      } else if (screen.name === 'discover' || screen.name === 'journey') {
         // The carousel + default compact list intentionally replace the previous card snapshot.
         // Keep layout, overflow and control behavior as hard gates while collecting a new visual baseline.
-        await page.screenshot({path:`test-results/new-discover-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
+        await page.screenshot({path:`test-results/new-${screen.name}-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
       } else {
         await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : (view.width >= 1366 && (screen.name === 'journal' || screen.name === 'journey')) ? 1500 : 150, threshold: 0.15})
       }

@@ -14,7 +14,7 @@ async function setup(page:Page,snapshot:{status:number;age_h?:number}){
   await page.addInitScript(()=>{if(!localStorage.getItem('folio-stock-size'))localStorage.setItem('folio-stock-size','all')});await page.goto('/');await openPage(page,'시장 요약')
   await expect(page.locator('.launch-overlay')).toHaveCount(0,{timeout:15000})
   await page.locator('.sidebar nav').getByRole('button',{name:'발견',exact:true}).click()
-  await page.getByRole('tab',{name:'종목',exact:true}).click()
+  await page.getByRole('tab',{name:'종목 검토',exact:true}).click()
   return calls
 }
 test('fresh snapshot is used without calling the live function',async({page})=>{
