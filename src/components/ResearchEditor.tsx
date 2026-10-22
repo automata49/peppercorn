@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useId,useState} from 'react'
 import type {EditableRow} from '../types'
 import {EditorialHeading} from './EditorialHeading'
 
@@ -16,6 +16,7 @@ const fields:Field[]=[
 ]
 function ResearchForm({record,onPatch}:{record:EditableRow;onPatch:(id:string,field:string,value:string)=>string|null}){
  const [notice,setNotice]=useState('')
+ const formId=useId()
  const write=(field:string,value:string)=>{
   if(field==='source'&&value.trim()){
    try{const url=new URL(value.trim());if(!['https:','http:'].includes(url.protocol))throw new Error('unsafe')}
@@ -25,16 +26,16 @@ function ResearchForm({record,onPatch}:{record:EditableRow;onPatch:(id:string,fi
   const error=onPatch(String(record.id),field,value)
   setNotice(error||'입력 내용이 기록에 반영됐습니다.')
  }
- return <form className="folio-research-form" onSubmit={event=>{event.preventDefault();(document.activeElement as HTMLElement|null)?.blur()}}>
+ return <form className="folio-research-form" onSubmit={event=>{event.preventDefault();const active=document.activeElement;if(active instanceof HTMLElement&&event.currentTarget.contains(active))active.blur()}}>
   <div className="folio-research-fields">
-   {fields.map(field=><label key={field.id} className={'folio-research-field'+(field.kind==='area'?' folio-research-wide':'')}>
+   {fields.map(field=><label key={field.id} htmlFor={formId+'-'+field.id} className={'folio-research-field'+(field.kind==='area'?' folio-research-wide':'')}>
     <span>{field.label}</span>
-    {field.kind==='select'?<select aria-label={field.label} value={String(record[field.id]||field.choices![0])} onChange={e=>write(field.id,e.target.value)}>
+    {field.kind==='select'?<select id={formId+'-'+field.id} aria-label={field.label} value={String(record[field.id]||field.choices![0])} onChange={e=>write(field.id,e.target.value)}>
        {field.choices!.map(choice=><option key={choice} value={choice}>{choice}</option>)}
-     </select>:field.kind==='area'?<textarea key={String(record.id)+'|'+field.id} aria-label={field.label} rows={3} defaultValue={String(record[field.id]??'')} onBlur={e=>write(field.id,e.target.value)}/>:<input key={String(record.id)+'|'+field.id} aria-label={field.label} type={field.kind==='date'?'date':field.kind==='url'?'url':'text'} defaultValue={String(record[field.id]??'')} onBlur={e=>write(field.id,e.target.value)}/>}
+     </select>:field.kind==='area'?<textarea id={formId+'-'+field.id} key={String(record.id)+'|'+field.id} aria-label={field.label} rows={3} defaultValue={String(record[field.id]??'')} onBlur={e=>write(field.id,e.target.value)}/>:<input id={formId+'-'+field.id} key={String(record.id)+'|'+field.id} aria-label={field.label} type={field.kind==='date'?'date':field.kind==='url'?'url':'text'} defaultValue={String(record[field.id]??'')} onBlur={e=>write(field.id,e.target.value)}/>}
    </label>)}
   </div>
-  <div className="folio-research-form-footer"><p role="status">{notice||'입력 후 다른 항목을 선택하면 기록에 반영됩니다.'}</p><button type="submit">입력 확정</button></div>
+  <div className="folio-research-form-footer"><p role="status">{notice||'항목 이동 시 자동 저장됩니다. 완료 후 저장 상태를 확인하세요.'}</p><button type="submit">입력 확정</button></div>
  </form>
 }
 export function ResearchEditor({rows,onCreate,onPatch}:{rows:EditableRow[];onCreate:()=>{id?:string;error?:string};onPatch:(id:string,field:string,value:string)=>string|null}){
