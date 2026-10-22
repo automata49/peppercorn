@@ -1,3 +1,9 @@
+## FOLIO-REPORT-CHROME-20261022 — approved report heading cleanup
+
+- Discover → 시장 신호 → MARKET & COMPANIES → 리포트 already owns the report context in the switcher; do not render an additional visible `리서치 리포트` heading above the PDF list.
+- Remove the grey top border immediately above the first PDF report item only. Later record separators, source dates, original PDF links, accordion actions and private access remain intact.
+- Preserve report/news mode persistence and 44px interactions; check the signed-in report list at 390/834/1440px and avoid any additional decorative rule.
+
 ## FOLIO-TOP-EDITORIAL-MASTHEAD-20261022 — latest page header authority (2026-10-22)
 
 - On phone and iPad portrait/compact landscape, Discover / Journal / Journey show the same canonical English kicker + Korean page-level title **at the screen's top masthead**. Do not repeat the visual page heading in the content hero; keep each page's image, caption where space allows and contextual actions.
