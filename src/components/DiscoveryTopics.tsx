@@ -1,13 +1,14 @@
 import { useVisualStyle, coverPhoto } from './VisualStyle'
 import type { EditableRow, LeaderRow } from '../types'
 import { Button } from './ui/button'
+import type {ReactNode} from 'react'
 
 function sourceUrl(value:unknown){
  try{const url=new URL(String(value||''));return ['http:','https:'].includes(url.protocol)?url:null}catch{return null}
 }
 
 /** Editorial observations are the user's sourced research, never invented news. */
-export function DiscoveryTopics({research,match,onSelect,onResearch}:{research:EditableRow[];match:(r:EditableRow)=>LeaderRow|null;onSelect:(r:LeaderRow)=>void;onResearch:()=>void}){
+export function DiscoveryTopics({research,match,onSelect,onResearch,children}:{research:EditableRow[];match:(r:EditableRow)=>LeaderRow|null;onSelect:(r:LeaderRow)=>void;onResearch:()=>void;children?:ReactNode}){
  const {photoStyle}=useVisualStyle()
  const observations=research.filter(r=>sourceUrl(r.source)&&String(r.fact||'').trim()).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,3)
  return <section className="discovery-topics" aria-label="출처가 있는 주제">
@@ -23,6 +24,7 @@ export function DiscoveryTopics({research,match,onSelect,onResearch}:{research:E
     </div>
    </article>
   }):<div className="discovery-topic-empty"><span className="journey-kicker">관찰에서 기업으로</span><h3>출처가 있는 발견을 모아보세요.</h3><p>아직 출처 링크와 관찰 사실이 함께 기록된 주제가 없습니다. 리서치 노트에 사실과 해석을 나누어 남기면 이곳에서 기업으로 이어집니다.</p></div>}
-  <Button variant="ghost" onClick={onResearch}>리서치 노트에 관찰 남기기 →</Button>
+  {children}
+  <Button variant="ghost" onClick={onResearch}>리서치 전체 비교 · 고급 편집 →</Button>
  </section>
 }
