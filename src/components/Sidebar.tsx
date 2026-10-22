@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle } from './ui/dialog'
 import { AppIcon, type AppIconName } from './AppIcon'
 import { FolioWordmark } from './FolioWordmark'
+import { editorialPageHeadings } from './SectionHeading'
 
 const pages:[string,AppIconName,string][]=[
   ['today','home','오늘'],
@@ -73,7 +74,7 @@ function FolioBrand(){
   return <FolioWordmark/>
 }
 
-export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch,onBasket,basketCount}:{page:string;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean;onSearch:()=>void;onBasket:()=>void;basketCount:number}){
+export function Sidebar({page,analysisDetail=false,setPage,open,setOpen,onRefresh,refreshing,onSearch,onBasket,basketCount}:{page:string;analysisDetail?:boolean;setPage:(p:string)=>void;open:boolean;setOpen:(open:boolean)=>void;onRefresh:()=>void;refreshing:boolean;onSearch:()=>void;onBasket:()=>void;basketCount:number}){
   const [theme,setTheme]=useState<ThemeMode>(readTheme)
 
   useEffect(()=>{
@@ -85,6 +86,8 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch
     media.addEventListener?.('change',handle)
     return ()=>media.removeEventListener?.('change',handle)
   },[theme])
+
+  const editorialHeading=page==='analysis'&&!analysisDetail?editorialPageHeadings.discover:page==='notebook'?editorialPageHeadings.journal:page==='tracking'?editorialPageHeadings.journey:null
 
   const pageButton=([id,icon,label]:[string,AppIconName,string])=><button key={id} className={page===id?'active':''} onClick={()=>{setPage(id);setOpen(false)}} aria-current={page===id?'page':undefined}>
     <span className="nav-icon"><AppIcon name={icon}/></span><span className="nav-label">{label}</span>
@@ -112,9 +115,9 @@ export function Sidebar({page,setPage,open,setOpen,onRefresh,refreshing,onSearch
     </header>
 
     <div className="mobile-brandbar">
-      <button className="mobile-brand-home" onClick={()=>setPage('today')} aria-label="오늘로 이동">
-        <span className="folio-brand">{page==='today'?<FolioBrand/>:<AppIcon name="home"/>}</span>
-      </button>
+      {editorialHeading
+        ? <div className="mobile-brand-title"><span className="journey-kicker">{editorialHeading.kicker}</span><h1>{editorialHeading.title}</h1></div>
+        : <div className="mobile-brand-wordmark folio-brand"><FolioBrand/></div>}
       <div className="mobile-brand-actions">{stockActions}</div>
     </div>
 
