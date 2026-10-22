@@ -36,7 +36,7 @@ for(const [width,height] of [[390,844],[834,1194],[1440,900]]){
     await expect(page.locator('.catalog-wheel-arrows')).toHaveCount(0)
     await expect(wheels.locator('.catalog-wheel-heading')).toHaveText(['시장','종목 분류','주도 분류'])
     const tabs=page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')
-    await expect(tabs).toHaveText(['시장 신호','종목','주제'])
+    await expect(tabs).toHaveText(['시장 신호','종목 검토','리서치 기록'])
     await expect(page.locator('.catalog-heading-row h2')).toHaveText('주도 종목')
     const action=page.getByRole('button',{name:/Filter & Sort/})
     await expect(action).toBeVisible()

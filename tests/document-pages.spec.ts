@@ -26,7 +26,7 @@ for(const width of [390,834,1366,1440])test(`document pages ${width}: source tab
  await expect(page.locator('.home-heading')).toContainText('오늘')
  await openPage(page,'발견')
  await expect(page.getByRole('heading',{name:'변화하는 세상을 읽다',exact:true})).toBeVisible()
- await expect(page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')).toHaveText(['시장 신호','종목','주제'])
+ await expect(page.getByRole('tablist',{name:'발견 영역'}).getByRole('tab')).toHaveText(['시장 신호','종목 검토','리서치 기록'])
  await page.getByRole('tab',{name:'종목 검토',exact:true}).focus();await page.keyboard.press('ArrowRight');await expect(page.getByRole('tab',{name:'리서치 기록',exact:true})).toHaveAttribute('aria-selected','true');await expect(page.locator('.analysis-finder')).toHaveCount(0)
  await expect(page.locator('.discovery-topic')).toContainText('이것은 저장한 관찰 사실입니다.')
  await expect(page.locator('.discovery-provenance')).toContainText('오래된 관찰')
