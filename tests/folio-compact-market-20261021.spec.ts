@@ -18,12 +18,13 @@ for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]]){
   await expect(page.locator('.discovery-news-heading .journey-kicker')).toHaveText('MARKET & COMPANIES')
   await expect(page.locator('.discovery-news-heading h3')).toHaveText('시장과 기업의 새 소식')
   const titles=[
-   ['Sector Leaders','주도 섹터'],
+   ['SECTOR LEADERS','주도 섹터'],
    ['SECTOR MAP','시장 지표 · 섹터 히트맵'],
    ['ETF MAP','ETF 주도 산업'],
+   ['ETF LEADERS','ETF 주도 종목'],
   ]
   const headings=page.locator('.folio-editorial-map-heading')
-  await expect(headings).toHaveCount(3)
+  await expect(headings).toHaveCount(4)
   for(let i=0;i<titles.length;i++){
    const heading=headings.nth(i)
    await expect(heading.locator('.journey-kicker')).toHaveText(titles[i][0])
