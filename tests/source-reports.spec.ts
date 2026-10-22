@@ -37,6 +37,8 @@ for(const width of [390,834,1440])test(`Reports move to MARKET & COMPANIES ${wid
  await expect(tabs.getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
  const reports=section.getByRole('region',{name:'Folio 리서치 리포트'})
  await expect(reports).toContainText(report.title);await expect(reports).toContainText(report.summary[0]);expect(detailRequests).toBe(0)
+ await expect(reports.getByRole('heading',{name:'리서치 리포트',exact:true})).toHaveCount(0)
+ await expect(reports.locator('article').first()).toHaveCSS('border-top-width','0px')
  await reports.getByRole('button',{name:'전문·차트 읽기'}).click()
  await expect(reports.getByLabel('리포트 전문')).toContainText('주문·출하·마진')
  await expect(reports.getByRole('link',{name:'원본 PDF ↗'})).toHaveAttribute('href',report.source_url)
