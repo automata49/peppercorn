@@ -43,7 +43,7 @@ export function ComparisonSheet({rows,columns,onChange,onDelete,label}:{rows:Com
            const field=col.field||'__actions',index=page*size+i,readonly=col.editable===false||['id','market','ticker','name','current_price'].includes(field)
            const raw=record[field],val=String(raw??'')
            const choices=(col.cellEditorParams as {values?:unknown[]}|undefined)?.values
-           const key=String(record.id??index)+'|'+field
+           const key=String(record.id??index)+'|'+field+'|'+val
            return <td key={key}>{field==='__actions'&&onDelete?
              <button type="button" className="grid-delete" aria-label={String(record.ticker||record.name||'기록')+' 삭제'} onClick={()=>onDelete(record as EditableRow)}>삭제</button>:
              readonly?<span className="vertical-compare-readonly">{display(col,record)}</span>:

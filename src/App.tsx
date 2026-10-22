@@ -1579,6 +1579,7 @@ export default function App(){
               <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
                 <div className="thesis-head"><EditorialHeading kicker="MY THESIS" title="내 분석"/><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
                 <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
+                 {actionNotice&&!record&&<p className="folio-editor-notice" role="alert">{actionNotice}</p>}
                 <AnalysisSheet key={String(record?.id||selected.market+':'+selected.ticker)} row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
                   <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>

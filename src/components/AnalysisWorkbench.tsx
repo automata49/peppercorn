@@ -132,15 +132,24 @@ function inputMark(f: SheetField, v: unknown): Mark {
 function SheetInput({ f, value, onCommit }: { f: SheetField; value: unknown; onCommit: (v: string | number | boolean | null) => void }) {
   const [text, setText] = useState(inputText(f, value))
   const last = useRef(inputText(f, value))
+  const [error,setError]=useState('')
   useEffect(() => { const t = inputText(f, value); if (t !== last.current) { last.current = t; setText(t) } }, [f, value])
-  const commit = (t: string) => { if (t === last.current) return; last.current = t; onCommit(parseInput(f, t)) }
+  const commit = (t: string) => {
+    if(t===last.current)return
+    if((f.kind==='num'||f.kind==='pct')&&t.trim()&&!Number.isFinite(Number(t.replace(/[%,\s]/g,'')))){
+      setError('유효한 숫자를 입력해 주세요.');return
+    }
+    setError('')
+    last.current=t
+    onCommit(parseInput(f,t))
+  }
   const id = `sheet-${f.field}`
   if (f.kind === 'select') return <select id={id} aria-label={f.label} value={text} onChange={e => { setText(e.target.value); commit(e.target.value) }}>
     {f.options!.map(o => <option key={o} value={o}>{o || '선택'}</option>)}</select>
   if (f.kind === 'long') return <textarea id={id} aria-label={f.label} rows={2} value={text} onChange={e => setText(e.target.value)} onBlur={() => commit(text)} />
-  return <span className="sheet-input"><input id={id} aria-label={f.label} inputMode={f.kind === 'text' ? 'text' : 'decimal'} value={text}
+  return <span className="sheet-input"><input id={id} aria-label={f.label} aria-invalid={!!error} inputMode={f.kind === 'text' ? 'text' : 'decimal'} value={text}
     onChange={e => setText(e.target.value)} onBlur={() => commit(text)} onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }} />
-    {f.kind === 'pct' && <i>%</i>}</span>
+    {f.kind === 'pct' && <i>%</i>}{error&&<small role="alert">{error}</small>}</span>
 }
 
 /** Vertical input sheet: rows are analysis items; columns are my input, the filed value and the input's check. */

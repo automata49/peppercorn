@@ -1,7 +1,7 @@
 /* FOLIO-EDITORIAL-WORKFLOW-20261022 — one bilingual title hierarchy. */
 :root{
  --folio-section-kicker:10px;
- --folio-section-title:clamp(24px,2.7vw,32px);
+ --folio-section-title:clamp(22px,2.5vw,30px);
  --folio-subsection-title:clamp(17px,1.9vw,22px);
 }
 html body .shell .app-main .folio-editorial-heading{
