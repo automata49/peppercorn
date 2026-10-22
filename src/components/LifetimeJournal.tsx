@@ -6,7 +6,7 @@ import {ReflectionPanel} from './ReflectionPanel'
 import {DecisionQueue} from './DecisionQueue'
 import {reviewStatus,reviewLabels,reviewOrder,decisionSearch,decisionActivityDate} from '../lib/decisionReview'
 import { instrumentLabel } from '../lib/instrumentLabel'
-import { SectionHeading } from './SectionHeading'
+import { SectionHeading, editorialPageHeadings } from './SectionHeading'
 import { useVisualStyle, coverPhoto } from './VisualStyle'
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
@@ -129,7 +129,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
    <div className="today-stories">{stories.map((story, i) => <motion.button key={story.key} type="button" layoutId={`frame-${story.key}`} transition={transition} className={`today-story story-${story.tone}${i === 0 ? ' journal-story-hero' : ''}`} aria-label={story.label} disabled={!ready && story.action === 'edit'} onClick={() => show(story)}><StoryCover story={story} /></motion.button>)}</div>
    <div className="today-write"><p>오늘 발견한 작은 변화도, 아직 정리되지 않은 생각도.</p></div>
   </> : mode === 'journal' ? <>
-   <SectionHeading kind="journal" kicker="MY PAGES" title="기록, 일상, 투자" description="관찰, 판단, 그리고 일상의 아름다움."><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></SectionHeading>
+   <SectionHeading kind="journal" {...editorialPageHeadings.journal}><Button disabled={!ready} onClick={() => show()}>새 페이지</Button></SectionHeading>
    <Tabs value={filter} onValueChange={setFilter}>
     <TabsList aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>
     <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
