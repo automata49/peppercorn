@@ -1,3 +1,9 @@
+## FOLIO-TAB-RAIL-JOURNAL-COVER-20261022 — approved responsive cleanup
+
+- Discover (시장 신호/종목 검토/리서치 기록), Journey (재검토/관심종목/보유종목), Journal (전체/일상/투자) use one accessible 3-column editorial tab anatomy. Remove grey full-width borders below tab groups on all viewports, including stock-detail tabs; preserve the dark active-tab indicator, keyboard focus, readable labels and 44px+ targets. Never delete record, table or input separators while cleaning tab chrome.
+- Journal MY PAGES / 기록, 일상, 투자 shares Discover/Journey's canonical image source via coverPhoto('journal',photoStyle). Render a visible, successfully loaded image on phone/iPad/desktop; on phones use a full-width photographic band and keep 새 페이지 visible. Preserve photo style setting, image rights, journal content/storage/edit actions, responsive header without a duplicated title.
+- Validate at phone 390px, iPad portrait 834px, iPad landscape 1194px and desktop 1440px, including tab switch and persisted content, image naturalWidth, line removal, active underline, focus, no overflow, portrait/landscape and dark theme.
+
 ## FOLIO-ETF-WATCH-ACTIONS-20261022 — leadership titles and editable actions
 
 - Discover → Market Signal uses `SECTOR LEADERS / 주도 섹터` uppercase kicker. The former `ETF 요약` section and full-list dialog title are now `ETF 주도 종목`; its kicker is `ETF LEADERS` and it uses the **same bilingual size/spacing/font roles** as `ETF MAP / ETF 주도 산업`. Data ranking, ETF-only RS and Top 5/full-list behavior are unchanged.
