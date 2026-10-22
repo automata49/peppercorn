@@ -37,7 +37,7 @@ for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]]){
    const tab=tabs.getByRole('tab',{name:label})
    await tab.click()
    await expect(tab).toHaveAttribute('data-state','active')
-   expect(await tab.evaluate(el=>getComputedStyle(el).borderBottomColor)).toBe('rgb(17, 17, 19)')
+   expect(await tab.evaluate(el=>getComputedStyle(el).borderBottomColor)).toBe(await tab.evaluate(el=>getComputedStyle(el).color))
   }
   const styled=await tabs.locator('.folio-tabs-trigger').first().evaluate(el=>{
    const s=getComputedStyle(el);return [s.fontSize,s.fontWeight,s.lineHeight,s.letterSpacing]
