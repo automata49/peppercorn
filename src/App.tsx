@@ -1340,7 +1340,7 @@ export default function App(){
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
       <section className="journey-market" aria-label="시장 신호 요약">
         <div className="journey-heading"><div><span className="journey-kicker">MARKET SIGNAL</span><h2>오늘의 시장</h2></div><button className="dashboard-section-action" onClick={openMarketSignal}>전체 보기 →</button></div>
-        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market} · 시장 폭 → 섹터 → ETF 요약</p>
+        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market} · 시장 폭 → 섹터 → ETF 주도 종목</p>
         <div className="journey-market-facts">
           <div><span>시장 폭 · MA50 위</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong><small>{ma200Rows.length?'MA200 '+(ma200Breadth*100).toFixed(0)+'%':''}</small></div>
           <div><span>주도 섹터</span><strong>{homeSector?sectorName(homeSector.market,homeSector.sector):'—'}</strong><small>{homeSector&&homeSector.medRank!=null?'RS '+Math.round(homeSector.medRank)+' · 주도 '+(homeSector.core+homeSector.candidate):''}</small></div>
