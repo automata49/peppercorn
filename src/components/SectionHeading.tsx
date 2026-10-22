@@ -10,5 +10,5 @@ export const editorialPageHeadings = {
 
 export function SectionHeading({kind,kicker,title,description,children}:{kind:'discover'|'journal'|'journey';kicker:string;title:string;description:string;children?:ReactNode}){
  const {photoStyle}=useVisualStyle()
- return <header className={"lifetime-heading section-heading"+(kind==='discover'?' discovery-heading':'')}><div><span className="journey-kicker">{kicker}</span><h2>{title}</h2><p>{description}</p>{children}</div><img src={coverPhoto(kind,photoStyle)} alt=""/></header>
+ return <header className={"lifetime-heading section-heading"+(kind==='discover'?' discovery-heading':kind==='journal'?' journal-section-heading':'')}><div><span className="journey-kicker">{kicker}</span><h2>{title}</h2><p>{description}</p>{children}</div><img src={coverPhoto(kind,photoStyle)} alt=""/></header>
 }
