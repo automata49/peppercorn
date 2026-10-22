@@ -161,3 +161,5 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 .discovery-news-report-content{min-width:0;max-width:100%;padding:clamp(8px,1.5vw,16px) 0 clamp(16px,2vw,28px)}
 .discovery-news-report-content .source-reports{max-width:960px;margin:0}
 .discovery-news-report-content .source-reports article{border-top:1px solid var(--folio-border,rgba(120,110,100,.2));padding-block:20px}
+/* The first report follows the report/news switch without a decorative grey rule. */
+.discovery-news-report-content .source-reports article:first-of-type{border-top:0;padding-top:0}
