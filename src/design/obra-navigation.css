@@ -49,3 +49,46 @@ html body .stock-basket-list button{min-height:44px;padding:12px 0;border:0;back
 .stock-basket-list>li>button:first-child{display:grid;gap:4px;flex:1;min-width:0}
 .stock-basket-list small{color:var(--folio-muted);overflow-wrap:anywhere}
 .stock-basket-list>li>button:last-child{width:44px;flex-shrink:0;text-align:center}
+
+/* TOP-EDITORIAL-MASTHEAD-20261022: page identity leads compact screens.
+   Keep the 44px search/basket actions and bottom navigation, but never
+   show a second Discover/Journal/Journey title below the masthead. */
+@media(max-width:1279px), (min-width:1280px) and (max-width:1500px) and (hover:none){
+  html body .shell.editorial-masthead-shell>.mobile-brandbar{
+    height:auto!important;min-height:88px;box-sizing:border-box;
+    padding:12px var(--folio-ds-gutter-phone,16px)!important;
+    gap:8px;align-items:center;
+  }
+  .editorial-masthead-shell .mobile-brand-title{
+    min-width:0;flex:1 1 auto;display:flex;flex-direction:column;
+    align-items:flex-start;justify-content:center;gap:3px;
+    color:var(--folio-ink);
+  }
+  .editorial-masthead-shell .mobile-brand-title>.journey-kicker{
+    font-size:10px;line-height:1.3;letter-spacing:.13em;
+    font-weight:700;color:var(--folio-muted);
+  }
+  .editorial-masthead-shell .mobile-brand-title>h1{
+    margin:0;max-width:100%;
+    font-family:var(--folio-editorial-font);
+    font-size:clamp(25px,3.1vw,32px);font-weight:450;
+    line-height:1.12;letter-spacing:-.04em;
+    white-space:normal;word-break:keep-all;overflow-wrap:normal;
+  }
+  .editorial-masthead-shell .mobile-brand-actions{display:flex;flex-shrink:0;align-items:center}
+  .editorial-masthead-shell .app-main>.topbar{display:none!important}
+  html body .editorial-masthead-shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace){padding-top:8px!important}
+  html body .editorial-masthead-shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace)>.section-heading{min-height:0;margin-bottom:16px}
+  .editorial-masthead-shell .section-heading>div>.journey-kicker,
+  .editorial-masthead-shell .section-heading>div>h2{display:none!important}
+  .mobile-brand-wordmark .folio-wordmark-system{--folio-wordmark-size:25px;height:25px!important}
+}
+@media(max-width:580px){
+  html body .editorial-masthead-shell:is(.page-shell-analysis,.page-shell-tracking) .app-main .section-heading{
+    display:block;min-height:0;
+  }
+  .editorial-masthead-shell:is(.page-shell-analysis,.page-shell-tracking) .section-heading>div{display:none}
+  html body .editorial-masthead-shell:is(.page-shell-analysis,.page-shell-tracking) .section-heading>img{
+    width:100%;height:clamp(112px,29vw,148px);object-fit:cover;
+  }
+}
