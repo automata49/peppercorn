@@ -113,7 +113,7 @@ html body .shell .app-main .page-thesis .analysis-page>.analysis-body,
 html body .shell .app-main .page-thesis .analysis-page>.empty{grid-column:2;grid-row:1;min-width:0;margin:0}
 html body .shell .app-main .page-thesis .journey-theses .journey-heading{display:grid;align-items:start;gap:8px}
 html body .shell .app-main .page-thesis .journey-theses .journey-heading .folio-editorial-heading{margin:0!important}
-html body .shell .app-main .page-thesis .journey-theses .decision-queue{min-width:0}
+html body .shell .app-main .page-thesis .journey-theses .decision-list{min-width:0}
 html body .shell .app-main .page-thesis .analysis-page>.journey-theses .dashboard-section-action{min-height:44px;justify-self:start}
 html body .shell .app-main .page-thesis .analysis-page .analysis-main{min-width:0}
 html body .shell .app-main .page-thesis .analysis-page .analysis-secondary-body{display:block!important;padding:12px 0!important}
@@ -130,8 +130,8 @@ html body .shell .app-main .page-thesis .records-anchor{padding-top:0!important}
  html body .shell .app-main .folio-research-list>button{flex:0 0 clamp(178px,44vw,240px);scroll-snap-align:start}
  html body .shell .app-main .page-thesis .analysis-page{display:block!important;max-width:850px}
  html body .shell .app-main .page-thesis .analysis-page>.journey-theses{position:static;max-height:none;overflow:visible;margin-bottom:18px!important}
- html body .shell .app-main .page-thesis .journey-theses .decision-queue{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:6px}
- html body .shell .app-main .page-thesis .journey-theses .decision-queue>button{flex:0 0 clamp(190px,56vw,280px);scroll-snap-align:start}
+ html body .shell .app-main .page-thesis .journey-theses .decision-list{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:6px}
+ html body .shell .app-main .page-thesis .journey-theses .decision-list>button{flex:0 0 clamp(190px,56vw,280px);scroll-snap-align:start}
 }
 @media(max-width:600px){
  html body .shell .app-main .folio-research-fields{grid-template-columns:1fr}
@@ -152,3 +152,12 @@ html body .shell .app-main .page-thesis .records-anchor{padding-top:0!important}
 @media(max-width:900px){
  html body .shell .app-main .page-thesis .analysis-page>.archived-thesis{width:100%;min-width:0}
 }
+
+/* Preserve tap targets and remove visual rules from the selected Thesis record list. */
+html body .shell .app-main .page-thesis .journey-theses .decision-list{min-width:0}
+html body .shell .app-main .page-thesis .journey-theses .decision-row{
+ box-shadow:none!important;border:0!important;border-left:3px solid transparent!important;
+ background:transparent!important;min-width:0;min-height:56px;overflow-wrap:anywhere
+}
+html body .shell .app-main .page-thesis .journey-theses .decision-row:hover,
+html body .shell .app-main .page-thesis .journey-theses .decision-row:focus-visible{border-left-color:var(--folio-ink)!important}
