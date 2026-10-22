@@ -710,6 +710,7 @@ export default function App(){
   const edgeSwipeRef=useRef<{x:number;y:number}|null>(null)
   const lastBackRequestRef=useRef(0)
   const [analysisDetail,setAnalysisDetail]=useState(false)
+  const [focusThesis,setFocusThesis]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
   const [tradeDrafts,setTradeDrafts]=useState<Record<string,EditableRow>>({})
   const [discoverTab,setDiscoverTab]=useState<'topics'|'stocks'|'signal'>('signal')
@@ -802,7 +803,11 @@ export default function App(){
   const [basketOpen,setBasketOpen]=useState(false)
   const [stockSearchOpen,setStockSearchOpen]=useState(false)
   const basketHas=(row:LeaderRow)=>basket.some(r=>r.market===row.market&&r.ticker===row.ticker)
-  const addToBasket=(row:LeaderRow)=>{if(!basketHas(row))setBasket([...basket,{market:row.market,ticker:row.ticker,name:row.name}])}
+  const addToBasket=(row:LeaderRow)=>{
+    if(basketHas(row)){setBasketOpen(true);return}
+    setBasket([...basket,{market:row.market,ticker:row.ticker,name:row.name}])
+    setActionNotice('장바구니에 담았습니다. 상단 장바구니에서 확인하세요.')
+  }
   const [watch,setWatch]=useAccountRows<EditableRow>('peppercorn-watchlist',accountScope,session?[]:initialWatchlist)
   const [portfolio,setPortfolio]=useAccountRows<EditableRow>('peppercorn-portfolio',accountScope,session?[]:initialPortfolio)
   const [research,setResearch]=useAccountRows<EditableRow>('peppercorn-research',accountScope,session?[]:initialResearch)
@@ -949,6 +954,16 @@ export default function App(){
     return()=>window.removeEventListener('popstate',onPop)
   },[])
 
+  useEffect(()=>{
+    if(!focusThesis)return
+    if(page!=='analysis'||!analysisDetail){setFocusThesis(false);return}
+    if(analysisSection!=='thesis')return
+    const root=document.getElementById('analysis-judgement')
+    if(!root)return
+    root.scrollIntoView({behavior:reduceLaunchMotion?'instant':'smooth',block:'start'})
+    root.querySelector<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>('.analysis-sheet textarea,.analysis-sheet input,.analysis-sheet select')?.focus({preventScroll:true})
+    setFocusThesis(false)
+  },[focusThesis,analysisSection,analysisDetail,page,selectedRecordId,reduceLaunchMotion])
   useEffect(()=>{
     if((page==='analysis'||page==='thesis')&&scrollToAnalysis){
       setPage('thesis');setAnalysisRecordsOpen(true)
@@ -1193,13 +1208,14 @@ export default function App(){
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ticker · 종목 · 산업 · 섹터 검색"/>
   </div>
 
-  const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true)=>{
-    if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return}
+  const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true):string|null=>{
+    if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return null}
     setSelected(row)
     const recordId=crypto.randomUUID();setSelectedRecordId(recordId)
     updateAnalysis([{id:recordId,date:new Date().toISOString().slice(0,10),market:row.market,ticker:row.ticker,name:row.name},...analysis])
     if(navigate){setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null);setAnalysisSection('thesis');setPage('thesis')}
     if(scroll)setScrollToAnalysis(true)
+    return recordId
   }
   const updateAnalysisField=(record:EditableRow,field:string,value:string|number|boolean|null)=>{
     const index=Math.max(0,Number(record.no||1)-1)
@@ -1516,26 +1532,27 @@ export default function App(){
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
     const addWatch=()=>{
-      if(!selected||inWatch)return
+      if(!selected)return
+      if(inWatch){setActionNotice('이미 관심종목에 등록됐습니다. 여정 > 관심종목에서 확인하세요.');return}
       if(session&&!cloudReadyRef.current.resources.has('watchlist')){setActionNotice('관심종목 동기화 준비 중입니다. 다시 시도하세요.');return}
       updateWatch([{id:crypto.randomUUID(),market:selected.market,ticker:selected.ticker,name:selected.name,priority:'B'},...watch])
-      setActionNotice('관심종목에 추가했습니다.')
+      setActionNotice('관심종목에 추가했습니다. 여정 > 관심종목에서 확인하세요.')
     }
     const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
     const goJudgement=()=>{
       if(!selected)return
       if(!record){
-        if(session&&!cloudReadyRef.current.resources.has('analysis')){setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return}
-        recordAnalysis(selected,false,false)
+        if(!recordAnalysis(selected,false,false))return
         setActionNotice('Thesis를 생성했습니다. 내용을 작성해 주세요.')
-      }
-      // The stock and its saved thesis stay on the same detail page.
+      }else setActionNotice('저장된 Thesis를 열었습니다.')
+      // Move to the actual editable sheet and expose the result immediately.
       setAnalysisSection('thesis')
+      setFocusThesis(true)
     }
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     const detailActions=<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
       <Button variant="secondary" aria-pressed={!!selected&&basketHas(selected)} onClick={()=>{if(selected)addToBasket(selected)}}><AppIcon name="basket"/>{selected&&basketHas(selected)?'장바구니 담김':'장바구니 담기'}</Button>
-      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
+      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
       <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
       {actionNotice&&<span role="status" className="analysis-action-notice">{actionNotice}</span>}
     </div>
@@ -1594,7 +1611,7 @@ export default function App(){
                  {actionNotice&&!record&&<p className="folio-editor-notice" role="alert">{actionNotice}</p>}
                 <AnalysisSheet key={String(record?.id||selected.market+':'+selected.ticker)} row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
-                  <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
+                  <button type="button" className="secondary-action" aria-pressed={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
                   <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
                   {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
                 </div>
