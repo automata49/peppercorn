@@ -25,7 +25,6 @@ export function SourceReports({controller}:{controller:ReportController}){
  if(!controller.uid)return null
  if(!controller.items.length&&!controller.error)return null
  return <section className="home-digest source-reports" aria-label="Folio 리서치 리포트">
-  <h4>리서치 리포트</h4>
   {controller.error&&<p role="status">{controller.error} <Button variant="ghost" onClick={controller.refresh}>다시 시도</Button></p>}
   {controller.items.map(r=><article key={r.drive_file_id}>
    <h5>{r.title}</h5><time>{new Date(r.source_modified_at).toLocaleString('ko-KR')} · PDF 수정 시각</time>
