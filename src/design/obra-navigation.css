@@ -76,6 +76,7 @@ html body .stock-basket-list button{min-height:44px;padding:12px 0;border:0;back
     white-space:normal;word-break:keep-all;overflow-wrap:normal;
   }
   .editorial-masthead-shell .mobile-brand-actions{display:flex;flex-shrink:0;align-items:center}
+  .shell>.mobile-brandbar .mobile-brand-actions{margin-left:auto}
   .editorial-masthead-shell .app-main>.topbar{display:none!important}
   html body .editorial-masthead-shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace){padding-top:8px!important}
   html body .editorial-masthead-shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace)>.section-heading{min-height:0;margin-bottom:16px}
