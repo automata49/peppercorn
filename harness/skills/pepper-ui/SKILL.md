@@ -3,6 +3,10 @@ name: pepper-ui
 description: Use for Pepper responsive layout, typography, navigation, tables, Dashboard, stock dialog and visual-regression changes.
 ---
 
+## FOLIO-TAB-RAIL-JOURNAL-COVER-20261022 — current tab and cover authority
+
+Discover, Journal and Journey use the same three-column editorial tabs with a 2px ink underline on the active tab only; remove their decorative full-width grey rails and the stock-detail tab rail without removing focus outlines, functional tab underlines or record/table separators. Journal's MY PAGES uses the existing coverPhoto('journal',photoStyle) asset: keep it visible with a full-width band on phones while preserving the new-page button and the compact bilingual top masthead. Validate 390/834/1194/1440px, image load, tab switches, accessibility and no horizontal overflow.
+
 ## DISCOVERY-CATALOG-1 / VISUAL-STYLE-1 — user direction (2026-10-13)
 
 Discover stocks use a compact editorial banner, category menu (대형주 / 중소형주 / 전체 / ETF), one search and a responsive stock-card catalogue. Desktop has leadership filters at the upper left beneath the category menu; compact mobile/iPad uses four short leadership controls above cards. Keep first stock cards near the initial viewport, one-line horizontally scrollable recent history, optional detailed conditions and preserved category/market/sector/lens state. Obra token controls replace old animated Pebble/glass geometry **in this catalogue only**, with visible focus, >=44px targets and reduced motion. Preserve ranking, ETF independence, progressive rows, price history and missing states.

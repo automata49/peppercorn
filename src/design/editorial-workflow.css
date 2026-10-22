@@ -91,3 +91,45 @@ html body .shell .app-main .ticker-entry-results button{
 .ticker-entry-hint{flex:1 1 100%;font-size:12px;color:var(--folio-muted)}
 .ticker-entry-results button:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
 .obra-detail .analysis-judgement{scroll-margin-top:clamp(12px,5vh,64px)}
+
+/* FOLIO-TAB-RAIL-JOURNAL-COVER-20261022
+   The selected tab's ink underline is functional; the grey full-width rail is not. */
+html body .shell .app-main :is(
+  .discovery-tabbar,
+  .discovery-tabbar .folio-tabs-list,
+  .journey-magazine-tabs,
+  .journal-magazine-tabs,
+  .obra-detail .analysis-detail-tabs
+){
+  border-bottom:0!important;
+  box-shadow:none!important;
+}
+html body .shell .app-main :is(
+  .discovery-tabbar .folio-tabs-trigger,
+  .journey-magazine-tabs .folio-tabs-trigger,
+  .journal-magazine-tabs .folio-tabs-trigger
+)[data-state="active"]{
+  border-bottom:2px solid var(--folio-ink)!important;
+}
+html body .shell .app-main .journal-section-heading>img{
+  display:block;min-width:0;width:100%;object-fit:cover;
+  object-position:center;border-radius:16px;
+}
+@media(max-width:580px){
+  /* Same full-bleed editorial cover rhythm as Discover/Journey on phones.
+     Keep the new-page action below the photograph, not hidden with duplicate title. */
+  html body .editorial-masthead-shell .app-main .lifetime-journal>.journal-section-heading{
+    display:flex!important;flex-direction:column;align-items:stretch;
+    gap:10px;min-height:0;
+  }
+  html body .editorial-masthead-shell .app-main .lifetime-journal>.journal-section-heading>img{
+    order:0;width:100%;height:clamp(112px,29vw,148px);
+  }
+  html body .editorial-masthead-shell .app-main .lifetime-journal>.journal-section-heading>div{
+    order:1;display:flex;justify-content:flex-end;
+    align-items:center;min-width:0;
+  }
+  html body .editorial-masthead-shell .app-main .journal-section-heading>div>.folio-button{
+    margin:0;min-height:44px;
+  }
+}
