@@ -3,11 +3,14 @@ import {inkColor,inkPath} from '../lib/notebookInk'
 
 /** Crop only the reading preview; never modify stored paper-space points. */
 export function inkPreviewBox(strokes:InkStroke[],fit=false){
- const points=strokes.flat().filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y))
- const originalHeight=strokes.some(s=>s[0]?.tool)?Math.max(400,...points.map(p=>p.y+20)):400
- if(!fit||!points.length)return `0 0 1000 ${originalHeight}`
- const left=Math.min(...points.map(p=>p.x)),right=Math.max(...points.map(p=>p.x))
- const top=Math.min(...points.map(p=>p.y)),bottom=Math.max(...points.map(p=>p.y))
+ let left=Infinity,right=-Infinity,top=Infinity,bottom=-Infinity
+ for(const stroke of strokes)for(const p of stroke){
+  if(!Number.isFinite(p.x)||!Number.isFinite(p.y))continue
+  left=Math.min(left,p.x);right=Math.max(right,p.x)
+  top=Math.min(top,p.y);bottom=Math.max(bottom,p.y)
+ }
+ const originalHeight=strokes.some(s=>s[0]?.tool)&&Number.isFinite(bottom)?Math.max(400,bottom+20):400
+ if(!fit||!Number.isFinite(left))return `0 0 1000 ${originalHeight}`
  const margin=24
  return `${left-margin} ${top-margin} ${Math.max(320,right-left+margin*2)} ${Math.max(64,bottom-top+margin*2)}`
 }
