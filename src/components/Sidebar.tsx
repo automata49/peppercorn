@@ -117,7 +117,7 @@ export function Sidebar({page,analysisDetail=false,setPage,open,setOpen,onRefres
     <div className="mobile-brandbar">
       {editorialHeading
         ? <div className="mobile-brand-title"><span className="journey-kicker">{editorialHeading.kicker}</span><h1>{editorialHeading.title}</h1></div>
-        : <div className="mobile-brand-home mobile-brand-wordmark folio-brand"><FolioBrand/></div>}
+        : page==='today' ? <div className="mobile-brand-home mobile-brand-wordmark folio-brand"><FolioBrand/></div> : null}
       <div className="mobile-brand-actions">{stockActions}</div>
     </div>
 
