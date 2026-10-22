@@ -81,6 +81,7 @@ html body .stock-basket-list button{min-height:44px;padding:12px 0;border:0;back
   html body .editorial-masthead-shell .app-main :is(.discovery-workspace,.lifetime-journal,.journey-workspace)>.section-heading{min-height:0;margin-bottom:16px}
   .editorial-masthead-shell .section-heading>div>.journey-kicker,
   .editorial-masthead-shell .section-heading>div>h2{display:none!important}
+  .mobile-brand-wordmark{cursor:default!important;user-select:none}
   .mobile-brand-wordmark .folio-wordmark-system{--folio-wordmark-size:25px;height:25px!important}
 }
 @media(max-width:580px){
