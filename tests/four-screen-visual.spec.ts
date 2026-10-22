@@ -175,9 +175,26 @@ for (const view of views) for (const theme of ['light', 'dark'] as const) {
         expect(layout.quoteVisible).toBe(true)
         expect(layout.fitsViewport).toBe(true)
         await page.screenshot({path:`test-results/new-today-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
-      } else if (screen.name === 'discover' || screen.name === 'journey') {
-        // The carousel + default compact list intentionally replace the previous card snapshot.
-        // Keep layout, overflow and control behavior as hard gates while collecting a new visual baseline.
+      } else if (screen.name === 'discover' || screen.name === 'journal' || screen.name === 'journey') {
+        // TOP-EDITORIAL-MASTHEAD-20261022 changes the compact page header and
+        // Journal's previously approved pixel baseline. Preserve that baseline
+        // unchanged; capture candidate screenshots for human review and enforce
+        // the new layout with semantic/overflow/touch geometry assertions.
+        if (view.touch) {
+          const labels = {
+            discover:['DISCOVER','변화하는 세상을 읽다'],
+            journal:['MY PAGES','기록, 일상, 투자'],
+            journey:['A LIFETIME IN PAGES','그때의 나, 지금의 나'],
+          } as const
+          const [kicker,title] = labels[screen.name]
+          const head=page.locator('.mobile-brandbar .mobile-brand-title')
+          await expect(head.locator('.journey-kicker')).toHaveText(kicker)
+          await expect(head.locator('h1')).toHaveText(title)
+          await expect(head.locator('h1')).toBeVisible()
+          await expect(page.locator('.mobile-brandbar').getByRole('button',{name:'오늘로 이동'})).toHaveCount(0)
+          await expect(page.locator('.mobile-brandbar').getByRole('button',{name:'종목 검색'})).toBeVisible()
+          await expect(page.locator('.mobile-bottom-nav').getByRole('button',{name:'오늘'})).toBeVisible()
+        }
         await page.screenshot({path:`test-results/new-${screen.name}-${theme}-${view.name}.png`,animations:'disabled',caret:'hide'})
       } else {
         await expect.soft(page).toHaveScreenshot(`${screen.name}-${theme}-${view.name}.png`, {fullPage: false, animations: 'disabled', caret: 'hide', maxDiffPixels: screen.name === 'journal' && view.name === 'phone-390' ? 300 : (view.width >= 1366 && (screen.name === 'journal' || screen.name === 'journey')) ? 1500 : 150, threshold: 0.15})
