@@ -1,3 +1,9 @@
+## FOLIO-REPORT-WHEEL-20261022 — report/news filter scope (2026-10-22)
+
+- Discover → 시장 신호 → MARKET & COMPANIES: **리포트** mode displays PDF research reports without the market or stock-category vertical wheels. Apply equally to signed-in lists and signed-out/empty/error cases on every viewport.
+- **뉴스** mode alone mounts market / stock-category FilterWheels. Switching to 리포트 removes the controls from DOM and accessibility tree; switching to 뉴스 restores persisted selections. Leave 종목 검토 wheels untouched.
+- Preserve private PDF access, source/rights, news freshness, saved filters, 44px hit targets and stock rankings. Regression: reports have zero wheels; news has two functioning wheels; mode toggles preserve selections; 390/834/1440px no horizontal overflow.
+
 ## FOLIO-INK-TABS-BACK-20261022 — approved responsive correction (2026-10-22)
 
 - Journal read-first ink preview frames actual stroke bounds, not the mostly-empty 1000-wide writing paper. Fit to available reading width and permit vertical scrolling for longer ink. Never resave, migrate or alter original stroke coordinates; thumbnail and editable paper views retain original geometry.

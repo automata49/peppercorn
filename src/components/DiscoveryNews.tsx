@@ -74,12 +74,12 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
    <button type="button" aria-pressed={newsTab==='reports'} onClick={()=>setNewsTab('reports')}>리포트</button>
    <button type="button" aria-pressed={newsTab==='news'} onClick={()=>setNewsTab('news')}>뉴스</button>
   </div>
-  <div className="catalog-carousel-layout discovery-news-filter-layout">
+  {newsTab==='news'&&<div className="catalog-carousel-layout discovery-news-filter-layout">
    <div className="catalog-filter-rails" aria-label="시장과 기업 뉴스 필터">
     <FilterWheel label="시장" value={newsMarket} onChange={v=>{setNewsMarket(v as 'ALL'|Market);setNewsTab('news')}} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
     <FilterWheel label="종목 분류" value={newsSize} onChange={v=>{setNewsSize(v as StockSize);setNewsTab('news')}} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
    </div>
-  </div>
+  </div>}
   {newsTab==='reports'?<div className="discovery-news-report-content">
    {!reports.uid?<p className="discovery-news-empty" role="status">로그인 후 Folio 리서치 리포트를 볼 수 있습니다.</p>:!reports.items.length&&!reports.error?<p className="discovery-news-empty" role="status">등록된 리서치 리포트가 없습니다.</p>:<SourceReports controller={reports}/>}
   </div>:<>
