@@ -21,16 +21,24 @@ for (const viewport of cases) {
   await page.route('**/functions/v1/position-public?*',route=>route.fulfill({json:{rows:[]}}))
   await page.goto('/peppercorn/')
   const values: {page:string; x:number; y:number;titleX:number;titleY:number}[]=[]
+  const compact=viewport.width<1280
   for (const [label,container] of [
    ['발견','.discovery-workspace'],
    ['저널','.lifetime-journal'],
    ['여정','.journey-workspace'],
   ] as const) {
    await openPage(page,label)
-   const heading=page.locator(`${container} > .section-heading`)
+   const bodyHeading=page.locator(`${container} > .section-heading`)
+   const heading=compact?page.locator('.mobile-brandbar .mobile-brand-title'):bodyHeading
    const kicker=heading.locator('.journey-kicker')
-   const title=heading.locator('h2')
+   const title=heading.locator(compact?'h1':'h2')
    await expect(title).toBeVisible()
+   if(compact){
+    await expect(bodyHeading.locator('h2')).toBeHidden()
+    await expect(page.locator('.mobile-brandbar').getByRole('button',{name:'오늘로 이동'})).toHaveCount(0)
+    await expect(page.locator('.mobile-brandbar').getByRole('button',{name:'종목 검색'})).toBeVisible()
+    await expect(page.locator('.mobile-bottom-nav').getByRole('button',{name:'오늘'})).toBeVisible()
+   }
    // openPage may explicitly select card view in Discover; Playwright scrolls that
    // below-the-fold control into view. Compare headings at a common scroll origin.
    await page.evaluate(async()=>{
