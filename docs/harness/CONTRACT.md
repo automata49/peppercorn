@@ -1,3 +1,11 @@
+## FOLIO-EDITORIAL-RESEARCH-THESIS-20261022 — approved design/workflow corrections
+
+1. One type scale: Folio Insight (FOLIO INSIGHT / 핵심 요약) defines Level-3 English kicker + Korean H3. The shared EditorialHeading must match on all stock-detail tabs, Research and Thesis: title 22–30px, kicker 10–12px, restrained 12px meta. Level-2 page section 26–38px, minor labels 13–16px. Semantic headings and accessible names are required in portrait and landscape.
+2. Research belongs to Discover → 리서치 기록. New notes may cover macro/sector/industry without a stock ticker. Record list and writing panel share account-scoped original research objects, with sourced observations below and advanced vertical comparison under progressive disclosure. Preserve record IDs, source verification, explicit confirm, blur-save, safe source URL validation, and cloud readiness failure feedback.
+3. Thesis belongs to a selected stock with a single record list and editable analysis form (automated SEC/DART values read-only). Desktop/wide: record selector left and writer right. Mobile/iPad portrait: record picker above writer. Preserve record IDs/date, archived theses, typed percent/boolean values, protected new-record creation and account sync. Do not merge Thesis with Research.
+4. Remove redundant grey decorative section rules around editorial blocks only. Retain active tab indicator, real table divisions, form input boundaries, focus outlines and semantic grouping.
+5. Validate at 390/834/1440px, light/dark, with heading font scale matching Folio Insight; research notes create/edit/refresh and URL safety; Thesis new-record/edit/validation and no viewport overflow. Browser regression is not physical Safari certification.
+
 ## FOLIO-EDITORIAL-RESEARCH-THESIS-20261022 — approved information hierarchy & writing (2026-10-22)
 
 - Treat 종목 상세 → Overview's **FOLIO INSIGHT / 핵심 요약** as a canonical semantic Level-2 style: uppercase English kicker 10px, Korean title 24–32px responsive Folio editorial, and optional subdued metadata. Apply to Leadership Check, Same Industry, Compare, Analysis, Financials and Thesis section heads; maintain Level-3 text/metric distinction without duplicating page headings or altering prices/market colors.

@@ -1592,7 +1592,7 @@ export default function App(){
           {page==='analysis'&&detailActions}
           {page==='analysis'&&analysisSection==='analysis'&&<section className="obra-market-details" aria-label="종목 비교와 출처"><Button variant="secondary" className="obra-compare" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{inCompare?'비교 빼기':'비교'}</Button><InstrumentContext row={selected}/></section>}
         </div>
-      </div>:page==='thesis'?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
+      </div>:page==='thesis'&&!archived?<p className="empty">종목을 골라 내 판단을 기록하세요.</p>:null}
       </div>
       {(page==='thesis'||page==='analysis'&&analysisDetail&&analysisSection==='thesis')&&<div ref={analysisRecordsRef} className="records-anchor">
         <ProgressiveDisclosure title="종목분석 기록 · 목록" meta={`${enrichedAnalysis.length}건`} className="workspace-table-disclosure analysis-records-disclosure" open={analysisRecordsOpen} onOpenChange={setAnalysisRecordsOpen}>

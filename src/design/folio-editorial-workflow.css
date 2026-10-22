@@ -1,0 +1,163 @@
+/* FOLIO EDITORIAL HIERARCHY 2026-10-22
+   Folio Insight = level 3 reference. One English eyebrow, one Korean heading, optional metadata.
+   Only navigational and editable surface separators remain; ornamental grey rules disappear. */
+:root{
+ --folio-editorial-title:clamp(22px,2.5vw,30px);
+ --folio-editorial-section:clamp(26px,3.25vw,38px);
+ --folio-editorial-eyebrow:clamp(10px,.95vw,12px);
+}
+html body .shell .app-main .folio-editorial-heading{
+ display:flex;align-items:flex-start;justify-content:space-between;gap:12px 24px;
+ min-width:0;margin:0 0 clamp(18px,2.1vw,26px);padding:0;
+ border:0!important;background:transparent!important;box-shadow:none!important;
+}
+html body .shell .app-main .folio-editorial-heading>div{min-width:0}
+html body .shell .app-main .folio-editorial-kicker,
+html body .shell .app-main .folio-insight>header span{
+ display:block;margin:0 0 8px;color:var(--folio-coral);font-family:inherit;
+ font-size:var(--folio-editorial-eyebrow);font-weight:740;line-height:1.25;
+ letter-spacing:.15em;text-transform:uppercase;
+}
+html body .shell .app-main :is(.folio-editorial-heading h3,.folio-insight>header h3){
+ margin:0!important;color:var(--folio-ink)!important;
+ font-family:var(--folio-editorial-font,var(--folio-display,Georgia,serif))!important;
+ font-size:var(--folio-editorial-title)!important;
+ line-height:1.2!important;letter-spacing:-.045em!important;font-weight:var(--folio-editorial-weight,560)!important;
+ word-break:keep-all;overflow-wrap:anywhere;
+}
+html body .shell .app-main .folio-editorial-heading h2{
+ margin:0!important;color:var(--folio-ink)!important;
+ font-family:var(--folio-editorial-font,var(--folio-display,Georgia,serif))!important;
+ font-size:var(--folio-editorial-section)!important;font-weight:var(--folio-editorial-weight,560)!important;
+ line-height:1.16;letter-spacing:-.045em;word-break:keep-all;
+}
+html body .shell .app-main .folio-editorial-meta,
+html body .shell .app-main .folio-insight>header small{
+ align-self:flex-start;color:var(--folio-muted);font-size:12px;letter-spacing:0;line-height:1.55;text-transform:none;
+}
+html body .shell .app-main .folio-insight>header{
+ padding:0!important;border:0!important;box-shadow:none!important;
+}
+html body .shell .app-main .folio-insight{gap:clamp(12px,2vw,20px)}
+/* Let whitespace carry hierarchy; do not alter functional table, input, tab, or focus borders. */
+html body .shell .app-main .obra-detail .analysis-secondary-body>.analysis-block,
+html body .shell .app-main .analysis-page .analysis-secondary-body>.analysis-block{
+ border:0!important;border-bottom:0!important;
+ background:transparent!important;box-shadow:none!important;
+ padding-bottom:clamp(12px,1.8vw,24px)!important;
+}
+html body .shell .app-main .page-thesis .journey-theses,
+html body .shell .app-main .page-thesis .records-anchor{
+ border:0!important;
+}
+html body .shell .app-main .folio-research-editor,
+html body .shell .app-main .folio-research-workspace,
+html body .shell .app-main .folio-research-layout,
+html body .shell .app-main .folio-research-writing{
+ min-width:0;
+}
+html body .shell .app-main .folio-research-editor{display:grid;gap:clamp(12px,2vw,22px);margin:0 0 28px}
+html body .shell .app-main .folio-research-topline{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+html body .shell .app-main .folio-research-topline .folio-editorial-heading{margin:0!important}
+html body .shell .app-main .folio-research-add{
+ min-height:44px;padding:8px 0;border:0!important;border-radius:0!important;
+ background:transparent!important;color:var(--folio-ink)!important;
+ font-size:15px;font-weight:700;text-decoration:underline;text-underline-offset:5px;cursor:pointer;
+}
+html body .shell .app-main .folio-research-layout{
+ display:grid;grid-template-columns:minmax(210px,270px) minmax(0,1fr);gap:clamp(18px,3.5vw,52px);
+ align-items:start;
+}
+html body .shell .app-main .folio-research-list{min-width:0;display:grid;align-content:start;gap:8px;max-height:70svh;overflow:auto;overscroll-behavior:contain}
+html body .shell .app-main .folio-research-list>button{
+ display:grid;gap:5px;min-width:0;min-height:64px;text-align:left;padding:10px 14px;
+ border:0!important;border-left:3px solid transparent!important;border-radius:0!important;
+ background:transparent!important;color:var(--folio-ink)!important;box-shadow:none!important;
+}
+html body .shell .app-main .folio-research-list>button[aria-pressed="true"]{
+ border-left-color:var(--folio-ink)!important;background:var(--folio-surface)!important;
+}
+html body .shell .app-main .folio-research-list>button :is(span,small){color:var(--folio-muted);font-size:12px;line-height:1.35}
+html body .shell .app-main .folio-research-list>button strong{font-size:15px;line-height:1.35;overflow-wrap:anywhere}
+html body .shell .app-main .folio-research-writing{padding:0;align-self:start}
+html body .shell .app-main .folio-research-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 22px}
+html body .shell .app-main .folio-research-field{display:grid;align-content:start;gap:7px;min-width:0;font-size:13px;font-weight:650;color:var(--folio-ink)}
+html body .shell .app-main .folio-research-field.folio-research-wide{grid-column:1/-1}
+html body .shell .app-main .folio-research-field :is(input,textarea,select){
+ box-sizing:border-box;min-width:0;width:100%;min-height:44px;padding:12px 10px;
+ background:var(--folio-surface)!important;color:var(--folio-ink)!important;
+ border:0!important;border-bottom:1px solid var(--folio-line)!important;border-radius:0!important;
+ font:inherit;font-size:16px;line-height:1.6;box-shadow:none!important;
+}
+html body .shell .app-main .folio-research-field textarea{min-height:110px;resize:vertical}
+html body .shell .app-main .folio-research-field :is(input,textarea,select):focus-visible{
+ outline:2px solid var(--folio-ink);outline-offset:2px;border-bottom-color:transparent!important;
+}
+html body .shell .app-main .folio-research-form-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 0}
+html body .shell .app-main .folio-research-form-footer p,
+html body .shell .app-main .folio-editor-notice{margin:0;font-size:13px;line-height:1.5;color:var(--folio-muted)}
+html body .shell .app-main .folio-research-form-footer button{
+ min-height:44px;padding:8px 16px;border:0;border-radius:8px;background:var(--folio-ink);color:var(--folio-paper);font-weight:650;
+}
+html body .shell .app-main .folio-research-comparison{margin:16px 0 34px}
+html body .shell .app-main .folio-research-comparison summary{display:list-item;cursor:pointer;min-height:44px;padding:12px 0;font-size:14px;color:var(--folio-ink);font-weight:650}
+html body .shell .app-main .discovery-research-archive{padding-top:16px}
+html body .shell .app-main .discovery-research-archive .discovery-topic,
+html body .shell .app-main .discovery-research-archive .discovery-topic-empty{border:0!important;box-shadow:none!important}
+html body .shell .app-main .page-thesis .analysis-page{
+ display:grid;grid-template-columns:minmax(200px,270px) minmax(0,1fr);column-gap:clamp(20px,3vw,44px);
+ row-gap:20px;align-items:start;max-width:1180px;
+}
+html body .shell .app-main .page-thesis .analysis-page>.journey-theses{grid-column:1;grid-row:1 / span 2;position:sticky;top:90px;padding:0!important;margin:0!important;max-height:calc(100svh - 106px);overflow-y:auto;overscroll-behavior:contain}
+html body .shell .app-main .page-thesis .analysis-page>.analysis-body,
+html body .shell .app-main .page-thesis .analysis-page>.empty{grid-column:2;grid-row:1;min-width:0;margin:0}
+html body .shell .app-main .page-thesis .journey-theses .journey-heading{display:grid;align-items:start;gap:8px}
+html body .shell .app-main .page-thesis .journey-theses .journey-heading .folio-editorial-heading{margin:0!important}
+html body .shell .app-main .page-thesis .journey-theses .decision-list{min-width:0}
+html body .shell .app-main .page-thesis .analysis-page>.journey-theses .dashboard-section-action{min-height:44px;justify-self:start}
+html body .shell .app-main .page-thesis .analysis-page .analysis-main{min-width:0}
+html body .shell .app-main .page-thesis .analysis-page .analysis-secondary-body{display:block!important;padding:12px 0!important}
+html body .shell .app-main .page-thesis .analysis-page .analysis-judgement{min-width:0}
+html body .shell .app-main .page-thesis .thesis-head{align-items:start;flex-wrap:wrap;gap:12px 22px}
+html body .shell .app-main .page-thesis .thesis-head .folio-editorial-heading{margin:0!important}
+html body .shell .app-main .page-thesis .thesis-head .action-box{margin-left:auto;min-width:0;max-width:100%;padding:10px 12px}
+html body .shell .app-main .page-thesis .analysis-sheet{min-width:0;max-width:100%;overflow-x:auto}
+html body .shell .app-main .page-thesis .sheet-table{width:100%;min-width:580px}
+html body .shell .app-main .page-thesis .records-anchor{padding-top:0!important}
+@media(max-width:900px){
+ html body .shell .app-main .folio-research-layout{grid-template-columns:1fr;gap:18px}
+ html body .shell .app-main .folio-research-list{display:flex;flex-direction:row;gap:8px;overflow-x:auto;overflow-y:hidden;max-height:none;padding-bottom:6px;scroll-snap-type:x proximity}
+ html body .shell .app-main .folio-research-list>button{flex:0 0 clamp(178px,44vw,240px);scroll-snap-align:start}
+ html body .shell .app-main .page-thesis .analysis-page{display:block!important;max-width:850px}
+ html body .shell .app-main .page-thesis .analysis-page>.journey-theses{position:static;max-height:none;overflow:visible;margin-bottom:18px!important}
+ html body .shell .app-main .page-thesis .journey-theses .decision-list{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;padding-bottom:6px}
+ html body .shell .app-main .page-thesis .journey-theses .decision-list>button{flex:0 0 clamp(190px,56vw,280px);scroll-snap-align:start}
+}
+@media(max-width:600px){
+ html body .shell .app-main .folio-research-fields{grid-template-columns:1fr}
+ html body .shell .app-main .folio-research-field.folio-research-wide{grid-column:auto}
+ html body .shell .app-main .folio-research-topline{align-items:start}
+ html body .shell .app-main .folio-editorial-heading{align-items:start;flex-wrap:wrap}
+ html body .shell .app-main .page-thesis .analysis-page .analysis-secondary-body{padding:8px 0!important}
+ html body .shell .app-main .page-thesis .sheet-table{min-width:530px}
+}
+@media(prefers-reduced-motion:reduce){
+ html body .shell .app-main :is(.folio-research-list>button,.folio-research-add,.folio-research-field input){transition:none!important}
+}
+
+/* An archived thesis is also a writer and should not fall into the selector column. */
+@media(min-width:901px){
+ html body .shell .app-main .page-thesis .analysis-page>.archived-thesis{grid-column:2;grid-row:1;min-width:0;margin:0!important}
+}
+@media(max-width:900px){
+ html body .shell .app-main .page-thesis .analysis-page>.archived-thesis{width:100%;min-width:0}
+}
+
+/* Preserve tap targets and remove visual rules from the selected Thesis record list. */
+html body .shell .app-main .page-thesis .journey-theses .decision-list{min-width:0}
+html body .shell .app-main .page-thesis .journey-theses .decision-row{
+ box-shadow:none!important;border:0!important;border-left:3px solid transparent!important;
+ background:transparent!important;min-width:0;min-height:56px;overflow-wrap:anywhere
+}
+html body .shell .app-main .page-thesis .journey-theses .decision-row:hover,
+html body .shell .app-main .page-thesis .journey-theses .decision-row:focus-visible{border-left-color:var(--folio-ink)!important}
