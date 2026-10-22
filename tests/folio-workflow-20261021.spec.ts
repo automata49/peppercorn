@@ -28,6 +28,8 @@ test('Journey menu shares existing watchlist and portfolio records; research com
  await expect(page.locator('.journey-magazine-tabs').getByRole('tab',{name:'보유종목'})).toHaveAttribute('data-state','active')
  await page.locator('.sidebar-tools').click()
  await page.getByRole('dialog').getByRole('button',{name:'리서치 노트'}).click()
+ await expect(page.getByRole('region',{name:'리서치 기록 작성'})).toBeVisible()
+ await page.getByText('전체 기록 비교 · 고급 편집',{exact:false}).click()
  const table=page.locator('.vertical-compare-table')
  await expect(table).toBeVisible()
  await expect(table.locator('thead th').first()).toHaveText('항목')

@@ -12,6 +12,8 @@ export function DiscoveryTopics({research,match,onSelect,onResearch,children}:{r
  const {photoStyle}=useVisualStyle()
  const observations=research.filter(r=>sourceUrl(r.source)&&String(r.fact||'').trim()).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,3)
  return <section className="discovery-topics" aria-label="출처가 있는 주제">
+  {children}
+  <div className="discovery-research-archive"><h3 className="sr-only">최근 출처가 있는 관찰</h3>
   {observations.length?observations.map((note,i)=>{
    const url=sourceUrl(note.source)!,company=match(note),date=String(note.date||'')
    const parsed=Date.parse(date),stale=Number.isFinite(parsed)&&Date.now()-parsed>30*86400000
@@ -24,7 +26,7 @@ export function DiscoveryTopics({research,match,onSelect,onResearch,children}:{r
     </div>
    </article>
   }):<div className="discovery-topic-empty"><span className="journey-kicker">관찰에서 기업으로</span><h3>출처가 있는 발견을 모아보세요.</h3><p>아직 출처 링크와 관찰 사실이 함께 기록된 주제가 없습니다. 리서치 노트에 사실과 해석을 나누어 남기면 이곳에서 기업으로 이어집니다.</p></div>}
-  {children}
+  </div>
   <Button variant="ghost" onClick={onResearch}>리서치 전체 비교 · 고급 편집 →</Button>
  </section>
 }
