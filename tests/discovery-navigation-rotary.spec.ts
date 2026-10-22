@@ -217,7 +217,7 @@ test('Harness: saved right-drawer filters, idempotent leadership, detail actions
   await expect(page.locator('.analysis-finder [data-wheel="주도 분류"]').getByRole('button',{name:'전체'})).toHaveAttribute('aria-pressed','true')
   const row=page.locator('.stock-compact-main').first();await row.click()
   await expect(page.locator('.obra-masthead')).toBeVisible()
-  await expect(page.locator('.obra-overview')).not.toContainText('한눈에 보기')
+  await expect(page.locator('.folio-insight')).toBeVisible();await expect(page.locator('.folio-insight')).not.toContainText('한눈에 보기')
   const actions=page.getByRole('toolbar',{name:'종목 빠른 동작'})
   await expect(actions).toBeVisible()
   const interest=actions.getByRole('button',{name:'관심 추가'})

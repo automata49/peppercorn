@@ -46,6 +46,8 @@ import { loadLeaderboard } from './lib/rest'
 import { pushRecent, readRecent, type RecentStock } from './lib/search'
 import { AnalysisSheet, CheckupSummary, CompareView, StockSearch } from './components/AnalysisWorkbench'
 import { FolioInsight } from './components/FolioInsight'
+import { EditorialHeading } from './components/EditorialHeading'
+import { ResearchEditor } from './components/ResearchEditor'
 import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
@@ -1017,6 +1019,20 @@ export default function App(){
   const updateAnalysis=(rows:EditableRow[])=>{if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');return}setAnalysis(rows);void syncRows('analysis',rows)}
   const updateJournal=(rows:EditableRow[])=>{if(session&&!cloudReadyRef.current.resources.has('journal')){setSyncState('error');return}setJournal(rows);void syncRows('journal',rows)}
   const updateTemperature=(rows:TempEntry[])=>{if(session&&!cloudReadyRef.current.resources.has('temperature')){setSyncState('error');return}setTempEntries(rows);void syncRows('temperature',rows as unknown as EditableRow[])}
+  // Research notes are not restricted to ticker-bearing records.
+  const researchReady=()=>!session||cloudReadyRef.current.resources.has('research')
+  const newResearchRecord=():{id?:string;error?:string}=>{
+    if(!researchReady()){setSyncState('error');return {error:'리서치 동기화 준비 중입니다. 다시 시도하세요.'}}
+    const id=crypto.randomUUID()
+    updateResearch([{id,date:new Date().toISOString().slice(0,10),type:'산업',verification:'미검증',status:'관찰중'},...research])
+    return {id}
+  }
+  const updateResearchEntry=(id:string,field:string,value:string):string|null=>{
+    if(!researchReady()){setSyncState('error');return '리서치 동기화 준비 중입니다. 다시 시도하세요.'}
+    if(!research.some(r=>String(r.id)===id))return '기록이 변경됐습니다. 다시 선택해 주세요.'
+    updateResearch(research.map(r=>String(r.id)===id?{...r,[field]:value}:r))
+    return null
+  }
 
   const sizes=useMemo(()=>stockSizes(leaders),[leaders])
   const sizedRows=(rows:LeaderRow[])=>filterStockSize(rows,stockSize,sizes)
@@ -1168,6 +1184,7 @@ export default function App(){
   </div>
 
   const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true)=>{
+    if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return}
     setSelected(row)
     const recordId=crypto.randomUUID();setSelectedRecordId(recordId)
     updateAnalysis([{id:recordId,date:new Date().toISOString().slice(0,10),market:row.market,ticker:row.ticker,name:row.name},...analysis])
@@ -1190,7 +1207,7 @@ export default function App(){
     if(!matches.length)return '리더보드에 없는 종목코드입니다. 시장 데이터가 연결된 종목을 입력해 주세요.'
     if(matches.length>1)return '동일한 코드가 여러 시장에 있습니다. US: 또는 KR:을 붙여 주세요.'
     const row=matches[0]
-    if(resource==='analysis'){recordAnalysis(row,false,false);return null}
+    if(resource==='analysis'){if(session&&!cloudReadyRef.current.resources.has('analysis'))return 'Thesis 동기화 준비 중입니다. 다시 시도하세요.';recordAnalysis(row,false,false);return null}
     const common={id:crypto.randomUUID(),market:row.market,ticker:row.ticker,name:row.name}
     if(resource==='research')updateResearch([{...common,date:new Date().toISOString().slice(0,10),type:'종목',target:row.name,related_assets:row.ticker,verification:'미검증',status:'관찰중'},...research])
     if(resource==='watchlist'){
@@ -1278,7 +1295,12 @@ export default function App(){
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
     content=<LifetimeJournal session={session} financials={financialReferences} key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:session?enrichedAnalysis as EditableRow[]:(enrichedAnalysis as EditableRow[]).filter(r=>!initialAnalysis.some(seed=>seed.id===r.id)),trades:session?enrichedJournal:enrichedJournal.filter(r=>!initialJournal.some(seed=>seed.id===r.id)),insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
-    content=<><div className="folio-section-heading"><span className="journey-kicker">RESEARCH NOTES</span><h2>리서치 노트</h2></div><TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/><ComparisonSheet rows={enrichedResearch} columns={researchCols} onChange={updateResearch} label="리서치 비교 및 편집"/></>
+    content=<section className="folio-research-workspace"><ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry}/>
+      <details className="folio-research-comparison"><summary>전체 기록 비교 · 고급 편집 ({enrichedResearch.length}건)</summary>
+        <TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/>
+        <ComparisonSheet rows={enrichedResearch} columns={researchCols} onChange={updateResearch} label="리서치 비교 및 편집"/>
+      </details>
+    </section>
   }else if(page==='dashboard'){
     const todayRows=todayLeaderRows
     const sizePool=sizedRows(stockRows)
@@ -1527,12 +1549,12 @@ export default function App(){
         </div>
       </div>}
 
-      {page==='thesis'&&<section className="journey-theses"><div className="journey-heading"><h2>내 투자 근거</h2><button className="dashboard-section-action" onClick={()=>navigatePage('analysis')}>종목 찾기 →</button></div><DecisionList items={(enrichedAnalysis as EditableRow[]).filter(r=>r.ticker).map((r,i)=>({key:String(r.id||i),data:r,title:String(r.name||r.ticker),meta:String(r.conclusion||'투자 근거를 작성하세요.'),eyebrow:String(r.market)+' · '+String(r.ticker)+' · '+String(r.date||'')}))} onSelect={r=>{setSelectedRecordId(r.id!=null?String(r.id):null);const hit=matchLeader(r);if(hit)setSelected(hit);setAnalysisSection('thesis')}} emptyLabel="아직 기록이 없습니다. 탐색에서 종목을 고르고 Thesis를 작성하세요."/></section>}
-      {archived&&record&&<section className="analysis-card"><h3>{String(record.name||record.ticker)}</h3><p className="note">현재 유니버스에 없는 보관 기록입니다. 시장 데이터 없이 기존 투자 근거를 편집할 수 있습니다.</p><AnalysisSheet row={{name:String(record.name||record.ticker)}} record={record} onCreate={()=>{}} onChange={(field,value)=>updateAnalysisField(record,field,value)}/></section>}
+      {page==='thesis'&&<section className="journey-theses"><div className="journey-heading"><EditorialHeading kicker="MY THESIS" title="내 투자 근거" level={2}/><button className="dashboard-section-action" onClick={()=>navigatePage('analysis')}>종목 찾기 →</button></div><DecisionList items={(enrichedAnalysis as EditableRow[]).filter(r=>r.ticker).map((r,i)=>({key:String(r.id||i),data:r,title:String(r.name||r.ticker),meta:String(r.conclusion||'투자 근거를 작성하세요.'),eyebrow:String(r.market)+' · '+String(r.ticker)+' · '+String(r.date||'')}))} onSelect={r=>{setSelectedRecordId(r.id!=null?String(r.id):null);const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis')}} emptyLabel="아직 기록이 없습니다. 탐색에서 종목을 고르고 Thesis를 작성하세요."/></section>}
+      {archived&&record&&<section className="analysis-card archived-thesis"><EditorialHeading kicker="ARCHIVED THESIS" title={String(record.name||record.ticker)}/><p className="note">현재 유니버스에 없는 보관 기록입니다. 기존 투자 근거는 계속 편집할 수 있습니다.</p><AnalysisSheet key={String(record.id)} row={{name:String(record.name||record.ticker)}} record={record} onCreate={()=>{}} onChange={(field,value)=>updateAnalysisField(record,field,value)}/></section>}
       {selected&&!archived&&(page==='analysis'?analysisDetail:!!record)?<div className="analysis-body">
         <div className={'analysis-main analysis-card'+(page==='analysis'?' analysis-price-momentum':'')} data-market={selected.market}>
           {page==='analysis'&&<AnalysisHero row={selected}/>}
-          {page==='thesis'&&<div className="journey-heading"><h3>{selected.name} · {selected.ticker}</h3><button className="dashboard-section-action" onClick={()=>openAnalysisStock(selected)}>종목 상세 →</button></div>}
+          {page==='thesis'&&<div className="journey-heading"><EditorialHeading kicker="SELECTED COMPANY" title={selected.name+' · '+selected.ticker}/><button className="dashboard-section-action" onClick={()=>openAnalysisStock(selected)}>종목 상세 →</button></div>}
           {page==='analysis'&&<nav className="analysis-detail-tabs" role="tablist" aria-label="종목 분석 영역">
             {([['overview','Overview'],['analysis','Analysis'],['financials','Financials'],['thesis','Thesis']] as const).map(([key,label])=><button key={key} type="button" role="tab" id={"detail-tab-"+key} aria-controls="detail-panel" tabIndex={analysisSection===key?0:-1} onKeyDown={e=>{const keys=["overview","analysis","financials","thesis"] as const;const i=keys.indexOf(key);const next=e.key==="ArrowRight"?keys[(i+1)%4]:e.key==="ArrowLeft"?keys[(i+3)%4]:e.key==="Home"?keys[0]:e.key==="End"?keys[3]:null;if(next){e.preventDefault();setAnalysisSection(next);document.getElementById("detail-tab-"+next)?.focus()}}} aria-selected={analysisSection===key} className={analysisSection===key?'on':''} onClick={()=>setAnalysisSection(key)}>{label}</button>)}
           </nav>}
@@ -1540,24 +1562,25 @@ export default function App(){
             
             {page==='analysis'&&analysisSection==='overview'&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block insight-block"><FolioInsight row={selected} position={positionOf(selected)} compact/></section>
-              <section className="analysis-block overview-checkup"><h3 className="block-title">Leadership Check</h3><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
-              <section className="analysis-block"><h3 className="block-title">Same Industry</h3><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
-              {compareRows.length>0&&<section className="analysis-block"><h3 className="block-title compare-head">Compare <small>{compareRows.length}/4</small></h3><CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
+              <section className="analysis-block overview-checkup"><EditorialHeading kicker="LEADERSHIP CHECK" title="주도력 점검"/><CheckupSummary row={selected} position={positionOf(selected)} leadership={leadership(selected)}/></section>
+              <section className="analysis-block"><EditorialHeading kicker="SAME INDUSTRY" title="동일 산업 비교"/><PeerStrip row={selected} rows={leaders} onPick={pickStock}/></section>
+              {compareRows.length>0&&<section className="analysis-block"><EditorialHeading kicker="COMPARE" title="종목 비교" meta={compareRows.length+'/4'}/><CompareView rows={compareRows} positionOf={positionOf} leadershipOf={leadership} onSelect={pickStock} onRemove={r=>setCompareKeys(keys=>keys.filter(k=>k!==keyOf(r)))}/></section>}
             </div>}
             {page==='analysis'&&analysisSection==='analysis'&&<div className="analysis-secondary-body" data-market={selected.market}>
-              <section className="analysis-block"><h3 className="analysis-part">Swing · 모멘텀</h3>
+              <section className="analysis-block"><EditorialHeading kicker="SWING ANALYSIS" title="모멘텀 분석"/>
                 <StockSnapshot row={selected} peers={leaders} onRefresh={()=>void refreshLeaderboard(true)} refreshing={refreshing}/>
 
               </section>
             </div>}
             {page==='analysis'&&analysisSection==='financials'&&<div className="analysis-secondary-body" data-market={selected.market}>
-              <section className="analysis-block"><h3 className="analysis-part">Financial Snapshot · 공시 펀더멘털</h3><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
+              <section className="analysis-block"><EditorialHeading kicker="FINANCIAL SNAPSHOT" title="공시 펀더멘털"/><PositionPanel row={selected} position={positionOf(selected)} status={position.loading?'loading':position.status}/></section>
             </div>}
             {(page==='thesis'||analysisSection==='thesis')&&<div className="analysis-secondary-body" data-market={selected.market}>
               <section className="analysis-block analysis-judgement" id="analysis-judgement" aria-label="내 판단">
-                <div className="thesis-head"><div><span>MY THESIS</span><h3>내 분석</h3></div><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
+                <div className="thesis-head"><EditorialHeading kicker="MY THESIS" title="내 분석"/><div className="action-box"><span>액션 가이드</span><strong>{selected.action_guide||'—'}</strong></div></div>
                 <p className="analysis-mine">경쟁우위·성장 동력·핵심 리스크·결론은 직접 판단해 기록합니다. 자동 Insight와 내 Thesis는 분리해서 보관합니다.</p>
-                <AnalysisSheet row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
+                 {actionNotice&&!record&&<p className="folio-editor-notice" role="alert">{actionNotice}</p>}
+                <AnalysisSheet key={String(record?.id||selected.market+':'+selected.ticker)} row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
                   <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
                   <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
@@ -1647,7 +1670,9 @@ export default function App(){
 
 
   if(page==='analysis'&&!analysisDetail){
-    if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}/>
+    if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}>
+      <ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry}/>
+    </DiscoveryTopics>
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
       <SectionHeading kind="discover" kicker="DISCOVER" title="변화하는 세상을 읽다" description="기업을 발견하고, 나의 관점으로 남기는 시간."/>
       <Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}>
