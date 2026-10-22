@@ -43,7 +43,7 @@ import { Dialog, DialogTrigger, DialogClose, DialogContent, DialogDescription, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from './components/ui/alert-dialog'
 import { initialAnalysis, initialJournal, initialPortfolio, initialResearch, initialWatchlist } from './data/mock'
 import { loadLeaderboard } from './lib/rest'
-import { pushRecent, readRecent, type RecentStock } from './lib/search'
+import { pushRecent, readRecent, searchRows, type RecentStock } from './lib/search'
 import { AnalysisSheet, CheckupSummary, CompareView, StockSearch } from './components/AnalysisWorkbench'
 import { FolioInsight } from './components/FolioInsight'
 import { EditorialHeading } from './components/EditorialHeading'
@@ -665,18 +665,28 @@ function StockSnapshot({row,peers,onRefresh,refreshing}:{row:LeaderRow;peers:Lea
   </div>
 }
 
-function TickerEntry({onAdd}:{onAdd:(ticker:string)=>string|null}){
+function TickerEntry({onAdd,rows=[]}:{onAdd:(ticker:string)=>string|null;rows?:LeaderRow[]}){
   const [ticker,setTicker]=useState('')
   const [error,setError]=useState('')
+  const query=ticker.trim()
+  const requested=query.match(/^(US|KR)[:\s-]+(.+)$/i)
+  const options=query?searchRows(rows.filter(r=>(r.asset_class==='Equity'||r.asset_class==='ETF')&&(!requested||r.market===requested[1].toUpperCase())),requested?requested[2]:query,8):[]
+  const submit=(value:string)=>{
+    const message=onAdd(value);setError(message||'')
+    if(!message)setTicker('')
+  }
   return <form className="ticker-entry" onSubmit={event=>{
     event.preventDefault()
-    const message=onAdd(ticker)
-    setError(message||'')
-    if(!message)setTicker('')
+    // A single matching suggestion is unambiguous. Otherwise preserve the
+    // typed symbol/exact name and let addTickerRecord validate it.
+    const target=options.length===1?options[0].market+':'+options[0].ticker:ticker
+    submit(target)
   }}>
-    <label htmlFor="new-ticker">종목코드로 기록 추가</label>
-    <input id="new-ticker" value={ticker} onChange={event=>{setTicker(event.target.value);setError('')}} placeholder="예: AAPL · 005930 · KR:005930" aria-invalid={!!error}/>
+    <label htmlFor="new-ticker">종목 코드 · 이름으로 추가</label>
+    <input id="new-ticker" type="search" autoComplete="off" value={ticker} onChange={event=>{setTicker(event.target.value);setError('')}} placeholder="AAPL · 삼성전자 · KR:005930" aria-invalid={!!error}/>
     <button type="submit">추가</button>
+    {options.length>0&&<ul className="ticker-entry-results" aria-label="추가할 종목 선택">{options.map(r=><li key={r.market+':'+r.ticker}><button type="button" onClick={()=>submit(r.market+':'+r.ticker)}><strong>{r.name}</strong><span>{r.market} · {r.ticker}{r.asset_class==='ETF'?' · ETF':''}</span></button></li>)}</ul>}
+    {query&&!options.length&&rows.length>0&&<span className="ticker-entry-hint">일치하는 종목이 없습니다.</span>}
     {error&&<span className="ticker-entry-error" role="alert">{error}</span>}
   </form>
 }
@@ -700,6 +710,7 @@ export default function App(){
   const edgeSwipeRef=useRef<{x:number;y:number}|null>(null)
   const lastBackRequestRef=useRef(0)
   const [analysisDetail,setAnalysisDetail]=useState(false)
+  const [focusThesis,setFocusThesis]=useState(false)
   const [linkedTradeId,setLinkedTradeId]=useState<string|null>(null)
   const [tradeDrafts,setTradeDrafts]=useState<Record<string,EditableRow>>({})
   const [discoverTab,setDiscoverTab]=useState<'topics'|'stocks'|'signal'>('signal')
@@ -792,7 +803,11 @@ export default function App(){
   const [basketOpen,setBasketOpen]=useState(false)
   const [stockSearchOpen,setStockSearchOpen]=useState(false)
   const basketHas=(row:LeaderRow)=>basket.some(r=>r.market===row.market&&r.ticker===row.ticker)
-  const addToBasket=(row:LeaderRow)=>{if(!basketHas(row))setBasket([...basket,{market:row.market,ticker:row.ticker,name:row.name}])}
+  const addToBasket=(row:LeaderRow)=>{
+    if(basketHas(row)){setBasketOpen(true);return}
+    setBasket([...basket,{market:row.market,ticker:row.ticker,name:row.name}])
+    setActionNotice('장바구니에 담았습니다. 상단 장바구니에서 확인하세요.')
+  }
   const [watch,setWatch]=useAccountRows<EditableRow>('peppercorn-watchlist',accountScope,session?[]:initialWatchlist)
   const [portfolio,setPortfolio]=useAccountRows<EditableRow>('peppercorn-portfolio',accountScope,session?[]:initialPortfolio)
   const [research,setResearch]=useAccountRows<EditableRow>('peppercorn-research',accountScope,session?[]:initialResearch)
@@ -939,6 +954,16 @@ export default function App(){
     return()=>window.removeEventListener('popstate',onPop)
   },[])
 
+  useEffect(()=>{
+    if(!focusThesis)return
+    if(page!=='analysis'||!analysisDetail){setFocusThesis(false);return}
+    if(analysisSection!=='thesis')return
+    const root=document.getElementById('analysis-judgement')
+    if(!root)return
+    root.scrollIntoView({behavior:reduceLaunchMotion?'instant':'smooth',block:'start'})
+    root.querySelector<HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement>('.analysis-sheet textarea,.analysis-sheet input,.analysis-sheet select')?.focus({preventScroll:true})
+    setFocusThesis(false)
+  },[focusThesis,analysisSection,analysisDetail,page,selectedRecordId,reduceLaunchMotion])
   useEffect(()=>{
     if((page==='analysis'||page==='thesis')&&scrollToAnalysis){
       setPage('thesis');setAnalysisRecordsOpen(true)
@@ -1183,13 +1208,14 @@ export default function App(){
     <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Ticker · 종목 · 산업 · 섹터 검색"/>
   </div>
 
-  const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true)=>{
-    if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return}
+  const recordAnalysis=(row:LeaderRow,navigate=false,scroll=true):string|null=>{
+    if(session&&!cloudReadyRef.current.resources.has('analysis')){setSyncState('error');setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return null}
     setSelected(row)
     const recordId=crypto.randomUUID();setSelectedRecordId(recordId)
     updateAnalysis([{id:recordId,date:new Date().toISOString().slice(0,10),market:row.market,ticker:row.ticker,name:row.name},...analysis])
     if(navigate){setSummaryTab(null);setDrillSectorKey(null);setDrillStock(null);setAnalysisSection('thesis');setPage('thesis')}
     if(scroll)setScrollToAnalysis(true)
+    return recordId
   }
   const updateAnalysisField=(record:EditableRow,field:string,value:string|number|boolean|null)=>{
     const index=Math.max(0,Number(record.no||1)-1)
@@ -1197,15 +1223,17 @@ export default function App(){
   }
   const addTickerRecord=(resource:WorkspaceResource,input:string):string|null=>{
     const raw=input.trim().toUpperCase()
-    if(!raw)return '종목코드를 입력해 주세요.'
+    if(!raw)return '종목 코드나 이름을 입력해 주세요.'
     const prefix=raw.match(/^(US|KR)[:\s-]+(.+)$/)
     const requestedMarket=prefix?prefix[1]:null
     const symbol=(prefix?prefix[2]:raw).trim()
     const ticker=/^\d{1,6}$/.test(symbol)?symbol.padStart(6,'0'):symbol
-    const candidates=leaders.filter(r=>r.asset_class==='Equity'&&r.ticker.toUpperCase()===ticker&&(!requestedMarket||r.market===requestedMarket))
-    const matches=!requestedMarket&&candidates.length>1&&market!=='ALL'?candidates.filter(r=>r.market===market):candidates
-    if(!matches.length)return '리더보드에 없는 종목코드입니다. 시장 데이터가 연결된 종목을 입력해 주세요.'
-    if(matches.length>1)return '동일한 코드가 여러 시장에 있습니다. US: 또는 KR:을 붙여 주세요.'
+    const nameKey=symbol.replace(/\s+/g,'')
+    const candidates=leaders.filter(r=>(resource==='watchlist'||resource==='portfolio'||r.asset_class==='Equity')&&(!requestedMarket||r.market===requestedMarket)&&(r.ticker.toUpperCase()===ticker||r.name.toUpperCase().replace(/\s+/g,'')===nameKey))
+    const matches=candidates
+    if(!matches.length)return '종목을 찾지 못했습니다. 코드나 정확한 이름으로 검색 결과에서 선택해 주세요.'
+    if(matches.length>1)return '여러 시장에 일치하는 종목이 있습니다. 검색 결과에서 시장과 코드를 선택해 주세요.'
+    if(session&&!cloudReadyRef.current.resources.has(resource)){setSyncState('error');return '계정 자료 동기화 준비 중입니다. 다시 시도해 주세요.'}
     const row=matches[0]
     if(resource==='analysis'){if(session&&!cloudReadyRef.current.resources.has('analysis'))return 'Thesis 동기화 준비 중입니다. 다시 시도하세요.';recordAnalysis(row,false,false);return null}
     const common={id:crypto.randomUUID(),market:row.market,ticker:row.ticker,name:row.name}
@@ -1312,7 +1340,7 @@ export default function App(){
       <MarketSegment label="시장 선택" value={market} onChange={setMarket}/>
       <section className="journey-market" aria-label="시장 신호 요약">
         <div className="journey-heading"><div><span className="journey-kicker">MARKET SIGNAL</span><h2>오늘의 시장</h2></div><button className="dashboard-section-action" onClick={openMarketSignal}>전체 보기 →</button></div>
-        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market} · 시장 폭 → 섹터 → ETF 요약</p>
+        <p className="journey-source">{source==='demo'?'예시 데이터':'일간 데이터'} · {market==='ALL'?'KR · US':market} · 시장 폭 → 섹터 → ETF 주도 종목</p>
         <div className="journey-market-facts">
           <div><span>시장 폭 · MA50 위</span><strong>{ma50Rows.length?(breadth*100).toFixed(0)+'%':'—'}</strong><small>{ma200Rows.length?'MA200 '+(ma200Breadth*100).toFixed(0)+'%':''}</small></div>
           <div><span>주도 섹터</span><strong>{homeSector?sectorName(homeSector.market,homeSector.sector):'—'}</strong><small>{homeSector&&homeSector.medRank!=null?'RS '+Math.round(homeSector.medRank)+' · 주도 '+(homeSector.core+homeSector.candidate):''}</small></div>
@@ -1336,7 +1364,7 @@ export default function App(){
         <div className="dashboard-left-column">
         <div className="panel industry-panel dashboard-sector-panel focus-sector-panel">
           <div className="panel-head dashboard-sector-head">
-            <div className="folio-editorial-map-heading"><span className="journey-kicker">Sector Leaders</span><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
+            <div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR LEADERS</span><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
             <div className="sector-actions">
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
@@ -1388,7 +1416,7 @@ export default function App(){
           </div>
           <section className="panel dashboard-etf-panel">
             <div className="panel-head dashboard-sector-head">
-              <div><h2>ETF 요약</h2><p>홈 ETF와 동일한 ETF 전용 RS 순위 Top 5</p></div>
+              <div className="folio-editorial-map-heading"><span className="journey-kicker">ETF LEADERS</span><h2>ETF 주도 종목</h2><p>ETF 전용 RS 순위 Top 5</p></div>
               <div className="sector-actions"><button className="dashboard-section-action" onClick={()=>setEtfSummaryOpen(true)}>전체 보기 →</button></div>
             </div>
             <EtfRsChart rows={rankedEtfRows.slice(0,5)} onSelect={chartOpenEtf}/>
@@ -1440,7 +1468,7 @@ export default function App(){
   }else if(workspacePage==='watchlist'){
     const rows=enrich(watch)
     const openStock=(r:EditableRow)=>{const hit=matchLeader(r);if(hit)openAnalysisStock(hit)}
-    content=<><div className="page-note workspace-note"><b>Watchlist</b><span>관심 종목의 현재 위치를 먼저 보고, 가격·손절·우선순위 편집은 필요할 때만 엽니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('watchlist',ticker)}/>
+    content=<><div className="page-note workspace-note"><b>Watchlist</b><span>관심 종목의 현재 위치를 먼저 보고, 가격·손절·우선순위 편집은 필요할 때만 엽니다.</span></div><TickerEntry rows={leaders} onAdd={ticker=>addTickerRecord('watchlist',ticker)}/>
       <section className="workspace-mobile-summary" aria-label="Watchlist 요약">
         <DecisionList items={rows.map((r,i)=>({
           key:String(r.id??r.market+':'+r.ticker),
@@ -1462,7 +1490,7 @@ export default function App(){
   }else if(workspacePage==='portfolio'){
     const rows=enrich(portfolio)
     const openStock=(r:EditableRow)=>{const hit=matchLeader(r);if(hit)openAnalysisStock(hit)}
-    content=<><div className="page-note workspace-note"><b>Portfolio</b><span>보유 종목의 현재가와 평단을 먼저 보고, 수량·Stop·투자 가설 편집은 필요할 때만 엽니다.</span></div><TickerEntry onAdd={ticker=>addTickerRecord('portfolio',ticker)}/>
+    content=<><div className="page-note workspace-note"><b>Portfolio</b><span>보유 종목의 현재가와 평단을 먼저 보고, 수량·Stop·투자 가설 편집은 필요할 때만 엽니다.</span></div><TickerEntry rows={leaders} onAdd={ticker=>addTickerRecord('portfolio',ticker)}/>
       <section className="workspace-mobile-summary" aria-label="Portfolio 요약">
         <DecisionList items={rows.map((r,i)=>({
           key:String(r.id??r.market+':'+r.ticker),
@@ -1504,26 +1532,27 @@ export default function App(){
     const inCompare=!!selected&&compareKeys.includes(keyOf(selected))
     const inWatch=!!selected&&watch.some(r=>r.market===selected.market&&r.ticker===selected.ticker)
     const addWatch=()=>{
-      if(!selected||inWatch)return
+      if(!selected)return
+      if(inWatch){setActionNotice('이미 관심종목에 등록됐습니다. 여정 > 관심종목에서 확인하세요.');return}
       if(session&&!cloudReadyRef.current.resources.has('watchlist')){setActionNotice('관심종목 동기화 준비 중입니다. 다시 시도하세요.');return}
       updateWatch([{id:crypto.randomUUID(),market:selected.market,ticker:selected.ticker,name:selected.name,priority:'B'},...watch])
-      setActionNotice('관심종목에 추가했습니다.')
+      setActionNotice('관심종목에 추가했습니다. 여정 > 관심종목에서 확인하세요.')
     }
     const toggleCompare=()=>{if(!selected)return;setCompareKeys(keys=>inCompare?keys.filter(k=>k!==keyOf(selected)):[...keys,keyOf(selected)].slice(0,4))}
     const goJudgement=()=>{
       if(!selected)return
       if(!record){
-        if(session&&!cloudReadyRef.current.resources.has('analysis')){setActionNotice('Thesis 동기화 준비 중입니다. 다시 시도하세요.');return}
-        recordAnalysis(selected,false,false)
+        if(!recordAnalysis(selected,false,false))return
         setActionNotice('Thesis를 생성했습니다. 내용을 작성해 주세요.')
-      }
-      // The stock and its saved thesis stay on the same detail page.
+      }else setActionNotice('저장된 Thesis를 열었습니다.')
+      // Move to the actual editable sheet and expose the result immediately.
       setAnalysisSection('thesis')
+      setFocusThesis(true)
     }
     const compareLabel=inCompare?'비교에서 빼기':compareKeys.length>=4?'비교 4개 가득':'비교에 추가'
     const detailActions=<div className="analysis-actionbar" role="toolbar" aria-label="종목 빠른 동작">
       <Button variant="secondary" aria-pressed={!!selected&&basketHas(selected)} onClick={()=>{if(selected)addToBasket(selected)}}><AppIcon name="basket"/>{selected&&basketHas(selected)?'장바구니 담김':'장바구니 담기'}</Button>
-      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
+      <Button variant="secondary" aria-label={inWatch?'관심 등록됨':'관심 추가'} aria-pressed={inWatch} onClick={addWatch}>{inWatch?'관심 등록됨':'관심 추가'}</Button>
       <Button className="primary" onClick={goJudgement}>{record?'Thesis 보기':'Thesis 쓰기'}</Button>
       {actionNotice&&<span role="status" className="analysis-action-notice">{actionNotice}</span>}
     </div>
@@ -1582,7 +1611,7 @@ export default function App(){
                  {actionNotice&&!record&&<p className="folio-editor-notice" role="alert">{actionNotice}</p>}
                 <AnalysisSheet key={String(record?.id||selected.market+':'+selected.ticker)} row={selected} record={record} onCreate={()=>recordAnalysis(selected,false,false)} onChange={(field,value)=>{if(record)updateAnalysisField(record,field,value)}}/>
                 <div className="judgement-actions">
-                  <button type="button" className="secondary-action" aria-pressed={inWatch} disabled={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
+                  <button type="button" className="secondary-action" aria-pressed={inWatch} onClick={addWatch}>{inWatch?'★ 관심 등록됨':'☆ 관심 추가'}</button>
                   <button type="button" className="secondary-action compare-toggle" aria-pressed={inCompare} disabled={!inCompare&&compareKeys.length>=4} onClick={toggleCompare}>{compareLabel}</button>
                   {record&&<button type="button" className="secondary-action wide" onClick={addSelectedAnalysis}>새 분석일로 기록 추가</button>}
                 </div>
@@ -1744,7 +1773,7 @@ export default function App(){
     <DialogContent className="sector-summary-dialog etf-summary-dialog">
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
-        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>{chosenEtfIndustry?`ETF 주도 산업 · ${etfIndustryLabel(chosenEtfIndustry.market,chosenEtfIndustry.industry)}`:'ETF 요약 · 전체'}</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>{chosenEtfIndustry?`ETF 주도 산업 · ${etfIndustryLabel(chosenEtfIndustry.market,chosenEtfIndustry.industry)}`:'ETF 주도 종목 · 전체'}</DialogTitle><DialogDescription>ETF 전용 RS 순위 내림차순 · 시장별로 ETF끼리만 비교 · 주도 종목과 같은 항목</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="drill-summary-list"><StockRows label="ETF" rows={dialogEtfRows} onSelect={openEtf} nameWidth={sectorNameWidth} onResizeStart={startSectorColumnResize}/></div>

@@ -1,3 +1,10 @@
+## FOLIO-ETF-WATCH-ACTIONS-20261022 — latest UI acceptance
+
+- SECTOR LEADERS is uppercase; ETF LEADERS / ETF 주도 종목 matches ETF MAP / ETF 주도 산업's kicker + title role. The ETF summary data and sorting remain untouched.
+- Journey 관심종목 and 보유종목 allow searching and selecting by full company name or ticker, with market + code visible in each selection; duplicates and unsupported inputs show explicit feedback, cross-device data remains account-scoped.
+- Basket / interest / Thesis quick actions provide observable state. Existing basket opens on repeat, interest duplicates report why they cannot be added again, Thesis opens the editable record with keyboard focus; preserve all saved records and fixed bottom navigation.
+- Reference regressions: `tests/folio-actions-20261022.spec.ts` and `tests/folio-compact-market-20261021.spec.ts`.
+
 ## FOLIO-EDITORIAL-RESEARCH-THESIS-20261022 — approved design/workflow corrections
 
 1. One type scale: Folio Insight (FOLIO INSIGHT / 핵심 요약) defines Level-3 English kicker + Korean H3. The shared EditorialHeading must match on all stock-detail tabs, Research and Thesis: title 22–30px, kicker 10–12px, restrained 12px meta. Level-2 page section 26–38px, minor labels 13–16px. Semantic headings and accessible names are required in portrait and landscape.

@@ -1,3 +1,10 @@
+## FOLIO-ETF-WATCH-ACTIONS-20261022 — leadership titles and editable actions
+
+- Discover → Market Signal uses `SECTOR LEADERS / 주도 섹터` uppercase kicker. The former `ETF 요약` section and full-list dialog title are now `ETF 주도 종목`; its kicker is `ETF LEADERS` and it uses the **same bilingual size/spacing/font roles** as `ETF MAP / ETF 주도 산업`. Data ranking, ETF-only RS and Top 5/full-list behavior are unchanged.
+- Journey → 관심종목/보유종목 additions accept exact ticker or company name plus market-qualified `US:/KR:` codes. Show up to eight searchable name/code candidates; candidate selection is market-explicit, deduplicated, and uses the existing account workspace sync without inventing instruments. ETFs are supported here as positions, without equity leader classification.
+- Stock detail actionbar: add to basket updates the same account/device basket and confirms it, clicking an already-added basket item opens the existing basket; interest add confirms an existing record or explicitly reports account-sync unavailability; Thesis creates or opens the canonical linked research record, focuses its editing sheet and preserves back navigation. Never silently report a write as successful when the cloud workspace is not ready.
+- Gates: viewport 390/834/1194/1440, title hierarchy, name/code entry with collision/error states, duplicate detection, basket count and modal, interested state persistence, Thesis sheet focus/save, no horizontal overflow and live-data provenance.
+
 ## FOLIO-REPORT-CHROME-20261022 — approved report heading cleanup
 
 - Discover → 시장 신호 → MARKET & COMPANIES → 리포트 already owns the report context in the switcher; do not render an additional visible `리서치 리포트` heading above the PDF list.
