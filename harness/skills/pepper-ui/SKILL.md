@@ -95,7 +95,7 @@ Keep body content legible on Paper. Glass is for interactive controls and transi
 ## FOLIO-COMPACT-MARKET-20261021 (supersedes prior Signal hero and wheel dimensions)
 - All portrait wheel viewports: 128px with 44px interactive rows and centered Liquid Glass selection; wide viewports: 136px and 48px rows. Keep pan-y, snap, correct settlement, 44px minimum hit targets and reduced-motion/transparency fallbacks.
 - Discover's Signal tab has no MARKET MAP title/button row; do not reintroduce a secondary Stocks CTA. Single navigation is the Discover tab switch.
-- Sector Leaders / 주도 섹터, SECTOR MAP / 시장 지표 · 섹터 히트맵, ETF MAP / ETF 주도 산업 exactly follow the MARKET & COMPANIES / 시장과 기업의 새 소식 editorial font scale, weights and eyebrow spacing. Remove double ETF h2 and the top-level '홈과 동일한 … ETF RS 순위' description.
+- SECTOR LEADERS / 주도 섹터, SECTOR MAP / 시장 지표 · 섹터 히트맵, ETF MAP / ETF 주도 산업, ETF LEADERS / ETF 주도 종목 exactly follow the MARKET & COMPANIES / 시장과 기업의 새 소식 editorial font scale, weights and eyebrow spacing. Remove double ETF h2 and the top-level '홈과 동일한 … ETF RS 순위' description.
 - Sector/ETF heatmaps, ranking data, click-through dialogs, summaries and market/stock filters remain untouched. Test 390, 834, 1194, 1440 px and include title parity, layout/scrolling and absence of redundant content.
 
 ## FOLIO-MARKET-LEADERS-WHEEL-20261021 — approved correction
