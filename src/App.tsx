@@ -1706,7 +1706,7 @@ export default function App(){
 
   if(page==='analysis'&&!analysisDetail){
     if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}>
-      <ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry}/>
+      <ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry} onDelete={deleteResearchEntry}/>
     </DiscoveryTopics>
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
       <SectionHeading kind="discover" {...editorialPageHeadings.discover}/>
