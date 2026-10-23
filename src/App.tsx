@@ -20,7 +20,7 @@ import { useLifetimeJournal } from './lib/lifetimeJournal'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
 import {heatColor,HEAT_MISSING} from './lib/marketColors'
 import { CHART_SESSIONS } from './lib/rsChart'
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { ColDef } from 'ag-grid-community'
 import { Sidebar } from './components/Sidebar'
 import { AppIcon } from './components/AppIcon'
@@ -1765,7 +1765,7 @@ export default function App(){
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
-        {[...rankedSectorRows,...referenceSectorRows].map(g=><tr key={g.key} data-market={g.market} data-sector-rank={g.rankEligible?'ranked':'reference'} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+        {[...rankedSectorRows,...referenceSectorRows].map((g,i)=><Fragment key={g.key}>{i===rankedSectorRows.length&&referenceSectorRows.length>0&&<tr className="sector-reference-divider"><td colSpan={14}>순위 제외 · 표본 부족(5종목 미만 또는 지표 부족) / 주도 종목 없음 / 기타 분류</td></tr>}<tr data-market={g.market} data-sector-rank={g.rankEligible?'ranked':'reference'} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
           <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.rankEligible?`주도 점수 ${g.rankScore?.toFixed(1)} · ${g.verdict}`:`참고 · ${g.rankReason}`}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
           <td>{g.n}</td>
@@ -1775,8 +1775,8 @@ export default function App(){
           <td><strong className="sector-count correction">{g.correction}</strong></td>
           {[g.medRet5d,g.medRet20d,g.medRet50d,g.medRet120d,g.medRet200d,g.medRet12m].map((value,i)=><td key={i} className={value!=null&&value>0?'pos':value!=null&&value<0?'neg':''}>{pct(value)}</td>)}
           <td><span className="sector-high-cell"><i><em style={{width:(g.highNearShare*100).toFixed(0)+'%'}}/></i><b>{(g.highNearShare*100).toFixed(0)}%</b></span></td>
-        </tr>)}
-        {!rankedSectorRows.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
+        </tr></Fragment>)}
+        {!rankedSectorRows.length&&!referenceSectorRows.length&&<tr><td colSpan={14} className="empty">조건에 맞는 섹터가 없습니다.</td></tr>}
       </tbody></table></div>
     </DialogContent>
   </Dialog>
