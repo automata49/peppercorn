@@ -95,7 +95,7 @@ for(const view of views){
 
   await expect(page.locator('.folio-motif-panel img')).toHaveAttribute('src','./folio-brand-typography.webp?v=u2')
   if(!view.compact)await expect(page.locator('.folio-photo-panel img')).toHaveAttribute('src','./folio-brand-photography.webp?v=u2')
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
+  await expect.poll(()=>page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1)).toBe(true)
   if(shots)await page.screenshot({path:`${shots}/${view.name}-page.png`,fullPage:true})
 
   if(view.compact){
