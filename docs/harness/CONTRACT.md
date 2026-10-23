@@ -1,3 +1,7 @@
+## RELEASE-GATE-FASTPATH-20261023 — approved deployment workflow
+
+- On `main` push, keep `harness:check`, data/database verification, TypeScript/Vite build, snapshot and publishing checks. Do not re-install Chromium or re-run duplicate visual Playwright suites in the release job: PR Pepper Harness, UX regression and discovery UI gates own that coverage. On manual `workflow_dispatch`, retain full visual/browser troubleshooting checks. Pages live-smoke must confirm published assets. Do not confuse a successful source Pages build with the finalized generated asset bundle.
+
 ## SECTOR-STANDING-V2 — sector representation and ranking (2026-10-23)
 
 - US sectors normalize both Nasdaq labels and four unambiguous TradingView fallback sector labels at display load: Process Industries and Non-Energy Minerals → Materials; Energy Minerals → Energy; Electronic Technology → Information Technology. Keep original source, classification scheme and as-of date unchanged; never rewrite source data or stock leadership/RS ranks.
