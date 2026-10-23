@@ -21,7 +21,7 @@ test('Journal and Journey: minimal toolbar and durable confirmed deletion',async
  await page.reload()
  await openPage(page,'저널')
  await expect(page.getByRole('tab')).toContainText(['전체','일상','투자'])
- await expect(page.getByRole('searchbox',{name:'기록 찾기'})).toBeVisible()
+ await expect(page.getByRole('searchbox',{name:'내 기록 검색'})).toBeVisible()
  await expect(page.getByRole('button',{name:'날짜 · 모아보기'})).toBeVisible()
  await expect(page.locator('.journal-view-toggle button')).toHaveCount(2)
  await expect(page.getByRole('heading',{name:'나의 페이지 1개'})).toBeVisible()
