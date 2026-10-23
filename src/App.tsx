@@ -52,6 +52,7 @@ import { loadPosition, positionKey, type PositionLoad } from './lib/position'
 import { ETF_RS_RANK_VERSION, withEtfRanks } from './lib/etfRank'
 import { applyKrEtfNames } from './lib/krEtfNames'
 import { GROUP_MIN_MEMBERS, normalizeUsSectors, withGroupRanks } from './lib/groupRank'
+import { sectorStanding,compareSectorStanding,SECTOR_MIN_MEMBERS } from './lib/sectorStanding'
 import { flagBadges, flagKey, useStockFlags } from './lib/stockFlags'
 import { BIGCAP, DEFAULT_LENS_FILTER, applyLensFilter, bigCapLeaders, byGroupThenRs, groupKey, leaderGroups, topGroup, type LensFilter } from './lib/leaderLens'
 import { ETF_HEAT_PERIODS, ETF_INDUSTRY_VERSION, buildEtfIndustries, etfIndustryLabel, type EtfHeatPeriod, type EtfIndustry } from './lib/etfIndustries'
@@ -129,7 +130,7 @@ type SectorSummary={
   medRet5d:number|null;medRet20d:number|null;medRet50d:number|null;
   medRet120d:number|null;medRet200d:number|null;medRet12m:number|null;
   avgRet1w:number|null;highNearShare:number;
-  verdict:string;smallSample:boolean;top:string[]
+  verdict:string;smallSample:boolean;top:string[];rankEligible:boolean;rankScore:number|null;rankReason:string
 }
 
 const sectorKey=(r:LeaderRow)=>`${r.market}|${r.sector||'분류 확인'}`
@@ -147,7 +148,9 @@ function buildSectors(rows:LeaderRow[]):SectorSummary[]{
     const turn=list.filter(r=>leadership(r)==='강세 전환').length
     const correction=list.filter(isCorrection).length
     const coreShare=n?core/n:0
-    const breadth=n?list.filter(r=>r.price!=null&&r.ma50!=null&&Number(r.price)>Number(r.ma50)).length/n:0
+    const ma50Count=list.filter(r=>r.price!=null&&r.ma50!=null).length
+    const rankedCount=list.filter(r=>r.rs_rank!=null&&Number.isFinite(r.rs_rank)).length
+    const breadth=ma50Count?list.filter(r=>r.price!=null&&r.ma50!=null&&Number(r.price)>Number(r.ma50)).length/ma50Count:0
     const medRank=med(list.map(r=>r.rs_rank))
     const medRs1w=med(list.map(r=>r.rs_1w)),medRs1m=med(list.map(r=>r.rs_1m)),medRs3m=med(list.map(r=>r.rs_3m))
     const medRet1w=med(list.map(r=>r.return_1w)),medRet1m=med(list.map(r=>r.return_1m)),medRet3m=med(list.map(r=>r.return_3m))
@@ -168,8 +171,9 @@ function buildSectors(rows:LeaderRow[]):SectorSummary[]{
     else if(improvingShare>=.35&&(medRank??0)>=55&&breadth>=.45&&(medRs1m??-1)>0)verdict='개선 섹터'
     else if(breadth<.35&&(medRank??50)<45)verdict='약세'
     const ranked=list.slice().sort((a,b)=>(b.rs_rank??0)-(a.rs_rank??0)).slice(0,3).map(r=>r.name)
-    return {key,market:list[0].market,sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs1w,medRs1m,medRs3m,medRet1w,medRet1m,medRet3m,medRet5d,medRet20d,medRet50d,medRet120d,medRet200d,medRet12m,avgRet1w,highNearShare,verdict,smallSample,top:ranked}
-  }).sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.coreShare-a.coreShare)
+    return {key,market:list[0].market,sector:list[0].sector||'분류 확인',n,core,candidate,turn,correction,coreShare,breadth,medRank,medRs1w,medRs1m,medRs3m,medRet1w,medRet1m,medRet3m,medRet5d,medRet20d,medRet50d,medRet120d,medRet200d,medRet12m,avgRet1w,highNearShare,verdict,smallSample,top:ranked,
+      ...sectorStanding({sector:list[0].sector||'분류 확인',n,rankedCount,ma50Count,medRank,core,candidate,breadth})}
+  }).sort(compareSectorStanding)
 }
 
 const upDownRules={
@@ -1120,7 +1124,8 @@ export default function App(){
   const eligibleSectors=allSectorRows
   const sectorLabel=(g:SectorSummary)=>`${sectorMkt==='ALL'?g.market+' · ':''}${sectorName(g.market,g.sector)}`
   const shownSectors=sector?eligibleSectors.filter(g=>g.key===sector):eligibleSectors
-  const rankedSectorRows=shownSectors.slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)
+  const rankedSectorRows=shownSectors.filter(g=>g.rankEligible).sort(compareSectorStanding)
+  const referenceSectorRows=shownSectors.filter(g=>!g.rankEligible).sort(compareSectorStanding)
   const dashboardTopSectors=rankedSectorRows.slice(0,5)
   // RS-CHART-1 charts get stable inputs (memoized rows + ref-backed handlers) so other App updates skip them.
   const openStock=(row:LeaderRow)=>{setSelectedRecordId(null);setSelected(row);setSummaryTab(null);setDrillSectorKey(null);setDrillStock(row)}
@@ -1339,7 +1344,7 @@ export default function App(){
     const todayRows=todayLeaderRows
     const sizePool=sizedRows(stockRows)
     const classCounts={core:sizePool.filter(r=>leadership(r)==='핵심 주도').length,candidates:sizePool.filter(r=>leadership(r)==='주도 후보').length,turns:sizePool.filter(r=>leadership(r)==='강세 전환').length,corrections:sizePool.filter(isCorrection).length}
-    const homeSector=buildSectors(marketRows).slice().sort((a,b)=>(b.medRank??-1)-(a.medRank??-1)||b.core-a.core)[0]??null
+    const homeSector=buildSectors(marketRows).find(g=>g.rankEligible)??null
     const homeEtf=rankedEtfRows[0]??null
     const openMarketSignal=()=>{setSector(null);setSectorMkt(market);setDiscoverTab('signal');setPage('analysis');window.scrollTo({top:0,behavior:'instant'})}
     content=<div className="journey-home">
@@ -1370,14 +1375,14 @@ export default function App(){
         <div className="dashboard-left-column">
         <div className="panel industry-panel dashboard-sector-panel focus-sector-panel">
           <div className="panel-head dashboard-sector-head">
-            <div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR LEADERS</span><h2>주도 섹터</h2><p>먼저 강한 섹터를 고르고, 눌러서 대표 종목을 확인하세요.</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
+            <div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR LEADERS</span><h2>주도 섹터</h2><p>주도 점수: RS 45% · 주도 비율 25% · MA50 20% · 주도 수 10% · 최소 5종목</p><MarketSegment label="섹터 요약" value={sectorMkt} onChange={setSectorMkt}/></div>
             <div className="sector-actions">
               <button className="dashboard-section-action" onClick={()=>setSectorSummaryOpen(true)}>전체 보기 →</button>
             </div>
           </div>
           <div className="industry-table-wrap dashboard-sector-table-wrap" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-metrics-table focus-sector-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>주도</th><th>등락 20D</th><th>등락 50D</th><th>52W 근접</th></tr></thead><tbody>
             {dashboardTopSectors.map(g=><tr key={g.key} data-market={g.market} className={sectorKeySelected===g.key?'selected':''} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 주도 종목 보기`} onClick={()=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
-              <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
+              <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict} · 점수 {g.rankScore?.toFixed(1)??'—'} · {g.n}종목</small></td>
               <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
               <td><strong className="sector-count sector-core-count">{g.core+g.candidate}</strong><small className="sector-count-note"> 핵심 주도 {g.core}</small></td>
               <td className={g.medRet20d!=null&&g.medRet20d>0?'pos':g.medRet20d!=null&&g.medRet20d<0?'neg':''}>{pct(g.medRet20d)}</td>
@@ -1394,7 +1399,7 @@ export default function App(){
               rank:index+1,
               eyebrow:g.market,
               title:sectorLabel(g),
-              meta:`RS ${g.medRank==null?'—':Math.round(g.medRank)} · 주도 ${g.core+g.candidate}`,
+              meta:`점수 ${g.rankScore?.toFixed(1)??'—'} · RS ${g.medRank==null?'—':Math.round(g.medRank)} · 주도 ${g.core+g.candidate}`,
               badge:g.core>0?`핵심 주도 ${g.core}`:g.verdict,
               badgeTone:g.core>0?'green':'gray',
               value:pct(g.medRet20d),
@@ -1756,12 +1761,12 @@ export default function App(){
     <DialogContent className="sector-summary-dialog">
       <div className="drill-handle"/>
       <div className="sector-summary-dialog-head">
-        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>RS 순위 중앙값 기준 내림차순 · 주도 분류와 등락 5D~52W 전체 보기</DialogDescription></div>
+        <div><small>{market==='ALL'?'전체 시장':market}</small><DialogTitle>섹터 요약 · 전체</DialogTitle><DialogDescription>주도 종목 수·비율, RS 중앙값, MA50 상회 비율 종합 점수순 · 최소 {SECTOR_MIN_MEMBERS}종목 · 미달 섹터는 아래 참고 목록</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
       <div className="sector-summary-dialog-table" style={sectorTableStyle}><table className="industry-table dashboard-sector-table sector-summary-full-table sector-metrics-table"><thead><tr><th className="sector-name-head">섹터<button type="button" className="sector-column-resizer" aria-label="섹터 열 너비 조절" title="드래그하여 섹터 열 너비 조절" onPointerDown={startSectorColumnResize}/></th><th>RS 순위</th><th>종목 수</th><th>핵심 주도</th><th>주도 후보</th><th>강세 전환</th><th>조정 중</th><th>등락 5D</th><th>등락 20D</th><th>등락 50D</th><th>등락 120D</th><th>등락 200D</th><th>등락 52W</th><th>52W 고점 근접</th></tr></thead><tbody>
-        {rankedSectorRows.map(g=><tr key={g.key} data-market={g.market} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
-          <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.verdict}</small></td>
+        {[...rankedSectorRows,...referenceSectorRows].map(g=><tr key={g.key} data-market={g.market} data-sector-rank={g.rankEligible?'ranked':'reference'} tabIndex={0} role="button" aria-label={`${sectorLabel(g)} 상세 보기`} onClick={()=>{setSectorSummaryOpen(false);setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.currentTarget.click()}}}>
+          <td className="industry-name-cell" title={sectorLabel(g)}><b>{sectorLabel(g)}</b><small>{g.rankEligible?`주도 점수 ${g.rankScore?.toFixed(1)} · ${g.verdict}`:`참고 · ${g.rankReason}`}</small></td>
           <td><span className={(g.medRank??0)>=90?'heat top':(g.medRank??0)>=70?'heat high':'heat'}>{g.medRank==null?'—':Math.round(g.medRank)}</span></td>
           <td>{g.n}</td>
           <td><strong className="sector-count sector-core-count">{g.core}</strong></td>
