@@ -214,3 +214,12 @@ html body .shell .app-main .folio-research-remove:is(:hover,:focus-visible){
  color:var(--folio-ink)!important;
 }
 html body .shell .app-main .folio-research-remove:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
+
+
+/* SECTOR-STANDING-V2: unranked reference groups stay drillable but never masquerade as leaders. */
+.sector-summary-full-table .sector-reference-divider td{
+  font-size:12px;font-weight:650;letter-spacing:.02em;
+  padding:18px 12px 8px;background:transparent;color:var(--folio-muted);
+  border-top:1px solid var(--folio-line);
+}
+.sector-summary-full-table tr[data-sector-rank="reference"] .industry-name-cell small{color:var(--folio-muted)}

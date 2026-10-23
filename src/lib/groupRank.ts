@@ -44,6 +44,12 @@ export const US_SECTOR_GICS:Record<string,string>={
   'Basic Materials':'Materials',
   'Telecommunications':'Communication Services',
   'Miscellaneous':'Other',
+  // TradingView America fallback is a distinct naming system. Align unequivocal sector-level categories;
+  // keep the source/provenance fields intact (this is a display grouping, not an issuer reclassification).
+  'Process Industries':'Materials',
+  'Non-Energy Minerals':'Materials',
+  'Energy Minerals':'Energy',
+  'Electronic Technology':'Information Technology',
 }
 export function normalizeUsSectors(rows:LeaderRow[]):LeaderRow[]{
   return rows.map(r=>r.market==='US'&&US_SECTOR_GICS[r.sector]?{...r,sector:US_SECTOR_GICS[r.sector]}:r)
