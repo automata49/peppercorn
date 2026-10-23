@@ -1399,7 +1399,7 @@ export default function App(){
             onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
             emptyLabel="조건에 맞는 섹터가 없습니다."
           />
-          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR MAP</span><h3>시장 지표 · 섹터 히트맵</h3></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
+          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head signal-etf-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR MAP</span><h2>시장 지표 · 섹터 히트맵</h2></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
         </div>
         </div>
       </section>
