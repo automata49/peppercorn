@@ -11,6 +11,7 @@ export type AppIconName =
   | 'sectors'
   | 'menu'
   | 'close'
+  | 'trash'
   | 'refresh'
   | 'search'
   | 'arrow'
@@ -52,6 +53,7 @@ export function AppIcon({name,size=20,className=''}:{name:AppIconName;size?:numb
       case 'settings': return <><circle cx="12" cy="12" r="2.8"/><path d="M19.2 13.7a7.7 7.7 0 0 0 .05-3.4l2-1.55-2-3.45-2.45 1a8 8 0 0 0-2.95-1.7L13.5 2h-4l-.35 2.6A8 8 0 0 0 6.2 6.3l-2.45-1-2 3.45 2 1.55a7.7 7.7 0 0 0 .05 3.4l-2.05 1.55 2 3.45 2.5-1a8 8 0 0 0 2.9 1.7L9.5 22h4l.35-2.6a8 8 0 0 0 2.9-1.7l2.5 1 2-3.45-2.05-1.55Z"/></>
       case 'sectors': return <><rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/></>
       case 'menu': return <><path d="M4 7h16M4 12h16M4 17h16"/></>
+      case 'trash': return <><path d="M4 7h16M9 4h6M6 7l1 14h10l1-14M10 11v6M14 11v6"/></>
       case 'close': return <><path d="m6 6 12 12M18 6 6 18"/></>
       case 'refresh': return <><path d="M20 6v5h-5"/><path d="M18.2 9A7 7 0 1 0 19 15"/></>
       case 'search': return <><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></>

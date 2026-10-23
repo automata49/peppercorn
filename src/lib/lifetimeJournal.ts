@@ -7,7 +7,7 @@ export type JournalAIMessage={role:'user'|'assistant';content:string}
 export type NotebookNote={body:JSONContent;text:string;ink:InkStroke[];photos:string[];paper?:'plain'|'ruled'|'grid'}
 export type Reflection={judgement?:string;previousJudgement?:string;trigger?:string;nextReviewDate?:string;note?:NotebookNote;at:string;outcome:'maintain'|'revise'|'close';result:string;lesson:string;nextAction:string}
 export type EntrySnapshot={aiMessages?:JournalAIMessage[];paper?:'plain'|'ruled'|'grid';title:string;body:JSONContent;text:string;question:string;answer:string;hypothesis?:string;counterEvidence?:string;reflections?:Reflection[];photo?:string;photos?:string[];ink:InkStroke[];kind:'life'|'investment';ticker:string;reviewDate:string;place:string;expense:string;currency:string}
-export type JournalEntry=EntrySnapshot&{id:string;createdAt:string;updatedAt:string;revisions:{at:string;snapshot:EntrySnapshot}[]}
+export type JournalEntry=EntrySnapshot&{id:string;createdAt:string;updatedAt:string;deletedAt?:string;revisions:{at:string;snapshot:EntrySnapshot}[]}
 export const questions=[
  '오늘 새롭게 발견한 것은 무엇인가요?',
  '현재 가격이 정당화되려면 무엇이 실현되어야 할까요?',
@@ -39,6 +39,7 @@ async function write(scope:string,updates:JournalEntry[],importOnly=false){
     for(const entry of updates){
      const existing=merged.get(entry.id)
      if(existing&&(importOnly||JSON.stringify(existing)===JSON.stringify(entry)))continue
+     if(existing?.deletedAt&&!entry.deletedAt)throw Error('삭제된 기록은 수정하거나 복원할 수 없습니다.')
      if(existing&&entry.revisions.at(-1)?.at!==existing.updatedAt)throw Error('다른 창에서 이 기록이 변경되었습니다. 현재 글을 복사한 뒤 다시 열어주세요.')
      merged.set(entry.id,entry)
     }
@@ -91,6 +92,8 @@ async function prepareSync(scope:string,remote:JournalEntry[]){
    let recovered=false
    for(const page of local){
     const server=cloud.get(page.id),dirty=pending[page.id]
+    // An acknowledged deletion always wins over an older device and pending stale edits.
+    if(server?.deletedAt){delete pending[page.id];merged.set(page.id,server);continue}
     if(!server){pending[page.id]=page;continue}
     if(equalEntries(page,server)){delete pending[page.id];merged.set(page.id,server);continue}
     if(!dirty&&marker.result)continue
@@ -141,6 +144,17 @@ export function useLifetimeJournal(scope:string,session:Session|null=null){
   const interval=window.setInterval(refresh,30000)
   return()=>{live=false;window.clearInterval(interval);window.removeEventListener('focus',refresh);window.removeEventListener('online',refresh);document.removeEventListener('visibilitychange',refresh)}
  },[scope,publish,sync])
+ const remove=useCallback(async(id:string)=>{
+  if(active.current!==scope)throw Error('계정이 변경되었습니다.')
+  const current=(await read(scope)).find(e=>e.id===id&&!e.deletedAt)
+  if(!current)throw Error('삭제할 기록을 찾을 수 없습니다.')
+  const now=new Date().toISOString()
+  // Small tombstone retains only the ID and parent revision timestamp. No note/photo/ink is copied.
+  const marker:JournalEntry={...blankSnapshot(),kind:current.kind,id,createdAt:current.createdAt,updatedAt:now,deletedAt:now,revisions:[{at:current.updatedAt,snapshot:blankSnapshot()}]}
+  const updated=await write(scope,[marker]);publish(updated,'',!!sessionRef.current)
+  if('BroadcastChannel' in window){const c=new BroadcastChannel('folio-notebook');c.postMessage(scope);c.close()}
+  await sync()
+ },[scope,publish,sync])
  const replace=useCallback(async(updates:JournalEntry[],importOnly=false)=>{
   if(active.current!==scope)throw Error('계정이 변경되었습니다.')
   const entries=await write(scope,updates,importOnly);publish(entries,'',!!sessionRef.current)
@@ -150,7 +164,7 @@ export function useLifetimeJournal(scope:string,session:Session|null=null){
   // and retries the same IDs on reconnect instead of duplicating editor submissions.
  },[scope,publish,sync])
  useEffect(()=>{if(!('BroadcastChannel' in window))return;const c=new BroadcastChannel('folio-notebook');c.onmessage=e=>{if(e.data===scope)void read(scope).then(entries=>setState(s=>s.scope===scope?{...s,entries}:s))};return()=>c.close()},[scope])
- return {entries:state.scope===scope?state.entries:[],ready:state.scope===scope&&state.ready,error:state.scope===scope?state.error:'',syncing:state.scope===scope&&state.syncing,storageLabel:session?(state.error?'기기 보관 · 동기화 필요':state.syncing?'계정 동기화 중…':'계정에 동기화됨'):'이 기기에 보관한 기록',replace,retry:sync}
+ return {entries:state.scope===scope?state.entries.filter(e=>!e.deletedAt):[],ready:state.scope===scope&&state.ready,error:state.scope===scope?state.error:'',syncing:state.scope===scope&&state.syncing,storageLabel:session?(state.error?'기기 보관 · 동기화 필요':state.syncing?'계정 동기화 중…':'계정에 동기화됨'):'이 기기에 보관한 기록',replace,remove,retry:sync}
 }
 export function downloadNotebook(entries:JournalEntry[]){
  const url=URL.createObjectURL(new Blob([JSON.stringify({format:'folio-journal',version:1,entries},null,2)],{type:'application/json'}))
@@ -184,6 +198,6 @@ export function parseNotebook(text:string):JournalEntry[]{
  }
  return data.entries.map((e:any)=>{
   if(typeof e.id!=='string'||!Number.isFinite(Date.parse(e.createdAt))||!Number.isFinite(Date.parse(e.updatedAt)))throw Error('기록 날짜 또는 식별자를 확인할 수 없습니다.')
-  return {...clean(e),id:e.id,createdAt:e.createdAt,updatedAt:e.updatedAt,revisions:(Array.isArray(e.revisions)?e.revisions:[]).map((r:any)=>({at:String(r.at),snapshot:clean(r.snapshot)}))}
+  return {...clean(e),id:e.id,createdAt:e.createdAt,updatedAt:e.updatedAt,...(typeof e.deletedAt==='string'&&Number.isFinite(Date.parse(e.deletedAt))?{deletedAt:e.deletedAt}:{}),revisions:(Array.isArray(e.revisions)?e.revisions:[]).map((r:any)=>({at:String(r.at),snapshot:clean(r.snapshot)}))}
  })
 }

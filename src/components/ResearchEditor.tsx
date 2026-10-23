@@ -1,6 +1,7 @@
 import {useId,useState} from 'react'
 import type {EditableRow} from '../types'
 import {EditorialHeading} from './EditorialHeading'
+import {AppIcon} from './AppIcon'
 
 type Field={id:string;label:string;kind?:'area'|'date'|'url'|'select';choices?:string[]}
 const fields:Field[]=[
@@ -38,13 +39,19 @@ function ResearchForm({record,onPatch}:{record:EditableRow;onPatch:(id:string,fi
   <div className="folio-research-form-footer"><p role="status">{notice||'항목 이동 시 자동 저장됩니다. 완료 후 저장 상태를 확인하세요.'}</p><button type="submit">입력 확정</button></div>
  </form>
 }
-export function ResearchEditor({rows,onCreate,onPatch}:{rows:EditableRow[];onCreate:()=>{id?:string;error?:string};onPatch:(id:string,field:string,value:string)=>string|null}){
+export function ResearchEditor({rows,onCreate,onPatch,onDelete}:{rows:EditableRow[];onCreate:()=>{id?:string;error?:string};onPatch:(id:string,field:string,value:string)=>string|null;onDelete:(id:string)=>string|null}){
  const [selectedId,setSelectedId]=useState<string|null>(null)
  const [notice,setNotice]=useState('')
  const selected=rows.find(r=>String(r.id)===selectedId)||rows[0]
  const create=()=>{const result=onCreate();setNotice(result.error||'');if(result.id){setSelectedId(result.id);setNotice('새 기록이 생성됐습니다. 사실과 해석을 작성해 주세요.')}}
+ const remove=()=>{
+  if(!selected||!window.confirm(`“${String(selected.title||selected.target||'리서치 기록')}”을 삭제할까요?`))return
+  const error=onDelete(String(selected.id))
+  if(error){setNotice(error);return}
+  setSelectedId(null);setNotice('리서치 기록을 삭제했습니다.')
+ }
  return <section className="folio-research-editor" aria-label="리서치 기록 작성">
-   <div className="folio-research-topline"><EditorialHeading kicker="MY RESEARCH" title="리서치 기록" meta={rows.length+'건'} /><button type="button" className="folio-research-add" onClick={create}>+ 새 기록</button></div>
+   <div className="folio-research-topline"><EditorialHeading kicker="MY RESEARCH" title="리서치 기록" meta={rows.length+'건'} /><div className="folio-research-actions">{selected&&<button type="button" className="folio-research-remove" onClick={remove} aria-label="선택한 리서치 삭제" title="선택한 리서치 삭제"><AppIcon name="trash" size={18}/></button>}<button type="button" className="folio-research-add" onClick={create}>+ 새 기록</button></div></div>
    {notice&&<p role="status" className="folio-editor-notice">{notice}</p>}
    <div className="folio-research-layout">
     <nav className="folio-research-list" aria-label="리서치 기록 선택">

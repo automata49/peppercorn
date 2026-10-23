@@ -18,7 +18,8 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,102
   await openPage(page,label)
   const filters=page.getByRole('complementary',{name:'기록 검색 및 날짜 필터'}),content=page.locator('.journal-collection-content')
   const f=(await filters.boundingBox())!,c=(await content.boundingBox())!
-  if(width>=1024||(width>=700&&width>height)){expect(f.x+f.width).toBeLessThanOrEqual(c.x);expect(c.width).toBeGreaterThan(f.width)}else{expect(f.y+f.height).toBeLessThanOrEqual(c.y);if(label==='저널')expect(await page.locator('.journal-gallery').first().evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(2)}
+  expect(f.y+f.height).toBeLessThanOrEqual(c.y+2)
+  if(width<=580&&label==='저널')expect(await page.locator('.journal-gallery').first().evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(2)
   const card=page.getByRole('button',{name:'기록 1 기록 열기'})
   await expect(card).toBeVisible()
   if(label==='저널'){
@@ -27,12 +28,12 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1366,102
   const alpha=Number(glass.fill.match(/\/\s*([\d.]+)/)?.[1]??glass.fill.match(/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)/)?.[1]??1)
   expect(alpha).toBeGreaterThan(.3);expect(alpha).toBeLessThan(1)
   }else{await expect(page.locator('.decision-queue-item')).toHaveCount(2);await expect(page.locator('.decision-queue img,.decision-queue .journal-story')).toHaveCount(0)}
-  await page.getByLabel('내 기록 검색').fill('기록 1');const dates=page.locator('.journal-date-toggle');if(await dates.isVisible())await dates.click();await page.getByLabel('기록 연도',{exact:true}).selectOption('2026')
+  await page.getByRole('searchbox',{name:'내 기록 검색'}).fill('기록 1');const dates=page.locator('.journal-date-toggle');if(await dates.isVisible())await dates.click();await page.getByLabel('기록 연도',{exact:true}).selectOption('2026')
   await expect(page.locator(label==='저널'?'.journal-albums .journal-story':'.decision-queue-item')).toHaveCount(1)
   await page.setViewportSize({width:height,height:width})
-  await expect(page.getByLabel('내 기록 검색')).toHaveValue('기록 1');await expect(page.getByLabel('기록 연도',{exact:true})).toHaveValue('2026')
+  await expect(page.getByRole('searchbox',{name:'내 기록 검색'})).toHaveValue('기록 1');await expect(page.getByLabel('기록 연도',{exact:true})).toHaveValue('2026')
   await card.click();await expect(page.locator('.journal-page-reader')).toBeVisible();await expect(page.locator('.journal-page-reader h2')).toHaveText('기록 1');await page.locator('.journal-read-actions').getByRole('button',{name:'수정'}).click();await expect(page.getByLabel('기록 제목')).toHaveValue('기록 1');await page.keyboard.press('Escape');await expect(card).toBeFocused()
-  await page.getByRole('button',{name:'검색·날짜 초기화'}).click();await page.setViewportSize({width,height})
+  await page.getByRole('button',{name:'초기화'}).click();await page.setViewportSize({width,height})
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
  }
  await context.close()

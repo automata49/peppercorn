@@ -1052,6 +1052,12 @@ export default function App(){
     updateResearch([{id,date:new Date().toISOString().slice(0,10),type:'산업',verification:'미검증',status:'관찰중'},...research])
     return {id}
   }
+  const deleteResearchEntry=(id:string):string|null=>{
+    if(!researchReady()){setSyncState('error');return '리서치 동기화 준비 중입니다. 삭제할 수 없습니다.'}
+    if(!research.some(r=>String(r.id)===id))return '기록이 변경됐습니다. 다시 선택해 주세요.'
+    updateResearch(research.filter(r=>String(r.id)!==id))
+    return null
+  }
   const updateResearchEntry=(id:string,field:string,value:string):string|null=>{
     if(!researchReady()){setSyncState('error');return '리서치 동기화 준비 중입니다. 다시 시도하세요.'}
     if(!research.some(r=>String(r.id)===id))return '기록이 변경됐습니다. 다시 선택해 주세요.'
@@ -1323,7 +1329,7 @@ export default function App(){
   }else if(page==='notebook'||(page==='tracking'&&trackingTab==='review')){
     content=<LifetimeJournal session={session} financials={financialReferences} key={(session?.user.id||'guest')+page} mode={page==='notebook'?'journal':'journey'} {...notebook} navigate={navigatePage} linkedRecords={{theses:session?enrichedAnalysis as EditableRow[]:(enrichedAnalysis as EditableRow[]).filter(r=>!initialAnalysis.some(seed=>seed.id===r.id)),trades:session?enrichedJournal:enrichedJournal.filter(r=>!initialJournal.some(seed=>seed.id===r.id)),insights:leaderInsights}} openLinked={(kind,r)=>{if(kind==='thesis'){setSelectedRecordId(String(r.id));const hit=matchLeader(r);setSelected(hit);setAnalysisSection('thesis');setPage('thesis')}else{setLinkedTradeId(String(r.id));setPage('journal')}}} assetFlow={<PortfolioDisclosure portfolio={portfolio} leaders={leaders} source={source}/>}/>
   }else if(page==='research'){
-    content=<section className="folio-research-workspace"><ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry}/>
+    content=<section className="folio-research-workspace"><ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry} onDelete={deleteResearchEntry}/>
       <details className="folio-research-comparison"><summary>전체 기록 비교 · 고급 편집 ({enrichedResearch.length}건)</summary>
         <TickerEntry onAdd={ticker=>addTickerRecord('research',ticker)}/>
         <ComparisonSheet rows={enrichedResearch} columns={researchCols} onChange={updateResearch} label="리서치 비교 및 편집"/>
@@ -1399,7 +1405,7 @@ export default function App(){
             onSelect={g=>{setSectorKeySelected(g.key);setSummaryTab(null);setDrillStock(null);setDrillSectorKey(g.key)}}
             emptyLabel="조건에 맞는 섹터가 없습니다."
           />
-          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR MAP</span><h3>시장 지표 · 섹터 히트맵</h3></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
+          <section className="dashboard-disclosure sector-heat-disclosure signal-expanded-block" aria-label="시장 지표 · 섹터 히트맵"><div className="signal-expanded-head signal-etf-head"><div className="folio-editorial-map-heading"><span className="journey-kicker">SECTOR MAP</span><h2>시장 지표 · 섹터 히트맵</h2></div><div className="sector-secondary-actions"><button className="dashboard-section-action market-metrics-trigger" onClick={()=>setMarketMetricsOpen(true)} aria-haspopup="dialog">시장 지표 보기</button></div></div><SectorHeatmap rows={sectorRows} market={sectorMkt} sector={sector} onSelect={chartOpenSector}/></section>
         </div>
         </div>
       </section>
@@ -1700,7 +1706,7 @@ export default function App(){
 
   if(page==='analysis'&&!analysisDetail){
     if(discoverTab==='topics')content=<DiscoveryTopics research={enrichedResearch} match={matchLeader} onSelect={openAnalysisStock} onResearch={()=>navigatePage('research')}>
-      <ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry}/>
+      <ResearchEditor rows={enrichedResearch} onCreate={newResearchRecord} onPatch={updateResearchEntry} onDelete={deleteResearchEntry}/>
     </DiscoveryTopics>
     content=<section className={"discovery-workspace"+(discoverTab==='stocks'?' discovery-stocks':'')}>
       <SectionHeading kind="discover" {...editorialPageHeadings.discover}/>

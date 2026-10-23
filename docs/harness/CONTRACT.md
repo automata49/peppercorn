@@ -1,3 +1,11 @@
+## FOLIO-SECTOR-JOURNAL-MINIMAL-20261023 — approved UI and deletion (2026-10-23)
+
+- Sector Map uses the same editorial bilingual title hierarchy and open unboxed heatmap surface as ETF Map. Remove decorative panel/plot borders, not heat tile focus, data colour keys, selection or accessible market labels.
+- Journal keeps the 3 flat category tabs and a compact search + expandable date/group filter row above “나의 페이지 N개”, with unboxed card/list switch; Journey reuses the compact control anatomy. On desktop the search/filter bar stays above content, rather than a permanent left rail; no blank separators, no duplicate status text, 44px targets.
+- Journal read/edit and Journey reflection sheets show a discreet accessible trash action for an existing original notebook. Research writing also has a guarded delete icon for the selected account-owned research record; Thesis preserves its existing confirm-to-delete path. Confirm irreversibility. Deleting the notebook removes its Journey decision queue and Today's source; no “delete” on an unsaved page. A deletion must not reappear after refresh, account sync or another-device migration.
+- Account deletion writes a minimal soft-deletion marker with record ID, created/updated/deleted timestamps and a conflict-check revision, **not the user's original text, ink, photographs or previous revisions**. Hidden tombstones stay in sync/storage to prevent older devices from recreating a deleted ID. Backups and gallery exports contain live entries only. Do not represent it as physical database-row erasure.
+- Validate 390/834/1194/1440px, light/dark, orientation, confirm/cancel, offline queued delete and remote tombstone convergence; build, harness, existing editorial and notebook tests, no source/ranking/ownership changes.
+
 ## FOLIO-TAB-RAIL-JOURNAL-COVER-20261022 — approved responsive cleanup
 
 - Discover (시장 신호/종목 검토/리서치 기록), Journey (재검토/관심종목/보유종목), Journal (전체/일상/투자) use one accessible 3-column editorial tab anatomy. Remove grey full-width borders below tab groups on all viewports, including stock-detail tabs; preserve the dark active-tab indicator, keyboard focus, readable labels and 44px+ targets. Never delete record, table or input separators while cleaning tab chrome.

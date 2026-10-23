@@ -21,7 +21,7 @@ import { InkPreview } from './InkPad'
 import { NotebookReadOnly } from './NotebookReadOnly'
 import { downloadNotebook, entryPhotos, parseNotebook, questions, type JournalEntry } from '../lib/lifetimeJournal'
 const JournalEditor = lazy(() => import('./JournalEditor'))
-type Props = { session?:Session|null;financials?:FinancialReference[];mode: 'today' | 'journal' | 'journey'; storageLabel?:string;retry?:()=>Promise<void>; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; navigate: (p: string) => void; assetFlow?:ReactNode; linkedRecords?:{theses:EditableRow[];trades:EditableRow[];insights:InsightsFeed|null}; openLinked?:(kind:'thesis'|'trade',row:EditableRow)=>void }
+type Props = { session?:Session|null;financials?:FinancialReference[];mode: 'today' | 'journal' | 'journey'; storageLabel?:string;retry?:()=>Promise<void>; entries: JournalEntry[]; ready: boolean; error: string; replace: (e: JournalEntry[], importOnly?: boolean) => Promise<void>; remove: (id:string)=>Promise<void>; navigate: (p: string) => void; assetFlow?:ReactNode; linkedRecords?:{theses:EditableRow[];trades:EditableRow[];insights:InsightsFeed|null}; openLinked?:(kind:'thesis'|'trade',row:EditableRow)=>void }
 type Story = { key: string; title: string; kicker: string; caption: string; tone: 'photo' | 'paper' | 'type' | 'sunset'; image?: string; entry?: JournalEntry; action: 'edit' | 'market' | 'journey' | 'reflect'; label: string }
 const day = (value: string) => new Date(value).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 const brandPhoto = `${import.meta.env.BASE_URL}folio-brand-photography.webp`
@@ -52,7 +52,7 @@ function StoryCover({ story, expanded = false }: { story: Story; expanded?: bool
  </>
 }
 
-export function LifetimeJournal({ mode, entries, ready, error, replace, navigate, assetFlow, linkedRecords, openLinked, storageLabel='이 기기에 보관한 기록',retry,session=null,financials=[] }: Props) {
+export function LifetimeJournal({ mode, entries, ready, error, replace, remove, navigate, assetFlow, linkedRecords, openLinked, storageLabel='이 기기에 보관한 기록',retry,session=null,financials=[] }: Props) {
  const {photoStyle}=useVisualStyle()
  const [selected, setSelected] = useState<Story | undefined>(), [open, setOpen] = useState(false), [editing,setEditing] = useState(false), [dirty, setDirty] = useState(false), [filter, setFilter] = useState('all'), [query, setQuery] = useState(''), [notice, setNotice] = useState('')
  const [year,setYear]=useState(''),[month,setMonth]=useState(''),[date,setDate]=useState(''),[scale,setScale]=useState<'year'|'month'|'day'>('month'),[limit,setLimit]=useState(40)
@@ -65,6 +65,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
   try { localStorage.setItem(`folio-${mode==='journey'?'journey':'journal'}-view`,next) } catch { /* Storage may be unavailable in private mode. */ }
  }
  const [calendarOpen,setCalendarOpen]=useState(false)
+ const [deleting,setDeleting]=useState(false),[deleteError,setDeleteError]=useState('')
  const importRef = useRef<HTMLInputElement>(null), returnFocus = useRef<HTMLElement | null>(null), reduce = useReducedMotion()
  const sorted = unifiedPages(entries,linkedRecords?.theses||[],linkedRecords?.trades||[]).slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt))
  const investmentPages = sorted.filter(e=>e.kind==='investment')
@@ -79,12 +80,20 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
  }, [dirty])
  function show(story?: Story) {
   returnFocus.current = document.activeElement as HTMLElement
-  setSelected(story);setEditing(!story?.entry||story.action==='reflect'); setDirty(false); setOpen(true)
+  setDeleteError('');setSelected(story);setEditing(!story?.entry||story.action==='reflect'); setDirty(false); setOpen(true)
  }
  function close() {
   if (dirty && !window.confirm('저장하지 않은 변경이 있습니다. 닫을까요?')) return
   if(dismiss.ref.current)dismiss.ref.current.scrollTop=0
   setOpen(false); setDirty(false)
+ }
+ async function deleteSelected(){
+  const entry=selected?.entry
+  if(!entry||deleting||!window.confirm(`“${entry.title}” 기록을 삭제할까요? 삭제 후에는 복구할 수 없습니다.`))return
+  setDeleting(true);setDeleteError('')
+  try {await remove(entry.id);setDirty(false);setOpen(false);setSelected(undefined)}
+  catch(error){setDeleteError((error as Error).message||'삭제하지 못했습니다. 다시 시도해주세요.')}
+  finally{setDeleting(false)}
  }
  const dismiss = useCardDismiss(open, close)
  function entryStory(e: JournalEntry, key = e.id): Story {
@@ -115,8 +124,8 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
   <label>일<select aria-label="기록 일" value={date} onChange={e=>setDate(e.target.value)}><option value="">모든 일</option>{days.map(v=><option key={v} value={v}>{Number(v)}일</option>)}</select></label>
   {mode!=='journey'&&<label>모아보기<select aria-label="기록 묶음" value={scale} onChange={e=>setScale(e.target.value as typeof scale)}><option value="year">연도별</option><option value="month">월별</option><option value="day">일별</option></select></label>}
  </div>
- const search = <input className="journal-search" aria-label="내 기록 검색" placeholder={mode==='journey'?'Thesis, 종목, 판단, 새 증거 검색':'제목, 종목, 기록으로 검색'} value={query} onChange={e=>setQuery(e.target.value)}/>
- const collectionFilters = <aside className="journal-collection-filters" data-dates-open={calendarOpen} aria-label="기록 검색 및 날짜 필터"><h3>{mode==='journey'?'판단 찾기':'기록 찾기'}</h3>{search}<Button className="journal-date-toggle" variant="ghost" aria-expanded={calendarOpen} onClick={()=>setCalendarOpen(v=>!v)}>{year?`${year}년${month?` · ${Number(month)}월`:''}${date?` · ${Number(date)}일`:''}`:mode==='journey'?'날짜':'날짜 · 모아보기'}</Button>{calendarControls}{(query||year||month||date)&&<Button variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>검색·날짜 초기화</Button>}<p className="journal-collection-hint">{mode==='journey'?'점검일이나 최근 판단일로 찾습니다. 원본 글은 저널에 보관됩니다.':<>날짜별로 모으고,<br/>그때의 생각을 다시 읽습니다.</>}</p></aside>
+ const search = <input type="search" className="journal-search" aria-label="내 기록 검색" placeholder={mode==='journey'?'판단 찾기':'기록 찾기'} value={query} onChange={e=>setQuery(e.target.value)}/>
+ const collectionFilters = <aside className="journal-collection-filters" data-dates-open={calendarOpen} aria-label="기록 검색 및 날짜 필터"><label className="journal-search-field"><AppIcon name="search" size={17}/>{search}</label><Button className="journal-date-toggle" variant="ghost" aria-expanded={calendarOpen} onClick={()=>setCalendarOpen(v=>!v)}>{year?`${year}년${month?` · ${Number(month)}월`:''}${date?` · ${Number(date)}일`:''}`:'날짜 · 모아보기'}</Button>{calendarControls}{(query||year||month||date)&&<Button className="journal-clear-filters" variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>초기화</Button>}</aside>
  function gallery(items:JournalEntry[]){
   const groups = new Map<string,JournalEntry[]>()
   for(const item of items.slice(0,limit)){const key=calendarGroup(item.createdAt,scale);groups.set(key,[...(groups.get(key)||[]),item])}
@@ -133,7 +142,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
    <Tabs value={filter} onValueChange={setFilter}>
     <TabsList className="journal-magazine-tabs" aria-label="저널 분류"><TabsTrigger value="all">전체</TabsTrigger><TabsTrigger value="life">일상</TabsTrigger><TabsTrigger value="investment">투자</TabsTrigger></TabsList>
     <div className="journal-collection">{collectionFilters}<div className="journal-collection-content">
-     <header className="journal-collection-heading"><h3>나의 페이지 <span>{list.length}개</span></h3><div className="journal-heading-actions"><p role="status">{storageLabel}</p><ViewSelector section="journal" view={journalView} onChange={selectView}/></div></header>
+     <header className="journal-collection-heading"><h3>나의 페이지 <span>{list.length}개</span></h3><div className="journal-heading-actions"><ViewSelector section="journal" view={journalView} onChange={selectView}/></div></header>
      {['all', 'life', 'investment'].map(key => <TabsContent key={key} value={key}>{gallery(list)}{!list.length && (entries.length?<p className="journal-empty">조건에 맞는 기록이 없습니다.</p>:<div className="journal-empty journal-empty-cover"><img src={coverPhoto('journal',photoStyle)} alt=""/><div><span className="journey-kicker">YOUR FIRST PAGE</span><h3>생각은 한 페이지에서 시작됩니다.</h3><p>아직 남긴 페이지가 없습니다. 사진 한 장이나 문장 하나로 시작해보세요.</p><Button variant="secondary" disabled={!ready} onClick={()=>show()}>첫 페이지 쓰기</Button></div></div>)}</TabsContent>)}
     </div></div>
    </Tabs>
@@ -162,7 +171,8 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, navigate
       <button type="button" className="card-dismiss-handle" aria-label="기록 닫기" title="아래로 당겨 닫기" onClick={close}><span aria-hidden="true"/></button>
       {selected && <div className={`story-detail-cover story-${selected.tone}`}><StoryCover story={selected} expanded /></div>}
       <motion.div className="story-detail-body" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduce ? 0 : .18, delay: reduce ? 0 : .15 }}>
-       <div className="journal-dialog-header"><Button variant="ghost" size="icon" aria-label="목록으로 돌아가기" onClick={close}><AppIcon name="back"/></Button><div><DialogPrimitive.Title>{selected?.action==='reflect'?'판단 재점검':selected?.action === 'market' ? '세상의 흐름 발견하기' : selected?.action === 'journey' ? '나의 투자 여정' : selected?.entry ? '나의 페이지' : '새 페이지'}</DialogPrimitive.Title><DialogPrimitive.Description>{selected?.action === 'edit' || !selected ? storageLabel : '관찰과 판단을 이어가는 Folio'}</DialogPrimitive.Description></div></div>
+       <div className="journal-dialog-header"><Button variant="ghost" size="icon" aria-label="목록으로 돌아가기" onClick={close}><AppIcon name="back"/></Button><div><DialogPrimitive.Title>{selected?.action==='reflect'?'판단 재점검':selected?.action === 'market' ? '세상의 흐름 발견하기' : selected?.action === 'journey' ? '나의 투자 여정' : selected?.entry ? '나의 페이지' : '새 페이지'}</DialogPrimitive.Title><DialogPrimitive.Description>{selected?.action === 'edit' || !selected ? storageLabel : '관찰과 판단을 이어가는 Folio'}</DialogPrimitive.Description></div>{selected?.entry&&<Button className="journal-delete-action" variant="ghost" size="icon" aria-label="기록 삭제" title="기록 삭제" disabled={deleting} onClick={()=>void deleteSelected()}><AppIcon name="trash" size={18}/></Button>}</div>
+       {deleteError&&<p role="alert" className="journal-delete-error">{deleteError}</p>}
        {selected?.action==='reflect'&&selected.entry?<ReflectionPanel entry={selected.entry} onDirty={setDirty} onSave={async e=>{await replace([e]);if(dismiss.ref.current)dismiss.ref.current.scrollTop=0;setDirty(false);setOpen(false)}}/>:selected?.action === 'market' ? <div className="story-reading"><p>시장의 움직임을 살펴보고, 무엇을 발견했는지 나의 말로 남겨보세요.</p><div className="story-destinations"><Button onClick={() => go('analysis')}>오늘의 주도주 →</Button><Button variant="secondary" onClick={() => go('dashboard')}>시장 요약 →</Button><Button variant="secondary" onClick={() => go('signal')}>시장 신호 →</Button></div></div> : selected?.action === 'journey' ? <div className="story-reading"><p>그때 보았던 증거와 지금의 결과를 나란히 읽어보세요. 생각이 바뀌어도 처음 남긴 판단은 수정 이력에 남습니다.</p><Button onClick={() => go('tracking')}>나의 여정 돌아보기 →</Button></div> : selected?.entry&&selected.action==='edit'&&!editing ? <article className="journal-page-reader" aria-label="저널 읽기">
          <div className="journal-read-actions"><time dateTime={selected.entry.createdAt}>{day(selected.entry.createdAt)}</time><Button variant="ghost" onClick={()=>setEditing(true)}>수정</Button></div>
          <h2>{selected.entry.title}</h2>
