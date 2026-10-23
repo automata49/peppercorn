@@ -1,3 +1,10 @@
+## SECTOR-STANDING-V2 — sector representation and ranking (2026-10-23)
+
+- US sectors normalize both Nasdaq labels and four unambiguous TradingView fallback sector labels at display load: Process Industries and Non-Energy Minerals → Materials; Energy Minerals → Energy; Electronic Technology → Information Technology. Keep original source, classification scheme and as-of date unchanged; never rewrite source data or stock leadership/RS ranks.
+- A **ranked leading sector** needs >=5 member equities, >=5 usable RS values, >=5 usable MA50 comparisons, at least one core/candidate leader, and a standard/non-Other sector. Others are unranked references in 전체 보기, with explicit reasons (표본 부족/주도 없음/기타 분류), and remain drillable and searchable in the heatmap/filter. The top five and Home leading sector only consume ranked sectors.
+- Comparable score: 45% median RS rank, 25% (core+candidate) / membership, 20% price>MA50 breadth over valid comparisons, 10% min(leader count/20,1); multiply by min(member count/20,1) to reduce small-group noise. Sorted by descending score; tie-break median RS, number of leaders, members and key. Show the actual RS median under RS 순위; label the separate composite clearly as 주도 점수. Use exactly the same order in desktop table, mobile list, Home summary and full dialog.
+- Do not change individual-equity classifications, ETF ordering, Group-Rank-1 industry rankings, heatmap tile size/value or original data. Regression: a one-name RS outlier with zero leaders cannot rank; broad stronger leadership overrides a higher median RS; normalized GEF/Process Industries no longer appears as a separate US sector; 390/834/1440px UI and full-dialog references remain accessible.
+
 ## FOLIO-TAB-RAIL-JOURNAL-COVER-20261022 — approved responsive cleanup
 
 - Discover (시장 신호/종목 검토/리서치 기록), Journey (재검토/관심종목/보유종목), Journal (전체/일상/투자) use one accessible 3-column editorial tab anatomy. Remove grey full-width borders below tab groups on all viewports, including stock-detail tabs; preserve the dark active-tab indicator, keyboard focus, readable labels and 44px+ targets. Never delete record, table or input separators while cleaning tab chrome.
