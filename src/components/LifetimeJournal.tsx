@@ -124,7 +124,7 @@ export function LifetimeJournal({ mode, entries, ready, error, replace, remove, 
   <label>일<select aria-label="기록 일" value={date} onChange={e=>setDate(e.target.value)}><option value="">모든 일</option>{days.map(v=><option key={v} value={v}>{Number(v)}일</option>)}</select></label>
   {mode!=='journey'&&<label>모아보기<select aria-label="기록 묶음" value={scale} onChange={e=>setScale(e.target.value as typeof scale)}><option value="year">연도별</option><option value="month">월별</option><option value="day">일별</option></select></label>}
  </div>
- const search = <input type="search" className="journal-search" aria-label={mode==='journey'?'판단 찾기':'기록 찾기'} placeholder={mode==='journey'?'판단 찾기':'기록 찾기'} value={query} onChange={e=>setQuery(e.target.value)}/>
+ const search = <input type="search" className="journal-search" aria-label="내 기록 검색" placeholder={mode==='journey'?'판단 찾기':'기록 찾기'} value={query} onChange={e=>setQuery(e.target.value)}/>
  const collectionFilters = <aside className="journal-collection-filters" data-dates-open={calendarOpen} aria-label="기록 검색 및 날짜 필터"><label className="journal-search-field"><AppIcon name="search" size={17}/>{search}</label><Button className="journal-date-toggle" variant="ghost" aria-expanded={calendarOpen} onClick={()=>setCalendarOpen(v=>!v)}>{year?`${year}년${month?` · ${Number(month)}월`:''}${date?` · ${Number(date)}일`:''}`:'날짜 · 모아보기'}</Button>{calendarControls}{(query||year||month||date)&&<Button className="journal-clear-filters" variant="ghost" onClick={()=>{setQuery('');setYear('');setMonth('');setDate('')}}>초기화</Button>}</aside>
  function gallery(items:JournalEntry[]){
   const groups = new Map<string,JournalEntry[]>()
