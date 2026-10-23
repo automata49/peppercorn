@@ -1,3 +1,7 @@
+## FOLIO-SECTOR-JOURNAL-MINIMAL-20261023
+
+Approved compact controls: Sector Map matches the ETF Map heading and borderless heatmap; Journal offers plain full-width category tabs, a single inline search/date-and-group toolbar, “나의 페이지 N개” and simple card/list buttons. Mobile (390), iPad portrait (834), landscape (1194) and desktop (1440) share 44px controls and visible focus. Expand date filters only on request. Journal/Journey original record modal exposes a small accessible delete button in reader, editor and reflection modes. Confirm before deleting; cancel preserves content, deleted records do not resurface on reload or cross-device sync. The tombstone is a logical removal, not a physical delete from the database. Validate no overflows, list/card persistence, and original photos/notes for surviving pages.
+
 ## FOLIO-WORKFLOW-20261021 — latest user authority (2026-10-21)
 
 Discover / Market Signal / detail / Journal use one continuous reversible workflow: discover leaders → source and stock → save interest/Thesis → read original Journal → explicitly edit/review. Mobile and iPad portrait set the baseline; landscape/desktop reflow without smaller touch targets.
