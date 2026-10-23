@@ -202,3 +202,15 @@ html body .shell .app-main .journal-section-heading>img{
 @media(prefers-reduced-motion:reduce){
  .lifetime-workspace .journal-date-toggle::after{transition:none}
 }
+
+/* Writing actions: one quiet deletion glyph with a full touch target. */
+.folio-research-actions{display:flex;align-items:center;gap:8px}
+html body .shell .app-main .folio-research-remove{
+ display:inline-grid;place-items:center;min-width:44px;min-height:44px;padding:8px;
+ border:0!important;border-radius:8px!important;background:transparent!important;
+ color:var(--folio-muted)!important;cursor:pointer;
+}
+html body .shell .app-main .folio-research-remove:is(:hover,:focus-visible){
+ color:var(--folio-ink)!important;
+}
+html body .shell .app-main .folio-research-remove:focus-visible{outline:2px solid var(--folio-ink);outline-offset:2px}
