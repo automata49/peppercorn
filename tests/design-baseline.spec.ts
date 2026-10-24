@@ -47,8 +47,20 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   const brand=page.locator('.mobile-brand-home .folio-wordmark-system')
   const brandBox=await brand.boundingBox()
   expect(brandBox).not.toBeNull()
-  expect(brandBox!.x).toBeGreaterThanOrEqual(15.5)
-  expect(brandBox!.x).toBeLessThanOrEqual(16.5)
+  // TODAY-HERO-ALIGNMENT-20261024 uses a separate responsive 8–18px gutter,
+  // while the global Level-0 phone gutter token remains 16px for other pages.
+  // The heading and cards animate in on navigation. Measure both after they settle.
+  await expect.poll(async()=>{
+    const wordmark=await brand.boundingBox()
+    const heading=await page.locator('.home-heading-intro h2').boundingBox()
+    return wordmark&&heading?Math.abs(wordmark.x-heading.x):Infinity
+  }).toBeLessThan(3)
+  // The first Motion cover enters with a transient x offset; compare settled positions.
+  await expect.poll(async()=>{
+    const wordmark=await brand.boundingBox()
+    const cover=await page.locator('.home-motion-card.home-today').boundingBox()
+    return wordmark&&cover?Math.abs(wordmark.x-cover.x):Infinity
+  }).toBeLessThan(3)
 
   const word=brand.locator('.folio-wordmark-image-light')
   const darkWord=brand.locator('.folio-wordmark-image-dark')
