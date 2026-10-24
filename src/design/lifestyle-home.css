@@ -77,7 +77,7 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
   .lifestyle-home .home-story-action{min-height:0;padding:0;margin-top:6px;border:0;background:none;color:rgba(255,255,255,.85);font-size:13px}
 }
 @media (orientation:portrait){
-  .lifestyle-home{padding:clamp(8px,2vw,18px)}
+  .lifestyle-home{padding:var(--folio-today-inline-gutter,clamp(8px,2vw,18px))}
   .lifestyle-home .home-motion-cards{grid-auto-rows:clamp(145px,19vw,240px);gap:clamp(8px,1.4vw,16px)}
   .lifestyle-home .home-motion-card .home-cover-copy{inset:auto 11px 12px}
   .lifestyle-home .home-motion-card .home-cover-copy h3{font-size:clamp(22px,4.4vw,34px)}
@@ -163,3 +163,16 @@ html body .home-destination-nav button{min-height:44px;padding:10px 0;border:0;b
 .discovery-news-report-content .source-reports article{border-top:1px solid var(--folio-border,rgba(120,110,100,.2));padding-block:20px}
 /* The first report follows the report/news switch without a decorative grey rule. */
 .discovery-news-report-content .source-reports article:first-of-type{border-top:0;padding-top:0}
+
+/* TODAY-HERO-ALIGNMENT-20261024: one visible hero title; preserve the whole-card action. */
+@media(orientation:landscape){
+  .lifestyle-home .home-motion-card.home-today .home-cover-copy{
+    inset:auto 5% 24px;display:flex;justify-content:flex-end;text-align:right;
+  }
+  .lifestyle-home .home-motion-card.home-today .home-cover-copy h3,
+  .lifestyle-home .home-motion-card.home-today .home-cover-copy p{display:none}
+  .lifestyle-home .home-motion-card.home-today .home-story-action{
+    min-height:44px;display:inline-flex;align-items:center;justify-content:flex-end;
+    margin:0;padding:8px 0;
+  }
+}
