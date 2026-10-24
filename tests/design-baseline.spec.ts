@@ -50,11 +50,14 @@ test('phone consumes the Level-0 design baseline',async({browser})=>{
   // TODAY-HERO-ALIGNMENT-20261024 uses a separate responsive 8–18px gutter,
   // while the global Level-0 phone gutter token remains 16px for other pages.
   const todayTitle=await page.locator('.home-heading-intro h2').boundingBox()
-  const firstCover=await page.locator('.home-motion-card.home-today').boundingBox()
   expect(todayTitle).not.toBeNull()
-  expect(firstCover).not.toBeNull()
   expect(Math.abs(brandBox!.x-todayTitle!.x)).toBeLessThan(3)
-  expect(Math.abs(brandBox!.x-firstCover!.x)).toBeLessThan(3)
+  // The first Motion cover enters with a transient x offset; compare settled positions.
+  await expect.poll(async()=>{
+    const wordmark=await brand.boundingBox()
+    const cover=await page.locator('.home-motion-card.home-today').boundingBox()
+    return wordmark&&cover?Math.abs(wordmark.x-cover.x):Infinity
+  }).toBeLessThan(3)
 
   const word=brand.locator('.folio-wordmark-image-light')
   const darkWord=brand.locator('.folio-wordmark-image-dark')
