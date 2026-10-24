@@ -94,3 +94,11 @@ html body .stock-basket-list button{min-height:44px;padding:12px 0;border:0;back
     width:100%;height:clamp(112px,29vw,148px);object-fit:cover;
   }
 }
+
+/* TODAY-HERO-ALIGNMENT-20261024: use the photo-grid gutter for the compact wordmark. */
+.page-shell-today{--folio-today-inline-gutter:clamp(8px,2vw,18px)}
+@media(orientation:portrait){
+  html body .shell.page-shell-today>.mobile-brandbar{
+    padding-inline:var(--folio-today-inline-gutter)!important;
+  }
+}
