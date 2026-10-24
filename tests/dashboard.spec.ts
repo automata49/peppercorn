@@ -327,7 +327,7 @@ test('KR ETFs show their Korean name in the dashboard ETF summary and detail',as
   const row=page.locator('.dashboard-etf-panel .stock-row').first();
   await expect(row.locator('.stock-id b')).toHaveText('KODEX 200');
   await row.click();
-  await expect(page.locator('.drill-sheet h2').first()).toHaveText('KODEX 200');
+  await expect(page.locator('.obra-detail .hero-name')).toContainText('KODEX 200');
 });
 
 test('table headers are left-aligned and numeric cells right-aligned',async({page})=>{
