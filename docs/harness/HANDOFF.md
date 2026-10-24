@@ -1,3 +1,7 @@
+## 2026-10-24 — Market Signal stock detail shares canonical Harness
+
+Sector and ETF listings now navigate to Discover/Stock Review's canonical Obra detail (Overview, Analysis, Financials, Thesis); the previous modal stock-detail body and subordinate modal history were removed. Native/canonical Back restores the originating sector/group or ETF-industry/all list. RS, ranking, classification, price sources and user records remain unchanged. Browser CI and physical Safari validation status must be recorded separately.
+
 ## 2026-10-21 — Folio workflow refresh
 
 FOLIO-WORKFLOW-20261021 supersedes the older placement, left drawer and direct-edit Journal instructions. Follow user-approved stock→Thesis→watchlist/review workflow. Code targets App, News, FilterWheel, Sidebar, LifetimeJournal, Obra and Folio CSS. Validate CI and Pages separately; physical Safari remains open.
