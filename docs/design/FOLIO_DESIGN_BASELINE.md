@@ -1,3 +1,7 @@
+## TODAY-HERO-ALIGNMENT-20261024 — approved home visual cleanup
+
+Compact portrait Today uses a shared left gutter for the supplied Folio raster wordmark, the `오늘` page title, and the first Motion cover; do not indent the wordmark separately. Landscape Today has one large editorial heading, date, manifesto and quote. Remove the repeated `오늘` and redundant image-card summary under that heading while retaining a lower-right `오늘의 이야기` link cue and whole-cover tap/click. Do not change the portrait photo grid, image assets, saved content or the other three cards. See `docs/harness/CONTRACT.md` / TODAY-HERO-ALIGNMENT-20261024.
+
 ## TOP-EDITORIAL-MASTHEAD-20261022 — editorial title elevation
 
 Discover (`DISCOVER / 변화하는 세상을 읽다`), Journal and Journey use a full-size bilingual page masthead in the compact sticky top bar, with no repeated body title. Non-Home compact headers drop the redundant home glyph; Today's supplied Folio wordmark stays. Search/basket and the bottom Today destination are functional and unchanged. On desktop, keep the horizontal navigation and the editorial title at the top of content. Source of truth: `editorialPageHeadings` and `docs/harness/CONTRACT.md`. This supersedes the previous compact home-icon shortcut, not primary navigation or stock-detail back behavior.
