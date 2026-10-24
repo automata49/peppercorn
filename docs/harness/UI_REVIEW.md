@@ -1,3 +1,10 @@
+## FOLIO-SIGNAL-DETAIL-PARITY-20261024 — one stock-detail Harness (2026-10-24)
+
+- 발견 → 시장 신호의 섹터(표·히트맵·분류 드릴) 및 ETF(Top 5·차트·전체/산업별 목록) 종목 선택은 발견 → 종목 검토와 **같은 정식 Obra 종목 상세 화면**으로 이동한다. 모달 전용 축약 종목 상세는 사용하지 않는다.
+- Overview / Analysis / Financials / Thesis와 Folio Insight, 비교, 공시, 차트, 장바구니·관심 등록·Thesis 편집은 단일 화면과 동일 데이터 소스를 공유한다. 시장 신호의 섹터/ETF 순위·분류·계산·필터·도표는 그대로 유지한다.
+- 정식 상세에서 뒤로 가기(브라우저/OS Back 포함)는 이전 시장 신호 목록으로 복귀하고, 섹터 분류나 ETF 전체/산업별 팝업에서 진입했다면 해당 원본 팝업을 다시 연다. 팝업은 종목 선택 시 닫아 중첩하지 않는다.
+- 검증: phone 390px, iPad portrait 834px, iPad landscape 1194px, iPad Pro 1366px, desktop 1440px; 다크/라이트, 키보드 진입, 탭, 가격/RS 차트, 공시, Thesis 동작, 뒤로 가기, 가로 넘침과 모달 포커스. 실제 Safari 장치 검증은 별도로 기록한다.
+
 ## SECTOR-STANDING-V2 — sector representation and ranking (2026-10-23)
 
 - US sectors normalize both Nasdaq labels and four unambiguous TradingView fallback sector labels at display load: Process Industries and Non-Energy Minerals → Materials; Energy Minerals → Energy; Electronic Technology → Information Technology. Keep original source, classification scheme and as-of date unchanged; never rewrite source data or stock leadership/RS ranks.
