@@ -1779,7 +1779,7 @@ export default function App(){
         <div><small>{summaryTab?lensMarket:(drillSector?.market||'전체 시장')}</small><DialogTitle>{summaryTab?`주도 종목 · ${summaryTabNames[summaryTab]}`:(drillSector?sectorName(drillSector.market,drillSector.sector):'전체 주도 종목')}</DialogTitle><DialogDescription className="sr-only">분류별 주도 종목을 선택하면 공통 종목 상세 페이지로 이동합니다.</DialogDescription></div>
         <DialogClose asChild><button className="drill-close" aria-label="닫기"><AppIcon name="close"/></button></DialogClose>
       </div>
-summaryTab?<div className="drill-content drill-summary-list">
+{summaryTab?<div className="drill-content drill-summary-list">
         <div className="tabs summary-tabs" role="tablist" aria-label="주도 종목 분류">{(Object.keys(summaryTabNames) as SummaryTab[]).map(t=><button key={t} type="button" role="tab" aria-selected={summaryTab===t} className={summaryTab===t?'on':''} onClick={()=>showStockGroup(t)}>{summaryTabNames[t]} <b>{lens(summaryGroups[t]).length}</b></button>)}</div>
         <LensBar view={leaderView} setView={v=>{setLeaderView(v);setLeaderGroupKey(null)}} filter={lensFilter} setFilter={f=>{setLensFilter(f);setLeaderGroupKey(null)}} flagsReady={!!flagFile}/>
         {summaryTab==='bigcap'&&<p className="lens-explain">{Object.keys(bigCaps.markets).length?`대형 주도주 (${BIGCAP.version}, IBD Big Cap 20 방식): 20일 평균 거래대금 상위 10% 종목 중 대형주끼리 비교한 RS순위 상위 30%, 가격 > MA50 > MA200, 52주 고점 -25% 이내. ${Object.entries(bigCaps.markets).map(([m,v])=>`${m} 대형주 ${v.large}종목`).join(' · ')}. 표시용이며 분류를 바꾸지 않습니다.`:'거래대금 데이터가 없어 대형주를 정할 수 없습니다.'}</p>}
