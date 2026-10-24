@@ -1,3 +1,9 @@
+## TODAY-HERO-ALIGNMENT-20261024 — compact brand alignment and unique title
+
+- In phone/iPad portrait, Today's raster Folio wordmark left edge, Today h2 and the first Motion cover share a single responsive inline gutter `--folio-today-inline-gutter` (`clamp(8px, 2vw, 18px)`); preserve the supplied wordmark asset, its 25px sizing and 44px search/basket hit targets. Do not shift the global Discover/Journal/Journey masthead.
+- In landscape, the Today hero h2 is the sole visible `오늘` title. The Today cover must not duplicate its title/summary over the date/quote; retain its existing `오늘의 이야기` affordance on the opposite, lower-right side and preserve clicking the full card to expand the original content. In portrait, keep the existing separate first-card title and the staggered two-column photo grid.
+- Regression at 390px and 834px portrait, 844px and 1194px landscape, 1440px desktop, light/dark: glyph/header/heading/card x-alignment in portrait, no duplicate visible Today title in landscape, quote does not collide with CTA, four cards and reverse animations remain accessible, and no horizontal overflow. Browser simulation is not device Safari certification.
+
 ## SECTOR-STANDING-V2 — sector representation and ranking (2026-10-23)
 
 - US sectors normalize both Nasdaq labels and four unambiguous TradingView fallback sector labels at display load: Process Industries and Non-Energy Minerals → Materials; Energy Minerals → Energy; Electronic Technology → Information Technology. Keep original source, classification scheme and as-of date unchanged; never rewrite source data or stock leadership/RS ranks.

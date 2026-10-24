@@ -1,3 +1,7 @@
+## TODAY-HERO-ALIGNMENT-20261024 — user-approved responsive correction (2026-10-24)
+
+Today portrait: share the exact responsive inline gutter between Folio wordmark, Today header and first Motion card at phone/iPad portrait; preserve raster asset and header actions. Landscape: one visible Today title only, no overlapping first-card summary with the daily quote, and keep the existing `오늘의 이야기` expansion affordance on the lower right. Portrait photo grid, card labels/actions, source data and other pages remain untouched. Add Playwright geometry/visibility checks for 390/834 portrait and 844/1194/1440 landscape, both themes; see `docs/harness/CONTRACT.md`.
+
 ## FOLIO-WORKFLOW-20261021 — latest user authority (2026-10-21)
 
 Discover / Market Signal / detail / Journal use one continuous reversible workflow: discover leaders → source and stock → save interest/Thesis → read original Journal → explicitly edit/review. Mobile and iPad portrait set the baseline; landscape/desktop reflow without smaller touch targets.
