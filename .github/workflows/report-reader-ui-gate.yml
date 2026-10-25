@@ -2,6 +2,8 @@ name: Folio report reader UI gate
 on:
   pull_request:
     paths:
+      - 'src/components/DiscoveryNews.tsx'
+      - 'src/design/discovery-news.css'
       - 'src/components/SourceReports.tsx'
       - 'src/components/ReportVisuals.tsx'
       - 'src/components/source-reports.css'
@@ -28,7 +30,7 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get install -y fonts-noto-cjk
-      - run: npx playwright test tests/source-reports.spec.ts tests/report-presentation.spec.ts --workers=2 --max-failures=2
+      - run: npx playwright test tests/source-reports.spec.ts tests/report-presentation.spec.ts tests/discovery-news.spec.ts tests/instinct-structured-reports.spec.ts --workers=2 --max-failures=2
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

@@ -19,8 +19,6 @@ type NewsStory={
 export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{reports:ReportController;feed:InsightsFeed|null;rows:LeaderRow[];market:Market|'ALL';getClass:(row:LeaderRow)=>string;onSelect:(row:LeaderRow)=>void}){
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
- // A signed-in user's PDF research reports are the default editorial view.
- const [newsTab,setNewsTab]=useState<'reports'|'news'>('reports')
  const [newsMarket,setNewsMarket]=useState<'ALL'|Market>(()=>{try{const v=localStorage.getItem('folio-news-market');return v==='KR'||v==='US'?v:market}catch{return market}})
  const [newsSize,setNewsSize]=useState<StockSize>(()=>{try{const v=localStorage.getItem('folio-news-size');return v==='small'||v==='all'||v==='etf'?v:'large'}catch{return 'large'}})
  useEffect(()=>{try{localStorage.setItem('folio-news-market',newsMarket);localStorage.setItem('folio-news-size',newsSize)}catch{}},[newsMarket,newsSize])
@@ -66,26 +64,19 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
  const newsStock=unique(fresh([...fromDrive.filter(item=>item.kind==='stock'),...rss]))
  const stock=newsStock.filter(item=>item.row&&filterStockSize([item.row],newsSize,sizes).length>0)
  const stories=[...trends,...stock.slice(0,Math.max(0,4-trends.length))]
- // Keep the report-first editorial surface visible even for signed-out users with no fresh news.
- // Guests should see the login requirement rather than an entirely missing section.
+ // Public news remains visible; private summaries are supplied only by the account controller.
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
-  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>{newsTab==='reports'?'Google Drive · 리서치 리포트':'최근 7일 · 출처 확인'}</span></header>
-  <div className="discovery-news-modes" role="group" aria-label="시장과 기업 보기">
-   <button type="button" aria-pressed={newsTab==='reports'} onClick={()=>setNewsTab('reports')}>리포트</button>
-   <button type="button" aria-pressed={newsTab==='news'} onClick={()=>setNewsTab('news')}>뉴스</button>
-  </div>
-  {newsTab==='news'&&<div className="catalog-carousel-layout discovery-news-filter-layout">
+  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>뉴스 · 리포트 요약</span></header>
+  <div className="catalog-carousel-layout discovery-news-filter-layout">
    <div className="catalog-filter-rails" aria-label="시장과 기업 뉴스 필터">
-    <FilterWheel label="시장" value={newsMarket} onChange={v=>{setNewsMarket(v as 'ALL'|Market);setNewsTab('news')}} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
-    <FilterWheel label="종목 분류" value={newsSize} onChange={v=>{setNewsSize(v as StockSize);setNewsTab('news')}} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
+    <FilterWheel label="시장" value={newsMarket} onChange={v=>{setNewsMarket(v as 'ALL'|Market)}} options={[{value:'ALL',label:'전체'},{value:'KR',label:'KR'},{value:'US',label:'US'}]}/>
+    <FilterWheel label="종목 분류" value={newsSize} onChange={v=>{setNewsSize(v as StockSize)}} options={[{value:'large',label:'대형주'},{value:'small',label:'중소형주'},{value:'all',label:'전체'},{value:'etf',label:'ETF'}]}/>
    </div>
-  </div>}
-  {newsTab==='reports'?<div className="discovery-news-report-content">
-   {!reports.uid?<p className="discovery-news-empty" role="status">로그인 후 Folio 리서치 리포트를 볼 수 있습니다.</p>:!reports.items.length&&!reports.error?<p className="discovery-news-empty" role="status">등록된 리서치 리포트가 없습니다.</p>:<SourceReports controller={reports}/>}
-  </div>:<>
+  </div>
+  {!reports.uid&&<p className="discovery-news-empty" role="status">로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.</p>}
   {!stories.length&&<p className="discovery-news-empty" role="status">최근 7일에 해당하는 {newsSize==='large'?'대형주':newsSize==='small'?'중소형주':newsSize==='etf'?'ETF':'전체 종목'} 뉴스가 없습니다. 다른 분류를 선택해 보세요.</p>}
-  <div className="discovery-news-stories" role="list">{stories.map(item=>{
+  <SourceReports controller={reports} news>{stories.map(item=>{
    const image=item.image&&!failed.has(item.image.url)?item.image:null
    const linked=item.images?.find(v=>!failed.has(v.url))
    const visual=item.visual&&!failed.has(item.visual.url)?item.visual:undefined
@@ -101,6 +92,6 @@ export function DiscoveryNews({reports,feed,rows,market,getClass,onSelect}:{repo
      <div className="discovery-news-actions"><a href={item.url} target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a>{item.row&&<button type="button" onClick={()=>onSelect(item.row!)}>종목 보기 →</button>}</div>
     </div>
    </article>
-  })}</div></>}
+  })}</SourceReports>
  </section>
 }
