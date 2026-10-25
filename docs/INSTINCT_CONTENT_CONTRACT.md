@@ -105,3 +105,14 @@ a verified supplied image.
 - Build and Harness; parser/browser source report and news tests.
 - Operational: actual Instinct JSON in Drive, successful private job and same-owner
   authenticated reader. Fixtures are not evidence of live private ingestion.
+
+## Folio visual reader (2026-10-25)
+
+Latest report is shown first; older imports remain in a collapsed archive. Drive/PDF/JSON
+file links are hidden; article references and image credits remain. Source summary
+categories become tiles, and facts/forecasts/disclaimers stay visually distinct.
+An explicit 2-column table (2–20 unique labels, finite nonnegative numeric strings,
+known units in caption/value header) can offer a zero-baseline comparison chart and
+original table switch. Mixed/negative/unknown/unitless values stay as tables. Put
+chartable source data in `tables` with its original units, period and sources; Folio
+never derives quantitative charts from prose or invents missing numbers.
