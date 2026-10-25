@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updated_at": "2026-10-25T17:12:11.363810Z",
+  "updated_at": "2026-10-25T22:34:53.566368Z",
   "items": [
+    {
+      "headline": "Trump says US won't strike Iran today, amid rising tensions",
+      "summary": "타임스오브이스라엘에 따르면 트럼프 대통령은 25일(현지시간) 기자들에게 '오늘은 공격하지 않을 것(There will not be a strike today)'이라고 말해 전날 시사한 이란 공격을 일단 유보했다. 앞서 뉴욕타임스는 이란 관리 2명이 미 외교관 등에 대한 공격 준비를 확인했다고 보도하는 등 긴장은 유지되고 있다.",
+      "source_name": "The Times of Israel",
+      "source_url": "https://www.timesofisrael.com/liveblog_entry/trump-says-us-wont-strike-iran-today-amid-rising-tensions/",
+      "market": "GLOBAL",
+      "published_at": "2026-10-25T16:47:00Z",
+      "type": "trend",
+      "trend_topic": "트럼프 '오늘 이란 공격 없다' - 공격 일단 유보",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/0298e618e68fbd25dfa6.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
     {
       "headline": "Trump announces at a Georgia campaign rally that Audi will build a new auto factory in the state",
       "summary": "트럼프 대통령이 24일 조지아주 유세에서 아우디의 첫 미국 공장 건설을 발표했고 게르노트 되르너 아우디 CEO가 함께 참석했습니다. 관세 압박 속에 독일 자동차업체의 미국 현지 생산이 확대되는 신호로 해석됩니다.",
