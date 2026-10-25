@@ -126,3 +126,5 @@ Report covers use the first verified stored section image with its caption, crea
 ## Incremental sync compatibility (2026-10-26)
 
 Existing database timestamptz values may end in `+00`; only the stored-value parser accepts this SQL representation. Export and Drive dates still need explicit `Z` or `±HH:MM`. Report `sources[].url` preserves public HTTP/HTTPS citation links for display without fetching them; arbitrary schemes, private hosts, credentials and Drive originals remain rejected. All image URLs/provenance and public news keep their HTTPS-only gates.
+
+Commons API may append `utm_source`, `utm_campaign` and `utm_content` to an original image URL. Folio disregards only these analytics parameters for API identity comparison; all other URL components and license/creator checks still apply. Instinct can keep the original image URL without tracking parameters. Image validation version changes trigger one recheck of stored report image rejections without changing the Drive source.

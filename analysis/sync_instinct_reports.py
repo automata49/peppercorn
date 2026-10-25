@@ -14,7 +14,7 @@ import urllib.request
 from datetime import datetime, timezone
 from analysis.sync_instinct_news import FOLDER_ID, get_token, utc, url_ok
 from analysis.drive_pdf_reports import upsert_sql
-from analysis.instinct_images import ImageCollector
+from analysis.instinct_images import ImageCollector, IMAGE_VALIDATION_VERSION
 
 PROJECT = 'mhbcchegrbakearqptdr'
 MAX_FILE = 2_000_000
@@ -186,7 +186,7 @@ def normalize(raw, *, file_id, modified_at, images):
     if total > 500000:
         raise ValueError('Report exceeds text budget')
     request_keys = {images.key(v) for section in sections for v in section.get('images', [])[:3] if isinstance(v, dict)}
-    pages[0].update(pending_images=images.pending, image_rejections=sorted(images.rejected & request_keys), format='instinct-json-v1', report_id=report_id, published_at=raw['published_at'],
+    pages[0].update(image_validation_version=IMAGE_VALIDATION_VERSION, pending_images=images.pending, image_rejections=sorted(images.rejected & request_keys), format='instinct-json-v1', report_id=report_id, published_at=raw['published_at'],
                     updated_at=raw['updated_at'], tickers=tickers,
                     original_url=f'https://drive.google.com/file/d/{file_id}/view')
     payload = dict(drive_file_id=file_id, folder_id=FOLDER_ID, title=title,
@@ -266,7 +266,7 @@ def main():
     # Only the existing registered-folder owner can receive this folder's reports.
     owners = query(f"select distinct user_id::text from public.private_source_reports where folder_id='{FOLDER_ID}'")
     owner = owner_id(owners, os.environ.get('FOLIO_REPORT_USER_ID', ''))
-    headers = query(f"select drive_file_id,source_modified_at,pages->0->>'report_id' as report_id,pages->0->>'pending_images' as pending_images from public.private_source_reports where user_id='{owner}' and folder_id='{FOLDER_ID}'")
+    headers = query(f"select drive_file_id,source_modified_at,pages->0->>'report_id' as report_id,pages->0->>'pending_images' as pending_images,pages->0->>'image_validation_version' as image_validation_version from public.private_source_reports where user_id='{owner}' and folder_id='{FOLDER_ID}'")
     by_file = {r['drive_file_id']: r for r in headers}
     by_id = {r['report_id']: r for r in headers if r.get('report_id')}
     imported, unchanged, skipped = 0, 0, 0
@@ -277,7 +277,7 @@ def main():
             skipped += 1
             continue
         old = by_file.get(fid)
-        if old and utc(file['modifiedTime']) <= stored_utc(old['source_modified_at']) and old.get('pending_images') != 'true':
+        if old and utc(file['modifiedTime']) <= stored_utc(old['source_modified_at']) and old.get('pending_images') != 'true' and old.get('image_validation_version') == str(IMAGE_VALIDATION_VERSION):
             unchanged += 1
             continue
         try:
@@ -285,17 +285,17 @@ def main():
             # Retain the first real Drive identity for a stable Instinct report id.
             previous = by_id.get(raw.get('id')) if isinstance(raw, dict) else None
             storage_id = previous['drive_file_id'] if previous else fid
-            if previous and (utc(file['modifiedTime']) < stored_utc(previous['source_modified_at']) or (utc(file['modifiedTime']) == stored_utc(previous['source_modified_at']) and previous.get('pending_images') != 'true')):
+            if previous and (utc(file['modifiedTime']) < stored_utc(previous['source_modified_at']) or (utc(file['modifiedTime']) == stored_utc(previous['source_modified_at']) and previous.get('pending_images') != 'true' and previous.get('image_validation_version') == str(IMAGE_VALIDATION_VERSION))):
                 unchanged += 1
                 continue
             cached = query(f"select pages from public.private_source_reports where user_id='{owner}' and drive_file_id='{storage_id}'")
             images.cache.update({m.get('request_hash') or images.key(m): {**m, 'url': p['images'][m['image_index']]} for r in cached for p in r['pages'] for m in p.get('image_meta', [])})
-            images.rejected.update(k for r in cached for k in r['pages'][0].get('image_rejections', []))
+            images.rejected.update(k for r in cached if r['pages'][0].get('image_validation_version') == IMAGE_VALIDATION_VERSION for k in r['pages'][0].get('image_rejections', []))
             payload = normalize(raw, file_id=fid, modified_at=file['modifiedTime'], images=images)
             payload['drive_file_id'] = storage_id
             payload['source_url'] = f'https://drive.google.com/file/d/{storage_id}/view'
             query(upsert_sql(payload, owner))
-            snapshot = {'drive_file_id': storage_id, 'source_modified_at': file['modifiedTime'], 'report_id': raw['id'], 'pending_images': str(payload['pages'][0]['pending_images']).lower()}
+            snapshot = {'drive_file_id': storage_id, 'source_modified_at': file['modifiedTime'], 'report_id': raw['id'], 'pending_images': str(payload['pages'][0]['pending_images']).lower(), 'image_validation_version': str(IMAGE_VALIDATION_VERSION)}
             by_id[raw['id']] = snapshot
             by_file[fid] = snapshot
             imported += 1
