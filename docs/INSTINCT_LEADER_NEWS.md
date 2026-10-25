@@ -1,3 +1,7 @@
+## 2026-10-26 extension
+
+Optional `images` on each news item now follows [the shared content contract](INSTINCT_CONTENT_CONTRACT.md). Instinct only supplies links/provenance; Folio verifies rights, downloads and caches safe raster images. Public feed compatibility and original sources are preserved. The same Actions workflow has a separate private report JSON job; private reports/images are never committed.
+
 # Instinct.com → Folio MARKET & COMPANIES
 
 ## Source of truth / security boundary

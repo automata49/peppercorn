@@ -1,3 +1,7 @@
+## 2026-10-26 — Instinct structured report and supplied-image ingestion
+
+Implemented owner-only Drive JSON report sync, section/table reader and credential-free image validation/cache for public news/private reports. PDF and public news v1 compatibility retained. Read docs/INSTINCT_CONTENT_CONTRACT.md for the producer contract, existing management-token dependency and private/public boundary. Local validation: 29 Python ingestion/image tests, 7 owner/RLS database checks, 3 parser tests, TS/Vite build and Harness passed. CUA synthetic reader confirmed escaped body/table rendering at 390px container width. Local Playwright identity suite is blocked by missing Chromium executable; no replacement browser was installed. CI identity/four-screen/UX checks and actual Instinct sample ingestion remain to be verified. Read-only review findings on retries, duplicate base64 storage and image count were repaired. No private content is committed.
+
 ## 2026-10-24 — Market Signal stock detail shares canonical Harness
 
 Sector and ETF listings now navigate to Discover/Stock Review's canonical Obra detail (Overview, Analysis, Financials, Thesis); the previous modal stock-detail body and subordinate modal history were removed. Native/canonical Back restores the originating sector/group or ETF-industry/all list. RS, ranking, classification, price sources and user records remain unchanged. Browser CI and physical Safari validation status must be recorded separately.

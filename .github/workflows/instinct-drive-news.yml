@@ -1,5 +1,13 @@
 name: Instinct Drive leader news (public summaries only)
 on:
+  pull_request:
+    paths:
+      - 'analysis/instinct*'
+      - 'analysis/sync_instinct*'
+      - 'analysis/test_instinct*'
+      - 'analysis/test_sync_instinct*'
+      - 'analysis/news_visuals.py'
+      - '.github/workflows/instinct-drive-news.yml'
   push:
     branches: [main]
     paths:
@@ -10,13 +18,26 @@ on:
   schedule:
     - cron: '17 */4 * * *'
 permissions:
-  contents: write
-  actions: write
+  contents: read
 concurrency:
-  group: instinct-drive-leader-news
+  group: instinct-drive-leader-news-${{ github.event.pull_request.number || 'production' }}
   cancel-in-progress: false
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install 'Pillow==12.0.0'
+      - run: python -m unittest analysis.test_sync_instinct_news analysis.test_news_visuals analysis.test_instinct_images analysis.test_sync_instinct_reports
   publish-news:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    permissions:
+      contents: write
+      actions: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -26,8 +47,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Validate public news ingestion
-        run: python -m unittest analysis.test_sync_instinct_news analysis.test_news_visuals
+      - name: Install image decoder
+        run: python -m pip install 'Pillow==12.0.0'
       - name: Fetch configured Drive news files
         env:
           GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
@@ -35,7 +56,7 @@ jobs:
           GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
         run: |
           if [ -n "$GOOGLE_DRIVE_CLIENT_ID" ] && [ -n "$GOOGLE_DRIVE_CLIENT_SECRET" ] && [ -n "$GOOGLE_DRIVE_REFRESH_TOKEN" ]; then
-            python analysis/sync_instinct_news.py
+            python -m analysis.sync_instinct_news
           else
             echo "::warning::Google Drive OAuth is not configured. Using last approved committed news snapshot."
           fi
@@ -62,3 +83,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run deploy.yml --ref main
+
+  private-reports:
+    if: github.event_name != 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install 'Pillow==12.0.0'
+      - name: Sync owner-only Instinct JSON reports
+        env:
+          GOOGLE_DRIVE_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_CLIENT_ID }}
+          GOOGLE_DRIVE_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_CLIENT_SECRET }}
+          GOOGLE_DRIVE_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_REFRESH_TOKEN }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          FOLIO_REPORT_USER_ID: ${{ secrets.FOLIO_REPORT_USER_ID }}
+        run: python -m analysis.sync_instinct_reports

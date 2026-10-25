@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "type": "report",
+  "id": "folio-research-20261026-example",
+  "title": "형식 예시 · 실제 리서치 아님",
+  "published_at": "2026-10-26T00:00:00Z",
+  "updated_at": "2026-10-26T00:00:00Z",
+  "summary": ["[산업] 여기에 출처가 확인된 실제 변화와 기준 시점을 기재합니다."],
+  "tickers": [{"market": "US", "ticker": "NVDA"}],
+  "sections": [{
+    "heading": "산업 변화",
+    "body": "본문은 일반 텍스트로 작성합니다. 사실과 전망을 구분하고 수치의 단위·기준 시점·출처를 유지합니다.",
+    "images": [],
+    "tables": [{"caption": "형식 예시 · 단위와 기간을 반드시 기재", "columns": ["항목", "값"], "rows": [["실제 데이터 입력", "미확인"]]}]
+  }],
+  "sources": [{"label": "출처 형식 예시 · 실제 원문 URL로 교체", "url": "https://example.com/source"}]
+}
