@@ -32,7 +32,11 @@ def source_links(raw):
         raise ValueError('Invalid report sources')
     links = []
     for value in raw:
-        if not isinstance(value, dict) or not url_ok(value.get('url')):
+        link = value.get('url') if isinstance(value, dict) else None
+        # Citations are displayed, never fetched. Preserve original public HTTP links;
+        # image requests and public-news URLs retain their separate HTTPS-only gates.
+        checked = 'https://' + link[7:] if isinstance(link, str) and link.startswith('http://') else link
+        if not url_ok(checked):
             raise ValueError('Invalid report source URL')
         links.append({'label': text(value.get('label'), hi=500), 'url': value['url']})
     return links
@@ -225,6 +229,20 @@ def owner_id(rows, configured=''):
     return owners.pop()
 
 
+
+def stored_utc(value):
+    """Management SQL serializes timestamptz as `YYYY-MM-DD HH:MM:SS+00`.
+
+    Keep export/Drive timestamp validation strict; only database values use this parser.
+    """
+    if not isinstance(value, str):
+        raise ValueError('Invalid stored report timestamp')
+    parsed = datetime.fromisoformat(value.replace('Z', '+00:00'))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError('Invalid stored report timestamp')
+    return parsed.astimezone(timezone.utc)
+
+
 def main():
     token = get_token()
     files, cursor = [], None
@@ -259,7 +277,7 @@ def main():
             skipped += 1
             continue
         old = by_file.get(fid)
-        if old and utc(file['modifiedTime']) <= utc(old['source_modified_at']) and old.get('pending_images') != 'true':
+        if old and utc(file['modifiedTime']) <= stored_utc(old['source_modified_at']) and old.get('pending_images') != 'true':
             unchanged += 1
             continue
         try:
@@ -267,7 +285,7 @@ def main():
             # Retain the first real Drive identity for a stable Instinct report id.
             previous = by_id.get(raw.get('id')) if isinstance(raw, dict) else None
             storage_id = previous['drive_file_id'] if previous else fid
-            if previous and (utc(file['modifiedTime']) < utc(previous['source_modified_at']) or (utc(file['modifiedTime']) == utc(previous['source_modified_at']) and previous.get('pending_images') != 'true')):
+            if previous and (utc(file['modifiedTime']) < stored_utc(previous['source_modified_at']) or (utc(file['modifiedTime']) == stored_utc(previous['source_modified_at']) and previous.get('pending_images') != 'true')):
                 unchanged += 1
                 continue
             cached = query(f"select pages from public.private_source_reports where user_id='{owner}' and drive_file_id='{storage_id}'")
