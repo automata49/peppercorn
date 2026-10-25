@@ -113,3 +113,48 @@ class ExportCompatibilityTests(unittest.TestCase):
         self.assertEqual(validation_code(ValueError('private title and body must never appear')),'invalid_structure')
         self.assertEqual(validation_code(ValueError('Expected version 1 report')),'report_version_or_type')
         self.assertEqual(validation_code(KeyError('private value')),'missing_required_field')
+
+
+class IncrementalSyncTests(unittest.TestCase):
+    def test_sql_timestamp_roundtrip_handles_unchanged_and_updated_reports(self):
+        import json,io
+        from contextlib import redirect_stdout
+        from unittest.mock import patch
+        from analysis import sync_instinct_reports as sync
+        fid='fixture_report_12345'
+        for modified,expected in [('2026-10-25T11:00:00Z','imported=0 unchanged=1'),
+                                  ('2026-10-25T12:00:00Z','imported=1 unchanged=0')]:
+            writes=[]
+            def query(sql):
+                if 'select distinct' in sql:return [{'user_id':UID}]
+                if 'select drive_file_id' in sql:return [{'drive_file_id':fid,'report_id':REPORT['id'],
+                    'source_modified_at':'2026-10-25 11:00:00+00','pending_images':'false'}]
+                if 'select pages' in sql:return []
+                writes.append(sql);return []
+            def drive(url,token,media=False):
+                if media:return json.dumps(REPORT).encode()
+                return {'files':[{'id':fid,'name':'Folio-Report-2026-10-25.json','mimeType':'application/json',
+                                  'size':'1000','modifiedTime':modified}]}
+            output=io.StringIO()
+            with patch.object(sync,'query',side_effect=query),patch.object(sync,'drive',side_effect=drive),\
+                 patch.object(sync,'get_token',return_value='synthetic'),patch.dict(sync.os.environ,{'FOLIO_REPORT_USER_ID':''}),redirect_stdout(output):
+                sync.main()
+            self.assertIn(expected,output.getvalue())
+            self.assertEqual(len(writes),int('imported=1' in expected))
+            self.assertNotIn(REPORT['title'],output.getvalue())
+
+    def test_database_offset_parser_does_not_relax_export_dates(self):
+        from analysis.sync_instinct_reports import stored_utc,utc
+        self.assertEqual(stored_utc('2026-10-25 20:00:00+09'),utc('2026-10-25T11:00:00Z'))
+        with self.assertRaises(ValueError):stored_utc('2026-10-25 11:00:00')
+        with self.assertRaises(ValueError):utc('2026-10-25 11:00:00+00')
+
+    def test_public_http_citation_preserved_but_unsafe_sources_and_images_rejected(self):
+        from analysis.sync_instinct_reports import source_links
+        from analysis.instinct_images import public_url
+        link='http://publisher.example/original'
+        self.assertEqual(source_links([{'label':'Original','url':link}])[0]['url'],link)
+        for url in ['javascript:alert(1)','http://127.0.0.1/a','http://localhost/a',
+                    'http://drive.google.com/file/a','http://user:password@publisher.example/a']:
+            with self.assertRaises(ValueError):source_links([{'label':'Bad','url':url}])
+        with self.assertRaises(ValueError):public_url(link)
