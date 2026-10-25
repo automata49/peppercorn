@@ -20,7 +20,7 @@ from pathlib import Path
 FOLDER_ID = "1HdM3uXO3_cAnJS0igLlDIsCylch6KMey"
 NAME = re.compile(r"^Folio-News-(\d{4}-\d{2}-\d{2})\.json$")
 TARGET = Path("public/data/instinct-leader-news.json")
-MAX_FILE = 500_000
+MAX_FILE = 1_000_000
 MAX_ITEMS = 60
 
 
@@ -88,7 +88,26 @@ def clean(raw, now):
         common.update(type="trend", trend_topic=topic.strip())
     else:
         common.update(ticker=ticker)
+    if image_candidates(raw.get('images')):
+        common['images'] = image_candidates(raw['images'])
     return common
+
+def image_candidates(raw):
+    """Bound the untrusted image contract; rights are verified before any download."""
+    if not isinstance(raw, list):
+        return []
+    fields = ('image_url', 'source_url', 'caption', 'credit', 'usage_rights', 'license_url', 'kind')
+    result = []
+    for image in raw[:3]:
+        if not isinstance(image, dict):
+            continue
+        if not url_ok(image.get('image_url')) or not url_ok(image.get('source_url')):
+            continue
+        if any(not isinstance(image.get(k), str) or len(image[k]) > limit for k, limit in (('caption',500),('credit',200),('usage_rights',100))):
+            continue
+        result.append({k: image[k] for k in fields if k in image})
+    return result
+
 
 def parse_file(data, now):
     if len(data) > MAX_FILE:
@@ -163,6 +182,14 @@ def main():
         dedup[key] = a
     selected = sorted(dedup.values(), key=lambda a: a["published_at"], reverse=True)[:MAX_ITEMS]
     previous = json.loads(TARGET.read_text()) if TARGET.exists() else None
+    from analysis.instinct_images import ImageCollector
+    collector = ImageCollector(assets=Path('public/data/news-assets'),
+        cached=[image for article in (previous or {}).get('items', []) for image in article.get('images', [])])
+    for article in selected:
+        if 'images' in article:
+            article['images'] = collector.collect(article['images'])
+            if not article['images']:
+                del article['images']
     # Exclude derived visual metadata when determining source news changes.
     prior_items = [{k: v for k, v in row.items() if k != "visual"} for row in previous.get("items", [])] if previous else None
     if prior_items == selected:

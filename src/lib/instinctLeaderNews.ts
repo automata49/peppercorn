@@ -1,3 +1,4 @@
+import {parseInstinctImages,type InstinctImage} from './instinctImages'
 /** Sanitized public news from Instinct Drive exports; private PDFs never reach the browser. */
 export type InstinctVisual = {
  kind:'illustration';url:string;alt:string;
@@ -5,7 +6,7 @@ export type InstinctVisual = {
 }
 type Common={
  headline:string;summary:string;source_name:string;source_url:string;
- published_at:string;visual?:InstinctVisual
+ published_at:string;visual?:InstinctVisual;images?:InstinctImage[]
 }
 export type StockNews = Common & {type?:'stock';market:'KR'|'US';ticker:string}
 export type TrendNews = Common & {type:'trend';market:'KR'|'US'|'GLOBAL';trend_topic:string}
@@ -50,6 +51,7 @@ export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed
   const common={
    headline:String(r.headline),summary:String(r.summary),source_name:String(r.source_name),
    source_url:String(r.source_url),published_at:String(r.published_at),
+   images:parseInstinctImages(r.images),
    ...(readVisual(r.visual)?{visual:readVisual(r.visual)}:{})
   }
   let item:InstinctArticle
@@ -72,8 +74,8 @@ export async function loadInstinctNews():Promise<InstinctArticle[]>{
  const controller=new AbortController(),timer=window.setTimeout(()=>controller.abort(),8000)
  try{
   const response=await fetch(import.meta.env.BASE_URL+'data/instinct-leader-news.json',{signal:controller.signal,cache:'no-cache'})
-  if(!response.ok||Number(response.headers.get('content-length')||0)>100_000)return []
+  if(!response.ok||Number(response.headers.get('content-length')||0)>1_000_000)return []
   const body=await response.text()
-  return body.length<=100_000?(parseInstinctNews(JSON.parse(body))?.items||[]):[]
+  return body.length<=1_000_000?(parseInstinctNews(JSON.parse(body))?.items||[]):[]
  }catch{return []}finally{window.clearTimeout(timer)}
 }

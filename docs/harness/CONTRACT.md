@@ -1,3 +1,9 @@
+## INSTINCT-JSON-IMAGES-20261026 — report and news ingestion
+
+Instinct owns research, structured JSON and image link/provenance discovery; Folio owns validation, authorized storage and rendering. PDF/HTML export is optional. Existing news v1 and private PDF records remain compatible. Reports stay in Market Signal, account-only; public news never contains private report bodies or image bytes. Reuse Drive readonly OAuth and existing server-only report ingestion credentials, no frontend secrets or browser write grants.
+
+Report JSON keeps a stable id and original Drive file identity, bounded factual market/industry/company summary, sections, optional tables/images, exact tickers and dated original sources. Plain text is escaped; tables retain units/time and chart images are not cropped or photo-filtered. Unknown image rights keep fallback: verify Commons API license or an operator-reviewed publisher policy before download; public HTTPS/DNS pinning, redirect, byte/pixel/time budgets, WebP decoding and cached content hashes apply. Private images stay in owner-RLS report pages, public images alone enter static assets. Existing single folder owner can receive imports; multiple/absent owners fail closed unless explicitly configured to an existing folder owner. No auto-publication of reports or changes to ranking/notes. See docs/INSTINCT_CONTENT_CONTRACT.md.
+
 ## FOLIO-SIGNAL-DETAIL-PARITY-20261024 — one stock-detail Harness (2026-10-24)
 
 - 발견 → 시장 신호의 섹터(표·히트맵·분류 드릴) 및 ETF(Top 5·차트·전체/산업별 목록) 종목 선택은 발견 → 종목 검토와 **같은 정식 Obra 종목 상세 화면**으로 이동한다. 모달 전용 축약 종목 상세는 사용하지 않는다.

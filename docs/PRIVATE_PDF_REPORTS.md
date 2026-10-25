@@ -1,3 +1,7 @@
+## 2026-10-26 JSON report extension
+
+New Instinct reports can bypass PDF entirely: see [content contract](INSTINCT_CONTENT_CONTRACT.md). Structured sections, factual summaries, tables, source links and licensed images reuse the same owner-RLS table and read-only endpoint. Legacy PDFs retain their original reader. Market Signal is the current report location; historical Today/Journal placement below is superseded.
+
 # Private PDF reports
 
 User direction (2026-10-15): PDFs saved in the registered Drive folder feed a short summary in expanded Today and durable full reports in Journal. Preserve article titles/links-only HS Academy and hidden Gemini presentation; existing Gemini generation remains independent.

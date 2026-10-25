@@ -6,6 +6,7 @@ export default defineConfig({
   publicDir: '../public',
   plugins: [react()],
   base: '/peppercorn/',
+  server: { allowedHosts: ['terminal.local'] },
   build: {
     outDir: '../dist',
     emptyOutDir: true,

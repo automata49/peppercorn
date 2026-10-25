@@ -147,6 +147,10 @@ def apply_visuals(feed=FEED, assets=ASSETS, environ=None, generation=api_webp):
         identity_field = "trend_topic" if article.get("type") == "trend" else "ticker"
         if not all(k in article for k in ("market", identity_field, "headline", "summary", "source_url")):
             raise ValueError("Missing sanitized fields")
+        if article.get('images'):
+            if article.pop('visual', None) is not None:
+                changed = True
+            continue
         topic, name = category(article), identity(article)
         vector = assets / (name + ".svg")
         raster = assets / (name + ".webp")
@@ -170,7 +174,10 @@ def apply_visuals(feed=FEED, assets=ASSETS, environ=None, generation=api_webp):
             changed = True
     # Only keep assets used by the current seven-day public feed.
     active = {identity(a) for a in record["items"]}
+    external = {Path(img['url']).name for article in record['items'] for img in article.get('images', [])}
     for old in assets.iterdir():
+        if old.is_file() and re.fullmatch(r'external-[a-f0-9]{64}\.webp', old.name) and old.name not in external:
+            old.unlink()
         if old.is_file() and re.fullmatch(r"[a-f0-9]{20}\.(?:svg|webp)", old.name) and old.stem not in active:
             old.unlink()
     if changed:
