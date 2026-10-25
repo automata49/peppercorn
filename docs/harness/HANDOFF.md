@@ -1,3 +1,7 @@
+## 2026-10-26 — Commons stereo JPEG primary photo
+
+The supplied Commons Korea Exchange .JPG is actually an MPO stereo pair (two frames), so the static-only decoder rejected it despite verified rights. Permit exactly two MPO frames within a combined 20-million-pixel cap, then decode/store only the primary frame as metadata-free static WebP. Other animations and additional frames stay rejected, and byte/output/network/provenance limits remain. Validation version 3 rechecks older rejections once. Regressions verify primary-frame colour, one-frame WebP, EXIF removal, >2-frame/animated rejection and combined pixel cap. Verify both report image counts in private storage after main sync.
+
 ## 2026-10-26 — Commons original URL analytics compatibility
 
 Commons imageinfo now returns original image URLs with utm_source/utm_campaign/utm_content. Ignore only these three analytics query keys for verified API asset equality; keep scheme/host/path and every other query/fragment exact. Submitted original links, license/creator verification, credential-free pinned fetches and storage limits remain unchanged. Private image validation version 2 reprocesses unchanged older imports once and clears only old-version rejection caches, so a corrected matcher can recover rejected images without editing Drive sources. Regressions cover tracked URL acceptance, different assets/query rejection and retry of unchanged previously rejected images. Verify real private stored-image counts after main sync; no private source data committed.

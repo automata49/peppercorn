@@ -128,7 +128,7 @@ class IncrementalSyncTests(unittest.TestCase):
             def query(sql):
                 if 'select distinct' in sql:return [{'user_id':UID}]
                 if 'select drive_file_id' in sql:return [{'drive_file_id':fid,'report_id':REPORT['id'],
-                    'source_modified_at':'2026-10-25 11:00:00+00','pending_images':'false','image_validation_version':'2'}]
+                    'source_modified_at':'2026-10-25 11:00:00+00','pending_images':'false','image_validation_version':'3'}]
                 if 'select pages' in sql:return []
                 writes.append(sql);return []
             def drive(url,token,media=False):
@@ -183,4 +183,4 @@ class ImageValidationMigrationTests(unittest.TestCase):
             sync.main()
         self.assertEqual(len(writes),1)
         self.assertIn('data:image/webp;base64,',writes[0])
-        self.assertIn('"image_validation_version":2',writes[0].replace(' ',''))
+        self.assertIn('"image_validation_version":3',writes[0].replace(' ',''))

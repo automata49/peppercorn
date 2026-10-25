@@ -18,7 +18,8 @@ import warnings
 from pathlib import Path
 from urllib.parse import urlsplit, urljoin, urlencode, unquote, parse_qsl
 
-IMAGE_VALIDATION_VERSION = 2
+IMAGE_VALIDATION_VERSION = 3
+MAX_PIXELS = 20_000_000
 MAX_BYTES = 5_000_000
 POLICY = Path('analysis/instinct-image-policies.json')
 RIGHTS = {'CC0', 'Public domain', 'CC BY 4.0', 'CC BY-SA 4.0', 'CC BY 3.0', 'CC BY-SA 3.0', 'CC BY 2.0', 'CC BY-SA 2.0', 'CC BY 2.5', 'CC BY-SA 2.5'}
@@ -146,12 +147,27 @@ def metadata(raw, read=read_public):
 
 def optimize(blob):
     from PIL import Image, ImageOps
-    Image.MAX_IMAGE_PIXELS = 20_000_000
+    Image.MAX_IMAGE_PIXELS = MAX_PIXELS
     with warnings.catch_warnings():
         warnings.simplefilter('error', Image.DecompressionBombWarning)
         with Image.open(io.BytesIO(blob)) as image:
-            if image.format not in ('PNG', 'JPEG', 'WEBP') or image.width * image.height > 20_000_000 or getattr(image, 'n_frames', 1) != 1:
+            frames = getattr(image, 'n_frames', 1)
+            if image.format == 'MPO':
+                # Some Commons .JPG photographs contain a stereo pair. Store the
+                # primary photograph only, within a combined two-frame pixel cap.
+                if frames != 2:
+                    raise ValueError('Unsupported image')
+                pixels = 0
+                for frame in range(frames):
+                    image.seek(frame)
+                    pixels += image.width * image.height
+                    if pixels > MAX_PIXELS:
+                        raise ValueError('Image exceeds pixel budget')
+                image.seek(0)
+            elif image.format not in ('PNG', 'JPEG', 'WEBP') or frames != 1:
                 raise ValueError('Unsupported image')
+            if image.width * image.height > MAX_PIXELS:
+                raise ValueError('Image exceeds pixel budget')
             image.load()
             image = ImageOps.exif_transpose(image).convert('RGB')
             image.thumbnail((1600, 2400))
