@@ -38,7 +38,90 @@ def source_links(raw):
     return links
 
 
+
+def adapt_report(raw):
+    """Accept the established Instinct facts/outlook export without editing the source.
+
+    Missing discriminators are accepted only for this specific legacy shape. Explicit
+    unknown versions/types are never reinterpreted. Facts and forecasts stay separate.
+    """
+    if not isinstance(raw, dict):
+        raise ValueError('Expected version 1 report')
+    if ('version' in raw and raw['version'] != 1) or ('type' in raw and raw['type'] != 'report'):
+        raise ValueError('Expected version 1 report')
+    legacy = isinstance(raw.get('summaries'), dict) and isinstance(raw.get('sections'), list) and bool(raw['sections']) and all(
+        isinstance(section, dict) and ('facts' in section or 'outlook' in section) for section in raw['sections'])
+    if not legacy and (raw.get('version') != 1 or raw.get('type') != 'report'):
+        raise ValueError('Expected version 1 report')
+    result = {**raw, 'version': 1, 'type': 'report'}
+    if 'summary' not in raw and legacy:
+        summaries = raw['summaries']
+        if set(summaries) - {'market', 'industry', 'stocks'}:
+            raise ValueError('Unsupported summary categories')
+        result['summary'] = ['[' + label + '] ' + text(summaries[key], hi=595)
+            for key, label in (('market', '시장'), ('industry', '산업'), ('stocks', '종목'))
+            if key in summaries and summaries[key] != '']
+    sections = raw.get('sections')
+    if not isinstance(sections, list) or len(sections) > 60:
+        raise ValueError('Expected bounded report sections')
+    converted = []
+    for section in sections:
+        if not isinstance(section, dict):
+            raise ValueError('Invalid section')
+        item = dict(section)
+        if 'body' not in item and ('facts' in item or 'outlook' in item):
+            blocks = []
+            for key, label in (('facts', '확인된 사실'), ('outlook', '전망 · 미확정')):
+                values = item.get(key, [])
+                if not isinstance(values, list) or len(values) > 100:
+                    raise ValueError('Invalid fact/outlook list')
+                lines = [text(value, hi=5000) for value in values]
+                if lines:
+                    blocks.append(label + '\n' + '\n'.join('• ' + line for line in lines))
+            item['body'] = '\n\n'.join(blocks)
+        converted.append(item)
+    if legacy and converted and raw.get('disclaimer'):
+        disclaimer = text(raw['disclaimer'], hi=2000)
+        converted[0]['body'] = text(converted[0].get('body'), hi=50000) + '\n\n자료 유의사항\n' + disclaimer
+    result['sections'] = converted
+    return result
+
+
+def validation_code(error):
+    """Public CI diagnostics contain field categories, never report content or URLs."""
+    if isinstance(error, json.JSONDecodeError):
+        return 'json_syntax'
+    if isinstance(error, KeyError):
+        return 'missing_required_field'
+    return {
+        'Expected version 1 report': 'report_version_or_type',
+        'Unsupported summary categories': 'summary_categories',
+        'Expected 1-5 factual summary items': 'summary_count',
+        'Invalid report text': 'text_type_or_length',
+        'Expected bounded report sections': 'sections_count',
+        'Invalid section': 'section_shape',
+        'Invalid fact/outlook list': 'fact_outlook_shape',
+        'Invalid report source URL': 'source_url',
+        'Invalid report sources': 'sources_shape',
+        'Invalid related instrument': 'ticker_identity',
+        'Invalid related instruments': 'tickers_shape',
+        'Inconsistent report timestamps': 'timestamp_order',
+        'Future report timestamp': 'timestamp_future',
+        'Timestamp requires UTC offset': 'timestamp_timezone',
+        'Invalid report identity': 'report_id',
+        'Invalid image list': 'images_shape',
+        'Invalid tables': 'tables_shape',
+        'Invalid table': 'table_shape',
+        'Table exceeds budget': 'table_budget',
+        'Table shape mismatch': 'table_columns',
+        'Report exceeds text budget': 'text_budget',
+        'Report exceeds payload budget': 'payload_budget',
+    }.get(str(error), 'invalid_structure')
+
+
 def normalize(raw, *, file_id, modified_at, images):
+    source = raw
+    raw = adapt_report(raw)
     if not re.fullmatch(r'[A-Za-z0-9_-]{10,100}', file_id):
         raise ValueError('Invalid Drive identity')
     if not isinstance(raw, dict) or raw.get('version') != 1 or raw.get('type') != 'report':
@@ -104,7 +187,7 @@ def normalize(raw, *, file_id, modified_at, images):
                     original_url=f'https://drive.google.com/file/d/{file_id}/view')
     payload = dict(drive_file_id=file_id, folder_id=FOLDER_ID, title=title,
                    source_url=f'https://drive.google.com/file/d/{file_id}/view', source_modified_at=modified_at,
-                   content_hash=hashlib.sha256(json.dumps(raw, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+                   content_hash=hashlib.sha256(json.dumps(source, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
                    summary=summary, pages=pages, links=links)
     if len(json.dumps(payload, ensure_ascii=False).encode()) > 12_000_000:
         raise ValueError('Report exceeds payload budget')
@@ -170,7 +253,7 @@ def main():
     by_id = {r['report_id']: r for r in headers if r.get('report_id')}
     imported, unchanged, skipped = 0, 0, 0
     images = ImageCollector(max_fetches=8)
-    for file in sorted(files, key=lambda f: utc(f['modifiedTime']), reverse=True):
+    for index, file in enumerate(sorted(files, key=lambda f: utc(f['modifiedTime']), reverse=True), 1):
         fid = file['id']
         if not re.fullmatch(r'[A-Za-z0-9_-]{10,100}', fid):
             skipped += 1
@@ -198,8 +281,9 @@ def main():
             by_id[raw['id']] = snapshot
             by_file[fid] = snapshot
             imported += 1
-        except (ValueError, KeyError, TypeError):
+        except (ValueError, KeyError, TypeError) as error:
             skipped += 1
+            print(f'Private report index={index} rejected: {validation_code(error)}')
     print(f'Private reports imported={imported} unchanged={unchanged} invalid={skipped}; no private payload published')
     if skipped:
         raise ValueError('Invalid report JSON detected; check the documented schema')

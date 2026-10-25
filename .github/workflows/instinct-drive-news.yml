@@ -13,6 +13,9 @@ on:
     paths:
       - public/data/instinct-leader-news.json
       - analysis/news_visuals.py
+      - analysis/sync_instinct_reports.py
+      - analysis/sync_instinct_news.py
+      - analysis/instinct_images.py
       - .github/workflows/instinct-drive-news.yml
   workflow_dispatch:
   schedule:
