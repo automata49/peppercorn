@@ -54,3 +54,23 @@ class ImageTests(unittest.TestCase):
         c=ImageCollector(read=reader,max_fetches=1)
         self.assertEqual(len(c.collect([IMAGE,IMAGE])),2)
         self.assertEqual(c.remaining,0)
+
+
+class CommonsUrlTests(unittest.TestCase):
+    def test_provider_tracking_query_does_not_change_original_identity(self):
+        def tracked(url,**kwargs):
+            if kwargs.get('image'):return reader(url,**kwargs)
+            data=json.loads(reader(url));data['query']['pages']['1']['imageinfo'][0]['url'] += '?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original'
+            return json.dumps(data).encode()
+        values=ImageCollector(read=tracked).collect([IMAGE])
+        self.assertEqual(len(values),1)
+        self.assertEqual(values[0]['image_url'],IMAGE['image_url'])
+        self.assertEqual(values[0]['credit'],'Verified creator')
+
+    def test_tracking_exception_does_not_accept_other_assets_or_query_changes(self):
+        for other in [IMAGE['image_url']+'?download=other',IMAGE['image_url']+'different',
+                      IMAGE['image_url'].replace('upload.wikimedia.org','other.example')]:
+            def changed(url,**kwargs):
+                data=json.loads(reader(url));data['query']['pages']['1']['imageinfo'][0]['url']=other
+                return json.dumps(data).encode()
+            self.assertEqual(ImageCollector(read=changed).collect([IMAGE]),[])

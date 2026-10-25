@@ -128,7 +128,7 @@ class IncrementalSyncTests(unittest.TestCase):
             def query(sql):
                 if 'select distinct' in sql:return [{'user_id':UID}]
                 if 'select drive_file_id' in sql:return [{'drive_file_id':fid,'report_id':REPORT['id'],
-                    'source_modified_at':'2026-10-25 11:00:00+00','pending_images':'false'}]
+                    'source_modified_at':'2026-10-25 11:00:00+00','pending_images':'false','image_validation_version':'2'}]
                 if 'select pages' in sql:return []
                 writes.append(sql);return []
             def drive(url,token,media=False):
@@ -158,3 +158,29 @@ class IncrementalSyncTests(unittest.TestCase):
                     'http://drive.google.com/file/a','http://user:password@publisher.example/a']:
             with self.assertRaises(ValueError):source_links([{'label':'Bad','url':url}])
         with self.assertRaises(ValueError):public_url(link)
+
+class ImageValidationMigrationTests(unittest.TestCase):
+    def test_same_timestamp_retries_old_commons_rejection_once(self):
+        import json,io
+        from contextlib import redirect_stdout
+        from unittest.mock import patch
+        from analysis import sync_instinct_reports as sync
+        report=copy.deepcopy(REPORT);report['sections'][0]['images']=[IMAGE]
+        writes=[];fid='fixture_report_12345'
+        def query(sql):
+            if 'select distinct' in sql:return [{'user_id':UID}]
+            if 'select drive_file_id' in sql:return [{'drive_file_id':fid,'report_id':REPORT['id'],
+                'source_modified_at':'2026-10-25 12:00:00+00','pending_images':'false','image_validation_version':None}]
+            if 'select pages' in sql:return [{'pages':[{'images':[],'image_rejections':[ImageCollector.key(IMAGE)]}]}]
+            writes.append(sql);return []
+        def drive(url,token,media=False):
+            if media:return json.dumps(report).encode()
+            return {'files':[{'id':fid,'name':'Folio-Report-2026-10-25.json','mimeType':'application/json',
+                              'size':'1000','modifiedTime':'2026-10-25T12:00:00Z'}]}
+        with patch.object(sync,'query',side_effect=query),patch.object(sync,'drive',side_effect=drive),\
+             patch.object(sync,'get_token',return_value='synthetic'),patch.object(sync,'ImageCollector',side_effect=lambda **kw:ImageCollector(read=reader,**kw)),\
+             patch.dict(sync.os.environ,{'FOLIO_REPORT_USER_ID':''}),redirect_stdout(io.StringIO()):
+            sync.main()
+        self.assertEqual(len(writes),1)
+        self.assertIn('data:image/webp;base64,',writes[0])
+        self.assertIn('"image_validation_version":2',writes[0].replace(' ',''))

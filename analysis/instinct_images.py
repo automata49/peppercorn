@@ -16,8 +16,9 @@ import ssl
 import time
 import warnings
 from pathlib import Path
-from urllib.parse import urlsplit, urljoin, urlencode, unquote
+from urllib.parse import urlsplit, urljoin, urlencode, unquote, parse_qsl
 
+IMAGE_VALIDATION_VERSION = 2
 MAX_BYTES = 5_000_000
 POLICY = Path('analysis/instinct-image-policies.json')
 RIGHTS = {'CC0', 'Public domain', 'CC BY 4.0', 'CC BY-SA 4.0', 'CC BY 3.0', 'CC BY-SA 3.0', 'CC BY 2.0', 'CC BY-SA 2.0', 'CC BY 2.5', 'CC BY-SA 2.5'}
@@ -90,6 +91,15 @@ def read_public(url, *, image=False):
     raise ValueError('Redirect limit')
 
 
+def commons_asset_url(url):
+    # Commons imageinfo now adds these analytics parameters to the original URL.
+    # All asset identity, other query parameters and HTTPS checks remain exact.
+    parsed = public_url(url)
+    query = [(k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True)
+             if k not in {'utm_source', 'utm_campaign', 'utm_content'}]
+    return parsed._replace(query=urlencode(query)).geturl()
+
+
 def metadata(raw, read=read_public):
     if not isinstance(raw, dict) or raw.get('kind') not in ('photo', 'chart', 'illustration'):
         raise ValueError('Invalid image metadata')
@@ -108,7 +118,7 @@ def metadata(raw, read=read_public):
         ext = info.get('extmetadata', {})
         license_name = ext.get('LicenseShortName', {}).get('value')
         license_url = ext.get('LicenseUrl', {}).get('value', '')
-        if license_name not in RIGHTS or raw['image_url'] != info.get('url'):
+        if license_name not in RIGHTS or commons_asset_url(raw['image_url']) != commons_asset_url(info.get('url')):
             raise ValueError('Image or license does not match Commons')
         # Strip provider markup; React also escapes this plain text when rendered.
         credit = re.sub('<[^>]+>', '', ext.get('Artist', {}).get('value', '')).strip()[:200]
