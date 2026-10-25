@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updated_at": "2026-10-25T22:34:53.566368Z",
+  "updated_at": "2026-10-25T23:41:45.060574Z",
   "items": [
+    {
+      "headline": "US Equity Futures Climb as Crude Oil Price Dips: Markets Wrap",
+      "summary": "블룸버그에 따르면 미국 주가지수 선물이 상승 출발해 나스닥100 선물이 0.6%, S&P500 선물이 0.4% 올랐고, 브렌트유는 1% 넘게 내려 배럴당 115달러 수준으로 4월 이후 최고 종가에서 후퇴했다. 트럼프 대통령은 이란과의 합의 또는 공격 재개에 대해 '결정의 시간이 다가오고 있다'고 말했다. 이번 주 미국·유로존·일본 중앙은행의 금리 결정이 예정돼 있다.",
+      "source_name": "Bloomberg via swissinfo",
+      "source_url": "https://www.swissinfo.ch/eng/us-equity-futures-climb-as-crude-oil-price-dips%3a-markets-wrap/92273033",
+      "market": "GLOBAL",
+      "published_at": "2026-10-25T22:09:00Z",
+      "type": "trend",
+      "trend_topic": "미 주가선물 상승·유가 하락 출발 - 이란 공격 유보에 안도",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/863711b34a76a71c84b2.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
     {
       "headline": "Trump says US won't strike Iran today, amid rising tensions",
       "summary": "타임스오브이스라엘에 따르면 트럼프 대통령은 25일(현지시간) 기자들에게 '오늘은 공격하지 않을 것(There will not be a strike today)'이라고 말해 전날 시사한 이란 공격을 일단 유보했다. 앞서 뉴욕타임스는 이란 관리 2명이 미 외교관 등에 대한 공격 준비를 확인했다고 보도하는 등 긴장은 유지되고 있다.",
