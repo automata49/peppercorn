@@ -31,13 +31,12 @@ async function boot(page:Page,value:unknown=feed,reportedRows=rows){
 }
 async function showNews(page:Page){
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
- await section.getByRole('button',{name:'뉴스',exact:true}).click()
  await expect(section.locator('.discovery-news-filter-layout')).toBeVisible()
 }
 for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900]])test(`news ${width}x${height}: responsive editorial, grounded sources, market filter and detail link`,async({page})=>{
  await page.setViewportSize({width,height});await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}),list=section.locator('.discovery-news-stories')
- await expect(section).toBeVisible();await expect(section.getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true');await expect(section.locator('[data-wheel]')).toHaveCount(0)
+ await expect(section).toBeVisible();await expect(section.getByRole('group',{name:'시장과 기업 보기'})).toHaveCount(0);await expect(section.locator('[data-wheel]')).toHaveCount(2)
  await showNews(page);await section.locator('[data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await expect(section.locator('article')).toHaveCount(4)
  await expect(section.locator('h4').first()).toHaveText(stories[0].headline);await expect(section).toContainText(stories[0].summary);await expect(section).toContainText('AI 요약 초안');await expect(section).toContainText('원문 사진 아님')
@@ -53,7 +52,7 @@ for(const [width,height] of [[390,844],[844,390],[834,1194],[1194,834],[1440,900
 })
 test('expired news disappears and failed photos use labelled decorative art',async({page})=>{
  await boot(page);await page.route('https://upload.wikimedia.org/**',r=>r.fulfill({status:404,body:''}));await page.reload();await openNewsPage(page);await showNews(page);await page.locator('.discovery-news [data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true}).click();await expect(page.locator('.discovery-news-story img').first()).toHaveAttribute('src',/folio-retro-discover/);await expect(page.locator('.discovery-news-story').first()).toContainText('Folio 이미지 · 원문 사진 아님')
- await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openNewsPage(page);await expect(page.locator('.discovery-news')).toBeVisible();await expect(page.locator('.discovery-news-story')).toHaveCount(0);await expect(page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}).getByRole('button',{name:'리포트'})).toHaveAttribute('aria-pressed','true')
+ await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{...feed,items:stories.map(i=>({...i,expires_at:stamp(-1)}))}}));await page.reload();await openNewsPage(page);await expect(page.locator('.discovery-news')).toBeVisible();await expect(page.locator('.discovery-news-story')).toHaveCount(0);await expect(page.getByRole('region',{name:'시장과 종목의 최신 뉴스'}).locator('[data-wheel]')).toHaveCount(2)
 })
 
 test('Instinct Drive news matches Folio leader classification and leaves research separate',async({page})=>{
@@ -134,27 +133,19 @@ test('report-first stays visible for guests when both news feeds are empty',asyn
  await boot(page,{...feed,items:[]})
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
  await expect(section).toBeVisible()
- await expect(section.getByRole('button',{name:'리포트',exact:true})).toHaveAttribute('aria-pressed','true')
- await expect(section).toContainText('로그인 후 Folio 리서치 리포트를 볼 수 있습니다.')
+ await expect(section.getByRole('group',{name:'시장과 기업 보기'})).toHaveCount(0)
+ await expect(section).toContainText('로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.')
  await showNews(page);await section.locator('[data-wheel="종목 분류"]').getByRole('button',{name:'전체',exact:true}).click()
  await expect(section).toContainText('최근 7일에 해당하는 전체 종목 뉴스가 없습니다.')
 })
 
-for(const width of [390,834,1440])test(`reports hide news wheels while news retains wheel choices at ${width}px`,async({page})=>{
+for(const width of [390,834,1440])test(`unified news keeps wheel choices after reload at ${width}px`,async({page})=>{
  await page.setViewportSize({width,height:1000});await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
- const report=section.getByRole('button',{name:'리포트',exact:true})
- const news=section.getByRole('button',{name:'뉴스',exact:true})
- await expect(report).toHaveAttribute('aria-pressed','true')
- await expect(section.locator('.discovery-news-filter-layout')).toHaveCount(0)
- await expect(section.locator('[data-wheel]')).toHaveCount(0)
- await expect(section).toContainText('로그인 후 Folio 리서치 리포트를 볼 수 있습니다.')
- await news.click()
+ await expect(section.getByRole('group',{name:'시장과 기업 보기'})).toHaveCount(0)
  await expect(section.locator('[data-wheel]')).toHaveCount(2)
  await section.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true}).click()
- await report.click()
- await expect(section.locator('[data-wheel]')).toHaveCount(0)
- await news.click()
+ await page.reload();await openNewsPage(page)
  await expect(section.locator('[data-wheel="시장"]').getByRole('button',{name:'KR',exact:true})).toHaveAttribute('aria-pressed','true')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
 })

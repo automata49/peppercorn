@@ -116,3 +116,9 @@ known units in caption/value header) can offer a zero-baseline comparison chart 
 original table switch. Mixed/negative/unknown/unitless values stay as tables. Put
 chartable source data in `tables` with its original units, period and sources; Folio
 never derives quantitative charts from prose or invents missing numbers.
+
+## Unified news display (2026-10-25)
+
+The latest private report summary appears as an account-only card alongside public news. This changes presentation, not publication rights: report summary, full text and image bytes never enter the public JSON/static repository. Public news filters do not classify a cross-market report as an equity or suppress it. The full report opens below the shared card rail; previous reports remain collapsed.
+
+Report covers use the first verified stored section image with its caption, creator and license. Public news uses its own verified stored images. Failed candidates are excluded together before decorative fallback. A raw image URL alone or `usage_rights: "unknown"` does not authorize storage/display. Publisher candidates require an operator-reviewed permission policy and a documented license URL; Commons candidates are independently checked against the file API. Instinct must send accurate provenance rather than infer a license. The latest checked export had 19 unknown-rights news candidates and no report images, so no new inline source image could be accepted from that input.
