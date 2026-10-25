@@ -1,427 +1,598 @@
 {
   "version": 1,
-  "updated_at": "2026-10-17T12:06:26.126Z",
+  "updated_at": "2026-10-25T17:12:11.363810Z",
   "items": [
     {
-      "market": "KR",
-      "ticker": "351320",
-      "headline": "넥사다이내믹스, 311억 AI 서버 공급계약…연매출 2.4배",
-      "summary": "넥사다이내믹스가 연간 매출의 약 2.4배에 달하는 311억원 규모의 AI 서버 공급계약을 체결했다고 10월 15일 밝혔습니다.",
-      "source_name": "서울경제",
-      "source_url": "https://www.sedaily.com/article/20101833",
-      "published_at": "2026-10-15T09:00:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5b261b212854b6de23d7.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "KR",
-      "ticker": "092870",
-      "headline": "엑시콘, 과천 R&D센터 토지·건물 611억2500만원에 양수 결정",
-      "summary": "엑시콘이 과천 R&D센터 토지와 건물을 611억2500만원에 양수하기로 10월 15일 결정했습니다.",
-      "source_name": "디지털투데이",
-      "source_url": "https://www.digitaltoday.co.kr/disclosure/articleView.html?idxno=707569",
-      "published_at": "2026-10-15T09:00:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/9bbdb8737fbcfd9adb0c.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
+      "headline": "Trump announces at a Georgia campaign rally that Audi will build a new auto factory in the state",
+      "summary": "트럼프 대통령이 24일 조지아주 유세에서 아우디의 첫 미국 공장 건설을 발표했고 게르노트 되르너 아우디 CEO가 함께 참석했습니다. 관세 압박 속에 독일 자동차업체의 미국 현지 생산이 확대되는 신호로 해석됩니다.",
+      "source_name": "AP",
+      "source_url": "https://apnews.com/article/audi-georgia-trump-manufacturing-auto-plant-c1d49f2437c1d9cf349af399b8abe3a3",
       "market": "US",
-      "ticker": "MRNA",
-      "headline": "Merck CEO: Cancer vaccine manufacturing time could shrink",
-      "summary": "머크 CEO가 모더나와 협력 중인 암 백신의 생산 기간을 단축할 수 있다고 밝혔다고 10월 14일 보도됐습니다.",
-      "source_name": "CNBC",
-      "source_url": "https://www.cnbc.com/2026/10/14/merck-moderna-cancer-vaccine-manufacturing-time.html",
-      "published_at": "2026-10-14T10:00:00-04:00",
+      "published_at": "2026-10-25T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "산업·투자",
       "visual": {
         "kind": "illustration",
-        "url": "data/news-assets/081d13610b1aaa7510b8.svg",
+        "url": "data/news-assets/19c47bf718b51cc1e7a1.svg",
         "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "industry"
       }
     },
     {
-      "market": "US",
-      "ticker": "CDNA",
-      "headline": "CareDx to Report Third Quarter 2026 Financial Results on October 29, 2026",
-      "summary": "CareDx가 2026년 3분기 실적을 10월 29일 미국 장 마감 후 발표하고 같은 날 컨퍼런스콜을 연다고 10월 15일 밝혔습니다.",
-      "source_name": "Business Wire",
-      "source_url": "https://www.businesswire.com/news/home/20261015254708/en/CareDx-to-Report-Third-Quarter-2026-Financial-Results-on-October-29-2026",
-      "published_at": "2026-10-15T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/65e7f403c85827418835.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "RCEL",
-      "headline": "BTIG Maintains Buy on AVITA Medical, Raises Price Target to $15",
-      "summary": "BTIG가 AVITA Medical의 투자의견 매수를 유지하고 목표주가를 11달러에서 15달러로 올렸다고 Benzinga가 10월 12일 보도했습니다.",
-      "source_name": "Benzinga",
-      "source_url": "https://www.benzinga.com/news/26/10/62292863/btig-maintains-buy-avita-medical-raises-price-target-15",
-      "published_at": "2026-10-12T05:55:17-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/4abfe02ee17b69f6adbf.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "market": "KR",
-      "ticker": "396300",
-      "headline": "HT로보틱스, 북미 AI 전력망 선점…ESS 엔드플레이트 '200만개' 돌파",
-      "summary": "HT로보틱스의 북미 AI 데이터센터 전력망용 ESS 엔드플레이트 누적 생산이 양산 1년 4개월 만에 200만개를 넘었다고 10월 15일 밝혔습니다. 상반기 매출은 711억원으로 전년 동기 대비 87.5% 늘었고 수주잔고는 약 7000억원입니다.",
-      "source_name": "머니투데이",
-      "source_url": "https://www.mt.co.kr/stock/2026/10/15/2026101508391583408",
-      "published_at": "2026-10-15T08:44:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/00a1df90ad4e266ee2ae.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "CBRL",
-      "headline": "Cracker Barrel stock price hikes as shareholder vote looms",
-      "summary": "크래커 배럴이 우선주(블랭크체크) 사용을 제한하는 주주제안에 반대하는 위임장을 제출했다고 내슈빌포스트가 10월 16일 보도했습니다. 15일 주가는 7.48% 오른 67.41달러에 마감했습니다.",
-      "source_name": "Nashville Post",
-      "source_url": "https://www.nashvillepost.com/business/area_stocks/cracker-barrel-stock-price-hikes-as-shareholder-vote-looms/article_3c442d3d-172f-483f-907a-b4cc16fa4112.html",
-      "published_at": "2026-10-16T08:00:00-05:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/0343802c6de3e95f0dd3.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "CLMT",
-      "headline": "Calumet Issues Redemption Notice for $150 Million of 9.75% Senior Notes due 2028",
-      "summary": "칼루멧이 9.75% 2028년 만기 선순위채권 1억5000만달러를 10월 25일 조기상환한다고 10월 15일 밝혔습니다. 7월 이후 부채 축소액은 약 2억6500만달러입니다.",
-      "source_name": "Calumet(회사 보도자료)",
-      "source_url": "https://calumet.investorroom.com/2026-10-15-Calumet-Issues-Redemption-Notice-for-150-Million-of-9-75-Senior-Notes-due-2028",
-      "published_at": "2026-10-15T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/e7031627c5cc985be68b.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "CVI",
-      "headline": "Moody's upgrades CVR Energy to B1 on improved balance sheet and liquidity",
-      "summary": "무디스가 10월 16일 CVR에너지의 기업가족등급을 B2에서 B1으로 상향했습니다. 재무구조 개선과 잉여현금흐름에 따른 부채 축소가 근거며 등급 전망은 안정적입니다.",
-      "source_name": "Investing.com",
-      "source_url": "https://www.investing.com/news/stock-market-news/moodys-upgrades-cvr-energy-to-b1-on-improved-balance-sheet-and-liquidity-4954791",
-      "published_at": "2026-10-16T16:11:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/8198e98d72152362917b.svg",
-        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "energy"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "FIGS",
-      "headline": "FIGS Announces Date of Third Quarter 2026 Earnings Release, Conference Call and Webcast",
-      "summary": "FIGS가 2026년 3분기 실적을 11월 5일 미국 장 마감 후 발표하고 컨퍼런스콜을 연다고 10월 15일 밝혔습니다.",
-      "source_name": "FIGS IR",
-      "source_url": "https://ir.wearfigs.com/news/news-details/2026/FIGS-Announces-Date-of-Third-Quarter-2026-Earnings-Release-Conference-Call-and-Webcast/default.aspx",
-      "published_at": "2026-10-15T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/e648435ba27b7719bcce.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "HAE",
-      "headline": "Haemonetics (HAE): CSL plans full US NexSys rollout by end of 2027",
-      "summary": "CSL이 2027년 말까지 미국 내 전체 혈장센터를 헤모네틱스 NexSys 장비로 전환할 계획이라고 Centiview가 10월 12일 보도했습니다. 비독점 계약으로 최소 구매 조건은 없습니다.",
-      "source_name": "Centiview",
-      "source_url": "https://centiview.com/post/haemonetics-hae-csl-plans-full-us-nexsys-rollout-by-end-of-2027",
-      "published_at": "2026-10-12T04:35:00Z",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/73751d17c86a8c1f54a5.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "MPC",
-      "headline": "Marathon Petroleum price target raised to $433 from $413 at Jefferies",
-      "summary": "제프리스가 마라톤 페트롤리엄의 목표주가를 413달러에서 433달러로 올리고 투자의견 보유를 유지했다고 10월 11일 보도됐습니다.",
-      "source_name": "Business Insider Markets",
-      "source_url": "https://markets.businessinsider.com/news/stocks/marathon-petroleum-price-target-raised-to-433-from-413-at-jefferies-1036614801",
-      "published_at": "2026-10-11T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/9879fb95dbd6de5ff1b7.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "PACS",
-      "headline": "Polsinelli Advises PACS Group on 34-Facility Skilled Nursing Acquisition",
-      "summary": "PACS그룹이 Eduro Healthcare로부터 미 서부 6개주 요양시설 34곳(3633병상)의 운영권 인수 확정계약을 맺었다고 법률자문사 Polsinelli가 10월 13일 밝혔습니다.",
-      "source_name": "Polsinelli",
-      "source_url": "https://www.polsinelli.com/news/polsinelli-advises-pacs-group-on-34-facility-skilled-nursing-acquisition",
-      "published_at": "2026-10-13T09:00:00-05:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/fe590c52c1668eb3799f.svg",
-        "alt": "Folio health 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "health"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "PAYS",
-      "headline": "Paysign Stock Vaults 203% To Highs: Earnings On Deck",
-      "summary": "페이사인 주가가 10월 16일 사상 최고가를 경신하며 연초 대비 203% 상승했다고 Investor's Business Daily가 보도했습니다. 3분기 실적 발표는 11월 9일입니다.",
-      "source_name": "Investor's Business Daily",
-      "source_url": "https://www.investors.com/stock-lists/sector-leaders/fintech-stock-paysign-pays/",
-      "published_at": "2026-10-16T12:13:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/218a2749c8d96a8e88b5.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "RNG",
-      "headline": "Allnet.Italia and RingCentral Launch Strategic Partnership to Bring AI-First Cloud Communications to Italian Businesses",
-      "summary": "링센트럴과 이탈리아 Allnet.Italia가 10월 13일 전략적 파트너십을 발표했습니다. Allnet.Italia의 5000여 채널 파트너가 링센트럴의 AI 클라우드 커뮤니케이션을 이탈리아 기업에 판매·구축합니다.",
-      "source_name": "RingCentral(회사 보도자료)",
-      "source_url": "https://ir.ringcentral.com/news/press-release-details/2026/Allnet-Italia-and-RingCentral-Launch-Strategic-Partnership-to-Bring-AI-First-Cloud-Communications-to-Italian-Businesses/default.aspx",
-      "published_at": "2026-10-13T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/0672da7a873e7ebf0cb1.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "KR",
-      "ticker": "042510",
-      "headline": "라온시큐어, 로봇에 '디지털 신분증' 부여…피지컬AI 보안기술 개발",
-      "summary": "라온시큐어가 과기정통부·NIPA 지원 '피지컬AI 기반 다중계층 보안기술 개발' 과제 주관기관으로 10월 15일 선정됐습니다. 분산신원인증(DID)을 로봇·AI 에이전트로 확장해 디지털 신분증을 부여하는 기술을 개발합니다.",
+      "headline": "산은-기은, 1조원 규모 무위험지표금리 대출 첫 출시…지표금리 개편 속도",
+      "summary": "산업은행과 기업은행이 26일 한국 무위험지표금리(KOFR) 기반 기업대출을 총 1조원 규모로 처음 출시합니다. KOFR 활용이 파생·채권에서 대출시장으로 확대되는 것으로, IRS 시장 KOFR 비중 목표는 2030년 6월까지 70% 이상이고 KORIBOR 기반 신규 대출은 2027년 4월부터 원칙적으로 중단됩니다.",
       "source_name": "전자신문",
-      "source_url": "https://www.etnews.com/20261015000102",
-      "published_at": "2026-10-15T10:03:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/f816229174c7904aa718.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "GTLB",
-      "headline": "Connect your agents to your software lifecycle with the GitLab MCP server",
-      "summary": "깃랩이 10월 15일 GitLab 19.5와 함께 MCP 서버를 정식 출시했습니다. MCP 호환 AI 에이전트가 코드·머지리퀘스트·파이프라인 작업을 기존 사용자 권한 안에서 수행할 수 있습니다.",
-      "source_name": "GitLab(공식 블로그)",
-      "source_url": "https://about.gitlab.com/blog/mcp-server-ga/",
-      "published_at": "2026-10-15T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/9d0a24bd2f938fe69fd3.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "HALO",
-      "headline": "Keytruda Qlex Updates: PTAB Finds Four Additional Halozyme PH20 Patents Unpatentable and Halozyme Appeals Prior FWDs",
-      "summary": "미 특허심판원(PTAB)이 9월 말에서 10월 초 사이 할로자임의 PH20 히알루로니다제 특허 4건의 청구항을 무효로 판정했다고 JD Supra가 10월 14일 보도했습니다. 머크의 키트루다 퀄렉스 관련 분쟁이며 할로자임은 이전 판정들에 항소했습니다.",
-      "source_name": "JD Supra(Venable)",
-      "source_url": "https://www.jdsupra.com/legalnews/keytruda-qlex-tm-updates-ptab-finds-3582466/",
-      "published_at": "2026-10-14T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/dcf378092f3b5b30af2a.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
+      "source_url": "https://www.etnews.com/20261024000036",
       "market": "KR",
-      "ticker": "031980",
-      "headline": "피에스케이홀딩스, 첨단 패키징 증설 수혜 기대에 7%대 강세",
-      "summary": "현대차증권이 10월 16일 피에스케이홀딩스의 목표주가를 27만원으로 올리고 반도체 장비 업종 최선호주로 꼽았습니다. 주가는 장초반 7% 넘게 상승했습니다.",
-      "source_name": "한국경제",
-      "source_url": "https://www.hankyung.com/article/2026101656696",
-      "published_at": "2026-10-16T09:23:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/0b252ca4b538b4a81c59.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "market": "US",
-      "ticker": "NTRA",
-      "headline": "Natera's Signatera MRD Test Named to TIME's List of the Best Inventions of 2026",
-      "summary": "나테라의 암 재발 모니터링(MRD) 검사 시그나테라가 TIME의 '2026년 최고의 발명품' 의료·헬스케어 부문에 선정됐다고 회사가 10월 15일 밝혔습니다.",
-      "source_name": "Natera(회사 보도자료)",
-      "source_url": "https://www.natera.com/company/news/nateras-signatera-mrd-test-named-to-times-list-of-the-best-inventions-of-2026/",
-      "published_at": "2026-10-15T09:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/175cb93e771ec83192d4.svg",
-        "alt": "Folio health 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "health"
-      }
-    },
-    {
-      "market": "GLOBAL",
-      "type": "trend",
-      "trend_topic": "AI 인프라",
-      "headline": "EverWind Announces $10 billion Investment in Point Tupper Data Centre Campus and Renewable Energy Portfolio Across Nova Scotia",
-      "summary": "EverWind가 캐나다 노바스코샤 포인트 투퍼에 100억 달러 규모 데이터센터 캠퍼스와 풍력 발전 투자 계획을 10월 16일 발표했습니다. 420MW 캠퍼스는 2027년 말 95MW 1단계로 시작하며, 프론티어 AI 개발사와 초기 단계 장기 임대계약을 맺었습니다.",
-      "source_name": "GlobeNewswire",
-      "source_url": "https://www.globenewswire.com/news-release/2026/10/16/3382650/0/en/everwind-announces-10-billion-investment-in-point-tupper-data-centre-campus-and-renewable-energy-portfolio-across-nova-scotia.html",
-      "published_at": "2026-10-16T10:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/eae945020066f3d2de94.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "market": "GLOBAL",
-      "type": "trend",
-      "trend_topic": "반도체",
-      "headline": "TSMC Reports Third Quarter EPS of NT$29.43",
-      "summary": "TSMC가 3분기 매출 1조4942억 대만달러(467억 달러), 순이익 7631억 대만달러를 기록했다고 10월 15일 발표했습니다. 매출은 전년 동기 대비 50.9%, 순이익은 68.7% 늘었고 7나노 이하 첨단 공정이 웨이퍼 매출의 79%를 차지했습니다. 4분기 매출 전망은 523억~543억 달러입니다.",
-      "source_name": "TSMC(회사 보도자료)",
-      "source_url": "https://pr.tsmc.com/english/news/3346",
-      "published_at": "2026-10-15T09:00:00+08:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/495b7b31d1d2e8d27043.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "market": "KR",
-      "type": "trend",
-      "trend_topic": "반도체 정책",
-      "headline": "산업부에 반도체 전담 '국' 생긴다… 메가프로젝트·특별법 이행 총괄",
-      "summary": "산업통상부에 반도체 메가프로젝트와 반도체특별법 이행을 전담하는 국 단위 조직 '반도체혁신성장지원단'이 생깁니다. 직제 개정령안이 10월 13일 국무회의를 통과해 20일부터 시행되며, 반도체정책과·첨단반도체과·반도체생태계과 3개 과 체제로 운영됩니다.",
-      "source_name": "한국일보",
-      "source_url": "https://www.hankookilbo.com/news/article/A2026101311210001972",
-      "published_at": "2026-10-13T15:05:00+09:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/57a5299e9a3d9703b4f0.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "market": "US",
-      "type": "trend",
-      "trend_topic": "전력망",
-      "headline": "DOE to help TVA fund 2.5 GW of capacity across 84 grid projects",
-      "summary": "미국 에너지부가 테네시밸리공사(TVA)의 8개 주 84개 송배전 프로젝트에 약 5억8100만 달러(연방 지원 2억5000만 달러 포함)를 지원한다고 10월 15일 발표했습니다. GRIP·SPARK 프로그램을 합하면 TVA 관련 투자는 약 7억4100만 달러 규모이며 4300MW 이상의 송전 용량 추가가 예상됩니다.",
-      "source_name": "Renewable Energy World",
-      "source_url": "https://www.renewableenergyworld.com/power-grid/grid-modernization/doe-to-help-tva-fund-2-5-gw-of-capacity-across-84-grid-projects/",
-      "published_at": "2026-10-15T12:00:00-04:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/265f71276d3737d21a94.svg",
-        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "energy"
-      }
-    },
-    {
-      "market": "GLOBAL",
-      "type": "trend",
-      "trend_topic": "EV·배터리",
-      "headline": "BMW begins mass production of sixth-generation batteries in northeast China",
-      "summary": "BMW가 10월 15일 중국 선양 공장에서 6세대 고압 배터리 양산을 시작했습니다. 100억 위안(약 14억9000만 달러)이 투입된 이 프로젝트는 대형 원통형 셀을 쓰며 CATL, EVE에너지와 협력해 왔고, 2027년까지 중국에 노이어 클라쎄 기술 기반 신차·개량차 약 20종이 출시될 예정입니다.",
-      "source_name": "신화통신",
-      "source_url": "https://english.news.cn/20261015/54cebacd71a14092b166d8144e931052/c.html",
-      "published_at": "2026-10-15T20:52:16+08:00",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/b7609e2f4982c1f6307b.svg",
-        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "energy"
-      }
-    },
-    {
-      "market": "US",
+      "published_at": "2026-10-25T03:00:00Z",
       "type": "trend",
       "trend_topic": "금융·매크로",
-      "headline": "Markets expect the Fed to hold rates in October. Kevin Warsh could surprise them",
-      "summary": "10월 28일 FOMC를 앞두고 선물시장은 금리 인상 확률을 15%로 보고 있으며 연준 부의장과 뉴욕연은 총재는 동결에 무게를 두는 발언을 했다고 CNBC가 10월 16일 보도했습니다. 9월 소비자물가는 전년 동월 대비 3.7%, 생산자물가는 6.3% 상승했고, 9월 회의에서는 만장일치로 금리가 인상됐습니다.",
-      "source_name": "CNBC",
-      "source_url": "https://www.cnbc.com/2026/10/16/kevin-warsh-fed-october-rate-hike-interest-rates-markets.html",
-      "published_at": "2026-10-16T11:38:00-04:00",
       "visual": {
         "kind": "illustration",
-        "url": "data/news-assets/0276eaa51c7ae34d4a47.svg",
+        "url": "data/news-assets/5368ed47646480bf80fa.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Money Shifts From Tech Stocks to U.S. Treasurys on Big Tech Credit Fears",
+      "summary": "미국 10년물 국채금리가 22일 19bp 급락해 4.953%로 한 달 만에 5% 아래로 내려왔습니다. 하루 낙폭은 2023년 3월 이후 최대로, 빅테크 신용 우려에 따른 안전자산 매수세가 몰린 영향입니다. 한국 투자자들도 이달 22일까지 미국 채권을 13.71억 달러 순매수해 이미 지난달 전체(13.63억 달러)를 넘었습니다.",
+      "source_name": "Seoul Economic Daily",
+      "source_url": "https://en.sedaily.com/finance/2026/10/25/money-shifts-from-tech-stocks-to-us-treasurys-on-big-tech",
+      "market": "US",
+      "published_at": "2026-10-25T00:15:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/066f6c4e55474c438190.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "CENTCOM reportedly has plans for Iran strikes: Will Trump approve them?",
+      "summary": "알자자라에 따르면 미 중부사령부(CENTCOM)는 백악관 승인 시 이란 추가 공격을 실행할 계획을 갖추고 있고(더힐), 국방부는 이란 에너지·핵시설 타격 옵션 준비를 지시한 것으로 전해졌다(액시오스). 트럼프 대통령은 '이르면 일요일' 공격 가능성을 시사했고 미국은 세 번째 항모강습단과 병력 약 1만 명을 11월 말까지 중동에 추가 배치한다. 이란군은 미국산 드론 격추를 주장했고 로이터는 이란이 공격 재개 시 걸프 해저케이블을 겨냥할 계획이라고 보도했다.(게재일 기준, 시각 미표기)",
+      "source_name": "Al Jazeera",
+      "source_url": "https://www.aljazeera.com/news/2026/10/25/centcom-reportedly-has-plans-for-iran-strikes-will-trump-approve-them",
+      "market": "GLOBAL",
+      "published_at": "2026-10-24T21:00:00Z",
+      "type": "trend",
+      "trend_topic": "미 CENTCOM 이란 추가 공격 계획 마련 - 중동 긴장 격화",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/68203cf59a10543d264a.svg",
+        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "energy"
+      }
+    },
+    {
+      "headline": "U.S. is reducing staffing at 4 Middle East embassies over increased threats from Iran",
+      "summary": "미 국무부가 이란의 미국인 겨냥 위협 증가 첩보에 따라 요르단·레바논·카타르·UAE 등 중동 4개 대사관의 인력을 감축한다고 24일 밝혔습니다. AP가 입수한 국가정보국(DNI) 메모는 이란의 '치명적 음모가 중동 및 일부 국가에서 진전된 단계'라고 평가했습니다. 사우디 철수 명령과 달리 4개국은 강제 철수가 아닌 제한적 운영 상태이며 대사관은 유지되고, 미 당국자들은 인력 감축이 대이란 추가 공격 계획과 무관하다고 부인했습니다.",
+      "source_name": "AP (via PBS)",
+      "source_url": "https://www.pbs.org/newshour/politics/u-s-is-reducing-staffing-at-4-middle-east-embassies-over-increased-threats-from-iran",
+      "market": "GLOBAL",
+      "published_at": "2026-10-24T15:09:00Z",
+      "type": "trend",
+      "trend_topic": "에너지·지정학",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/41e8b913d41d2f306761.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Trump Floats New Strike on Iran as Oil Hits 6-Month High",
+      "summary": "트럼프 미 대통령이 23일 유세에서 이란에 대한 추가 군사공격(작전명 '라이징 퓨리') 가능성을 공개 언급했고, NYT는 미국·이스라엘이 단기 집중타격 계획을 수립하고 전투기 모의비행을 해왔다고 보도했습니다. 이란 고위관리들은 공격 시 걸프 해역 해저케이블 타격 계획을 준비했다며 '더 이상의 레드라인은 없다'고 경고했습니다. 브렌트 12월물은 3.14% 오른 배럴당 116.72달러로 6개월래 최고치에 마감했고, 사우디·이집트·튀르키예·프랑스·독일·영국 등 8개국 외무장관이 이스탄불에서 확전 자제를 촉구했습니다.",
+      "source_name": "Seoul Economic Daily",
+      "source_url": "https://en.sedaily.com/finance/2026/10/24/trump-floats-new-strike-on-iran-as-oil-hits-6-month-high",
+      "market": "GLOBAL",
+      "published_at": "2026-10-24T04:04:00Z",
+      "type": "trend",
+      "trend_topic": "에너지·지정학",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/5a146422baffbc9d2fb3.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Inflation, earnings reports and the mood of consumers and the Federal Reserve fill out a busy week",
+      "summary": "다음주(10월 26~30일) 글로벌 시장은 빅테크 실적과 연준 금리결정이 겹치는 중요한 한 주입니다. 마이크로소프트·아마존·알파벳이 실적을 발표하고, 연준은 28일 금리를 결정합니다. 미국 물가지표와 소비자심리 등 주요 경제지표도 발표될 예정입니다.",
+      "source_name": "AP",
+      "source_url": "https://apnews.com/article/inflation-fed-amazon-economy-earnings-google-7fc70f244e14a16e55450cf8b89d4651",
+      "market": "GLOBAL",
+      "published_at": "2026-10-24T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/aafc3074721ac6c40caf.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Iran's Revolutionary Guard says 2 supertankers struck mines in Strait of Hormuz",
+      "summary": "헤럴드 비즈니스에 따르면 이란 혁명수비대(IRGC) 해군은 23일(현지시간) 호르무즈 해협 남부의 지정 항로 밖을 통행하던 초대형 유조선 2척이 기뢰에 부딪혀 기관실 화재로 완전히 멈췄다고 발표했다. 두 유조선에는 원유 450만 배럴 이상이 실려 있었으며 승무원은 전원 즉시 하선했다고 IRGC는 밝혔다.",
+      "source_name": "Herald Business",
+      "source_url": "https://biz.heraldcorp.com/article/10913386",
+      "market": "GLOBAL",
+      "published_at": "2026-10-24T00:16:00Z",
+      "type": "trend",
+      "trend_topic": "호르무즈 해협에서 유조선 2척 추가 기뢰 피격",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/251cd911e73e7ac1ff85.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Chancellor unveils Britain's ambitious plan for AI",
+      "summary": "영국 재무장관이 다음주 예산안에 포함될 AI 투자 패키지를 24일 발표했습니다. 세계 최초의 AI 바이오안보연구소(AIBL) 설립 등 국가 AI 바이오안보 이니셔티브에 1억6500만 파운드, AI안전연구소(AISI)에 1억2000만 파운드를 추가 투입합니다. AIBL에는 OpenAI·앤트로픽이 최대 2억 파운드 규모의 모델 크레딧을 지원하고 구글 딥마인드 등이 협력하며, 에든버러 AI 칩 설계 역량과 맨체스터 AI 우수센터도 신설됩니다.",
+      "source_name": "GOV.UK",
+      "source_url": "https://www.gov.uk/government/news/chancellor-unveils-britains-ambitious-plan-for-ai",
+      "market": "GLOBAL",
+      "published_at": "2026-10-23T23:00:00Z",
+      "type": "trend",
+      "trend_topic": "규제·정책",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/fd3eabb762ca8e69ea8e.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "U.S. stocks lower at close of trade; Dow Jones Industrial Average down 1.24%",
+      "summary": "23일(현지시간) 뉴욕증시가 유가 상승 압박에 하락 마감했습니다. 다우 -1.24%, S&P500 -0.52%, 나스닥 -0.21%를 기록했고 통신·소비재 업종이 하락을 주도했습니다. 유가 강세에 셰브론은 2.88% 올라 사상 최고치를 경신했고, 브렌트 12월물은 배럴당 116.62달러에 거래됐습니다.",
+      "source_name": "Investing.com",
+      "source_url": "https://www.investing.com/news/stock-market-news/us-stocks-lower-at-close-of-trade-dow-jones-industrial-average-down-124-4970357",
+      "market": "US",
+      "published_at": "2026-10-23T20:30:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/15baf34295b1b6c6b984.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Apple is taking Wall Street's top spot back from Nvidia — for the fifth time",
+      "summary": "야후 파이낸스에 따르면 23일(현지시간) 애플이 장중 시가총액에서 엔비디아를 잠시 제치고 세계 시총 1위를 다섯 번째로 탈환했다. 양사 시총은 각각 약 5.1조달러로 전날 종가 기준 격차는 1% 미만이었으며, 이후 엔비디아가 다시 1위를 회복했다. 이날은 1,999달러 폴더블폰 '아이폰 듀오'가 매장에 출시된 날로, 애플 주가는 사상 최고치 행진을 이어갔다.",
+      "source_name": "Yahoo Finance",
+      "source_url": "https://finance.yahoo.com/markets/article/apple-is-taking-wall-streets-top-spot-back-from-nvidia--for-the-fifth-time-142810503.html",
+      "market": "US",
+      "published_at": "2026-10-23T15:16:00Z",
+      "type": "trend",
+      "trend_topic": "애플, 엔비디아 제치고 시총 1위 잠시 탈환 - 아이폰 듀오 출시일",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/f5584dec0d4f17967973.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "피에스케이, 국민성장펀드 받아 용인에 신규 공장 세운다",
+      "summary": "피에스케이홀딩스 자회사 피에스케이(PSK)가 23일 이사회에서 경기 용인 반도체클러스터에 1800억원 규모의 장비 생산시설을 신축하기로 결정했습니다. 자기자본 대비 33.39% 규모로 2028년 5월 준공 예정이며, 투자금의 80%(1400억원)를 국민성장펀드(1200억원)와 산업은행(200억원) 차입으로 조달할 계획입니다.",
+      "source_name": "디일렉",
+      "source_url": "https://www.thelec.kr/news/articleView.html?idxno=64203",
+      "market": "KR",
+      "published_at": "2026-10-23T07:52:00Z",
+      "ticker": "031980",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/5cb7717c8beef9797a0f.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "솔리다임 IPO 철회 덕분?…코스피, 낙폭 좁혀 5,500선 회복 마감",
+      "summary": "23일 코스피가 전장보다 16.53p(0.30%) 오른 5,550.30으로 마감했습니다. 지수는 2.36% 하락 출발해 장 초반 5,305.98(-4.12%)까지 밀렸으나 낙폭을 좁히며 폐장 20분 전 상승 전환했습니다. 코스닥은 1.62% 내린 751.69에 종료했고, SK하이닉스의 솔리다임 IPO 철회 공시가 반도체주 낙폭 축소에 영향을 준 것으로 풀이됩니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261023130000008",
+      "market": "KR",
+      "published_at": "2026-10-23T06:38:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/2894b90a733526c52745.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "Oil tops $114 as European shares fall and Kering tumbles",
+      "summary": "브렌트유가 23일 배럴당 114.73달러로 5개월래 최고치를 기록했습니다. 전일 4% 급등에 이어 0.9% 추가 상승한 것으로, 사우디아라비아 공격과 이란 전쟁 확전 우려가 공급 차질 불안을 키웠습니다. WTI는 100.75달러(+1.3%)를 기록했고, 중동-아시아 대형 유조선 운임은 전쟁 전 대비 5배 이상인 배럴당 37달러를 넘었습니다.",
+      "source_name": "Euronews",
+      "source_url": "https://www.euronews.com/2026/10/23/oil-prices-climb-above-113-as-ai-sell-off-rattles-stocks-and-investors-buy-bonds",
+      "market": "GLOBAL",
+      "published_at": "2026-10-23T05:08:00Z",
+      "type": "trend",
+      "trend_topic": "에너지",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/2a3f5f6c093d56a51025.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "HD Hyundai, Kiewit to form JV to build shipyard in U.S.",
+      "summary": "HD현대가 미국 최대 건설·엔지니어링사 키위트(Kiewit)와 합작사 'HD-Kiewit Shipbuilding'을 설립해 미국에 새 조선소를 짓기로 했습니다. 22일 휴스턴에서 협약을 체결했으며 2027년 착공, 2029년 본격 가동이 목표입니다. 노후 조선소 인수가 아닌 신설 투자로, 미 해군 지원함·상선 수주와 항만 인프라 협력도 추진합니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://en.yna.co.kr/view/AEN20261023002400320",
+      "market": "KR",
+      "published_at": "2026-10-23T01:27:00Z",
+      "type": "trend",
+      "trend_topic": "산업·투자",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/e8ff2bade9a119bc6a4d.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Nasdaq sinks as chip stocks tumble",
+      "summary": "22일(현지시간) 뉴욕증시에서 나스닥이 2.60% 하락한 26,008.86으로 마감했고 S&P500은 1.21% 내린 7,663.43을 기록했습니다. AI 투자 수익성 의구심에 반도체주가 급락해 램리서치 -11.75%, AMD -8.10%, 인텔 -8.04%를 기록했고, 다우는 0.02% 상승에 그쳤습니다. 중동 긴장에 따른 유가 상승도 부담으로 작용했습니다.",
+      "source_name": "InvestingLive",
+      "source_url": "https://investinglive.com/stocks/nasdaq-sinks-as-chip-stocks-tumble/",
+      "market": "US",
+      "published_at": "2026-10-23T00:18:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/5b0e9cac9aae3f01167d.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "솔리다임 IPO 철회에도...프리장 21만전자·120만닉스 반납",
+      "summary": "SK하이닉스가 23일 장 시작 전 미국 NAND 자회사 솔리다임의 기업공개(IPO)와 프리IPO를 철회한다고 공시하며 중복상장 논란을 해소했습니다. 간밤 뉴욕증시는 AI 과잉투자 우려에 나스닥 -2.6%, 필라델피아 반도체지수 -6.72%로 급락했고, 국내 반도체주도 프리마켓에서 삼성전자 -4.20%, SK하이닉스 -2.37%로 약세를 보였습니다.",
+      "source_name": "머니투데이",
+      "source_url": "https://www.mt.co.kr/stock/2026/10/23/2026102308175144786",
+      "market": "KR",
+      "published_at": "2026-10-22T23:32:00Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/93d5263e8dab7a886dfa.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "OpenAI working on new $30B raise at $1.25T valuation ahead of IPO",
+      "summary": "OpenAI가 최대 300억 달러 규모의 신규 펀딩을 프리머니 기업가치 1조2500억 달러로 추진 중이라고 CNBC가 보도했습니다. Coatue와 UAE 투자자들이 주도하며 한 달 전 목표(1.4조 달러)에서 하향됐습니다. 성사 시 역대 최고가 비상장기업이 되며, OpenAI는 6월 IPO 기밀 서류를 제출한 상태이고 앤트로픽도 1.5~2조 달러 상장을 검토 중으로 알려졌습니다.",
+      "source_name": "TechCrunch",
+      "source_url": "https://techcrunch.com/2026/10/22/openai-working-on-new-30b-raise-at-1-25t-valuation-ahead-of-ipo/",
+      "market": "US",
+      "published_at": "2026-10-22T22:08:00Z",
+      "type": "trend",
+      "trend_topic": "AI·자금흐름",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/6d91496643f367e28818.svg",
+        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "ai"
+      }
+    },
+    {
+      "headline": "Iran says 7 oil tankers attacked in the Strait of Hormuz as fears of a return to war grow",
+      "summary": "이란 국영TV는 호르무즈 해협에서 유조선 7척이 기뢰 또는 공격으로 화재·손상을 입었다고 22일 보도했습니다(AP 독자 확인 불가). 영국 해양무역기구(UKMTO)에 따르면 10월 선박 공격은 28건으로 전쟁 개전 이후 최다이며, 미군 보호 아래 오만 연안을 통과하는 '다크 셔틀'로 원유 운송이 이어지고 있습니다. 미국은 3번째 항공모함과 수천 명 병력을 추가 파견 중이고 UN은 미·이란에 외교 복귀를 촉구했습니다.",
+      "source_name": "NBC News (AP)",
+      "source_url": "https://www.nbcnews.com/world/iran/iran-says-7-oil-tankers-attacked-strait-hormuz-fears-grow-return-war-rcna605108",
+      "market": "GLOBAL",
+      "published_at": "2026-10-22T21:33:00Z",
+      "type": "trend",
+      "trend_topic": "에너지·지정학",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/5cb966efebd0c01ab860.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Meta stock sinks 7% as AI spend pushes free cash flow negative",
+      "summary": "메타 주가가 22일 약 7% 하락했습니다. 3분기 잉여현금흐름이 -21.2억 달러로 적자 전환했고 연간 설비투자 전망 하한을 1,300억 달러에서 1,350억 달러로 상향(상한 1,450억 달러)한 영향입니다. 5년물 CDS 스프레드가 사상 최고치를 기록했고, 회사는 성장 자금 조달을 위한 무보결권 C종 신주 발행 계획도 공개했습니다.",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/10/22/meta-stock-q3-earnings-free-cash-flow.html",
+      "market": "US",
+      "published_at": "2026-10-22T15:41:00Z",
+      "type": "trend",
+      "trend_topic": "AI·자금흐름",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/921da32bf4890d78a920.svg",
+        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "ai"
+      }
+    },
+    {
+      "headline": "Moderna (MRNA) Starts Late Stage Trial For mRNA Bird Flu Vaccine",
+      "summary": "모더나가 mRNA 기반 조류인플루엔자 백신을 후기 임상시험 단계로 진전시켰습니다. 팬데믹 인플루엔자 대상 mRNA 백신으로는 첫 사례이며, 약 4,000명 규모의 시험에서 효능과 안전성을 확인합니다. 모더나는 승인 시 생산능력의 20%를 저소득·중간소득 국가에 배정하겠다고 밝혔습니다.",
+      "source_name": "Yahoo Finance",
+      "source_url": "https://finance.yahoo.com/healthcare/articles/moderna-mrna-starts-stage-trial-101419096.html",
+      "market": "US",
+      "published_at": "2026-10-22T10:14:00Z",
+      "ticker": "MRNA",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/4f91d9ce4c6f7b5c9af3.svg",
         "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "industry"
+      }
+    },
+    {
+      "headline": "코스피, 낙폭 키워 3.5% 급락 마감…코스닥도 3.6%↓",
+      "summary": "22일 코스피가 전장보다 201.89p(3.52%) 내린 5,533.77로 마감하며 전일 급등분을 반납했습니다. 지수는 1.14% 하락 출발해 한때 상승 전환하기도 했으나 낙폭을 확대했고, 코스닥은 3.62% 내린 764.10에 종료했습니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261022144800008",
+      "market": "KR",
+      "published_at": "2026-10-22T06:36:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/1849b3c9f82b0f60cc1f.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Nvidia taps Korean component makers for AI chips, robots",
+      "summary": "삼성전기가 엔비디아와 AI 프로세서·네트워킹 칩용 반도체 기판을 공급하는 다년간 계약을 체결하고 세종·부산 생산시설 확충에 공동 투자합니다. 엔비디아는 삼성전기·이비덴·유니마이크론과의 계약으로 향후 3년간 기판 생산능력을 2.5배 늘린다고 밝혔습니다. LG이노텍은 엔비디아와 휴머노이드 로봇용 센싱 시스템을 공동 개발 중입니다.",
+      "source_name": "The Korea Herald",
+      "source_url": "https://www.koreaherald.com/article/10911360",
+      "market": "KR",
+      "published_at": "2026-10-22T04:22:00Z",
+      "type": "trend",
+      "trend_topic": "반도체·로봇",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/96a2c294b3dfb181cb6a.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "금리 만장일치 동결 배경은?…금통위 \"인상 영향 점검 필요\"",
+      "summary": "한국은행 금융통화위원회가 10월 22일 기준금리를 연 3.00%로 만장일치 동결했습니다. 두 차례 인상의 파급 영향과 중동사태, 주요국 통화·재정정책 불확실성을 점검할 필요가 있다고 밝혔고, 추가 인상 시기와 속도를 결정하겠다는 문구는 유지했습니다. 올해와 내년 성장률은 8월 전망치(각 3.3%, 2.9%)를 상당폭 상회할 것으로 예상했습니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261022074800002",
+      "market": "KR",
+      "published_at": "2026-10-22T01:48:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/b92bd32653a689e074c9.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Some US diplomats told to leave Saudi Arabia amid Houthi attacks",
+      "summary": "미 국무부가 후티의 거의 매일 이어지는 공격 속에 21일 사우디아라비아 주재 일부 외교관과 직원 가족에게 철수를 명령했습니다. 대상은 리야드 대사관과 영사관이며, 리야드 국제공항 공격 등으로 사상자가 발생했습니다. 당시 국무부는 사우디 외 철수 보도는 부정확하다고 밝혔으나, 이후 요르단·레바논·카타르·UAE 대사관 인력 감축으로 확대됐습니다.",
+      "source_name": "The Guardian",
+      "source_url": "https://www.theguardian.com/world/2026/oct/22/us-diplomats-told-to-leave-saudi-arabia-amid-houthi-attacks",
+      "market": "GLOBAL",
+      "published_at": "2026-10-22T00:26:00Z",
+      "type": "trend",
+      "trend_topic": "에너지·지정학",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/47d5ffbb70b66259918a.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Meta ordered to pay New Mexico $25 billion after Cambridge Analytica trial",
+      "summary": "뉴멕시코주 판사가 캠브리지 애널리티카 관련 재판에서 배심원단이 메타의 이용자 프라이버시 기만 책임을 인정하자 250억 달러의 지급을 명령했습니다. 메타 역사상 최대 규모의 벌금으로, 페이스북 사용자 데이터 보호 기만에 대한 책임을 물은 것입니다.",
+      "source_name": "AP",
+      "source_url": "https://apnews.com/article/facebook-penalty-cambridge-analytica-new-mexico-b329f82c3d3db3758a159405acbd4d0e",
+      "market": "US",
+      "published_at": "2026-10-21T21:31:00Z",
+      "type": "trend",
+      "trend_topic": "규제·정책",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/f0ad53974658fffe106c.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "Meta Q3 revenue tops estimates and Zuckerberg says Muse accounts have topped 10 million",
+      "summary": "메타가 3분기 매출 646억 달러로 전년 동기 대비 26% 늘어 시장 예상을 웃돌았다고 AP통신이 10월 21일 보도했습니다. 다만 아동 안전 소송 합의와 관련해 98억9000만 달러가 비용으로 반영됐고, 이를 제외한 영업이익은 228억9000만 달러였습니다. 같은 날 뉴멕시코 법원은 케임브리지 애널리티카 스캔들 관련 소송에서 메타에 250억 달러 지급을 명령했습니다.",
+      "source_name": "AP통신",
+      "source_url": "https://apnews.com/article/meta-earnings-facebook-instagram-muse-capex-13ecd6c459e39a3602f302bcc2412fe9",
+      "market": "US",
+      "published_at": "2026-10-21T21:00:00Z",
+      "type": "trend",
+      "trend_topic": "AI·미디어",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/cc77b938afd943a6a4c2.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Tesla's Q3 profit drops as it prepares for possible merger with SpaceX",
+      "summary": "테슬라가 3분기 매출 280억 달러로 전년 수준에 머물렀지만 시장 예상(279억 달러)을 소폭 웃돌았고, 영업이익은 7억1800만 달러로 전년 동기 대비 56% 급감했다고 AP통신 등이 10월 21일 보도했습니다. 자동차 매출은 3%, 에너지 저장 매출은 16% 감소한 반면 AI·자율주행·로봇 투자로 자본지출은 110% 늘어난 47억 달러였습니다. 테슬라와 스페이스X는 합병 가능성을 논의할 특별위원회를 구성했고, 머스크는 합병이 '좋은 아이디어'라고 말했습니다.",
+      "source_name": "AP통신",
+      "source_url": "https://apnews.com/article/tesla-quarterly-earning-musk-spacex-merger-cfe0453f6bf0d08d22150022128492fa",
+      "market": "US",
+      "published_at": "2026-10-21T21:00:00Z",
+      "type": "trend",
+      "trend_topic": "EV·배터리",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/58704c73ba1a2f74eaf0.svg",
+        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "energy"
+      }
+    },
+    {
+      "headline": "코스피, 장중 4%대 급등에 '매수 사이드카' 발동",
+      "summary": "코스피가 10월 21일 전날 하락을 딛고 장중 4%대 급등세를 보이면서 오전 10시 51분께 프로그램매수 호가 일시효력정지(매수 사이드카)가 발동됐습니다. 발동 시점 코스피200선물은 전일 종가보다 5.22% 상승한 904.84였고, 반도체주 강세 속에 삼성전자와 SK하이닉스가 급등했습니다. 오전 10시 58분 기준 코스피는 4.71% 오른 5814.06이었습니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261021075200008?section=market-plus%2Fall",
+      "market": "KR",
+      "published_at": "2026-10-21T02:03:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/9d1954eadc465ba9e5d8.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "반도체 수출 9개월 만에 3403억 달러…산업부 \"호황 넘어 초격차 확보\"",
+      "summary": "9월 반도체 수출액이 603억 달러로 월간 기준 사상 처음 600억 달러를 돌파했고 전년 동월 대비 262.8% 급증했다고 산업통상부가 10월 21일 밝혔습니다. 1~9월 누적 수출액은 3403억 달러로 지난해 연간 실적(1734억 달러)의 약 2배이며, 전체 수출의 41.8%를 차지합니다. 정부는 반도체 메가프로젝트와 소부장 지원으로 기술 초격차 확보에 나서겠다고 밝혔습니다.",
+      "source_name": "아주경제",
+      "source_url": "https://www.ajunews.com/view/20261021080133933",
+      "market": "KR",
+      "published_at": "2026-10-21T02:00:00Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/b29494b3020c9e7acb80.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "Netflix posts higher Q3 profit but revenue growth worries pull shares lower",
+      "summary": "넷플릭스가 3분기 순이익 36억6000만 달러(주당 87센트)로 전년 동기보다 44% 늘고 시장 예상(82센트)을 웃돌았지만, 광고 매출 가이던스를 하향하면서 주가가 하락했습니다. 매출은 12% 증가한 128억7000만 달러로 예상에 부합했습니다. 물러나는 CCO 벨라 바자리아의 후임으로 피터 라이스가 10월 26일 취임합니다.",
+      "source_name": "AP통신(WBAL)",
+      "source_url": "https://www.wbal.com/netflix-posts-higher-q3-profit-but-revenue-growth-worries-pull-shares-lower",
+      "market": "US",
+      "published_at": "2026-10-20T22:00:00Z",
+      "type": "trend",
+      "trend_topic": "미디어",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/40bc7a8d1a65e8f93688.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "[속보] 반등세 이어가지 못하고 폭락...코스피, 3.7% 하락",
+      "summary": "코스피가 10월 20일 전 거래일보다 215.27포인트(3.73%) 내린 5552.74로 마감해 전날 반등세를 이어가지 못했습니다. 삼성전자가 2.98%, SK하이닉스가 4.23% 하락했고 코스닥도 3.33% 내린 781로 마감했습니다. 10월 15일 7.57% 폭락 이후 변동성 장세가 이어지고 있습니다.",
+      "source_name": "YTN",
+      "source_url": "https://www.ytn.co.kr/_ln/0102_202610201538582131",
+      "market": "KR",
+      "published_at": "2026-10-20T06:38:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/a9c3bcd103b2a028570c.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "앰코, 광주에 3조원 투자…호남권 반도체 산업벨트 구축 '탄력'",
+      "summary": "앰코테크놀로지코리아가 10월 19일 광주 북구 첨단산업단지에서 3조원대 첨단 반도체 패키징·테스트 신규 제조라인 착공식을 열었습니다. 투자 규모는 당초 1조90억원에서 3배 늘어난 것으로, 2031년까지 생산시설 4개 동을 순차 증설하고 1500여 명을 신규 고용할 계획입니다. 삼성전자와 SK하이닉스의 호남권 반도체 메가프로젝트(팹 4기)와 연계한 지역 산업생태계 구축의 첫 사례로 해석됩니다.",
+      "source_name": "전자신문",
+      "source_url": "https://www.etnews.com/20261019000021",
+      "market": "KR",
+      "published_at": "2026-10-19T03:00:00Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/e944cc289d5ccad7d5d7.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
+    {
+      "headline": "[속보] 中 3분기 GDP 성장률 4.5%…2분기보다 0.2%p 상승",
+      "summary": "중국 3분기 국내총생산(GDP) 성장률이 4.5%로 집계돼 2분기보다 0.2%포인트 높아졌다고 연합뉴스가 10월 19일 속보로 전했습니다. AP통신은 시장 예상치를 웃도는 수치라고 보도했습니다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261019072400089",
+      "market": "GLOBAL",
+      "published_at": "2026-10-19T02:02:00Z",
+      "type": "trend",
+      "trend_topic": "금융·매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/71abfcb8536a9a72d966.svg",
+        "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "industry"
+      }
+    },
+    {
+      "headline": "Nvidia Co-Designs Custom HBM With Samsung, TSMC to Widen Bandwidth 30%",
+      "summary": "엔비디아가 자체 HBM인 NVHBM의 핵심 부품인 베이스다이를 삼성전자, TSMC와 공동 설계하고 있다고 서울경제가 10월 19일 보도했습니다. 메모리 컨트롤러를 베이스다이로 옮기고 물리층 면적을 표준 HBM 대비 60% 줄여 대역폭을 최대 30% 넓히고 전력 소비를 15% 줄이는 설계이며, TSMC 3나노 로직 공정 활용이 거론됩니다. UBS는 내년 HBM 수요가 올해보다 91% 늘어난 615억 기가비트로 신규 공급분 대비 약 10% 부족할 것으로 전망했습니다.",
+      "source_name": "서울경제(영문)",
+      "source_url": "https://en.sedaily.com/finance/2026/10/19/nvidia-co-designs-custom-hbm-with-samsung-tsmc-to-widen",
+      "market": "GLOBAL",
+      "published_at": "2026-10-19T01:06:36Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/f29a49316dde55f634dd.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
       }
     }
   ]
