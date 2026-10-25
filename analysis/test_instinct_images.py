@@ -74,3 +74,36 @@ class CommonsUrlTests(unittest.TestCase):
                 data=json.loads(reader(url));data['query']['pages']['1']['imageinfo'][0]['url']=other
                 return json.dumps(data).encode()
             self.assertEqual(ImageCollector(read=changed).collect([IMAGE]),[])
+
+
+class PrimaryPhotoTests(unittest.TestCase):
+    def mpo(self,count=2):
+        from PIL import Image
+        output=io.BytesIO()
+        Image.new('RGB',(12,10),'red').save(output,'MPO',save_all=True,
+            append_images=[Image.new('RGB',(12,10),'blue') for _ in range(count-1)])
+        return output.getvalue()
+
+    def test_stereo_jpeg_becomes_one_metadata_free_primary_photo(self):
+        from PIL import Image
+        from analysis.instinct_images import optimize
+        with Image.open(io.BytesIO(optimize(self.mpo()))) as result:
+            self.assertEqual(result.format,'WEBP')
+            self.assertEqual(getattr(result,'n_frames',1),1)
+            self.assertEqual(result.size,(12,10))
+            red,green,blue=result.getpixel((6,5))
+            self.assertGreater(red,200);self.assertLess(blue,30)
+            self.assertFalse(result.getexif())
+
+    def test_more_frames_and_animated_webp_still_rejected(self):
+        from PIL import Image
+        from analysis.instinct_images import optimize
+        with self.assertRaises(ValueError):optimize(self.mpo(3))
+        output=io.BytesIO();Image.new('RGB',(12,10),'red').save(output,'WEBP',save_all=True,
+            append_images=[Image.new('RGB',(12,10),'blue')],duration=100,loop=0)
+        with self.assertRaises(ValueError):optimize(output.getvalue())
+
+    def test_pixel_limit_applies_to_combined_stereo_frames(self):
+        from analysis.instinct_images import optimize
+        with patch('analysis.instinct_images.MAX_PIXELS',200):
+            with self.assertRaises(ValueError):optimize(self.mpo())
