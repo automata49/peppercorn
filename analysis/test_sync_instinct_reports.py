@@ -67,3 +67,49 @@ class ImageRecoveryTests(unittest.TestCase):
         payload=normalize(report,file_id='fixture_report_12345',modified_at='2026-10-25T12:00:00Z',images=ImageCollector(read=reader))
         self.assertFalse(payload['pages'][0]['pending_images'])
         self.assertEqual(len(payload['pages'][0]['image_rejections']),1)
+
+class ExportCompatibilityTests(unittest.TestCase):
+    def legacy(self):
+        return {
+            'id':'synthetic-legacy-report','title':'Synthetic legacy report',
+            'published_at':REPORT['published_at'],'updated_at':REPORT['updated_at'],
+            'summaries':{'market':'Observed market fact.','industry':'Observed industry fact.','stocks':'Observed company fact.'},
+            'disclaimer':'Synthetic data only.',
+            'sections':[{'heading':'Industry evidence','facts':['Observed capacity change.','A dated company statement.'],
+                         'outlook':['Company forecast remains uncertain.'],'images':[]}],
+            'sources':REPORT['sources'],'tickers':REPORT['tickers']}
+
+    def test_known_export_without_discriminators_is_lossless_and_private(self):
+        import hashlib,json
+        raw=self.legacy();original=copy.deepcopy(raw)
+        payload=convert(raw)
+        self.assertEqual(raw,original)
+        self.assertEqual(payload['summary'],['[시장] Observed market fact.','[산업] Observed industry fact.','[종목] Observed company fact.'])
+        body=payload['pages'][0]['text']
+        self.assertIn('확인된 사실\n• Observed capacity change.',body)
+        self.assertIn('전망 · 미확정\n• Company forecast remains uncertain.',body)
+        self.assertIn('자료 유의사항\nSynthetic data only.',body)
+        self.assertEqual(payload['content_hash'],hashlib.sha256(json.dumps(raw,ensure_ascii=False,sort_keys=True).encode()).hexdigest())
+
+    def test_explicit_unknown_version_or_type_is_never_downgraded(self):
+        for extra in ({'version':2},{'type':'news'},{'version':'1'}):
+            with self.assertRaises(ValueError):convert({**self.legacy(),**extra})
+
+    def test_ambiguous_or_malformed_legacy_input_fails_closed(self):
+        for extra in ({'summaries':{'unknown':'Do not silently drop this'}},
+                      {'sections':[{'heading':'Missing factual body'}]},
+                      {'sections':[{'heading':'Invalid list','facts':'not a list','outlook':[]}]},
+                      {'summaries':{'market':{'not':'text'}}}):
+            with self.assertRaises(ValueError):convert({**self.legacy(),**extra})
+        with self.assertRaises(ValueError):convert({k:v for k,v in REPORT.items() if k not in ('version','type')})
+
+    def test_explicit_v1_facts_outlook_and_native_contract_both_work(self):
+        payload=convert({**self.legacy(),'version':1,'type':'report'})
+        self.assertIn('확인된 사실',payload['pages'][0]['text'])
+        self.assertEqual(convert(REPORT)['pages'][0]['text'],REPORT['sections'][0]['body'])
+
+    def test_ci_diagnostics_never_contain_private_text(self):
+        from analysis.sync_instinct_reports import validation_code
+        self.assertEqual(validation_code(ValueError('private title and body must never appear')),'invalid_structure')
+        self.assertEqual(validation_code(ValueError('Expected version 1 report')),'report_version_or_type')
+        self.assertEqual(validation_code(KeyError('private value')),'missing_required_field')

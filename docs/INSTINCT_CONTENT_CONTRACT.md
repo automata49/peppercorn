@@ -30,6 +30,18 @@ version-1 public news remain supported; the report shelf stays in Market Signal.
   `sources`는 label/url, `tickers`는 market(US/KR)/ticker 배열.
 - 지정 폴더에 파일이 실제 저장됐는지 확인해줘.
 
+## Compatibility with existing Instinct exports
+
+The established export shape `summaries: {market, industry, stocks}` plus section
+`facts` / `outlook` arrays is also accepted, including older files without version/type.
+Only this recognizable shape receives implicit version 1/report discriminators;
+explicit unknown versions/types are rejected. Folio maps the summaries to labeled
+bullets and preserves every fact, forecast and disclaimer, separating forecasts under
+`전망 · 미확정`. The Drive original remains unchanged; unknown extra summary categories
+or malformed lists fail closed. New exports should use the canonical shape below.
+CI emits a safe rejection code (for example `report_version_or_type`) and ordinal,
+never the private title, body, URL or account ID.
+
 ## Report JSON
 
 See [synthetic format example](examples/Folio-Report-2026-10-26.json).
