@@ -70,6 +70,26 @@ export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed
  }
  return {version:1,updated_at:String(feed.updated_at),items:items.sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at))}
 }
+/** Freshest article per publisher first, then another round; never use issuer RSS fallback. */
+export function diverseInstinctNews(items:InstinctArticle[],now=Date.now()):InstinctArticle[]{
+ const sources=new Map<string,InstinctArticle[]>(),seen=new Set<string>()
+ for(const item of [...items].sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at))){
+  const age=now-Date.parse(item.published_at)
+  if(!Number.isFinite(age)||age< -3600_000||age>limitAge)continue
+  const url=new URL(item.source_url);url.hash=''
+  if(seen.has(url.href))continue
+  seen.add(url.href)
+  const source=url.hostname.toLowerCase().replace(/^www\./,'')
+  const bucket=sources.get(source)||[];bucket.push(item);sources.set(source,bucket)
+ }
+ const result:InstinctArticle[]=[]
+ for(let round=0;round<items.length;round++){
+  let added=false
+  for(const bucket of sources.values())if(bucket[round]){result.push(bucket[round]);added=true}
+  if(!added)break
+ }
+ return result
+}
 export async function loadInstinctNews():Promise<InstinctArticle[]>{
  const controller=new AbortController(),timer=window.setTimeout(()=>controller.abort(),8000)
  try{
