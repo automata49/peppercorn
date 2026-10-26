@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-26T15:13:01.436406Z",
+  "updated_at": "2026-10-26T21:01:56.527426Z",
   "items": [
     {
       "headline": "Stock Market Today (Oct. 26, 2026): S&P 500 climbs as markets gear up for earnings, Fed decision",
@@ -17,6 +17,57 @@
         "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "ai"
+      }
+    },
+    {
+      "headline": "Meta to raise up to US$95 billion in equity to fund costly AI expansion",
+      "summary": "로이터에 따르면 메타는 26일 AI 데이터센터·클라우드 확장 재원으로 최대 950억달러의 사상 최대 지분 조달 계획을 발표했다. 약 350억달러 규모 보통주·전환우선주 공모를 시작했고 무의결권 C주 거래 개시(2027년 1분기 예상) 후 최대 600억달러 시가매출 프로그램도 추진한다. 향후 AI 인프라에 약 8,250억달러 투입 계획이며 엔비디아·AMD·브로드컴이 최대 50억달러 매수 의향을 보였다.",
+      "source_name": "Reuters via The Business Times",
+      "source_url": "https://www.businesstimes.com.sg/companies-markets/telcos-media-tech/meta-raise-us95-billion-equity-fund-costly-ai-expansion",
+      "market": "US",
+      "published_at": "2026-10-26T13:15:00Z",
+      "type": "trend",
+      "trend_topic": "메타, AI 투자 재원으로 최대 950억달러 지분 조달 계획",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/100e9ae71021641014a8.svg",
+        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "ai"
+      }
+    },
+    {
+      "headline": "Oil plunges more than 6% from near wartime highs as diplomacy over Iran seemingly gathers pace",
+      "summary": "유로뉴스에 따르면 26일 오전 브렌트유는 카타르 중재단의 테헤란 방문 등 이란 관련 외교 움직임에 이 매체 집계 기준 금요일 종가 117.4달러에서 6% 넘게 급락해 약 110달러까지 내렸고 WTI는 약 2% 하락한 101.5달러였다(오전 11시18분 GMT+1 기준, 이 매체 집계). 다만 후티가 주말 사우디 공항·에너지 시설을 추가 공격했다고 밝히는 등 공급 리스크는 남아 있다.",
+      "source_name": "Euronews",
+      "source_url": "https://www.euronews.com/2026/10/26/oil-plunges-more-than-6-from-near-wartime-highs-as-diplomacy-over-iran-seemingly-gathers",
+      "market": "GLOBAL",
+      "published_at": "2026-10-26T10:18:00Z",
+      "type": "trend",
+      "trend_topic": "브렌트유 6% 급락 - 이란 외교 움직임에 전시 고점 후퇴",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/ffe584b60fd8d0e10970.svg",
+        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "energy"
+      }
+    },
+    {
+      "headline": "Wall St eyes best day in a month as Anthropic's IPO filing propels AI stocks",
+      "summary": "로이터에 따르면 AI 기업 앤트로픽이 미국 IPO 신고서를 제출해 급격한 매출 성장과 대규모 적자를 공개했고, 26일 기술주가 상승하며 S&P500이 한 달여 만에 최대 상승 흐름을 보였다(오전 11시30분 ET 기준 S&P500 +0.92%, 나스닥 +1.25%, 필라델피아 반도체지수 +3% 이상). 시장 변동성으로 다른 기업들이 IPO를 미루는 가운데 상장을 추진해 AI 업계의 시험대로 꼽힌다.",
+      "source_name": "Reuters via StreetInsider",
+      "source_url": "https://www.streetinsider.com/Market+Check/Wall+St+rises+as+Anthropics+IPO+filing+sharpens+focus+on+AI+trade/27230086.html",
+      "market": "US",
+      "published_at": "2026-10-26T10:02:00Z",
+      "type": "trend",
+      "trend_topic": "앤트로픽 IPO 신고 - AI주 반등 주도",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/14e133d05b9cbb8af5b1.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
       }
     },
     {
