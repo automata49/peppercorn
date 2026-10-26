@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updated_at": "2026-10-25T23:41:45.060574Z",
+  "updated_at": "2026-10-26T04:50:01.861563Z",
   "items": [
+    {
+      "headline": "코스피, 하락 출발 후 낙폭 줄여 보합권…장중 상승전환도(종합)",
+      "summary": "연합뉴스에 따르면 26일 코스피는 주말 사이 중동 긴장 고조와 국제유가 급등(23일 브렌트 116.72달러, +3.1%) 영향으로 0.92% 내린 5,499.05로 출발한 뒤 낙폭을 줄여 오전 9시 24분 0.09% 하락한 5,545.18을 기록했고 장중 잠시 상승 전환도 했다. 삼성전자는 0.93% 약세, SK하이닉스는 1.41% 강세를 보였다(오전 9시 35분 송고 기준).",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261026032651008?section=economy%2Feconomic-policy",
+      "market": "KR",
+      "published_at": "2026-10-26T00:35:00Z",
+      "type": "trend",
+      "trend_topic": "코스피, 중동발 유가 급등에 하락 출발 후 보합권 회복 시도",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/ca89afc71062fdadf323.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
     {
       "headline": "US Equity Futures Climb as Crude Oil Price Dips: Markets Wrap",
       "summary": "블룸버그에 따르면 미국 주가지수 선물이 상승 출발해 나스닥100 선물이 0.6%, S&P500 선물이 0.4% 올랐고, 브렌트유는 1% 넘게 내려 배럴당 115달러 수준으로 4월 이후 최고 종가에서 후퇴했다. 트럼프 대통령은 이란과의 합의 또는 공격 재개에 대해 '결정의 시간이 다가오고 있다'고 말했다. 이번 주 미국·유로존·일본 중앙은행의 금리 결정이 예정돼 있다.",
@@ -576,57 +593,6 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
-      }
-    },
-    {
-      "headline": "앰코, 광주에 3조원 투자…호남권 반도체 산업벨트 구축 '탄력'",
-      "summary": "앰코테크놀로지코리아가 10월 19일 광주 북구 첨단산업단지에서 3조원대 첨단 반도체 패키징·테스트 신규 제조라인 착공식을 열었습니다. 투자 규모는 당초 1조90억원에서 3배 늘어난 것으로, 2031년까지 생산시설 4개 동을 순차 증설하고 1500여 명을 신규 고용할 계획입니다. 삼성전자와 SK하이닉스의 호남권 반도체 메가프로젝트(팹 4기)와 연계한 지역 산업생태계 구축의 첫 사례로 해석됩니다.",
-      "source_name": "전자신문",
-      "source_url": "https://www.etnews.com/20261019000021",
-      "market": "KR",
-      "published_at": "2026-10-19T03:00:00Z",
-      "type": "trend",
-      "trend_topic": "반도체",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/e944cc289d5ccad7d5d7.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "[속보] 中 3분기 GDP 성장률 4.5%…2분기보다 0.2%p 상승",
-      "summary": "중국 3분기 국내총생산(GDP) 성장률이 4.5%로 집계돼 2분기보다 0.2%포인트 높아졌다고 연합뉴스가 10월 19일 속보로 전했습니다. AP통신은 시장 예상치를 웃도는 수치라고 보도했습니다.",
-      "source_name": "연합뉴스",
-      "source_url": "https://www.yna.co.kr/view/AKR20261019072400089",
-      "market": "GLOBAL",
-      "published_at": "2026-10-19T02:02:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/71abfcb8536a9a72d966.svg",
-        "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "industry"
-      }
-    },
-    {
-      "headline": "Nvidia Co-Designs Custom HBM With Samsung, TSMC to Widen Bandwidth 30%",
-      "summary": "엔비디아가 자체 HBM인 NVHBM의 핵심 부품인 베이스다이를 삼성전자, TSMC와 공동 설계하고 있다고 서울경제가 10월 19일 보도했습니다. 메모리 컨트롤러를 베이스다이로 옮기고 물리층 면적을 표준 HBM 대비 60% 줄여 대역폭을 최대 30% 넓히고 전력 소비를 15% 줄이는 설계이며, TSMC 3나노 로직 공정 활용이 거론됩니다. UBS는 내년 HBM 수요가 올해보다 91% 늘어난 615억 기가비트로 신규 공급분 대비 약 10% 부족할 것으로 전망했습니다.",
-      "source_name": "서울경제(영문)",
-      "source_url": "https://en.sedaily.com/finance/2026/10/19/nvidia-co-designs-custom-hbm-with-samsung-tsmc-to-widen",
-      "market": "GLOBAL",
-      "published_at": "2026-10-19T01:06:36Z",
-      "type": "trend",
-      "trend_topic": "반도체",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/f29a49316dde55f634dd.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
       }
     }
   ]
