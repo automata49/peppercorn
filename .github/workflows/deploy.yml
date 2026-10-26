@@ -194,7 +194,7 @@ jobs:
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
           mkdir -p data
-          for feed in leader-insights premium-insights instinct-leader-news; do
+          for feed in leader-insights premium-insights instinct-leader-news instinct-research-brief; do
             if [ -f "dist/data/$feed.json" ]; then
               cp "dist/data/$feed.json" "data/$feed.json"
             else
@@ -254,7 +254,7 @@ jobs:
           if [ -d data/news-assets ]; then
             git add -A -- data/news-assets
           fi
-          for feed in leader-insights premium-insights instinct-leader-news; do
+          for feed in leader-insights premium-insights instinct-leader-news instinct-research-brief; do
             if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
               git add -A -- "data/$feed.json"
             fi
