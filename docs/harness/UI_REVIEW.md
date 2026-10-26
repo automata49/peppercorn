@@ -1,3 +1,7 @@
+## INSTINCT-DIVERSE-NEWS-20261026 — user-approved news summaries
+
+Market Signal's unified news/report summary has no market/category vertical wheels and ignores old news filter storage. Render only validated Instinct public summaries; remove the fixed company RSS fallback from this surface. Include all fresh KR/US/GLOBAL stock and trend items, independent of leader classification, stock size or catalogue membership. Exact market+ticker lookup only enables an optional stock-detail action; never invent a match. Deduplicate original article URLs, rotate sources by normalized hostname (freshest first within each), show four initially and expose remaining items via 뉴스 더 보기. Keep exact supplied summaries, dated original citations, image rights/fallback and private latest-report/archive/reader/account guards. Leave stock-catalogue wheels and all ranking/storage calculations intact. Verify old saved news filters, mixed sources/markets, non-leader and unknown ticker, empty feed without issuer fallback, pagination, image failure, private reports and 390/834/1194/1440 Light/Dark overflow.
+
 ## FOLIO-SIGNAL-DETAIL-PARITY-20261024 — one stock-detail Harness (2026-10-24)
 
 - 발견 → 시장 신호의 섹터(표·히트맵·분류 드릴) 및 ETF(Top 5·차트·전체/산업별 목록) 종목 선택은 발견 → 종목 검토와 **같은 정식 Obra 종목 상세 화면**으로 이동한다. 모달 전용 축약 종목 상세는 사용하지 않는다.

@@ -1713,7 +1713,7 @@ export default function App(){
       <SectionHeading kind="discover" {...editorialPageHeadings.discover}/>
       <Tabs value={discoverTab} onValueChange={value=>setDiscoverTab(value as typeof discoverTab)}>
         <div className="discovery-tabbar"><TabsList aria-label="발견 영역"><TabsTrigger value="signal">시장 신호</TabsTrigger><TabsTrigger value="stocks">종목 검토</TabsTrigger><TabsTrigger value="topics">리서치 기록</TabsTrigger></TabsList></div>
-        {(['signal','stocks','topics'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&<>{tab==='signal'&&<DiscoveryNews reports={sourceReports} feed={leaderInsights} rows={leaders} market={market} getClass={displayClass} onSelect={openAnalysisStock}/>} {content}</>}</TabsContent>)}
+        {(['signal','stocks','topics'] as const).map(tab=><TabsContent key={tab} value={tab}>{discoverTab===tab&&<>{tab==='signal'&&<DiscoveryNews reports={sourceReports} rows={leaders} onSelect={openAnalysisStock}/>} {content}</>}</TabsContent>)}
       </Tabs>
     </section>
   }

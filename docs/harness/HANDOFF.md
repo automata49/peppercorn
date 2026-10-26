@@ -1,3 +1,7 @@
+## 2026-10-26 — Instinct diverse-source news summaries
+
+Removed Market Signal news market/category wheels, stored-filter restrictions and company RSS fallback. All validated fresh Instinct stock/trend items are eligible across markets, sizes and leaderboard membership. Deduplicated article URLs rotate by normalized publisher hostname, four initially with more available on demand. Exact ticker lookup only enables the existing stock detail action. Supplied summary wording, citations/image permissions and private report/archive/reader/account boundaries remain unchanged. Updated source instructions and responsive regressions. Local TS/Vite build, Harness, publisher ordering/dedup/expiry test and 8 Python import tests passed. Local browser tests cannot launch because Chromium is unavailable; CI browser and deployment results remain to verify. Physical Safari is unverified.
+
 ## 2026-10-26 — Commons stereo JPEG primary photo
 
 The supplied Commons Korea Exchange .JPG is actually an MPO stereo pair (two frames), so the static-only decoder rejected it despite verified rights. Permit exactly two MPO frames within a combined 20-million-pixel cap, then decode/store only the primary frame as metadata-free static WebP. Other animations and additional frames stay rejected, and byte/output/network/provenance limits remain. Validation version 3 rechecks older rejections once. Regressions verify primary-frame colour, one-frame WebP, EXIF removal, >2-frame/animated rejection and combined pixel cap. Verify both report image counts in private storage after main sync.
