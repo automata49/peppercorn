@@ -1,5 +1,7 @@
 import type {InstinctImage} from '../lib/instinctImages'
 import {useEffect,useState} from 'react'
+import {NewsStockMetrics} from './NewsStockMetrics'
+import {ResearchText} from './ResearchText'
 import type {LeaderRow} from '../types'
 import {loadInstinctNews,diverseInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/instinctLeaderNews'
 import {coverPhoto,useVisualStyle} from './VisualStyle'
@@ -37,7 +39,7 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
   <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>뉴스 · 리포트 요약</span></header>
   {!reports.uid&&<p className="discovery-news-empty" role="status">로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.</p>}
   {!stories.length&&<p className="discovery-news-empty" role="status">최근 7일의 Instinct 뉴스가 없습니다.</p>}
-  <SourceReports controller={reports} news>{stories.map(item=>{
+  <SourceReports controller={reports} news rows={rows} onSelect={onSelect}>{stories.map(item=>{
    const linked=item.images?.find(v=>!failed.has(v.url))
    const visual=item.visual&&!failed.has(item.visual.url)?item.visual:undefined
    return <article className="discovery-news-story" role="listitem" key={item.id} data-market={item.market} data-kind={item.kind} data-image-kind={linked?.kind}>
@@ -46,8 +48,9 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
     </figure>
     <div className="discovery-news-copy">
      <span className="discovery-news-instrument">{item.kind==='trend'?<><span className="discovery-news-trend-tag">TREND</span> {item.label} · {item.market==='GLOBAL'?'GLOBAL':item.market}</>:<>{item.label} · {item.row?.industry||item.row?.sector||item.market}</>}</span>
+     {item.row&&<NewsStockMetrics row={item.row}/>}
      <h4><a href={item.url} target="_blank" rel="noopener noreferrer">{item.headline}</a></h4>
-     {item.summary&&<p>{item.summary}</p>}
+     {item.summary&&<p><ResearchText text={item.summary} market={item.market}/></p>}
      <div className="discovery-news-source"><span>{item.publisher}</span><time dateTime={item.published_at}>{date(item.published_at)} KST</time><span>{now-Date.parse(item.published_at)>3*86400_000?'이전 소식 · ':''}Instinct AI 요약 · 원문 확인</span></div>
      <div className="discovery-news-actions"><a href={item.url} target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a>{item.row&&<button type="button" onClick={()=>onSelect(item.row!)}>종목 보기 →</button>}</div>
     </div>

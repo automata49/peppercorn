@@ -3,6 +3,17 @@ name: pepper-ui
 description: Use for Pepper responsive layout, typography, navigation, tables, Dashboard, stock dialog and visual-regression changes.
 ---
 
+## LEADER-RESEARCH-COVERFLOW-20261026 — approved leader research and responsive reading
+
+- Publish `data/instinct-research-brief.json` after the existing leaderboard snapshot on every release/market refresh. Public equities only, existing displayed classes (correction overrides), exact market+ticker, class then RS order, max 20/market. Snapshot retrieval time is not the trading date. Missing/stale/future snapshot is unavailable with no invented targets. External Instinct must read this endpoint each run; Folio publication alone does not configure that task.
+- Instinct researches those leaders using diverse original sources, facts/units/periods and risk/counter-evidence. Existing public news/private report JSON and image/table provenance remain; no fixed-company RSS fallback, private publication or extra model call. Keep diverse trend/other-company news and no news wheels; ranking and personal filters remain unchanged.
+- News and latest private report share one horizontal native-scroll Cover flow in every orientation, centered snap, shallow perspective, visible 44px previous/next, arrow/Home/End keyboard controls, reduced motion and no document overflow. Reader/archive stay outside the rail, full-width and account scoped.
+- Emphasize exact signed percentages; KR red/blue, US green/red only with explicit market, zero/unknown/mixed report prose neutral. Do not interpret numeric ranges as losses. Linked 20D fractional returns are labelled separately from article figures. Report related stocks use validated stored market+ticker only; no name inference or rewriting evidence.
+- Launch keeps the original white image identity/2000ms. iOS standalone landscape uses oriented screen dimensions, not portrait screen.height; resize/visual viewport updates recenter visible ink. Browser centering tests are not physical Safari proof.
+- Gates: Harness/build/identity/four-screen and focused 390/834/1194/1440 Light/Dark Cover flow navigation/overflow, report account boundaries, signed-text preservation, brief freshness/identity/unit bounds and installed landscape/rotation launch geometry.
+
+
+
 ## FOLIO-TAB-RAIL-JOURNAL-COVER-20261022 — current tab and cover authority
 
 Discover, Journal and Journey use the same three-column editorial tabs with a 2px ink underline on the active tab only; remove their decorative full-width grey rails and the stock-detail tab rail without removing focus outlines, functional tab underlines or record/table separators. Journal's MY PAGES uses the existing coverPhoto('journal',photoStyle) asset: keep it visible with a full-width band on phones while preserving the new-page button and the compact bilingual top masthead. Validate 390/834/1194/1440px, image load, tab switches, accessibility and no horizontal overflow.

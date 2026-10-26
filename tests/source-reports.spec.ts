@@ -61,6 +61,8 @@ test('late previous-account report response cannot cross accounts',async({page})
 test('structured JSON report parser validates tables, image provenance and original link',()=>{
  const page={number:1,text:'<script>plain text only</script>',heading:'산업 변화',images:[],format:'instinct-json-v1',published_at:'2026-10-25T10:00:00Z',updated_at:'2026-10-25T11:00:00Z',original_url:report.source_url,tables:[{caption:'매출 · USD million · 2025',columns:['기간','매출'],rows:[['2025','100']]}]}
  expect(parseReportDetail({...detail,pages:[page]}).pages[0].heading).toBe('산업 변화')
+ expect(parseReportDetail({...detail,pages:[{...page,tickers:[{market:'KR',ticker:'000660'}]}]}).pages[0].tickers).toEqual([{market:'KR',ticker:'000660'}])
+ expect(()=>parseReportDetail({...detail,pages:[{...page,tickers:[{market:'KR',ticker:'AAPL'}]}]})).toThrow()
  expect(()=>parseReportDetail({...detail,pages:[{...page,tables:[{...page.tables[0],rows:[['bad shape']]}]}]})).toThrow()
  expect(()=>parseReportDetail({...detail,pages:[{...page,original_url:'javascript:alert(1)'}]})).toThrow()
  expect(()=>parseReportDetail({...detail,pages:[{...page,image_meta:[{url:'https://tracking.example/image'}]}]})).toThrow()
