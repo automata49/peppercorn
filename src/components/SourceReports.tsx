@@ -3,6 +3,10 @@ import {coverPhoto,useVisualStyle} from './VisualStyle'
 import { Button } from './ui/button'
 import type { ReportController, ReportDetail, ReportPage } from '../lib/sourceReports'
 import {ReportSummary,ReportBody,ReportTableVisual} from './ReportVisuals'
+import type {LeaderRow} from '../types'
+import {NewsStockMetrics} from './NewsStockMetrics'
+import {NewsCoverFlow} from './NewsCoverFlow'
+import {ResearchText} from './ResearchText'
 import {splitReportShelf} from '../lib/reportPresentation'
 import './source-reports.css'
 
@@ -40,7 +44,7 @@ function ReportReader({report,controller,preloaded}:{report:ReportController['it
   {!!links.length&&<details><summary>리포트 출처 · {links.length}개</summary><ul>{links.map((l,i)=><li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label||l.url} ↗</a></li>)}</ul></details>}
  </div>
 }
-export function SourceReports({controller,news=false,children}:{controller:ReportController;news?:boolean;children?:ReactNode}){
+export function SourceReports({controller,news=false,children,rows=[],onSelect}:{controller:ReportController;news?:boolean;children?:ReactNode;rows?:LeaderRow[];onSelect?:(row:LeaderRow)=>void}){
  const [open,setOpen]=useState<string|null>(null)
  const {photoStyle}=useVisualStyle()
  const {latest,history}=splitReportShelf(controller.uid?controller.items:[])
@@ -57,6 +61,7 @@ export function SourceReports({controller,news=false,children}:{controller:Repor
  },[news,previewKey,controller.detail])
  const preloaded=preview?.key===previewKey?preview.value:undefined
  const cover=preloaded?.pages.flatMap(p=>(p.image_meta||[]).map(m=>({...m,url:p.images[m.image_index]}))).find(m=>m.url&&!failed.has(m.url))
+ const related=(preloaded?.pages[0]?.tickers||[]).map(t=>rows.find(r=>r.market===t.market&&r.ticker===t.ticker)).filter((r):r is LeaderRow=>!!r).filter((r,i,list)=>list.findIndex(v=>v.market===r.market&&v.ticker===r.ticker)===i).slice(0,3)
  const render=(r:ReportController['items'][number],isLatest=false)=><article key={r.drive_file_id} data-report={isLatest?'latest':'archived'}>
   {isLatest&&<span className="source-report-latest">최신 리포트</span>}
   <h5>{r.title}</h5><time dateTime={r.source_modified_at}>{new Date(r.source_modified_at).toLocaleString('ko-KR')} · 자료 갱신</time>
@@ -68,7 +73,7 @@ export function SourceReports({controller,news=false,children}:{controller:Repor
  const archive=!!history.length&&<details className="source-report-archive" onToggle={e=>{if(!e.currentTarget.open&&open&&history.some(r=>r.drive_file_id===open))setOpen(null)}}><summary>이전 리포트 · {history.length}개</summary>{history.map(r=>render(r))}</details>
  if(news)return <section className="source-reports source-reports-news" aria-label="뉴스와 리포트 요약">
   {errors}
-  <div className="discovery-news-stories" role="list">
+  <NewsCoverFlow>
    {latest&&<article className="discovery-news-story" role="listitem" data-kind="report" data-report="latest" data-image-kind={cover?.kind}>
     <figure><button className="discovery-news-cover" type="button" aria-label={latest.title+' 전문 열기'} onClick={()=>setOpen(latest.drive_file_id)}><img src={cover?.url||coverPhoto('discover',photoStyle)} alt={cover?.caption||''} loading="lazy" onError={()=>{if(cover)setFailed(old=>new Set([...old,cover.url]))}}/></button>
      <figcaption>{cover?<><span>{cover.kind==='chart'?'원문 차트':cover.kind==='illustration'?'출처 일러스트':'출처 사진'}</span><a href={cover.source_url} target="_blank" rel="noopener noreferrer">{cover.credit}</a><a href={cover.license_url} target="_blank" rel="noopener noreferrer">{cover.usage_rights}</a></>:<span>Folio 이미지 · 원문 사진 아님</span>}</figcaption>
@@ -76,13 +81,14 @@ export function SourceReports({controller,news=false,children}:{controller:Repor
     <div className="discovery-news-copy">
      <span className="discovery-news-instrument">REPORT · 최신 리포트 · 계정 전용</span>
      <h4><button type="button" onClick={()=>setOpen(latest.drive_file_id)}>{latest.title}</button></h4>
-     {latest.summary.map((line,i)=><p key={i}>{line}</p>)}
+     {!!related.length&&<details className="news-report-instruments"><summary>연결 종목 · {related.length}개</summary>{related.map(row=><div key={row.market+row.ticker}><NewsStockMetrics row={row}/>{onSelect&&<div className="discovery-news-actions"><button type="button" onClick={()=>onSelect(row)}>{row.market==='KR'?row.name:row.ticker} 종목 보기</button></div>}</div>)}</details>}
+     {latest.summary.map((line,i)=><p key={i}><ResearchText text={line}/></p>)}
      <div className="discovery-news-source"><span>Instinct · 리포트 요약</span><time dateTime={latest.source_modified_at}>{new Date(latest.source_modified_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})} KST · 자료 갱신</time></div>
      <div className="discovery-news-actions"><button type="button" aria-expanded={open===latest.drive_file_id} aria-controls="report-news-reader" onClick={()=>setOpen(open===latest.drive_file_id?null:latest.drive_file_id)}>{open===latest.drive_file_id?'전문 접기':'전문·차트 읽기'}</button></div>
     </div>
    </article>}
    {children}
-  </div>
+  </NewsCoverFlow>
   {latest&&open===latest.drive_file_id&&<section id="report-news-reader" aria-label="리포트 전문 읽기"><h4>{latest.title}</h4><ReportReader key={controller.uid+latest.drive_file_id} report={latest} controller={controller} preloaded={preloaded}/></section>}
   {archive}
  </section>

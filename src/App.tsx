@@ -884,11 +884,13 @@ export default function App(){
   useLayoutEffect(()=>{
     const root=launchRef.current
     if(!showIntro||!root)return
+    const recenter=()=>{const image=root.querySelector<HTMLImageElement>('.launch-wordmark');if(image)centerLaunchWordmark(image)}
+    recenter();window.addEventListener('resize',recenter);window.visualViewport?.addEventListener('resize',recenter)
     const timer=window.setTimeout(()=>{
       try{sessionStorage.setItem('peppercorn-intro-seen','1')}catch{}
       setShowIntro(false)
     },2000)
-    return()=>window.clearTimeout(timer)
+    return()=>{window.clearTimeout(timer);window.removeEventListener('resize',recenter);window.visualViewport?.removeEventListener('resize',recenter)}
   },[showIntro])
   useEffect(()=>{
     if(previousMarketRef.current===market)return

@@ -130,3 +130,32 @@ Existing database timestamptz values may end in `+00`; only the stored-value par
 Commons API may append `utm_source`, `utm_campaign` and `utm_content` to an original image URL. Folio disregards only these analytics parameters for API identity comparison; all other URL components and license/creator checks still apply. Instinct can keep the original image URL without tracking parameters. Image validation version changes trigger one recheck of stored report image rejections without changing the Drive source.
 
 A verified JPEG may contain an MPO stereo pair. Folio accepts exactly two MPO frames only within the combined 20-million-pixel budget and stores the primary photograph as one metadata-free WebP; no animation or stereo viewer is created. Other multi-frame files remain rejected. This does not change Instinct's seven-field image contract.
+
+## 주도 종목 기반 작성 기준 (2026-10-26)
+
+Instinct의 정기 뉴스/리포트 작업 시작 지침에 다음을 적용한다:
+
+> 매 실행마다 https://automata49.github.io/peppercorn/data/instinct-research-brief.json 을
+> 읽고 `status=ready`, `snapshot_at` 20시간 이내를 확인한다. `instruments`의
+> market+ticker를 작성 대상 기준으로 삼고 파일의 `instructions`를 따른다.
+> 핵심 주도/주도 후보 우선, 강세 전환/조정 중은 위험·반증을 확인한다.
+> 다양한 원문 출처를 사용하고 기존 뉴스·비공개 리포트 JSON 계약으로 Drive에 저장한다.
+> 작성 기준을 읽지 못하거나 오래된 경우 대상 종목을 추정하지 않는다.
+
+Folio publishes this bounded **public** brief after the existing leaderboard snapshot
+on every deployment/market-refresh deployment. It includes at most 20 equities per
+market, existing displayed leadership classes and RS order, snapshot retrieval time (not a market trading date), industry and
+20D/50D fractional returns; no personal filters, account data or private report text.
+It never changes investment selection/classification. News display retains diverse
+validated sources, trend and other-company coverage; no restored news filter wheels.
+
+This endpoint prepares the handoff; publishing Folio cannot change an external
+Instinct task's prompt. That task must read the endpoint on each run. No callback,
+Instinct execution, OAuth write scope or new model call is claimed by Folio.
+
+Story cards use the same native horizontal Cover flow in portrait and landscape,
+with previous/next, keyboard navigation and reduced motion. Linked stock 20D returns
+are labelled separately from article text; exact supplied signed percentages are
+emphasized without recomputation. Mixed-market/private prose has neutral percentages
+unless an explicit market is available. Quantitative evidence still comes only from
+validated source tables; decorative imagery is never evidence.

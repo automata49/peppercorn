@@ -10,12 +10,17 @@ test('installed iPhone splash is centered against the physical screen, not below
  expect(launchPhysicalScreenShift(true,0,852,792)).toBe(-30)
  expect(launchPhysicalScreenShift(false,60,852,792)).toBe(0)
  expect(launchPhysicalScreenShift(true,0,852,852)).toBe(0)
+ // iOS reports portrait screen dimensions while its content is landscape.
+ expect(launchPhysicalScreenShift(true,0,852,393,393,852)).toBe(0)
+ expect(launchPhysicalScreenShift(true,0,1194,834,834,1194)).toBe(0)
 })
 
 
-for (const viewport of [{width:390,height:844},{width:844,height:390},{width:834,height:1194},{width:1194,height:834},{width:1440,height:900}]) {
- test(`optical splash center at ${viewport.width}x${viewport.height}`,async({browser})=>{
-  const context=await browser.newContext({viewport,reducedMotion:'reduce'})
+for (const viewport of [{width:390,height:844},{width:844,height:390},{width:834,height:1194},{width:1194,height:834},{width:1440,height:900},{width:852,height:393,standalone:true},{width:1194,height:834,standalone:true}]) {
+ test(`optical splash center at ${viewport.width}x${viewport.height}${'standalone' in viewport?' installed':''}`,async({browser})=>{
+  const installed='standalone' in viewport
+  const context=await browser.newContext({viewport,reducedMotion:'reduce',...(installed?{userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',screen:{width:Math.min(viewport.width,viewport.height),height:Math.max(viewport.width,viewport.height)}}:{})})
+  if(installed)await context.addInitScript(()=>Object.defineProperty(navigator,'standalone',{value:true}))
   const page=await context.newPage()
   await page.clock.install({time:new Date('2026-10-17T00:00:00Z')})
   await page.clock.pauseAt(new Date('2026-10-17T00:00:00Z'))

@@ -11,3 +11,4 @@ console.log(`${cases.length} offline Analyst contract cases passed (no live mode
 await import('./position-cases.mjs');
 await import('./identity.mjs');
 await import('./screens.mjs');
+execFileSync(process.execPath,['--test','scripts/instinct-research-brief.test.mjs'],{stdio:'inherit'});

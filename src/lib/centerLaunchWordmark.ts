@@ -10,10 +10,12 @@
  * should keep their existing visual-viewport centering.
  */
 export function launchPhysicalScreenShift(
-  iosStandalone: boolean, safeTop: number, screenHeight: number, viewportHeight: number,
+  iosStandalone: boolean, safeTop: number, screenHeight: number, viewportHeight: number, screenWidth=0, viewportWidth=0,
 ): number {
   if (!iosStandalone) return 0
-  const excludedTop = Math.max(0, safeTop, screenHeight - viewportHeight)
+  // iOS can keep screen.height in portrait coordinates after rotating.
+  const orientedHeight=screenWidth>0&&viewportWidth>viewportHeight?Math.min(screenHeight,screenWidth):screenHeight
+  const excludedTop = Math.max(0, safeTop, orientedHeight - viewportHeight)
   if (excludedTop === 0) return 0
   return -Math.min(48, excludedTop / 2)
 }
@@ -31,7 +33,7 @@ function centerOnPhysicalScreen(image:HTMLImageElement):void {
   const device=/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)
   const installed=window.matchMedia('(display-mode: standalone)').matches || (navigator as Navigator&{standalone?:boolean}).standalone===true
   const safeTop=device&&installed?readSafeAreaTop():0
-  const shift=launchPhysicalScreenShift(device&&installed,safeTop,window.screen.height,window.innerHeight)
+  const shift=launchPhysicalScreenShift(device&&installed,safeTop,window.screen.height,window.innerHeight,window.screen.width,window.innerWidth)
   image.style.setProperty('--launch-physical-y',shift.toFixed(2)+'px')
 }
 

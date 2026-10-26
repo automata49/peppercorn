@@ -136,6 +136,8 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         run: node scripts/publish-leaderboard.mjs
+      - name: Publish current leader research brief for Instinct
+        run: node scripts/instinct-research-brief.mjs
       - name: Collect source-backed leader cards
         continue-on-error: true
         timeout-minutes: 6
