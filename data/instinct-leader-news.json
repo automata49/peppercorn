@@ -1,7 +1,58 @@
 {
   "version": 1,
-  "updated_at": "2026-10-26T04:50:01.861563Z",
+  "updated_at": "2026-10-26T15:13:01.436406Z",
   "items": [
+    {
+      "headline": "Stock Market Today (Oct. 26, 2026): S&P 500 climbs as markets gear up for earnings, Fed decision",
+      "summary": "야후 파이낸스(TheStreet)에 따르면 26일 뉴욕증시는 이번 주 빅테크 실적(마이크로소프트·알파벳·아마존)과 27~28일 FOMC 회의를 앞두고 상승 출발했고 유가는 하락했다. 시장이 반영하는 이번 회의 금리 인상 확률은 약 10%이며 12월 인상 신호를 주목하고 있다. 지난주 증시는 AI 투자 부담과 유가 상승, 중동 긴장으로 하락했다(오전 8시46분 CDT 기준).",
+      "source_name": "Yahoo Finance (TheStreet)",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/stock-market-today-oct-26-134626728.html",
+      "market": "US",
+      "published_at": "2026-10-26T13:46:00Z",
+      "type": "trend",
+      "trend_topic": "뉴욕증시, 빅테크 실적·FOMC 앞두고 상승 출발",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/07fe74f6e6e17a89ad2c.svg",
+        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "ai"
+      }
+    },
+    {
+      "headline": "[마감시황] '우울한 월요일' 코스피 5469선 후퇴…7개월 만 '최저'",
+      "summary": "뉴스핌에 따르면 26일 코스피는 외국인 순매도 7,531억원(NXT 포함 집계) 속에 전 거래일보다 80.83포인트(1.46%) 내린 5,469.47에 마감해 4월 6일 이후 약 7개월 만에 최저 종가를 기록했다. 코스닥은 3.26% 급락한 727.21로 7월 말 이후 최저였다. 개인·기관은 각 931억원·6,173억원 순매수로 집계됐다(집계 범위 미확인). FOMC와 빅테크·삼성·SK 실적을 앞둔 관망 심리가 반영됐다.",
+      "source_name": "뉴스핌",
+      "source_url": "https://www.newspim.com/news/view/20261026000894",
+      "market": "KR",
+      "published_at": "2026-10-26T06:42:00Z",
+      "type": "trend",
+      "trend_topic": "코스피 1.46% 하락 마감, 7개월 만 최저 - 외국인 대량 매도",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/540e07efea6c1f6bdf70.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "삼성·SK, 내년 2분기 HBM4 8단 양산 출하...엔비디아향 공급",
+      "summary": "지디넷코리아 취재에 따르면 삼성전자와 SK하이닉스는 엔비디아향 HBM4 8단 제품을 내년 2분기부터 양산 출하하는 방안을 계획 중이다(확정 로드맵 아님). 엔비디아는 차세대 AI 가속기 '루빈 울트라'에 12단 적층의 발열·수율 문제로 HBM4·HBM4E 8단 병행 탑재를 검토 중이며, 양사의 HBM4 12단 엔비디아 인증은 완료된 상태라고 이 매체는 전했다.",
+      "source_name": "ZDNet Korea",
+      "source_url": "https://zdnet.co.kr/view/?no=20261026115227",
+      "market": "KR",
+      "published_at": "2026-10-26T05:21:00Z",
+      "type": "trend",
+      "trend_topic": "삼성·SK, 내년 2분기 엔비디아향 HBM4 8단 양산 출하",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/2c8d8f0c0e3a656d50e6.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
     {
       "headline": "코스피, 하락 출발 후 낙폭 줄여 보합권…장중 상승전환도(종합)",
       "summary": "연합뉴스에 따르면 26일 코스피는 주말 사이 중동 긴장 고조와 국제유가 급등(23일 브렌트 116.72달러, +3.1%) 영향으로 0.92% 내린 5,499.05로 출발한 뒤 낙폭을 줄여 오전 9시 24분 0.09% 하락한 5,545.18을 기록했고 장중 잠시 상승 전환도 했다. 삼성전자는 0.93% 약세, SK하이닉스는 1.41% 강세를 보였다(오전 9시 35분 송고 기준).",
@@ -17,6 +68,23 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
+      }
+    },
+    {
+      "headline": "Samsung, SK hynix Poised for Record Q3 Profits, Riding AI Memory Boom",
+      "summary": "비즈니스코리아에 따르면 SK하이닉스는 28일, 삼성전자는 29일 3분기 확정 실적을 발표하며 합산 영업이익은 약 184조원으로 전망된다. 삼성전자는 잠정 매출 195조원·영업이익 107.4조원(전년 대비 +782.5%)을 발표했고 SK하이닉스도 매출 약 98조원·영업이익 약 77조원이 예상된다. HBM 수요와 메모리 가격 상승이 실적 개선을 이끌었다.",
+      "source_name": "Businesskorea",
+      "source_url": "https://www.businesskorea.co.kr/news/articleView.html?idxno=279605",
+      "market": "KR",
+      "published_at": "2026-10-26T00:33:00Z",
+      "type": "trend",
+      "trend_topic": "삼성전자·SK하이닉스 이번 주 3분기 실적 발표 - 사상 최대 전망",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/352170688ecd7edf8e06.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
       }
     },
     {
