@@ -40,7 +40,7 @@ for(const width of [390,834,1440])test(`Reports move to MARKET & COMPANIES ${wid
  await reports.getByRole('button',{name:'전문·차트 읽기'}).click()
  await expect(reports.getByLabel('리포트 전문',{exact:true})).toContainText('주문·출하·마진')
  await expect(reports.locator('a[href*="drive.google.com"]')).toHaveCount(0)
- await expect(section.locator('[data-wheel]')).toHaveCount(2)
+ await expect(section.locator('[data-wheel]')).toHaveCount(0)
  await expect(section.locator('[data-kind="report"]')).toHaveCount(1)
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
 })

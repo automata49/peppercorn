@@ -1,5 +1,6 @@
 import {test,expect,type Page} from '@playwright/test'
 import {demoRows} from '../src/data/mock'
+import {parseInsights} from '../src/lib/leaderInsights'
 import {diverseInstinctNews,parseInstinctNews,type InstinctArticle} from '../src/lib/instinctLeaderNews'
 const now=Date.parse('2026-10-26T08:00:00Z'),stamp=(hours=0)=>new Date(now+hours*3600_000).toISOString()
 const news:InstinctArticle[]=[
@@ -32,7 +33,7 @@ async function boot(page:Page,items:unknown=news){
  await page.route('**/functions/v1/position-public?*',r=>r.fulfill({json:{rows:[]}}))
  await page.route('**/functions/v1/quotes?*',r=>r.fulfill({json:{quotes:{}}}))
  await page.route('**/functions/v1/price-history?*',r=>r.fulfill({json:{series:{}}}))
- await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{version:1,published_at:stamp(),ai_status:'disabled',items:[]}}))
+ await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{version:1,published_at:stamp(),ai_status:'not_configured',items:[]}}))
  await page.route('**/data/instinct-leader-news.json*',r=>r.fulfill({json:{...feed,items}}))
  await page.goto('/peppercorn/');await openNewsPage(page)
 }
@@ -80,7 +81,9 @@ test('missing Instinct feed stays empty without company RSS fallback',async({pag
  await boot(page,[])
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
  const issuer={id:'US:NVDA:test',market:'US',ticker:'NVDA',headline:'NVIDIA issuer channel must stay absent',summary:'This is the old fixed company feed.',summary_kind:'source_excerpt',collected_at:stamp(),expires_at:stamp(24),generated_at:null,model:null,prompt_version:null,evidence:null,source:{id:'nvda',title:'Company channel',publisher:'NVIDIA Newsroom',url:'https://nvidianews.nvidia.com/news/test',published_at:stamp(-1)},image:null}
- await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:{version:1,published_at:stamp(),ai_status:'disabled',items:[issuer]}}))
+ const issuerFeed={version:1,published_at:stamp(),ai_status:'not_configured',items:[issuer]}
+ expect(parseInsights(issuerFeed,now)?.items).toHaveLength(1)
+ await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:issuerFeed}))
  await page.reload();await openNewsPage(page)
  await expect(section.locator('article')).toHaveCount(0)
  await expect(section).toContainText('최근 7일의 Instinct 뉴스가 없습니다.')
