@@ -1,8 +1,8 @@
 {
   "version": 1,
   "type": "folio-research-brief",
-  "generated_at": "2026-10-26T21:06:43.112Z",
-  "snapshot_at": "2026-10-26T21:06:42.767Z",
+  "generated_at": "2026-10-27T05:11:14.347Z",
+  "snapshot_at": "2026-10-27T05:11:14.017Z",
   "status": "ready",
   "source": "https://automata49.github.io/peppercorn/data/leaderboard.json",
   "return_unit": "fraction",
