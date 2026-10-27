@@ -1,7 +1,64 @@
 {
   "version": 1,
-  "updated_at": "2026-10-26T21:01:56.527426Z",
+  "updated_at": "2026-10-27T05:07:58.901876Z",
   "items": [
+    {
+      "headline": "Oil eases on Middle East diplomacy hopes, Saudi attacks keep supply worries alive",
+      "summary": "CNBC에 따르면 27일 00:00 GMT 기준 브렌트유 선물은 0.57% 내린 배럴당 115.15달러, WTI는 0.43% 내린 101.32달러였다(이 매체 집계 기준). 사우디아라비아·튀르키예·파키스탄이 26일 테헤란에서 이란 측과 회담했고, 이란 국영매체는 4개국이 협상 지속에 합의했다고 보도했다. 후티의 사우디 공격 재개로 하락폭은 제한됐다.",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/10/27/oil-eases-on-mideast-diplomacy-hopes-saudi-attacks-stoke-supply-woes.html",
+      "market": "GLOBAL",
+      "published_at": "2026-10-27T01:34:00Z",
+      "type": "trend",
+      "trend_topic": "브렌트유 115달러대로 추가 하락 - 이란 4자 회담 진전",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/894d6608b4e8a80a073d.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "[속보] 코스피 4%대 급등…매수 사이드카 발동",
+      "summary": "연합뉴스에 따르면 27일 코스피가 장 초반 4%대 급등세를 보이며 매수 사이드카가 발동됐다. 오전 9시2분 현재 코스피는 전장보다 198.11포인트(3.62%) 오른 5,667.58을, 코스닥은 2.53% 오른 745.64를 나타냈다. 전일 급락세에서 반등해 상승 출발한 뒤 오름폭을 키웠다.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261027065200008?section=economy%2Fall",
+      "market": "KR",
+      "published_at": "2026-10-27T01:15:00Z",
+      "type": "trend",
+      "trend_topic": "코스피 장 초반 4%대 급등 - 매수 사이드카 발동",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
+    {
+      "headline": "Equities end higher as Anthropic's IPO filing buoys AI stocks",
+      "summary": "로이터에 따르면 26일(현지시간) 뉴욕증시는 앤트로픽의 IPO 신고로 AI주 투자심리가 개선되며 상승 마감했다(다우 +0.28% 52,361.58, S&P500 +0.70% 7,676.77, 나스닥 +0.83% 26,169.38, 필라델피아 반도체지수 +2.8%). 메타는 최대 950억달러 지분 조달 계획에 1.9% 하락했고 테슬라는 바클레이즈 등급 상향에 5.2% 올라 3개월여 만에 최고치로 마감했다. 수요일 연준 결정을 앞두고 CME 페드워치상 금리 인상 확률은 12.7%다.",
+      "source_name": "Reuters via Yahoo Finance",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/us-stock-futures-edge-oil-100215774.html",
+      "market": "US",
+      "published_at": "2026-10-26T20:24:00Z",
+      "type": "trend",
+      "trend_topic": "뉴욕증시 상승 마감 - 앤트로픽 IPO 신고에 AI주 반등",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/fa0e1e377f166ad49934.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
     {
       "headline": "Stock Market Today (Oct. 26, 2026): S&P 500 climbs as markets gear up for earnings, Fed decision",
       "summary": "야후 파이낸스(TheStreet)에 따르면 26일 뉴욕증시는 이번 주 빅테크 실적(마이크로소프트·알파벳·아마존)과 27~28일 FOMC 회의를 앞두고 상승 출발했고 유가는 하락했다. 시장이 반영하는 이번 회의 금리 인상 확률은 약 10%이며 12월 인상 신호를 주목하고 있다. 지난주 증시는 AI 투자 부담과 유가 상승, 중동 긴장으로 하락했다(오전 8시46분 CDT 기준).",
