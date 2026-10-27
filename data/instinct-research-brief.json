@@ -1,8 +1,8 @@
 {
   "version": 1,
   "type": "folio-research-brief",
-  "generated_at": "2026-10-27T05:11:14.347Z",
-  "snapshot_at": "2026-10-27T05:11:14.017Z",
+  "generated_at": "2026-10-27T14:36:35.143Z",
+  "snapshot_at": "2026-10-27T14:36:34.795Z",
   "status": "ready",
   "source": "https://automata49.github.io/peppercorn/data/leaderboard.json",
   "return_unit": "fraction",
@@ -16,8 +16,19 @@
       "sector": "디스플레이",
       "industry": "IT",
       "rs_rank": 99,
-      "return_20d": 0.515068493150685,
-      "return_50d": 5.070252469813392
+      "return_20d": 0.4679399727148703,
+      "return_50d": 4.645330535152151
+    },
+    {
+      "market": "KR",
+      "ticker": "092870",
+      "name": "엑시콘",
+      "leadership_class": "핵심 주도",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 98,
+      "return_20d": 0.350407450523865,
+      "return_50d": 2.1920748486516235
     },
     {
       "market": "KR",
@@ -27,8 +38,41 @@
       "sector": "반도체와반도체장비",
       "industry": "IT",
       "rs_rank": 97,
-      "return_20d": 0.11833550065019516,
-      "return_50d": 0.07499999999999996
+      "return_20d": 0.18193069306930698,
+      "return_50d": 0.1506024096385543
+    },
+    {
+      "market": "KR",
+      "ticker": "064290",
+      "name": "인텍플러스",
+      "leadership_class": "핵심 주도",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 96,
+      "return_20d": 0.05291970802919699,
+      "return_50d": 0.7223880597014924
+    },
+    {
+      "market": "KR",
+      "ticker": "080580",
+      "name": "오킨스전자",
+      "leadership_class": "핵심 주도",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 96,
+      "return_20d": 0.08249496981891347,
+      "return_50d": 0.6993051168667088
+    },
+    {
+      "market": "KR",
+      "ticker": "077500",
+      "name": "유니퀘스트",
+      "leadership_class": "핵심 주도",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 95,
+      "return_20d": 0.2905331882480957,
+      "return_50d": 0.8945686900958467
     },
     {
       "market": "KR",
@@ -38,8 +82,8 @@
       "sector": "반도체와반도체장비",
       "industry": "IT",
       "rs_rank": 95,
-      "return_20d": 0.08183306055646478,
-      "return_50d": 0.10166666666666657
+      "return_20d": 0.13995308835027376,
+      "return_50d": 0.22830665543386686
     },
     {
       "market": "KR",
@@ -48,20 +92,9 @@
       "leadership_class": "주도 후보",
       "sector": "자본재",
       "industry": "산업재",
-      "rs_rank": 99,
-      "return_20d": 0.1938144329896907,
-      "return_50d": 0.4331683168316831
-    },
-    {
-      "market": "KR",
-      "ticker": "092870",
-      "name": "엑시콘",
-      "leadership_class": "주도 후보",
-      "sector": "반도체와반도체장비",
-      "industry": "IT",
       "rs_rank": 98,
-      "return_20d": 0.25131578947368416,
-      "return_50d": 1.855855855855856
+      "return_20d": -0.028523489932885893,
+      "return_50d": 0.3341013824884793
     },
     {
       "market": "KR",
@@ -71,8 +104,8 @@
       "sector": "기술하드웨어와장비",
       "industry": "IT",
       "rs_rank": 98,
-      "return_20d": 1.023783783783784,
-      "return_50d": 1.236559139784946
+      "return_20d": 0.5856905158069883,
+      "return_50d": 1.258293838862559
     },
     {
       "market": "KR",
@@ -82,41 +115,52 @@
       "sector": "소프트웨어와서비스",
       "industry": "IT",
       "rs_rank": 96,
-      "return_20d": 0.6069094304388423,
-      "return_50d": 1.0610778443113773
+      "return_20d": 0.6337899543378995,
+      "return_50d": 1.1196682464454977
     },
     {
       "market": "KR",
-      "ticker": "064290",
-      "name": "인텍플러스",
-      "leadership_class": "주도 후보",
-      "sector": "반도체와반도체장비",
-      "industry": "IT",
-      "rs_rank": 96,
-      "return_20d": -0.06654676258992809,
-      "return_50d": 0.707236842105263
-    },
-    {
-      "market": "KR",
-      "ticker": "077500",
-      "name": "유니퀘스트",
+      "ticker": "031980",
+      "name": "피에스케이홀딩스",
       "leadership_class": "주도 후보",
       "sector": "반도체와반도체장비",
       "industry": "IT",
       "rs_rank": 95,
-      "return_20d": 0.2517564402810304,
-      "return_50d": 0.7846410684474123
+      "return_20d": 0.03676470588235303,
+      "return_50d": 0.5508707607699359
     },
     {
       "market": "KR",
-      "ticker": "010580",
-      "name": "에스엠벡셀",
+      "ticker": "051160",
+      "name": "지어소프트",
       "leadership_class": "주도 후보",
-      "sector": "자동차와부품",
+      "sector": "소매(유통)",
       "industry": "경기관련소비재",
       "rs_rank": 94,
-      "return_20d": 0.1605166051660516,
-      "return_50d": 1.0019096117122852
+      "return_20d": 0.0888704318936877,
+      "return_50d": 0.19726027397260282
+    },
+    {
+      "market": "KR",
+      "ticker": "078350",
+      "name": "한양디지텍",
+      "leadership_class": "주도 후보",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 94,
+      "return_20d": 0.35443037974683533,
+      "return_50d": 0.6389496717724288
+    },
+    {
+      "market": "KR",
+      "ticker": "425420",
+      "name": "티에프이",
+      "leadership_class": "주도 후보",
+      "sector": "반도체와반도체장비",
+      "industry": "IT",
+      "rs_rank": 94,
+      "return_20d": 0.18506998444790046,
+      "return_50d": 1.2248175182481753
     },
     {
       "market": "KR",
@@ -126,8 +170,41 @@
       "sector": "내구소비재와의류",
       "industry": "경기관련소비재",
       "rs_rank": 93,
-      "return_20d": -0.03652058432934924,
-      "return_50d": 0.6086474501108647
+      "return_20d": -0.034700315457413256,
+      "return_50d": 0.4796905222437138
+    },
+    {
+      "market": "KR",
+      "ticker": "010580",
+      "name": "에스엠벡셀",
+      "leadership_class": "주도 후보",
+      "sector": "자동차와부품",
+      "industry": "경기관련소비재",
+      "rs_rank": 93,
+      "return_20d": 0.1374321880650995,
+      "return_50d": 1.004461440407903
+    },
+    {
+      "market": "KR",
+      "ticker": "091580",
+      "name": "상신이디피",
+      "leadership_class": "주도 후보",
+      "sector": "전자와 전기제품",
+      "industry": "IT",
+      "rs_rank": 93,
+      "return_20d": 0.24407582938388628,
+      "return_50d": 0.451077943615257
+    },
+    {
+      "market": "KR",
+      "ticker": "419050",
+      "name": "삼기에너지솔루션즈",
+      "leadership_class": "주도 후보",
+      "sector": "자동차와부품",
+      "industry": "경기관련소비재",
+      "rs_rank": 93,
+      "return_20d": 0.265495867768595,
+      "return_50d": 0.5888456549935148
     },
     {
       "market": "KR",
@@ -136,97 +213,20 @@
       "leadership_class": "주도 후보",
       "sector": "자본재",
       "industry": "산업재",
-      "rs_rank": 93,
-      "return_20d": 0.16796875,
-      "return_50d": 0.22540983606557385
-    },
-    {
-      "market": "KR",
-      "ticker": "003160",
-      "name": "디아이",
-      "leadership_class": "주도 후보",
-      "sector": "반도체와반도체장비",
-      "industry": "IT",
       "rs_rank": 92,
-      "return_20d": 0.03735632183908044,
-      "return_50d": 0.44979919678714864
+      "return_20d": 0.26038500506585605,
+      "return_50d": 0.27068437180796723
     },
     {
       "market": "KR",
-      "ticker": "012030",
-      "name": "DB",
+      "ticker": "053800",
+      "name": "안랩",
       "leadership_class": "주도 후보",
       "sector": "소프트웨어와서비스",
       "industry": "IT",
       "rs_rank": 92,
-      "return_20d": 0.33844339622641506,
-      "return_50d": 0.459807073954984
-    },
-    {
-      "market": "KR",
-      "ticker": "051160",
-      "name": "지어소프트",
-      "leadership_class": "주도 후보",
-      "sector": "소매(유통)",
-      "industry": "경기관련소비재",
-      "rs_rank": 92,
-      "return_20d": 0.05617977528089879,
-      "return_50d": 0.09990999099909992
-    },
-    {
-      "market": "KR",
-      "ticker": "251970",
-      "name": "펌텍코리아",
-      "leadership_class": "주도 후보",
-      "sector": "소재",
-      "industry": "소재",
-      "rs_rank": 92,
-      "return_20d": 0.19512195121951215,
-      "return_50d": 0.3816717019133937
-    },
-    {
-      "market": "KR",
-      "ticker": "340450",
-      "name": "지씨지놈",
-      "leadership_class": "주도 후보",
-      "sector": "제약과생물공학",
-      "industry": "건강관리",
-      "rs_rank": 92,
-      "return_20d": 0.2414266117969821,
-      "return_50d": 0.6544789762340038
-    },
-    {
-      "market": "KR",
-      "ticker": "105740",
-      "name": "디케이락",
-      "leadership_class": "주도 후보",
-      "sector": "자본재",
-      "industry": "산업재",
-      "rs_rank": 90,
-      "return_20d": 0.3570536828963795,
-      "return_50d": 0.46693657219973006
-    },
-    {
-      "market": "KR",
-      "ticker": "425420",
-      "name": "티에프이",
-      "leadership_class": "주도 후보",
-      "sector": "반도체와반도체장비",
-      "industry": "IT",
-      "rs_rank": 89,
-      "return_20d": -0.045031055900621064,
-      "return_50d": 0.8580060422960725
-    },
-    {
-      "market": "KR",
-      "ticker": "200470",
-      "name": "에이팩트",
-      "leadership_class": "강세 전환",
-      "sector": "반도체와반도체장비",
-      "industry": "IT",
-      "rs_rank": 94,
-      "return_20d": 0.19820971867007664,
-      "return_50d": 0.725598526703499
+      "return_20d": 0.2476446837146702,
+      "return_50d": 0.4372093023255814
     },
     {
       "market": "US",

@@ -1,7 +1,30 @@
 {
   "version": 1,
-  "updated_at": "2026-10-27T05:07:58.901876Z",
+  "updated_at": "2026-10-27T14:33:18.794241Z",
   "items": [
+    {
+      "headline": "[마감 시황] 외국인과 기관의 동반 매수세.. 코스피 5,638.34(▲168.87, +3.09%) 상승 마감",
+      "summary": "서울경제에 따르면 27일 코스피는 외국인(5,930억원)과 기관(2,804억원)의 동반 순매수에 전 거래일보다 168.87포인트(3.09%) 오른 5,638.34에 마감했다(수급 집계 범위 미확인). 개인은 9,478억원을 순매도했고 전기전자업이 4.48% 오르는 등 대부분 업종이 강세였다. 연합뉴스 속보 기준 코스닥은 2.29% 오른 743.83에 장을 마쳤다.",
+      "source_name": "서울경제",
+      "source_url": "https://www.sedaily.com/article/20106677",
+      "market": "KR",
+      "published_at": "2026-10-27T06:35:00Z",
+      "type": "trend",
+      "trend_topic": "코스피 3.09% 반등 마감 - 외국인·기관 동반 매수",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
     {
       "headline": "Oil eases on Middle East diplomacy hopes, Saudi attacks keep supply worries alive",
       "summary": "CNBC에 따르면 27일 00:00 GMT 기준 브렌트유 선물은 0.57% 내린 배럴당 115.15달러, WTI는 0.43% 내린 101.32달러였다(이 매체 집계 기준). 사우디아라비아·튀르키예·파키스탄이 26일 테헤란에서 이란 측과 회담했고, 이란 국영매체는 4개국이 협상 지속에 합의했다고 보도했다. 후티의 사우디 공격 재개로 하락폭은 제한됐다.",
@@ -43,6 +66,29 @@
       ]
     },
     {
+      "headline": "European shares dip as HSBC results weigh on banks ahead of Big Tech earnings",
+      "summary": "로이터(유로넥스트)에 따르면 27일 유럽 증시는 HSBC의 3분기 매출이 자산관리 부문 성장 둔화로 시장 예상을 밑돌면서 은행주 중심으로 하락했다(오전 장중 기준). HSBC 주가는 7% 급락했고 STOXX600 은행업종지수는 1.3%, STOXX600은 0.2%, 런던 FTSE100은 1% 내렸다. 세전이익은 예상에 부합했다. (유로넥스트 게재 시각 10:41, 시간대 미표기 - 게재일 기준 정규화)",
+      "source_name": "Reuters (Euronext)",
+      "source_url": "https://live.euronext.com/en/financial-news/european-shares-dip-hsbc-results-weigh-banks-ahead-big-tech-earnings",
+      "market": "GLOBAL",
+      "published_at": "2026-10-26T23:00:00Z",
+      "type": "trend",
+      "trend_topic": "유럽 증시 하락 - HSBC 실적 실망에 은행주 약세",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/d/db/HSBC_Headquarters_Canary_Wharf.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:HSBC_Headquarters_Canary_Wharf.jpg",
+          "caption": "HSBC 런던 카나리워프 본사 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "Romazur",
+          "usage_rights": "CC BY-SA 4.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+          "url": "data/news-assets/external-958434172b3ca576d8e89eb109a8beddc4975fe897c13c766b2bb0f5afd15524.webp",
+          "request_hash": "ff9ac40cb369e1fc45123c882a8dc3d639ab9842d65c91420abf840ecd68527e"
+        }
+      ]
+    },
+    {
       "headline": "Equities end higher as Anthropic's IPO filing buoys AI stocks",
       "summary": "로이터에 따르면 26일(현지시간) 뉴욕증시는 앤트로픽의 IPO 신고로 AI주 투자심리가 개선되며 상승 마감했다(다우 +0.28% 52,361.58, S&P500 +0.70% 7,676.77, 나스닥 +0.83% 26,169.38, 필라델피아 반도체지수 +2.8%). 메타는 최대 950억달러 지분 조달 계획에 1.9% 하락했고 테슬라는 바클레이즈 등급 상향에 5.2% 올라 3개월여 만에 최고치로 마감했다. 수요일 연준 결정을 앞두고 CME 페드워치상 금리 인상 확률은 12.7%다.",
       "source_name": "Reuters via Yahoo Finance",
@@ -75,6 +121,29 @@
         "credit": "Folio 편집 일러스트",
         "topic": "ai"
       }
+    },
+    {
+      "headline": "Anthropic's IPO prospectus shows $16.3 billion in revenue, an $80.7 billion net loss, and goal of an 'age of miracles'",
+      "summary": "포천에 따르면 앤트로픽이 26일 제출한 IPO 신고서(S-1)에서 2026년 상반기 매출은 163억달러로 전년 동기 대비 약 1,300% 급증했다. 상반기 순손실 807억달러 중 724억달러는 전환사채 가치 증가에 따른 비현금성 회계비용이며, 영업손실은 6.93억달러로 전년 21억달러에서 줄었다. 조정 영업이익은 16억달러(마진 약 10%)였다.",
+      "source_name": "Fortune",
+      "source_url": "https://fortune.com/2026/10/26/anthropics-s-1/",
+      "market": "US",
+      "published_at": "2026-10-26T13:25:00Z",
+      "type": "trend",
+      "trend_topic": "앤트로픽 S-1 공개 - 상반기 매출 163억달러, 순손실 807억달러",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Dario_Amodei_in_2023.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Dario_Amodei_in_2023.jpg",
+          "caption": "다리오 아모데이 앤트로픽 CEO(2023년 촬영) · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "UK Prime Minister",
+          "usage_rights": "CC BY 2.0",
+          "license_url": "https://creativecommons.org/licenses/by/2.0",
+          "url": "data/news-assets/external-1ec143a9215861e3e629b5e814e269165a0f2a05d1eff7bf0d5b0fa0c8bdf9b1.webp",
+          "request_hash": "64f431721253ef08ae7f92fd343b7fedb3bc2784d8effc540dd5f3fd2548d2f4"
+        }
+      ]
     },
     {
       "headline": "Meta to raise up to US$95 billion in equity to fund costly AI expansion",
@@ -752,23 +821,6 @@
         "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "finance"
-      }
-    },
-    {
-      "headline": "[속보] 반등세 이어가지 못하고 폭락...코스피, 3.7% 하락",
-      "summary": "코스피가 10월 20일 전 거래일보다 215.27포인트(3.73%) 내린 5552.74로 마감해 전날 반등세를 이어가지 못했습니다. 삼성전자가 2.98%, SK하이닉스가 4.23% 하락했고 코스닥도 3.33% 내린 781로 마감했습니다. 10월 15일 7.57% 폭락 이후 변동성 장세가 이어지고 있습니다.",
-      "source_name": "YTN",
-      "source_url": "https://www.ytn.co.kr/_ln/0102_202610201538582131",
-      "market": "KR",
-      "published_at": "2026-10-20T06:38:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/a9c3bcd103b2a028570c.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
       }
     }
   ]
