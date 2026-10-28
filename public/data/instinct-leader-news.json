@@ -1,7 +1,30 @@
 {
   "version": 1,
-  "updated_at": "2026-10-28T05:44:32.465944Z",
+  "updated_at": "2026-10-28T15:07:27.705801Z",
   "items": [
+    {
+      "headline": "[마감 시황] 외국인과 기관의 동반 매수세.. 코스피 6,012.44(▲374.10, +6.63%) 상승 마감",
+      "summary": "서울경제에 따르면 28일 코스피는 외국인(8,158억원)과 기관(9,608억원)의 동반 순매수에 374.10포인트(6.63%) 급등한 6,012.44에 마감하며 6,000선을 회복했다(수급 집계 범위 미확인). 개인은 1조8,016억원을 순매도했다. 서울신문 기준 SK하이닉스는 10.89% 급등한 148만7,000원, 삼성전자는 9.01% 오른 24만2,000원에 마쳤고, 연합뉴스 기준 코스닥은 3.69% 오른 771.28이었다.",
+      "source_name": "서울경제",
+      "source_url": "https://www.sedaily.com/article/20107224",
+      "market": "KR",
+      "published_at": "2026-10-28T06:34:00Z",
+      "type": "trend",
+      "trend_topic": "코스피 6.63% 급등 마감, 6,000선 회복 - 외국인·기관 1.8조 동반 매수",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
     {
       "headline": "코스피 장중 6,000선 돌파…삼전닉스 8% 급등",
       "summary": "연합뉴스에 따르면 28일 코스피는 SK하이닉스의 사상 최대 실적과 대규모 주주환원 발표에 장중 한때 6,000선을 돌파했고, 급등세에 매수 사이드카가 발동됐다. 삼성전자와 SK하이닉스는 8%대 급등했다. 지수는 이후 상승폭을 일부 반납해 5,900선에서 거래됐다(오전 장중 기준).",
@@ -22,6 +45,52 @@
           "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
           "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
           "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
+    {
+      "headline": "SK Hynix leads the tech sector; Technoprobe in the spotlight in Milan",
+      "summary": "일솔레24오레에 따르면 28일 유럽 증시는 SK하이닉스의 사상 최대 실적에 힘입어 기술주 중심으로 강세를 보여 유로스톡스 기술업종이 0.7% 상승했다. ASM인터내셔널은 3분기 매출 11.6억유로(전 분기 대비 +16%, 컨센서스 4.5% 상회)와 2027년 매출 전망 약 57억유로 제시로 3%가량 올랐고, ASML·BESI·아익스트론 등 반도체주가 동반 상승했다. (게재일 기준, 시각 미표기)",
+      "source_name": "Il Sole 24 Ore",
+      "source_url": "https://en.ilsole24ore.com/art/sk-hynix-leads-the-way-for-tech-milano-luce-technoprobe-AJeJebwB",
+      "market": "GLOBAL",
+      "published_at": "2026-10-27T23:00:00Z",
+      "type": "trend",
+      "trend_topic": "유럽 반도체주 강세 - SK하이닉스發 훈풍, ASM 실적 서프라이즈",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/ae/ASML_headquarters_Veldhoven.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:ASML_headquarters_Veldhoven.jpg",
+          "caption": "ASML 네덜란드 벨트호번 본사 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "A ansems",
+          "usage_rights": "Public domain",
+          "license_url": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+          "url": "data/news-assets/external-1a9db739fd882626c1effe3dd60cf58295a8a9f8d65c3db9232509732b3f1725.webp",
+          "request_hash": "7365debf67412fe19ee8d5aa05f992e67b278643c49b1e57faaa13dccd69d9d4"
+        }
+      ]
+    },
+    {
+      "headline": "Houthis claim strikes on Saudi refinery, ministry",
+      "summary": "AFP(던)에 따르면 후티는 27일 사우디 국방부와 사우디 최대 라스타누라 정유시설(일일 처리 55만배럴)에 탄도미사일을 발사했다고 주장했다. 사우디 당국은 리야드 상공 2발, 동부주 상공 3발을 요격했고 파편 피해를 확인했다. 라스타누라 인근 화재는 진압됐으나 피해 규모와 원유 선적 영향은 불분명하다고 해사보안업체 뱅가드가 전했다. (게재 시각 06:50, 시간대 미표기 - 게재일 기준 정규화)",
+      "source_name": "AFP (DAWN)",
+      "source_url": "https://www.dawn.com/news/2040379",
+      "market": "GLOBAL",
+      "published_at": "2026-10-27T19:00:00Z",
+      "type": "trend",
+      "trend_topic": "후티, 사우디 국방부·라스타누라 정유시설 미사일 공격 주장 - 사우디는 요격 확인",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Ras_Tanura_Refinery_by_Paul_Palmer_2487098008.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Ras_Tanura_Refinery_by_Paul_Palmer_2487098008.jpg",
+          "caption": "라스타누라 정유시설 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "Paul Palmer",
+          "usage_rights": "Public domain",
+          "license_url": "https://commons.wikimedia.org/wiki/Commons:Public_domain",
+          "url": "data/news-assets/external-8ed9a59d332ec2dfa2565b4365df18c44d9fd6a5ab5debaff6e9f0b5d99b5588.webp",
+          "request_hash": "81165d382960469b1b00de8b8ae6ceb75ab5d2318d30e91a12917786a8a67379"
         }
       ]
     },
