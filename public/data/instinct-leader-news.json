@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-29T15:15:03.311658Z",
+  "updated_at": "2026-10-29T21:08:25.875777Z",
   "items": [
     {
       "headline": "코스피, 삼성전자 주주환원책 실망에 하락 마감…코스닥도 2%대↓",
@@ -967,23 +967,6 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
-      }
-    },
-    {
-      "headline": "Meta stock sinks 7% as AI spend pushes free cash flow negative",
-      "summary": "메타 주가가 22일 약 7% 하락했습니다. 3분기 잉여현금흐름이 -21.2억 달러로 적자 전환했고 연간 설비투자 전망 하한을 1,300억 달러에서 1,350억 달러로 상향(상한 1,450억 달러)한 영향입니다. 5년물 CDS 스프레드가 사상 최고치를 기록했고, 회사는 성장 자금 조달을 위한 무보결권 C종 신주 발행 계획도 공개했습니다.",
-      "source_name": "CNBC",
-      "source_url": "https://www.cnbc.com/2026/10/22/meta-stock-q3-earnings-free-cash-flow.html",
-      "market": "US",
-      "published_at": "2026-10-22T15:41:00Z",
-      "type": "trend",
-      "trend_topic": "AI·자금흐름",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/921da32bf4890d78a920.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
       }
     }
   ]
