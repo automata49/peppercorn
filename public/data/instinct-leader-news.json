@@ -1,7 +1,81 @@
 {
   "version": 1,
-  "updated_at": "2026-10-29T05:50:29.806208Z",
+  "updated_at": "2026-10-29T15:15:03.311658Z",
   "items": [
+    {
+      "headline": "코스피, 삼성전자 주주환원책 실망에 하락 마감…코스닥도 2%대↓",
+      "summary": "코스피 5,937.66(-1.24%) 마감, 장중 6,100.11 고점 후 5,817.92까지 밀렸다가 낙폭 일부 만회. 삼성전자 -4.13%(주주환원 잔여재원 활용계획이 2027년 1월로 이연되며 실망 매물 - 신한투자증권 분석), SK하이닉스 +2.62% 152.6만원. LG엔솔 -8.60%, 체코 원전 시공협상 결렬에 대우건설 -18.57%. 코스닥 753.23(-2.34%). 원/달러 1,336.50원.",
+      "source_name": "한국경제",
+      "source_url": "https://www.hankyung.com/article/2026102939116",
+      "market": "KR",
+      "published_at": "2026-10-29T06:48:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
+    {
+      "headline": "GDP (Advance Estimate), 3rd Quarter 2026",
+      "summary": "미 3분기 실질 GDP 속보치 연율 +3.4%(2분기 +2.2%). 투자·소비·정부지출 증가가 견인, 수출 감소·수입 증가는 차감. 민간 국내최종판매 +4.9%(2분기 +4.6%). 3분기 PCE 가격지수 +2.1%, 근원 +2.5%(2분기 각 +5.0%·+3.3%). (게재일 기준, 시각 미표기)",
+      "source_name": "미국 경제분석국(BEA)",
+      "source_url": "https://www.bea.gov/news/2026/gdp-advance-estimate-3rd-quarter-2026",
+      "market": "US",
+      "published_at": "2026-10-29T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "매크로",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/e78b22243602da69afe9.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Personal Income and Outlays, September 2026",
+      "summary": "9월 PCE 가격지수 전월비 +0.5%, 근원 +0.3%; 전년비 헤드라인 +3.6%·근원 +3.1%. 개인소득 +0.2%(545억달러), 명목 소비지출 +0.5%(1,131억달러)지만 실질 PCE는 +0.1% 미만에 그침. 개인저축률 3.8%. (게재일 기준, 시각 미표기)",
+      "source_name": "미국 경제분석국(BEA)",
+      "source_url": "https://www.bea.gov/news/2026/personal-income-and-outlays-september-2026",
+      "market": "US",
+      "published_at": "2026-10-29T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "매크로·물가",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/af86784c8ef6249bd915.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
+    {
+      "headline": "[컨콜 종합] 삼성전자 \"HBM4 매출 3배 급증…2027년 HBM 물량 이미 '완판'\"",
+      "summary": "삼성전자는 3분기 콘콜에서 HBM4 매출이 전분기 대비 3배 이상 늘고 HBM 내 비중 60%에 도달했다고 밝혔다. 2027년 HBM 물량은 목표 가격 수준에서 협상 완료돼 \"사실상 솔드아웃\"이라고 설명. 메모리 공급 부족은 2028년까지 지속될 것으로 전망했고, 대형 고객 10곳과 장기공급계약 체결·10곳과 협상 중이라고 덧붙였다.",
+      "source_name": "EBN (인베스팅닷컴 게재)",
+      "source_url": "https://kr.investing.com/news/stock-market-news/article-2147465",
+      "market": "KR",
+      "published_at": "2026-10-29T03:21:00Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/5bfc2d86cd6aa0ccab4b.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
     {
       "headline": "Seoul stocks down 3 pct late Thurs. morning after weaker-than-expected Samsung earnings",
       "summary": "코스피 29일 오전 11:20 현재 5,831.34(-3.01%), 장중 6,100.11 고점 후 삼성전자 실적 발표 직전 하락 전환(연합 보도). 삼성전자 -6.61%, SK하이닉스 +0.4%. LG엔솔 -9.76%(LG화학 2.5조 지분 매각 계획), 체코 원전 협상 종료에 두산에너빌리티 -12.21%·대우건설 -21.79%. 원/달러 1,333.5원(+8.5원).",
@@ -910,39 +984,6 @@
         "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "ai"
-      }
-    },
-    {
-      "headline": "Moderna (MRNA) Starts Late Stage Trial For mRNA Bird Flu Vaccine",
-      "summary": "모더나가 mRNA 기반 조류인플루엔자 백신을 후기 임상시험 단계로 진전시켰습니다. 팬데믹 인플루엔자 대상 mRNA 백신으로는 첫 사례이며, 약 4,000명 규모의 시험에서 효능과 안전성을 확인합니다. 모더나는 승인 시 생산능력의 20%를 저소득·중간소득 국가에 배정하겠다고 밝혔습니다.",
-      "source_name": "Yahoo Finance",
-      "source_url": "https://finance.yahoo.com/healthcare/articles/moderna-mrna-starts-stage-trial-101419096.html",
-      "market": "US",
-      "published_at": "2026-10-22T10:14:00Z",
-      "ticker": "MRNA",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/4f91d9ce4c6f7b5c9af3.svg",
-        "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "industry"
-      }
-    },
-    {
-      "headline": "코스피, 낙폭 키워 3.5% 급락 마감…코스닥도 3.6%↓",
-      "summary": "22일 코스피가 전장보다 201.89p(3.52%) 내린 5,533.77로 마감하며 전일 급등분을 반납했습니다. 지수는 1.14% 하락 출발해 한때 상승 전환하기도 했으나 낙폭을 확대했고, 코스닥은 3.62% 내린 764.10에 종료했습니다.",
-      "source_name": "연합뉴스",
-      "source_url": "https://www.yna.co.kr/view/AKR20261022144800008",
-      "market": "KR",
-      "published_at": "2026-10-22T06:36:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/1849b3c9f82b0f60cc1f.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
       }
     }
   ]
