@@ -1,7 +1,30 @@
 {
   "version": 1,
-  "updated_at": "2026-10-29T21:08:25.875777Z",
+  "updated_at": "2026-10-30T05:52:02.749966Z",
   "items": [
+    {
+      "headline": "코스피, 장중 낙폭 커져 5%대 급락…코스닥 4%대↓",
+      "summary": "코스피 30일 오전 11:03 현재 5,620.68(-5.34%), 장중 5,599.42(-5.7%) 저점. 10:05 매도 사이드카 발동(10월 15일 -7.57% 급락 이후 11거래일 만). 알파벳 등 미국 기술주 급락 여파로 삼성전자 -6.14%·SK하이닉스 -8.65%. 외국인 -7,755억·기관 -2,388억 순매도, 개인 +9,074억 순매수. 코스닥도 4%대 하락.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261030080000008",
+      "market": "KR",
+      "published_at": "2026-10-30T02:11:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
     {
       "headline": "코스피, 삼성전자 주주환원책 실망에 하락 마감…코스닥도 2%대↓",
       "summary": "코스피 5,937.66(-1.24%) 마감, 장중 6,100.11 고점 후 5,817.92까지 밀렸다가 낙폭 일부 만회. 삼성전자 -4.13%(주주환원 잔여재원 활용계획이 2027년 1월로 이연되며 실망 매물 - 신한투자증권 분석), SK하이닉스 +2.62% 152.6만원. LG엔솔 -8.60%, 체코 원전 시공협상 결렬에 대우건설 -18.57%. 코스닥 753.23(-2.34%). 원/달러 1,336.50원.",
@@ -58,6 +81,46 @@
         "credit": "Folio 편집 일러스트",
         "topic": "other"
       }
+    },
+    {
+      "headline": "Amazon.com Announces Third Quarter Results",
+      "summary": "아마존 3분기 매출 2,019억달러(+12%). AWS 매출 460억달러(+39%, 약 5년래 최고 성장·연환산 1,840억달러), AWS 영업이익 178억달러. 순이익 207억달러(주당 1.89달러, 전년 앤트로픽 평가익 기저로 감소). 4분기 매출 가이드 2,400~2,470억달러(+12~16%). 재시 CEO \"2027-2028년 AWS 40% 이상 성장 전망\". (게재일 기준, 시각 미표기)",
+      "source_name": "Amazon IR (공식 보도자료)",
+      "source_url": "https://ir.aboutamazon.com/news-release/news-release-details/2026/Amazon-com-Announces-Third-Quarter-Results/",
+      "market": "US",
+      "published_at": "2026-10-29T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "AI·클라우드",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/a53cf1a0b9f3e9ce0bb6.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
+    {
+      "headline": "Wall Street ends lower as Alphabet revenue miss revives AI capex jitters",
+      "summary": "뉴욕증시 하락: 다우 52,342.56(-0.25%), S&P500 7,720.39(-0.30%), 나스닥 26,184.72(-1.37%). 알파벳 -12.6%(AI 지출 부담 부각)에 통신서비스주 동반 약세, 필라델피아 반도체지수 4연승 마감(-1.4%). 러셀2000은 +1.0%. 포드 +12.4%·릴리 +6.6%, 포티넷·서비스나우 -20% 이상 급락. 시간외 아마존 -6.5%. (게재일 기준, 시각 미표기)",
+      "source_name": "Reuters (StreetInsider 게재)",
+      "source_url": "https://www.streetinsider.com/General+News/Wall+Street+ends+lower+as+Alphabet+revenue+miss+revives+AI%C2%A0capex+jitters/27251190.html",
+      "market": "US",
+      "published_at": "2026-10-29T04:00:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름·매크로",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Wall_Street_-_New_York_Stock_Exchange.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Wall_Street_-_New_York_Stock_Exchange.jpg",
+          "caption": "뉴욕증권거래소(NYSE) 월가 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "Carlos Delgado",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-599104b17111ae280c97c59a87250ca9f8b2d70536e6a0f7e198a0f01dc97b1e.webp",
+          "request_hash": "b75ca085d0a35a481d162bb0a1634a4eb6b7c818bb56067f0d06238a32c7dda0"
+        }
+      ]
     },
     {
       "headline": "[컨콜 종합] 삼성전자 \"HBM4 매출 3배 급증…2027년 HBM 물량 이미 '완판'\"",
@@ -865,108 +928,6 @@
         "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "Oil tops $114 as European shares fall and Kering tumbles",
-      "summary": "브렌트유가 23일 배럴당 114.73달러로 5개월래 최고치를 기록했습니다. 전일 4% 급등에 이어 0.9% 추가 상승한 것으로, 사우디아라비아 공격과 이란 전쟁 확전 우려가 공급 차질 불안을 키웠습니다. WTI는 100.75달러(+1.3%)를 기록했고, 중동-아시아 대형 유조선 운임은 전쟁 전 대비 5배 이상인 배럴당 37달러를 넘었습니다.",
-      "source_name": "Euronews",
-      "source_url": "https://www.euronews.com/2026/10/23/oil-prices-climb-above-113-as-ai-sell-off-rattles-stocks-and-investors-buy-bonds",
-      "market": "GLOBAL",
-      "published_at": "2026-10-23T05:08:00Z",
-      "type": "trend",
-      "trend_topic": "에너지",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/2a3f5f6c093d56a51025.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "headline": "HD Hyundai, Kiewit to form JV to build shipyard in U.S.",
-      "summary": "HD현대가 미국 최대 건설·엔지니어링사 키위트(Kiewit)와 합작사 'HD-Kiewit Shipbuilding'을 설립해 미국에 새 조선소를 짓기로 했습니다. 22일 휴스턴에서 협약을 체결했으며 2027년 착공, 2029년 본격 가동이 목표입니다. 노후 조선소 인수가 아닌 신설 투자로, 미 해군 지원함·상선 수주와 항만 인프라 협력도 추진합니다.",
-      "source_name": "연합뉴스",
-      "source_url": "https://en.yna.co.kr/view/AEN20261023002400320",
-      "market": "KR",
-      "published_at": "2026-10-23T01:27:00Z",
-      "type": "trend",
-      "trend_topic": "산업·투자",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/e8ff2bade9a119bc6a4d.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "headline": "Nasdaq sinks as chip stocks tumble",
-      "summary": "22일(현지시간) 뉴욕증시에서 나스닥이 2.60% 하락한 26,008.86으로 마감했고 S&P500은 1.21% 내린 7,663.43을 기록했습니다. AI 투자 수익성 의구심에 반도체주가 급락해 램리서치 -11.75%, AMD -8.10%, 인텔 -8.04%를 기록했고, 다우는 0.02% 상승에 그쳤습니다. 중동 긴장에 따른 유가 상승도 부담으로 작용했습니다.",
-      "source_name": "InvestingLive",
-      "source_url": "https://investinglive.com/stocks/nasdaq-sinks-as-chip-stocks-tumble/",
-      "market": "US",
-      "published_at": "2026-10-23T00:18:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5b0e9cac9aae3f01167d.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "솔리다임 IPO 철회에도...프리장 21만전자·120만닉스 반납",
-      "summary": "SK하이닉스가 23일 장 시작 전 미국 NAND 자회사 솔리다임의 기업공개(IPO)와 프리IPO를 철회한다고 공시하며 중복상장 논란을 해소했습니다. 간밤 뉴욕증시는 AI 과잉투자 우려에 나스닥 -2.6%, 필라델피아 반도체지수 -6.72%로 급락했고, 국내 반도체주도 프리마켓에서 삼성전자 -4.20%, SK하이닉스 -2.37%로 약세를 보였습니다.",
-      "source_name": "머니투데이",
-      "source_url": "https://www.mt.co.kr/stock/2026/10/23/2026102308175144786",
-      "market": "KR",
-      "published_at": "2026-10-22T23:32:00Z",
-      "type": "trend",
-      "trend_topic": "반도체",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/93d5263e8dab7a886dfa.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "OpenAI working on new $30B raise at $1.25T valuation ahead of IPO",
-      "summary": "OpenAI가 최대 300억 달러 규모의 신규 펀딩을 프리머니 기업가치 1조2500억 달러로 추진 중이라고 CNBC가 보도했습니다. Coatue와 UAE 투자자들이 주도하며 한 달 전 목표(1.4조 달러)에서 하향됐습니다. 성사 시 역대 최고가 비상장기업이 되며, OpenAI는 6월 IPO 기밀 서류를 제출한 상태이고 앤트로픽도 1.5~2조 달러 상장을 검토 중으로 알려졌습니다.",
-      "source_name": "TechCrunch",
-      "source_url": "https://techcrunch.com/2026/10/22/openai-working-on-new-30b-raise-at-1-25t-valuation-ahead-of-ipo/",
-      "market": "US",
-      "published_at": "2026-10-22T22:08:00Z",
-      "type": "trend",
-      "trend_topic": "AI·자금흐름",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/6d91496643f367e28818.svg",
-        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "ai"
-      }
-    },
-    {
-      "headline": "Iran says 7 oil tankers attacked in the Strait of Hormuz as fears of a return to war grow",
-      "summary": "이란 국영TV는 호르무즈 해협에서 유조선 7척이 기뢰 또는 공격으로 화재·손상을 입었다고 22일 보도했습니다(AP 독자 확인 불가). 영국 해양무역기구(UKMTO)에 따르면 10월 선박 공격은 28건으로 전쟁 개전 이후 최다이며, 미군 보호 아래 오만 연안을 통과하는 '다크 셔틀'로 원유 운송이 이어지고 있습니다. 미국은 3번째 항공모함과 수천 명 병력을 추가 파견 중이고 UN은 미·이란에 외교 복귀를 촉구했습니다.",
-      "source_name": "NBC News (AP)",
-      "source_url": "https://www.nbcnews.com/world/iran/iran-says-7-oil-tankers-attacked-strait-hormuz-fears-grow-return-war-rcna605108",
-      "market": "GLOBAL",
-      "published_at": "2026-10-22T21:33:00Z",
-      "type": "trend",
-      "trend_topic": "에너지·지정학",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5cb966efebd0c01ab860.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
       }
     }
   ]
