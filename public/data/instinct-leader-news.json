@@ -1,7 +1,47 @@
 {
   "version": 1,
-  "updated_at": "2026-10-30T05:52:02.749966Z",
+  "updated_at": "2026-10-30T15:03:54.692066Z",
   "items": [
+    {
+      "headline": "[속보] 코스피 -3%대 하락 마감…SK하이닉스 -7% 급락",
+      "summary": "코스피 30일 5,730.74(-206.92p, -3.48%) 마감. 장중 매도 사이드카(10:04) 발동 후 -5%대까지 밀렸다가 오후 낙폭 일부 회복. 알파벳 쇼크에 삼성전자 -3.02%(22만5천원), SK하이닉스 -7.08%(141만8천원), 삼성전기 -7.50%. 코스닥 724.38(-3.83%).",
+      "source_name": "서울신문",
+      "source_url": "https://www.seoul.co.kr/news/economy/securities/2026/10/30/20261030500255",
+      "market": "KR",
+      "published_at": "2026-10-30T06:34:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/6/65/Korea_exchange.JPG",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Korea_exchange.JPG",
+          "caption": "한국거래소 사옥(부산) 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "hyolee2",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-83e63a889c5853e849fb287feb02f5aff98060f6c47dd59821640e24b5689421.webp",
+          "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
+        }
+      ]
+    },
+    {
+      "headline": "日銀, 금리동결 속 '물가 목표 2% 도달' 판단…\"금리 계속 인상\"(종합)",
+      "summary": "일본은행이 30일 정책금리 1.25% 동결(다카타 위원 0.25%p 인상 제안하며 반대). 전망보고서에서 기조적 물가상승률이 목표 2%와 \"대체로 정합적\"이라고 첫 공식 표명 - 사실상 디플레 탈출 선언으로 해석. \"정책금리를 계속 인상\" 방침 명시, 12월 추가 인상 전망 확산. 2026년 GDP 성장률 전망 0.7%로 상향.",
+      "source_name": "연합뉴스",
+      "source_url": "https://www.yna.co.kr/view/AKR20261030092451073",
+      "market": "GLOBAL",
+      "published_at": "2026-10-30T05:26:00Z",
+      "type": "trend",
+      "trend_topic": "금융·통화정책",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/0cf6795ebda067daf07f.svg",
+        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "finance"
+      }
+    },
     {
       "headline": "코스피, 장중 낙폭 커져 5%대 급락…코스닥 4%대↓",
       "summary": "코스피 30일 오전 11:03 현재 5,620.68(-5.34%), 장중 5,599.42(-5.7%) 저점. 10:05 매도 사이드카 발동(10월 15일 -7.57% 급락 이후 11거래일 만). 알파벳 등 미국 기술주 급락 여파로 삼성전자 -6.14%·SK하이닉스 -8.65%. 외국인 -7,755억·기관 -2,388억 순매도, 개인 +9,074억 순매수. 코스닥도 4%대 하락.",
@@ -24,6 +64,23 @@
           "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
         }
       ]
+    },
+    {
+      "headline": "Intel Reports Third-Quarter 2026 Financial Results",
+      "summary": "인텔 3분기 매출 165억달러(+21%), GAAP EPS 0.60달러·비GAAP 0.52달러로 자사 가이던스 상회. CFO \"데이터센터 매출 성장률 15년래 최대\", PC 둔화는 내년 상반기까지 지속 전망. 4분기 매출 가이드 150~160억달러, EPS 가이드 GAAP 0.10달러·비GAAP 0.25달러 제시.",
+      "source_name": "Intel IR (공식 보도자료)",
+      "source_url": "https://www.intc.com/news-events/press-releases/detail/1786/intel-reports-third-quarter-2026-financial-results",
+      "market": "US",
+      "published_at": "2026-10-29T20:01:00Z",
+      "type": "trend",
+      "trend_topic": "반도체",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/991e2aceafb56997135f.svg",
+        "alt": "Folio ai 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "ai"
+      }
     },
     {
       "headline": "코스피, 삼성전자 주주환원책 실망에 하락 마감…코스닥도 2%대↓",
@@ -895,39 +952,6 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
-      }
-    },
-    {
-      "headline": "피에스케이, 국민성장펀드 받아 용인에 신규 공장 세운다",
-      "summary": "피에스케이홀딩스 자회사 피에스케이(PSK)가 23일 이사회에서 경기 용인 반도체클러스터에 1800억원 규모의 장비 생산시설을 신축하기로 결정했습니다. 자기자본 대비 33.39% 규모로 2028년 5월 준공 예정이며, 투자금의 80%(1400억원)를 국민성장펀드(1200억원)와 산업은행(200억원) 차입으로 조달할 계획입니다.",
-      "source_name": "디일렉",
-      "source_url": "https://www.thelec.kr/news/articleView.html?idxno=64203",
-      "market": "KR",
-      "published_at": "2026-10-23T07:52:00Z",
-      "ticker": "031980",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5cb7717c8beef9797a0f.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "솔리다임 IPO 철회 덕분?…코스피, 낙폭 좁혀 5,500선 회복 마감",
-      "summary": "23일 코스피가 전장보다 16.53p(0.30%) 오른 5,550.30으로 마감했습니다. 지수는 2.36% 하락 출발해 장 초반 5,305.98(-4.12%)까지 밀렸으나 낙폭을 좁히며 폐장 20분 전 상승 전환했습니다. 코스닥은 1.62% 내린 751.69에 종료했고, SK하이닉스의 솔리다임 IPO 철회 공시가 반도체주 낙폭 축소에 영향을 준 것으로 풀이됩니다.",
-      "source_name": "연합뉴스",
-      "source_url": "https://www.yna.co.kr/view/AKR20261023130000008",
-      "market": "KR",
-      "published_at": "2026-10-23T06:38:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/2894b90a733526c52745.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
       }
     }
   ]
