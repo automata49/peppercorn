@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-30T15:03:54.692066Z",
+  "updated_at": "2026-10-30T20:49:51.662055Z",
   "items": [
     {
       "headline": "[속보] 코스피 -3%대 하락 마감…SK하이닉스 -7% 급락",
@@ -918,40 +918,6 @@
         "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "semiconductor"
-      }
-    },
-    {
-      "headline": "U.S. stocks lower at close of trade; Dow Jones Industrial Average down 1.24%",
-      "summary": "23일(현지시간) 뉴욕증시가 유가 상승 압박에 하락 마감했습니다. 다우 -1.24%, S&P500 -0.52%, 나스닥 -0.21%를 기록했고 통신·소비재 업종이 하락을 주도했습니다. 유가 강세에 셰브론은 2.88% 올라 사상 최고치를 경신했고, 브렌트 12월물은 배럴당 116.62달러에 거래됐습니다.",
-      "source_name": "Investing.com",
-      "source_url": "https://www.investing.com/news/stock-market-news/us-stocks-lower-at-close-of-trade-dow-jones-industrial-average-down-124-4970357",
-      "market": "US",
-      "published_at": "2026-10-23T20:30:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/15baf34295b1b6c6b984.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "headline": "Apple is taking Wall Street's top spot back from Nvidia — for the fifth time",
-      "summary": "야후 파이낸스에 따르면 23일(현지시간) 애플이 장중 시가총액에서 엔비디아를 잠시 제치고 세계 시총 1위를 다섯 번째로 탈환했다. 양사 시총은 각각 약 5.1조달러로 전날 종가 기준 격차는 1% 미만이었으며, 이후 엔비디아가 다시 1위를 회복했다. 이날은 1,999달러 폴더블폰 '아이폰 듀오'가 매장에 출시된 날로, 애플 주가는 사상 최고치 행진을 이어갔다.",
-      "source_name": "Yahoo Finance",
-      "source_url": "https://finance.yahoo.com/markets/article/apple-is-taking-wall-streets-top-spot-back-from-nvidia--for-the-fifth-time-142810503.html",
-      "market": "US",
-      "published_at": "2026-10-23T15:16:00Z",
-      "type": "trend",
-      "trend_topic": "애플, 엔비디아 제치고 시총 1위 잠시 탈환 - 아이폰 듀오 출시일",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/f5584dec0d4f17967973.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
       }
     }
   ]
