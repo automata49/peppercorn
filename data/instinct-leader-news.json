@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-31T05:44:11.276772Z",
+  "updated_at": "2026-10-31T14:33:06.821607Z",
   "items": [
     {
       "headline": "Stock market rocked as investors dump tech shares; Nasdaq suffers worst day since June: Live updates",
@@ -24,6 +24,23 @@
           "request_hash": "b75ca085d0a35a481d162bb0a1634a4eb6b7c818bb56067f0d06238a32c7dda0"
         }
       ]
+    },
+    {
+      "headline": "Wall Street braces for Democratic gains as 2026 midterm election nears",
+      "summary": "11월 3일 미 중간선거를 앞두고 월가는 여론조사상 민주당의 하원 탈환을 예상, 상원도 근접한 것으로 평가. 애널리스트들은 트럼프 잔여 임기 동안 분점정부의 교착으로 대형 정책 변화는 제한적일 것으로 보되 부채한도 대치 위험을 지적. 파이퍼샌들러는 민주당 정책안이 10년간 재정적자를 5조달러 늘릴 것으로 전망(CBO 데이터 분석).",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/10/30/2026-midterm-election-wall-street-prepares-for-democratic-gains.html",
+      "market": "US",
+      "published_at": "2026-10-30T19:11:00Z",
+      "type": "trend",
+      "trend_topic": "규제·정책",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/df13266ca2abcaf99ce4.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
     },
     {
       "headline": "Iran claims four tankers struck mines in Hormuz as strike fears grow after U.S. midterms",
