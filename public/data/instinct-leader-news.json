@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-31T19:59:53.957294Z",
+  "updated_at": "2026-10-31T23:24:55.346682Z",
   "items": [
     {
       "headline": "Stock market rocked as investors dump tech shares; Nasdaq suffers worst day since June: Live updates",
@@ -890,23 +890,6 @@
         "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "finance"
-      }
-    },
-    {
-      "headline": "CENTCOM reportedly has plans for Iran strikes: Will Trump approve them?",
-      "summary": "알자자라에 따르면 미 중부사령부(CENTCOM)는 백악관 승인 시 이란 추가 공격을 실행할 계획을 갖추고 있고(더힐), 국방부는 이란 에너지·핵시설 타격 옵션 준비를 지시한 것으로 전해졌다(액시오스). 트럼프 대통령은 '이르면 일요일' 공격 가능성을 시사했고 미국은 세 번째 항모강습단과 병력 약 1만 명을 11월 말까지 중동에 추가 배치한다. 이란군은 미국산 드론 격추를 주장했고 로이터는 이란이 공격 재개 시 걸프 해저케이블을 겨냥할 계획이라고 보도했다.(게재일 기준, 시각 미표기)",
-      "source_name": "Al Jazeera",
-      "source_url": "https://www.aljazeera.com/news/2026/10/25/centcom-reportedly-has-plans-for-iran-strikes-will-trump-approve-them",
-      "market": "GLOBAL",
-      "published_at": "2026-10-24T21:00:00Z",
-      "type": "trend",
-      "trend_topic": "미 CENTCOM 이란 추가 공격 계획 마련 - 중동 긴장 격화",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/68203cf59a10543d264a.svg",
-        "alt": "Folio energy 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "energy"
       }
     }
   ]
