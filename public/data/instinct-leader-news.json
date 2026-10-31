@@ -1,7 +1,47 @@
 {
   "version": 1,
-  "updated_at": "2026-10-30T20:49:51.662055Z",
+  "updated_at": "2026-10-31T05:44:11.276772Z",
   "items": [
+    {
+      "headline": "Stock market rocked as investors dump tech shares; Nasdaq suffers worst day since June: Live updates",
+      "summary": "10월 30일 뉴욕증시 최종 마감: 나스닥 25,437.00(-2.86%, 6월래 최악의 하루·최근 고점 대비 -8%), S&P500 7,580.07(-1.82%), 다우 51,770.31(-572.25p, -1.09%). 인텔 -29% 급락(PC 둔화 지적), 아마존 -1% 이상(FCF -424억달러). 월간 나스닥 -5.3%(2025년 3월래 최대 낙폭), S&P -0.9%, 다우 +1.7%.",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/10/29/stock-market-today-live-updates.html",
+      "market": "US",
+      "published_at": "2026-10-30T20:20:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름·매크로",
+      "images": [
+        {
+          "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Wall_Street_-_New_York_Stock_Exchange.jpg",
+          "source_url": "https://commons.wikimedia.org/wiki/File:Wall_Street_-_New_York_Stock_Exchange.jpg",
+          "caption": "뉴욕증권거래소(NYSE) 월가 전경 · 관련 사진 · 기사 현장 사진 아님",
+          "kind": "photo",
+          "credit": "Carlos Delgado",
+          "usage_rights": "CC BY-SA 3.0",
+          "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+          "url": "data/news-assets/external-599104b17111ae280c97c59a87250ca9f8b2d70536e6a0f7e198a0f01dc97b1e.webp",
+          "request_hash": "b75ca085d0a35a481d162bb0a1634a4eb6b7c818bb56067f0d06238a32c7dda0"
+        }
+      ]
+    },
+    {
+      "headline": "Iran claims four tankers struck mines in Hormuz as strike fears grow after U.S. midterms",
+      "summary": "이란이 호르무즈 해협에서 유조선 4척이 기뢰를 맞았다고 주장(3척 화재), 미 CENTCOM의 \"주요 항로 기뢰 제거 완료\" 발표를 반박. 영국 UKMTO는 오만 카삽 동북 25해리에서 유조선에 소형정이 폭발물 2개를 부착, 기관실 화재로 선박 무력화(선원 무사)를 보고. 후티는 사우디 공항·석유시설 6건 공격을 주장(사우디는 메카행 드론 요격만 확인).",
+      "source_name": "CNBC",
+      "source_url": "https://www.cnbc.com/2026/10/30/iran-trump-hormuz-oil-middle-east-.html",
+      "market": "GLOBAL",
+      "published_at": "2026-10-30T07:12:00Z",
+      "type": "trend",
+      "trend_topic": "에너지·지정학",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/095cdd71b80a6038019d.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
+    },
     {
       "headline": "[속보] 코스피 -3%대 하락 마감…SK하이닉스 -7% 급락",
       "summary": "코스피 30일 5,730.74(-206.92p, -3.48%) 마감. 장중 매도 사이드카(10:04) 발동 후 -5%대까지 밀렸다가 오후 낙폭 일부 회복. 알파벳 쇼크에 삼성전자 -3.02%(22만5천원), SK하이닉스 -7.08%(141만8천원), 삼성전기 -7.50%. 코스닥 724.38(-3.83%).",
@@ -64,6 +104,23 @@
           "request_hash": "ae36ec15344aa88e271644b4e01307a024bfdd6e7174e92f117b18d05270ee5b"
         }
       ]
+    },
+    {
+      "headline": "Crypto giant Binance attempting to recover $6.3bn stolen in hack linked to North Korea",
+      "summary": "바이낸스가 63억달러 규모 역대 최대 가상자산 해킹을 당했다고 공개(2025년 바이비트 15억달러 초과). 탈취 자산의 절반가량(30억달러) 동결 확보, 초기 '엔지니어 노트북 침해' 외 추가 침해 지점 확인. 분석업체들은 북한 해킹조직 연루를 지목했고 미 비밀경호국·FBI가 수사 중. 바이낸스는 63.4억달러를 충당해 \"모든 손실을 보상한다\"고 밝혔다. (게재일 기준, 시각 미표기)",
+      "source_name": "BBC",
+      "source_url": "https://www.bbc.com/news/articles/cwe8lp7zy07zo",
+      "market": "GLOBAL",
+      "published_at": "2026-10-30T00:00:00Z",
+      "type": "trend",
+      "trend_topic": "금융·규제",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/6b1d31e4f1bcc8b7a264.svg",
+        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "other"
+      }
     },
     {
       "headline": "Intel Reports Third-Quarter 2026 Financial Results",
@@ -850,74 +907,6 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
-      }
-    },
-    {
-      "headline": "Trump Floats New Strike on Iran as Oil Hits 6-Month High",
-      "summary": "트럼프 미 대통령이 23일 유세에서 이란에 대한 추가 군사공격(작전명 '라이징 퓨리') 가능성을 공개 언급했고, NYT는 미국·이스라엘이 단기 집중타격 계획을 수립하고 전투기 모의비행을 해왔다고 보도했습니다. 이란 고위관리들은 공격 시 걸프 해역 해저케이블 타격 계획을 준비했다며 '더 이상의 레드라인은 없다'고 경고했습니다. 브렌트 12월물은 3.14% 오른 배럴당 116.72달러로 6개월래 최고치에 마감했고, 사우디·이집트·튀르키예·프랑스·독일·영국 등 8개국 외무장관이 이스탄불에서 확전 자제를 촉구했습니다.",
-      "source_name": "Seoul Economic Daily",
-      "source_url": "https://en.sedaily.com/finance/2026/10/24/trump-floats-new-strike-on-iran-as-oil-hits-6-month-high",
-      "market": "GLOBAL",
-      "published_at": "2026-10-24T04:04:00Z",
-      "type": "trend",
-      "trend_topic": "에너지·지정학",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5a146422baffbc9d2fb3.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "headline": "Inflation, earnings reports and the mood of consumers and the Federal Reserve fill out a busy week",
-      "summary": "다음주(10월 26~30일) 글로벌 시장은 빅테크 실적과 연준 금리결정이 겹치는 중요한 한 주입니다. 마이크로소프트·아마존·알파벳이 실적을 발표하고, 연준은 28일 금리를 결정합니다. 미국 물가지표와 소비자심리 등 주요 경제지표도 발표될 예정입니다.",
-      "source_name": "AP",
-      "source_url": "https://apnews.com/article/inflation-fed-amazon-economy-earnings-google-7fc70f244e14a16e55450cf8b89d4651",
-      "market": "GLOBAL",
-      "published_at": "2026-10-24T04:00:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/aafc3074721ac6c40caf.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "headline": "Iran's Revolutionary Guard says 2 supertankers struck mines in Strait of Hormuz",
-      "summary": "헤럴드 비즈니스에 따르면 이란 혁명수비대(IRGC) 해군은 23일(현지시간) 호르무즈 해협 남부의 지정 항로 밖을 통행하던 초대형 유조선 2척이 기뢰에 부딪혀 기관실 화재로 완전히 멈췄다고 발표했다. 두 유조선에는 원유 450만 배럴 이상이 실려 있었으며 승무원은 전원 즉시 하선했다고 IRGC는 밝혔다.",
-      "source_name": "Herald Business",
-      "source_url": "https://biz.heraldcorp.com/article/10913386",
-      "market": "GLOBAL",
-      "published_at": "2026-10-24T00:16:00Z",
-      "type": "trend",
-      "trend_topic": "호르무즈 해협에서 유조선 2척 추가 기뢰 피격",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/251cd911e73e7ac1ff85.svg",
-        "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "other"
-      }
-    },
-    {
-      "headline": "Chancellor unveils Britain's ambitious plan for AI",
-      "summary": "영국 재무장관이 다음주 예산안에 포함될 AI 투자 패키지를 24일 발표했습니다. 세계 최초의 AI 바이오안보연구소(AIBL) 설립 등 국가 AI 바이오안보 이니셔티브에 1억6500만 파운드, AI안전연구소(AISI)에 1억2000만 파운드를 추가 투입합니다. AIBL에는 OpenAI·앤트로픽이 최대 2억 파운드 규모의 모델 크레딧을 지원하고 구글 딥마인드 등이 협력하며, 에든버러 AI 칩 설계 역량과 맨체스터 AI 우수센터도 신설됩니다.",
-      "source_name": "GOV.UK",
-      "source_url": "https://www.gov.uk/government/news/chancellor-unveils-britains-ambitious-plan-for-ai",
-      "market": "GLOBAL",
-      "published_at": "2026-10-23T23:00:00Z",
-      "type": "trend",
-      "trend_topic": "규제·정책",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/fd3eabb762ca8e69ea8e.svg",
-        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "semiconductor"
       }
     }
   ]
