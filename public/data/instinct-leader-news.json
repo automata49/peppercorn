@@ -1,7 +1,24 @@
 {
   "version": 1,
-  "updated_at": "2026-10-31T23:24:55.346682Z",
+  "updated_at": "2026-11-01T06:08:43.613343Z",
   "items": [
+    {
+      "headline": "[속보] 한국 수출 첫 9000억달러 돌파…10월 1153억달러",
+      "summary": "산업통상부: 10월 수출 1,152.8억달러(+93.7% YoY), 두 달 연속 1,100억달러 초과. 1~10월 누적 9,300억달러로 사상 첫 9천억 돌파, 11월 중 연간 1조달러 확실시. 반도체 수출 564.4억달러(+259.4%, 두 달 연속 500억 이상). 대중 +133.6%·대미 +185.8%. 무역흑자 425억달러로 2개월 연속 400억 초과.",
+      "source_name": "매일경제",
+      "source_url": "https://www.mk.co.kr/news/economy/12192552",
+      "market": "KR",
+      "published_at": "2026-11-01T00:26:00Z",
+      "type": "trend",
+      "trend_topic": "자금흐름·무역",
+      "visual": {
+        "kind": "illustration",
+        "url": "data/news-assets/e873f3b647cf1e390f53.svg",
+        "alt": "Folio semiconductor 관련 개념 일러스트 · 실제 기사 사진 아님",
+        "credit": "Folio 편집 일러스트",
+        "topic": "semiconductor"
+      }
+    },
     {
       "headline": "Stock market rocked as investors dump tech shares; Nasdaq suffers worst day since June: Live updates",
       "summary": "10월 30일 뉴욕증시 최종 마감: 나스닥 25,437.00(-2.86%, 6월래 최악의 하루·최근 고점 대비 -8%), S&P500 7,580.07(-1.82%), 다우 51,770.31(-572.25p, -1.09%). 인텔 -29% 급락(PC 둔화 지적), 아마존 -1% 이상(FCF -424억달러). 월간 나스닥 -5.3%(2025년 3월래 최대 낙폭), S&P -0.9%, 다우 +1.7%.",
@@ -839,57 +856,6 @@
         "alt": "Folio other 관련 개념 일러스트 · 실제 기사 사진 아님",
         "credit": "Folio 편집 일러스트",
         "topic": "other"
-      }
-    },
-    {
-      "headline": "Trump announces at a Georgia campaign rally that Audi will build a new auto factory in the state",
-      "summary": "트럼프 대통령이 24일 조지아주 유세에서 아우디의 첫 미국 공장 건설을 발표했고 게르노트 되르너 아우디 CEO가 함께 참석했습니다. 관세 압박 속에 독일 자동차업체의 미국 현지 생산이 확대되는 신호로 해석됩니다.",
-      "source_name": "AP",
-      "source_url": "https://apnews.com/article/audi-georgia-trump-manufacturing-auto-plant-c1d49f2437c1d9cf349af399b8abe3a3",
-      "market": "US",
-      "published_at": "2026-10-25T04:00:00Z",
-      "type": "trend",
-      "trend_topic": "산업·투자",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/19c47bf718b51cc1e7a1.svg",
-        "alt": "Folio industry 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "industry"
-      }
-    },
-    {
-      "headline": "산은-기은, 1조원 규모 무위험지표금리 대출 첫 출시…지표금리 개편 속도",
-      "summary": "산업은행과 기업은행이 26일 한국 무위험지표금리(KOFR) 기반 기업대출을 총 1조원 규모로 처음 출시합니다. KOFR 활용이 파생·채권에서 대출시장으로 확대되는 것으로, IRS 시장 KOFR 비중 목표는 2030년 6월까지 70% 이상이고 KORIBOR 기반 신규 대출은 2027년 4월부터 원칙적으로 중단됩니다.",
-      "source_name": "전자신문",
-      "source_url": "https://www.etnews.com/20261024000036",
-      "market": "KR",
-      "published_at": "2026-10-25T03:00:00Z",
-      "type": "trend",
-      "trend_topic": "금융·매크로",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/5368ed47646480bf80fa.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
-      }
-    },
-    {
-      "headline": "Money Shifts From Tech Stocks to U.S. Treasurys on Big Tech Credit Fears",
-      "summary": "미국 10년물 국채금리가 22일 19bp 급락해 4.953%로 한 달 만에 5% 아래로 내려왔습니다. 하루 낙폭은 2023년 3월 이후 최대로, 빅테크 신용 우려에 따른 안전자산 매수세가 몰린 영향입니다. 한국 투자자들도 이달 22일까지 미국 채권을 13.71억 달러 순매수해 이미 지난달 전체(13.63억 달러)를 넘었습니다.",
-      "source_name": "Seoul Economic Daily",
-      "source_url": "https://en.sedaily.com/finance/2026/10/25/money-shifts-from-tech-stocks-to-us-treasurys-on-big-tech",
-      "market": "US",
-      "published_at": "2026-10-25T00:15:00Z",
-      "type": "trend",
-      "trend_topic": "자금흐름",
-      "visual": {
-        "kind": "illustration",
-        "url": "data/news-assets/066f6c4e55474c438190.svg",
-        "alt": "Folio finance 관련 개념 일러스트 · 실제 기사 사진 아님",
-        "credit": "Folio 편집 일러스트",
-        "topic": "finance"
       }
     }
   ]
