@@ -1,797 +1,797 @@
 {
-  "fetched_at": "2026-10-03T12:17:34.864758+00:00",
+  "fetched_at": "2026-11-03T14:53:33.655117+00:00",
   "universe": "ALL",
   "companies": {
     "AAPL": {
       "cik": 320193,
       "sic": 3571,
-      "sec_sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43",
-      "price_sha256": "c6217b5d8b273d0afc75ce1c57a0df99e65ecc11aeef224394ff9ee42b54ca9f",
-      "price_days": 3207
+      "sec_sha256": "75a78f918313f3336823517d6c34908d23dd07f07e90e625c61e705e3bb6d27b",
+      "price_sha256": "eaeae184e47adb8e2f02537c1ee5eea481174ddbde7ad50ce8d344a486c9ff38",
+      "price_days": 3229
     },
     "MSFT": {
       "cik": 789019,
       "sic": 7372,
-      "sec_sha256": "f8aae2965b20ad0df44bdf7ccbedf797d275b6b8dc030154a7a311361bb7246f",
-      "price_sha256": "3e42e8c23a7f337b62b32788f93425a1edcfc727dd0a7420a606f6cf8df79ae3",
-      "price_days": 3207
+      "sec_sha256": "8c1903c041f5c27e86ed15f37debb1f41882b7904bba129ef9edc76478b1e8ea",
+      "price_sha256": "b88042b3e2cb40872c8cb7068959cbdfc3a19ede5139f2e19be8ed3f30753649",
+      "price_days": 3229
     },
     "NVDA": {
       "cik": 1045810,
       "sic": 3674,
       "sec_sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff",
-      "price_sha256": "f027df503fb3c106d5ddf5957957b8a909721428461a18facd3c9bf18ed31259",
-      "price_days": 3207
+      "price_sha256": "627fc60ca4e21f68405ef96496efa75d94874d9a73a3101c50b3fd918c766159",
+      "price_days": 3229
     },
     "GOOGL": {
       "cik": 1652044,
       "sic": 7370,
-      "sec_sha256": "a017f26ee88cb4a639d1c1ddb06d53b4afe22f0ac89cabec7cd67c88919fe1c5",
-      "price_sha256": "115faf4f253e9ccae255fe4bbbf86b944a1e935b5b2c1cac1d56c7bae82aef46",
-      "price_days": 3207
+      "sec_sha256": "ec4a3095d634583925b5ea450db8a5ed974dc48f6f1b4f594022310bc78d4032",
+      "price_sha256": "e5a23ad4e6cf0a5947664ad72a6d79abee6e9254f8686392a3128b825c4a1b27",
+      "price_days": 3229
     },
     "META": {
       "cik": 1326801,
       "sic": 7370,
-      "sec_sha256": "7518e76d6dac2d016e1a3d1dec1cc55ff9ea3bdd58a151b16fcaa067a6c9d94e",
-      "price_sha256": "23986f7c4a1a162bd63027b82112e366d38b6aa8fb6e84f5938c0d1ae55e6f8d",
-      "price_days": 3207
+      "sec_sha256": "795995ed1013ebfc08ccb904ba40e16771e9ac28dbbbc40634346b6f6cbe074f",
+      "price_sha256": "1d7bc30d1a4f409b885c077efc991d95e0783d812437f066d4de5574f021662f",
+      "price_days": 3229
     },
     "AMZN": {
       "cik": 1018724,
       "sic": 5961,
-      "sec_sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4",
-      "price_sha256": "c86281ecaadbe1e15762913eb7e999f2fed39ffe9af4e914a77677e8d5898d6a",
-      "price_days": 3207
+      "sec_sha256": "acddb7c0a6973a1fd08372de3b292298a34eae7f42a7eedc4bdebd3ac659c8fd",
+      "price_sha256": "ed5e4e74a915ede8ac1cb5d366943bc11842bf7950383476bca1239d3265d161",
+      "price_days": 3229
     },
     "ADBE": {
       "cik": 796343,
       "sic": 7372,
       "sec_sha256": "86a5689aa9aa7b0f9e95be21b48b0305376e014c8dbf3b8bb3b4b131f1b6a0c4",
-      "price_sha256": "4393d2f94b43a2a756992a64be1d5a4a184d5ac66ea17b26c2a46d86bc75c9bc",
-      "price_days": 3207
+      "price_sha256": "5cd78d9f740c27ff23e74ed88b227a5a242c1c71326ec970d3d2a40164e42f75",
+      "price_days": 3229
     },
     "CRM": {
       "cik": 1108524,
       "sic": 7372,
-      "sec_sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
-      "price_sha256": "6c88685f7a3e080455498e0018477fd928d6e860178ea9743c3fdd0acfefa843",
-      "price_days": 3207
+      "sec_sha256": "a89be8715e056f1cadffdcd9616676ec1949107233b11f430a8183f88ca4ae15",
+      "price_sha256": "db9c6238296716c03a1aea20a6c6a1d27436acadb4839b70550c9a8797773dba",
+      "price_days": 3229
     },
     "NOW": {
       "cik": 1373715,
       "sic": 7372,
-      "sec_sha256": "1131b67e8d2d6cd6415cafa82c8874cb2139016e4c8d7e04b1728837a8bbec2c",
-      "price_sha256": "1eeb5291e52caf602195eea506596c282fbbebaefa72fb2559ac5d5c6901554b",
-      "price_days": 3207
+      "sec_sha256": "427e2a9a58b944b34e0c7bb9560fdb7183de326e4fa9d880b5957e3025a0687e",
+      "price_sha256": "17e3b308d0cdd7b025b39741a109dab546b5c669eef4e73f39fd1d0e583c7093",
+      "price_days": 3229
     },
     "ISRG": {
       "cik": 1035267,
       "sic": 3842,
-      "sec_sha256": "b386a39dc2989008a01e4be5e12444e330e3a98b86c714e3b063b246235db44b",
-      "price_sha256": "28bd3819f7b46fe8bf5c161859d2d5a8bb7a3421b0f743059d0eb00fe5890675",
-      "price_days": 3207
+      "sec_sha256": "3419d6820891488e2d57eb100dd14e3a3cd21f7eae1564b8307540b2c91f5953",
+      "price_sha256": "8a75109cb770d28fd9dbffc36f4bc378d382eb6a4209fc53e0b7bd0f93bb0a8e",
+      "price_days": 3229
     },
     "AVGO": {
       "cik": 1730168,
       "sic": 3674,
       "sec_sha256": "3bdb6644c12addf1e63c4dc861008d7804fbf3d3f5aa6eb9b97f72c0e89a7adf",
-      "price_sha256": "114e640d19a36ff1db101d9b9aca42e765cd2cf37321adf43d034698ac374105",
-      "price_days": 3207
+      "price_sha256": "329cecbbf743ab06baddd718e85f5b43745ab217f1fcb10d407f593443c78d0b",
+      "price_days": 3229
     },
     "NFLX": {
       "cik": 1065280,
       "sic": 7841,
-      "sec_sha256": "00f3449073d90dfa3aec4e384de24b70d92d897f90c67d6bca61f23e33d38634",
-      "price_sha256": "d36a8cb0a6495371f55d04148f45d960f15e3e7788704ebefe848991b5674c4c",
-      "price_days": 3207
+      "sec_sha256": "fd31bc147b36495f6912e063188aea71434077236f4e995268620b47fda99e61",
+      "price_sha256": "c200ef968e3f64dce82505ae4177a526a85155a2a679070e6adf2fe27b25f94b",
+      "price_days": 3229
     },
     "ORCL": {
       "cik": 1341439,
       "sic": 7372,
-      "sec_sha256": "65523545f040abaea1dfcf321da2a5aec85e7f34387244b0ffcb26e4c8707f7d",
-      "price_sha256": "edca0f26aaf9c56de179092acc0355b87ee50d9dd859e8831e79a68968303153",
-      "price_days": 3207
+      "sec_sha256": "2ee4269be72f0f64658f0ae1481f3f79d44dd17f2553c59d0eb1fe68c3d469fc",
+      "price_sha256": "2e52bce4aca52548430577dddd7ad4f3b74b711941d59e68bbecffcf73007e18",
+      "price_days": 3229
     },
     "CSCO": {
       "cik": 858877,
       "sic": 3576,
-      "sec_sha256": "f9f6cfb3c04bb8102552f121868831471a474165074ccc7c539f6f80f19d1b99",
-      "price_sha256": "09966c6111c07b5c17e9edc0782f3d48fc9177b95ab6287b1bd1fd0d52916643",
-      "price_days": 3207
+      "sec_sha256": "69ccd0bc491edf4ef2191e8813ebc1766c0daf00c9e3d1aaa182d24b2e39e0df",
+      "price_sha256": "f210b9ee54400a9998fd704f6e38e69d96cfff925f290c9830956c63b7a8af7e",
+      "price_days": 3229
     },
     "TXN": {
       "cik": 97476,
       "sic": 3674,
-      "sec_sha256": "5ee95bf56949988a4beaf0598e3acb0a012867228760cd9462a1c9e72526446f",
-      "price_sha256": "da0be7b2d668c891e84d99148f3c4a8e4b46236eafa1d10640ff5b7d069cc284",
-      "price_days": 3207
+      "sec_sha256": "5ac0e3044f2368fe3dcce665440317bda9ce766feb27fd382e563593192ee80d",
+      "price_sha256": "89f40d048cbc656c2b3134ee9555551fe7771f925d9485903b59d83adc5f8c1e",
+      "price_days": 3229
     },
     "QCOM": {
       "cik": 804328,
       "sic": 3663,
       "sec_sha256": "bb7a668b9d54074b397cd3ada697e4db1ab09a0f8fd7837ef83cf5345a9728f2",
-      "price_sha256": "89c2e05edef2fae2d68d8496709c927c38c8784cead7af6ce560e5ebf9594450",
-      "price_days": 3207
+      "price_sha256": "701b1eaf7ad972e1615240479d05e3e052ff127f37d0435dcf2ac88e36050520",
+      "price_days": 3229
     },
     "INTU": {
       "cik": 896878,
       "sic": 7372,
       "sec_sha256": "456f89ae1757bb5a6ee0990f8b759e3d694222b0107c33ee4b163ee85a478d8a",
-      "price_sha256": "98576ad815c643b194b8a1e0ab98f4a16efce28588813fc3e2ee7b418fe4bf70",
-      "price_days": 3207
+      "price_sha256": "f38dc6348ebb34503f910a15503b7fd6557613a3a5a442a9122b37107de23bd0",
+      "price_days": 3229
     },
     "ADI": {
       "cik": 6281,
       "sic": 3674,
       "sec_sha256": "f468425da29412efbec29798ecd0f9cc719edd5766d734c5c3fc1092a3fe237c",
-      "price_sha256": "6d3276b5988ec642218bb6377350e92097b184b14b959b3245514126dbd4f54e",
-      "price_days": 3207
+      "price_sha256": "d9f82e529e8f75920fc6e32d6b58424c03bf5364b510ba83c8cb3a13a252d1fd",
+      "price_days": 3229
     },
     "ACN": {
       "cik": 1467373,
       "sic": 7389,
-      "sec_sha256": "3344df347f78eef6b760f2a9160190d35dd225079775f573d341b94e9b82e783",
-      "price_sha256": "61a5964b62fb3b13f1adea5245877f51d6e9d91f45ce9f510561db1f9a33d660",
-      "price_days": 3207
+      "sec_sha256": "83258e85f0e5ef6d55fe62cb43365d5bb764c3eb0786f05c13c57becd99d5fd8",
+      "price_sha256": "0ae89d0afbe8cd941813d82c50c3f37de36984f86f8d0271ada7a4e4ecc3ba43",
+      "price_days": 3229
     },
     "TMO": {
       "cik": 97745,
       "sic": 3829,
-      "sec_sha256": "4d98ebd4c91521f5d90f032834b8dec04f78b30758a214be33e6cbba68fa766a",
-      "price_sha256": "0878e0863bd570b2e7d53367077655e411369b65029cc68b62171389d5bd06b3",
-      "price_days": 3207
+      "sec_sha256": "c1702c20855e7f135eaea324dd0f46468bcd51f5a4f6846cc3f62e36cc71cf69",
+      "price_sha256": "62c44d69f870f9ee115bf9fa5d5fc818bfd063c746e56be43d6f07dc6b2a4bbe",
+      "price_days": 3229
     },
     "DHR": {
       "cik": 313616,
       "sic": 3823,
-      "sec_sha256": "4a686be88c501054fa141624a0b0cf61d46be16390113a430631f8f11f5a1cf0",
-      "price_sha256": "c3d7598053da2553555439720154bcc92191c92bcaa6f02e98f0289af33a80ce",
-      "price_days": 3207
+      "sec_sha256": "490c60712f8b9aafe5ad232e8d053a26205b5517f8f4679432503f7768574efb",
+      "price_sha256": "0b644061ed66502689140792503f562a93b455c911736053ff1c128bdb935c60",
+      "price_days": 3229
     },
     "SYK": {
       "cik": 310764,
       "sic": 3841,
-      "sec_sha256": "bad750877f22f14d07b23936d4750cb56275f184b0766a02336d59abef077666",
-      "price_sha256": "b139b5c75ca9567d1ced64f28a98d03880d0624da79bf8ccd99a5637184a14ed",
-      "price_days": 3207
+      "sec_sha256": "6cfb04516806667a8b2d681d80f19cff79b5cc687c5410c7330e5baf3cd7cbdf",
+      "price_sha256": "01004a9b9aaeac77e3fc0fbd9fc7d8a75dbe03e7949d6b3845fb118b8c7ef1e8",
+      "price_days": 3229
     },
     "ZTS": {
       "cik": 1555280,
       "sic": 2834,
       "sec_sha256": "b07a62edd0c62eecc2fb932a17063b7f406b6355ca6ec9a658407a39c1b87445",
-      "price_sha256": "29f4448e68b50296e92b407ddff9a1fd370205efa47991890ce8295e78a98900",
-      "price_days": 3207
+      "price_sha256": "3a0092836ffbe921e107ad648117fd4183ef22cb4f03a213a316d286326572a5",
+      "price_days": 3229
     },
     "AMGN": {
       "cik": 318154,
       "sic": 2836,
       "sec_sha256": "fdf5906752dbed7151b14f5e765db25e75393cedef4a2582d976623b49e2e4c7",
-      "price_sha256": "8a20f60527b5952b51b282af706cef8556a3c00074079394b3e384edb97eeb88",
-      "price_days": 3207
+      "price_sha256": "2aba98ca4e5577e38bb3375fa931ac9544524b705ae69dded7ee767f37ec9f67",
+      "price_days": 3229
     },
     "GILD": {
       "cik": 882095,
       "sic": 2836,
-      "sec_sha256": "5703fd84d6e3d00697ac60bc3d7ded9306be2a9f36170a342858b8e6417506f0",
-      "price_sha256": "6bbf2da08f3314fa9d82739c215031a577baf92a084f159c8e0741f332b216c1",
-      "price_days": 3207
+      "sec_sha256": "1c6c241ddb137215b2d1c2496e64895b3287ae59ae2fe963cf4fa725d0856e3d",
+      "price_sha256": "2ecb157d58d29f76ce1625c9c63dbb8f255510e9b8b7ffad81fbe62ea65fdea0",
+      "price_days": 3229
     },
     "BSX": {
       "cik": 885725,
       "sic": 3841,
-      "sec_sha256": "06fbd22345eaba9b752251c5e485a8a67a53a54d553376a44919d4724a40c786",
-      "price_sha256": "eda7549ea94a9e83ff915dcd85ee9b1c49e1e86f8e8b3b66cf996419b35b0a06",
-      "price_days": 3207
+      "sec_sha256": "4e2975ef764f80a328e119f48ecb517fc804233c0b11264f2154d2f645d0bdfe",
+      "price_sha256": "795ccf4c4973a396d807c794179d57b1060f3d94ab8cde5dbd2f96e7d74e7af0",
+      "price_days": 3229
     },
     "MDT": {
       "cik": 1613103,
       "sic": 3845,
       "sec_sha256": "38fb8ec4139e6db2fa9bcd6cce1c3de5d9fcb3838ad9a63a2e3c74a7afc79b27",
-      "price_sha256": "f9878e72151965bac99dce96c88746394fc6452672122563b034deef0c62f7d7",
-      "price_days": 3207
+      "price_sha256": "bc2dc0d4d7f55528ab2f27a5e5a780374a2694ef674dc316a6832b944e3d9010",
+      "price_days": 3229
     },
     "EW": {
       "cik": 1099800,
       "sic": 3842,
       "sec_sha256": "5e8f751fbec9a0a1ff653c4d2070ea46d6cde3f7ccf35f9c1d7367a126bc76c1",
-      "price_sha256": "f3b08377cfafbe7374f251ad14eee01e2191984fea09b0bd9f6ebc9d02e0d5da",
-      "price_days": 3207
+      "price_sha256": "216d77cb6401348a9096df84820e12469476f9e8ce0f5cf7eae118c8b8d76a3b",
+      "price_days": 3229
     },
     "IDXX": {
       "cik": 874716,
       "sic": 2835,
-      "sec_sha256": "0e6062dd20371329a7570315c03bbe5ae0b5c7ae89af18e7309e1b26e3ab4260",
-      "price_sha256": "ce296c2b9dcf9b9dfe3f224f2f79e30c0652e644f2986f25c84488835958812b",
-      "price_days": 3207
+      "sec_sha256": "7744c87025441e0703b0778d4f80a6690661522e03fd5a0cb7b4f9347dae3ce1",
+      "price_sha256": "46f4185712da0fbfb5440a9740e9f220316b9d9a14808c7b68c416280db3b9e8",
+      "price_days": 3229
     },
     "CMG": {
       "cik": 1058090,
       "sic": 5812,
-      "sec_sha256": "93c81e4ccae99f0420863a88e05765e0dc20f043cc7bb9ec03f3c0d4b75709e5",
-      "price_sha256": "e4ccbdd86969cdf6872432a5ee075814680cdaf2cfbd6f1762b10a97977e4b59",
-      "price_days": 3207
+      "sec_sha256": "f5fd6d411e43d180a358ef5dd9f380bc7d224dd2c7e03e54609e3f3eed7a80b4",
+      "price_sha256": "3cb7d6cdb907704d41eeeea540e2abd770a10fb5b8b305488d5c6664926e8d6e",
+      "price_days": 3229
     },
     "BKNG": {
       "cik": 1075531,
       "sic": 4700,
       "sec_sha256": "e4f4e13340718de01f6c966cc4c4ab09f037826023b7f20b9e969eb3ef7cb76c",
-      "price_sha256": "3cf039200f9f8773a5a8c6cf20ea8a4f8474fc42c4bd93663afdf37dc3aa2164",
-      "price_days": 3207
+      "price_sha256": "a3c78cab471c52dc1c54b8943ce03b337632c2e54f3abb2fad12339b20ef6db3",
+      "price_days": 3229
     },
     "ADP": {
       "cik": 8670,
       "sic": 7374,
-      "sec_sha256": "bf7d53d14fa29530fa1dd594ace14438282b8b6117069a8b3550e5c46059e034",
-      "price_sha256": "6924502bb8855f4cb1e1ad2419b763be89a6c35d1a7cc39a885e179fb7bca8d9",
-      "price_days": 3207
+      "sec_sha256": "07750ac1435f5c4569011de779d0c4e42bd293b9355eba6b28d62fac77c68a6d",
+      "price_sha256": "a568b416a5c4c15335f7a4d5ecade9859a52e8b6ad4f15178ffd79be37112ada",
+      "price_days": 3229
     },
     "PAYX": {
       "cik": 723531,
       "sic": 8700,
       "sec_sha256": "c14cf3666260c537a546e8e471039bf0b28c1cf9200eb2a1365668647b8c8328",
-      "price_sha256": "48b6e9b6b1cb2856713c46ea70b718f35615d67b8c6c29a09d3e74d0577b4c74",
-      "price_days": 3207
+      "price_sha256": "3b3bcc093d676c71dfe279825a0f8076595a4d2d91f96024b215ab2309a51776",
+      "price_days": 3229
     },
     "V": {
       "cik": 1403161,
       "sic": 7389,
       "sec_sha256": "df3caf7c5667296569fc3074ce2ff13629c9a555184a06c5ea9925b43e63971d",
-      "price_sha256": "5d951554cf05249ac1d1027803614f0d094944bd81b26f49ea91330ddb99ab06",
-      "price_days": 3207
+      "price_sha256": "da4b3e5ce3c968c9366b4cb45beaed3863a9ab7e0bfd97d3a482cd3de1280700",
+      "price_days": 3229
     },
     "MA": {
       "cik": 1141391,
       "sic": 7389,
-      "sec_sha256": "78082e9cbae91bfa8c1480d214bd20c8d35fcbbcc72d71eaf01739c48b1e9511",
-      "price_sha256": "b68b180a0089e8df47fa59ca36ba0622e3e7ff0f871387ac831f12afd1c80138",
-      "price_days": 3207
+      "sec_sha256": "eec2f64179fe268380a6f9f4b5e3da53a9c1c5adb988aa31cc40c8372c0d8899",
+      "price_sha256": "68fd121f8541b240b69a4d23f87efff7825eb9d7ed77fb637c25623264b7537a",
+      "price_days": 3229
     },
     "KO": {
       "cik": 21344,
       "sic": 2080,
-      "sec_sha256": "53d363a9aa3071406cda9857654358f4dca42e174a1defb8cc1ce9ad2a4c9e40",
-      "price_sha256": "41cec8856e7a03941e6b2952fcf3d5b0e78c231701831abde9b7ae70298ad976",
-      "price_days": 3207
+      "sec_sha256": "87a4173fcd3d662d18d19e0e885095aa5e3812b74c54d1ee55808ff1540a8081",
+      "price_sha256": "720d3508d6d929af9cf84e0160d751f470debfe773b05fc8ccc37a3b0b3c150f",
+      "price_days": 3229
     },
     "PG": {
       "cik": 80424,
       "sic": 2840,
-      "sec_sha256": "606ad7056b611e91cfab9f7568b747404405772add188600efa5ccda5824f3d8",
-      "price_sha256": "b0e01704cf90dd64ca733e031c78a389c2a7f2dad1dcec4fd7e2df805c3f18ce",
-      "price_days": 3207
+      "sec_sha256": "c6ae61e012a2b4aadeaa49400847842dd637a4a4a03cbdf4dfff27dffd78f8d1",
+      "price_sha256": "771bc52010174b912b07425cc06faa2b40c633d1558fecc8b86756afe283024e",
+      "price_days": 3229
     },
     "PEP": {
       "cik": 77476,
       "sic": 2080,
-      "sec_sha256": "7694c322779ef273d15b3791729e5f2d261ce6ed1839be8ff014a33f537375be",
-      "price_sha256": "607d3ed6c5741e05e4eb9ca2aa93a18b42a40359b88bddff9ac379f7656778e2",
-      "price_days": 3207
+      "sec_sha256": "4a734cc934f3cf9f129fc15657589d4c6c82138f1bd889023c11170d97990d8d",
+      "price_sha256": "ef359df8b2b2228bb4903b9470336273cbffb87f14a8752fff1ac1c6b25fb208",
+      "price_days": 3229
     },
     "JNJ": {
       "cik": 200406,
       "sic": 2834,
-      "sec_sha256": "7141c0c988fa1d30f779687b4c78ab561e19aa5990a58ad86a66467d0a783980",
-      "price_sha256": "c1d4441e18504d9f42c10941956e7545e96c2f36edfd65b25c738111beef8685",
-      "price_days": 3207
+      "sec_sha256": "9ce98e50414e9a6704eaf485e1868c2298c6ae36acc85a82c0a3737485303be7",
+      "price_sha256": "4d9a2927463a8e350b509703d96296e3f1577be1161973f4c6e26b7a05b532f3",
+      "price_days": 3229
     },
     "MCD": {
       "cik": 63908,
       "sic": 5812,
       "sec_sha256": "0394e814d75510be107679b026e2df6e5d02d4f2029166911aa4924f9556681f",
-      "price_sha256": "43249eb05990c525b6d7b33a3507d7b791c64ea42c513be5e918917ba541108a",
-      "price_days": 3207
+      "price_sha256": "c4a4ed0b1053c549873afa2406ce39d5abdca2b65688ae4fcc255f9633e56d3e",
+      "price_days": 3229
     },
     "COST": {
       "cik": 909832,
       "sic": 5331,
-      "sec_sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f",
-      "price_sha256": "17197907f94784cfb2c98ded3c99ffee6d0cd441b375d58b1a0c90ce22d9e596",
-      "price_days": 3207
+      "sec_sha256": "b675ced201b27ede2b0d26ca6fd873befe96a1afa9679339a2d0b964187dcdff",
+      "price_sha256": "00500d2387aa4c6d04058d07253dff12a8d5096fd0854c89c041936eb3e97484",
+      "price_days": 3229
     },
     "WMT": {
       "cik": 104169,
       "sic": 5331,
-      "sec_sha256": "54ec3fbf36dc203dd00a0333396b3df2b6695ecdf6cbb19b6ec41b053d86b517",
-      "price_sha256": "1a07759efa577f81c11ef21dbb63ba2c428dd01711753a62b451a437a358f790",
-      "price_days": 3207
+      "sec_sha256": "49330f98609f70fcef4054edc90bc811398a58c4bf26dc0b218d607967a8dbe4",
+      "price_sha256": "4dda0321a5053a6a4ff769712dc6b185583648919982fff52fd0534956d3bfbe",
+      "price_days": 3229
     },
     "HD": {
       "cik": 354950,
       "sic": 5211,
       "sec_sha256": "aaf03befa1695d87ce1252bc08ca278b65be63782e46dc0b2858aab7a32c1be2",
-      "price_sha256": "188da6f015da80d4bfc396773f695a03c436b021d44d15d224131c91261ff3e5",
-      "price_days": 3207
+      "price_sha256": "a2fbeb4db958d4247d25333cd64ceab339c57d76cc52a190e00646d60c9e0133",
+      "price_days": 3229
     },
     "UNH": {
       "cik": 731766,
       "sic": 6324,
       "sec_sha256": "6c9dff59732b7c597542b2d5eadaae0313ca0de03defdba2c00203e693632d76",
-      "price_sha256": "528f23e6951ea413ad97d8e6c5f4ecff5397a9eef99cad1be8992af14b378845",
-      "price_days": 3207
+      "price_sha256": "2f2720c808263ceb2c68bf0438014e1471fbdae73ae690381e3a88bd4c43f03a",
+      "price_days": 3229
     },
     "ABT": {
       "cik": 1800,
       "sic": 2834,
       "sec_sha256": "5d751f73769f5c0a1f9bee0de16cb39d8961cf3f1ebb5558d555bb2678afb4ff",
-      "price_sha256": "3913ca21b9d8960884c74f9e593cf8095701c576581935e8f66948379c490e14",
-      "price_days": 3207
+      "price_sha256": "a45468bb0bb1e1cc140fb4b1bcade8d82514fc3c1efe08ad463baba12adef8f8",
+      "price_days": 3229
     },
     "LOW": {
       "cik": 60667,
       "sic": 5211,
       "sec_sha256": "7912551d61433f5e7e863ac602ebf24ee1484699e10aa556534f0055fff2ea7d",
-      "price_sha256": "9118e713e812f9b7783857161f87b71cae3b02bb4b7409c452d15a018292a1fe",
-      "price_days": 3207
+      "price_sha256": "2374b8919c39c785c24b78ccb77b34ba518c1bcda35ff4542af23832b7661ddc",
+      "price_days": 3229
     },
     "TGT": {
       "cik": 27419,
       "sic": 5331,
       "sec_sha256": "eb15a2cd524e99ff27675db78840d039ec4a68b9cc2dcb10accbcb299933a487",
-      "price_sha256": "d00df2e3ae313b341f983e57c004a02477a91a5a3bf806b368597b2fc5d06687",
-      "price_days": 3207
+      "price_sha256": "56dfd0aa08c8c5d66434f1fc4b7c3cdee960f3de366351376ac5abd4984369fe",
+      "price_days": 3229
     },
     "SBUX": {
       "cik": 829224,
       "sic": 5810,
       "sec_sha256": "2488674b57020c5281665b0ff271a29da71da64a2c9fa66bec6a9118772970bb",
-      "price_sha256": "ae17c14e3ac2a981e108391ff5b1560c7dc1603eb34ffdda3a1f7319cd7c0529",
-      "price_days": 3207
+      "price_sha256": "3b612b602031350be5b7bf706952dde194ea1221b1856f0a69ef9c5c7424d6a0",
+      "price_days": 3229
     },
     "CL": {
       "cik": 21665,
       "sic": 2844,
-      "sec_sha256": "450c2668961565047c7745ff5df5d38b40cc57d6940c48fe8f32dca13100f96d",
-      "price_sha256": "ed9e9b6cce257e023bc315bdc41fdd41f8b98748d3d7a679ebb68433e4d6bc18",
-      "price_days": 3207
+      "sec_sha256": "334b53709b5e5d67c058029e4f6c27a8a6395c46b4e707b248e1f5b0b8fb49b2",
+      "price_sha256": "876954ae98b6652503297a80c99c10288ebd8deb901fa65ab73c3f8e80b5e5a2",
+      "price_days": 3229
     },
     "KMB": {
       "cik": 55785,
       "sic": 2670,
-      "sec_sha256": "20a44ed6a1f55fa51c786121735a8e3de8269d63c3584ad87844514756d04e18",
-      "price_sha256": "164c0b01c6fee1c7827d1bdbbd2ca27bdb840e5ec8248526426dc27bd063db6f",
-      "price_days": 3207
+      "sec_sha256": "0f2aca44d12367704193726b082595c5345a22c0df75bf3182eb26cb2f72596c",
+      "price_sha256": "80026995ceb23ab8ab1fb940dd12c6411a81b092b10341dd075ffcb978dc7429",
+      "price_days": 3229
     },
     "GIS": {
       "cik": 40704,
       "sic": 2040,
       "sec_sha256": "3dd0552f7e909fcef40d3d99b413e9fa360fd1110ebbce0ce507ed71e611aeda",
-      "price_sha256": "eaa80e1aa0117d625e6e1d950b27007363635b1698ee34c62233648eeb16867c",
-      "price_days": 3207
+      "price_sha256": "338a3faa9eaff7ce0dcb5215c9b36b6ff59a931e1d19b049063c0de1988dc87e",
+      "price_days": 3229
     },
     "HSY": {
       "cik": 47111,
       "sic": 2060,
-      "sec_sha256": "83d796de405903e86aacc31ab69ba5c0071939fe1195754576c1ba9b03cdf52c",
-      "price_sha256": "0ad5805152d7e10211e5d7fd4daa63284fac6a41218c3828e75c51a0acd932bf",
-      "price_days": 3207
+      "sec_sha256": "eda9c4b82fe8dfa45bce49e7c37d28940fd5f7496cfb8b37e3e6bb93ca61f9e3",
+      "price_sha256": "43d604e10c8a5e1f9922759168d2f36dff93029d0fa048f1e0dac7d9cf8227ac",
+      "price_days": 3229
     },
     "MDLZ": {
       "cik": 1103982,
       "sic": 2000,
-      "sec_sha256": "c66054b213ead15f0a177910e8d265dc12e917fa82b51c99c2eb5b20c6acf8df",
-      "price_sha256": "8817d92bbe563ee708566957d50a1c5ca811bb483bc61bc444c2edfe38317fd0",
-      "price_days": 3207
+      "sec_sha256": "5b1da475f3941c1bd5d2c07d1909f0d73a3b83d06bd5546cb0541c0cadf53a4b",
+      "price_sha256": "786555b8cc7f54f4bb9cc57f05b9c6c87899bd7619251a9083dfa4b918ad9d48",
+      "price_days": 3229
     },
     "YUM": {
       "cik": 1041061,
       "sic": 5812,
       "sec_sha256": "5562a1496decb21dc8129dff0af281d50da52344a638def297e879eda6f35bf9",
-      "price_sha256": "b675691c27fbce17d90d7605af2ed39048da041f330b417bfc3796d643f930c3",
-      "price_days": 3207
+      "price_sha256": "2ada330fa65a2d171375923dfa3164d8eeff587e1d752f3f4bc84be0a1bd80c3",
+      "price_days": 3229
     },
     "TJX": {
       "cik": 109198,
       "sic": 5651,
       "sec_sha256": "1b8f7be3fed954f682ae56ebe9c56a245f4df3640b92181a2d44d6e086a4905b",
-      "price_sha256": "9be85cae40857d2bcb2383e10ec5d21214f5f6c8e5ad3482dc8cba203a412197",
-      "price_days": 3207
+      "price_sha256": "66254cdbe9290479880328c736e1607f768db9a6122e0339feedbebb6b85f35d",
+      "price_days": 3229
     },
     "ROST": {
       "cik": 745732,
       "sic": 5651,
       "sec_sha256": "6310bb034c7b7b228799f757b5117d1e6a173af3ff6304b656e851f492ccfaf9",
-      "price_sha256": "cc623a6566024ebf6336f54dc044bfded6e1ebbe5c7aba8e1518d3b25be4dfe4",
-      "price_days": 3207
+      "price_sha256": "3cd590162fa177b0d14b7032d4148835dc1d9773eb9ce5aaebbe1779a6e7213a",
+      "price_days": 3229
     },
     "CLX": {
       "cik": 21076,
       "sic": 2842,
-      "sec_sha256": "ca18495c5ee7465ad58862a368813a9f2aeb8880344c014f6188c36ffc38976f",
-      "price_sha256": "bf6ff138aac9ce3ebe2407f7acdc0dda55a2b642af6ace8a1b5ac2ea007caba9",
-      "price_days": 3207
+      "sec_sha256": "f9b61f8b3fed2f3b2a75c062d778ff639e9a9467fbd186d3c1bf3d23d90ce5ce",
+      "price_sha256": "f3dabac90f15cf4e191090efe2738e5f3fade095e5c397dc70788ec21aca7794",
+      "price_days": 3229
     },
     "HON": {
       "cik": 773840,
       "sic": 3724,
-      "sec_sha256": "3ec36b94bcfb6c163227a5568ea524a2d714baae79e205929933cdb69ae3bcf7",
-      "price_sha256": "b0c7e218064fd19a9fe56f04f897e9bab47995d2fee9587e7f7c5f7b5f03c311",
-      "price_days": 3207
+      "sec_sha256": "ef98dc309c39aebcf0b47b11a618b20d812b226b0c709bc4ef7f838e803aab68",
+      "price_sha256": "8f873e87a93e58905cac5972ff30b813d645795049105e3d15a4db04995ac54a",
+      "price_days": 3229
     },
     "UNP": {
       "cik": 100885,
       "sic": 4011,
-      "sec_sha256": "99d22f8aa6dd31f102b2691ce5c53ef872908bb7b50860d153e6efbc6eef2b61",
-      "price_sha256": "74f688d29f0a0528552bb341f0134e909918efe79aba68366fc3842afe358f21",
-      "price_days": 3207
+      "sec_sha256": "0ad87b2eccbaeb0c2685e9aa7de2d79142b3885986a3a94ee64de2e3eb1b5d6f",
+      "price_sha256": "2a7c81ed6e4dad2e7120c2f5a9454bc50d1a4b124b394a75e0c80519d25438d1",
+      "price_days": 3229
     },
     "UPS": {
       "cik": 1090727,
       "sic": 4210,
       "sec_sha256": "19a5c39708df843df0ecefb17c8a53b8920ee8e43f64d0572b5dac0c167da90d",
-      "price_sha256": "4c3f6df4338ee29e9788f2921f1206ae1a2ed1725d74e56c57102b922dd94941",
-      "price_days": 3207
+      "price_sha256": "f53e04e25c0bd05414351c14c199503e5b1d1f2568ae494738c9b1ec87deed67",
+      "price_days": 3229
     },
     "LMT": {
       "cik": 936468,
       "sic": 3760,
-      "sec_sha256": "aedb683271d2c57451a89db5afa42af45eaaa74c57bc544ddfb427762f785c01",
-      "price_sha256": "eb71e2057e8751f0b00b8166ffad9107ed36353eafd6502ee59b902120db0238",
-      "price_days": 3207
+      "sec_sha256": "4cb5d1418e5c1b20be5d26085998d96bf1eef45015395fa49df6bac2ac0ffad5",
+      "price_sha256": "5866aa93096ef0530466a7e1cdaaf59e616e7b997aa59f2372293d2b29275c5f",
+      "price_days": 3229
     },
     "GD": {
       "cik": 40533,
       "sic": 3730,
-      "sec_sha256": "7fff513c1ae0c64ca16a673a15823a850bcb4d097506eaea38c8b540fa4708ff",
-      "price_sha256": "936758796a6fb0821c149a2e6c248fcc6c6fbca1ef00ce6196c66e754f1897b0",
-      "price_days": 3207
+      "sec_sha256": "83cb3ecff7ec6855f24d2198a1ae9e4e4963bf61c4d6af223a88db413eb15afa",
+      "price_sha256": "bace98265fbb3b246305735cd786ef08b50f258154f8bf0f2834175293c6b38e",
+      "price_days": 3229
     },
     "NOC": {
       "cik": 1133421,
       "sic": 3812,
-      "sec_sha256": "5d35e456d5a983567698b3053fa7440a7eea6a8de698d9de9be041e4a6d6d6b7",
-      "price_sha256": "f01289d839952507826316eb61f7515bf8a787c95506d96642d648e716ff324f",
-      "price_days": 3207
+      "sec_sha256": "4b2d23018cc5e052fe2453ec6c8607d0bf198997ee6a77cf1fd7eaf4b361cd2f",
+      "price_sha256": "3f90efcb79d27606867b82476cb59e559f46d6ce60ad6b62df11cae857b70078",
+      "price_days": 3229
     },
     "ITW": {
       "cik": 49826,
       "sic": 3560,
-      "sec_sha256": "93020fcf7c220cd160cf54605d3290782169ab1d62d0cc787988c7520bd4bf9a",
-      "price_sha256": "988d127abb6f6fa88d49d5d74daa989b33118150e99b17e2534574c93bf95db3",
-      "price_days": 3207
+      "sec_sha256": "849bbcb9ef5868b505ee92e7e87e427eced4fced4dbb4db6d931fc507a581833",
+      "price_sha256": "f664d5058a0e4adfb6d2a0081ad7cbaf1aac05195f41551fb51e85bbb1013eab",
+      "price_days": 3229
     },
     "EMR": {
       "cik": 32604,
       "sic": 3600,
       "sec_sha256": "195bcbf29fba4dfc4715c44e24c71f9da3bbca9c4d04f1166fd3a9ec661df27b",
-      "price_sha256": "65cf981846142818cd4f103745f0131fb3292afefbb578089100518541d413ca",
-      "price_days": 3207
+      "price_sha256": "7b8ac49b58224a8a000b9ac167f9d980916fe1315d85ae0865b1e7a80928cce1",
+      "price_days": 3229
     },
     "CSX": {
       "cik": 277948,
       "sic": 4011,
-      "sec_sha256": "85aa75ecd9ce76a5596f7973f2b41e953e022e056f9883bf9aec2190b7f43d0e",
-      "price_sha256": "27cdae37520b4d7f18003a7b61ca6244c8b928ac616edb90813ff2544dec91be",
-      "price_days": 3207
+      "sec_sha256": "59e87be010209bd73b7ca64b02c3be02b607eafd0b899c4fc33f733c308fabfa",
+      "price_sha256": "a18679fc3fe140fe1e69d9b3c2ad5d0fcb48326d4b8000718c36d633b41000fc",
+      "price_days": 3229
     },
     "NSC": {
       "cik": 702165,
       "sic": 4011,
-      "sec_sha256": "19e2b893fa81e7209a06aa2c2c327b0ca912a9a6bcb5c535439c80475eed4759",
-      "price_sha256": "04c6725196b5f4cc664021a20ac68adf449e8688efcf506ac4ab51d25dbccf8f",
-      "price_days": 3207
+      "sec_sha256": "1e39cce9e1272a8703da3a11c2df8133f844bedd381ae72257d2f6aef6934c8c",
+      "price_sha256": "8fb19646813e126cd4fd9122e95854a99088cae4a9830aeb2d9bc94161902914",
+      "price_days": 3229
     },
     "WM": {
       "cik": 823768,
       "sic": 4953,
-      "sec_sha256": "83672003d7cb177ccd772467684a05c7471ded8af93c0f7ed59b9e7a2cd97119",
-      "price_sha256": "3c6e014fcf250a82d3c231fb3c54c540464f3671222f975f9b07da4836d6c4dc",
-      "price_days": 3207
+      "sec_sha256": "f1319453df01c540de4ef887d12cc466fe215a75ba581da2c8020c2ef3586aa2",
+      "price_sha256": "a66ba627dcc57b43a9e95c390c11a320177428b735e346e5dda898f5810b9055",
+      "price_days": 3229
     },
     "SHW": {
       "cik": 89800,
       "sic": 5200,
-      "sec_sha256": "75ef555a24c3fad594f062ed70e1c36a9163efc4f86d0ae7b77281686593fad3",
-      "price_sha256": "749c5e5c91e571002989b247a137f2d55248291e4208f0d697d08982d0ccf37b",
-      "price_days": 3207
+      "sec_sha256": "736f5bac1390cbeee698eeb7d7dd6bd7037470e5e8ce88a9c70cb0370bf04e5a",
+      "price_sha256": "bacb440bf5286304f31caef58ec48ade12ab9de59725e4676e79a4584f4b3f40",
+      "price_days": 3229
     },
     "APD": {
       "cik": 2969,
       "sic": 2810,
       "sec_sha256": "b950a51ccd6520b9874e8452b9be9d2a43736bf24b7ea2413c44d34cf72a623a",
-      "price_sha256": "5302e560f7667436333f53764437f52f18c3f1567116df32670471995bb9d238",
-      "price_days": 3207
+      "price_sha256": "4773077aee68f8068ce749160124aa0ce3fa6eca3b9e6cf53d9bdecccf9515b5",
+      "price_days": 3229
     },
     "MU": {
       "cik": 723125,
       "sic": 3674,
-      "sec_sha256": "a8b088c2111daef36536e53c81fef4c0f01220c64933e126a665b00a9257f882",
-      "price_sha256": "fc8b902d42b258e34315e17d6f649982dbbea44940586e402139873db3115a4a",
-      "price_days": 3207
+      "sec_sha256": "162439f31208eaf4cd1a33939d80fd40479a559735b9488d32ac43d5516ff7bf",
+      "price_sha256": "08a582bbd261d17b1a470bf8d15cdd8f6dd0f29143843745b00b5f7eb1f6788d",
+      "price_days": 3229
     },
     "INTC": {
       "cik": 50863,
       "sic": 3674,
-      "sec_sha256": "70056711b8b04d3a27e4a42b6d86e26f85ddaa3d59e480039d66ccfb353eb0b8",
-      "price_sha256": "014da3e8fc449ea642716b376829c4e56e8c55974462d4f287eb6dbe3c4e7a52",
-      "price_days": 3207
+      "sec_sha256": "9c568557a91cfbc234c999183d6434f8bbf7b8ebf2f29577f28d761a9becb59d",
+      "price_sha256": "eefcfa9012a9c271fa7da227a649f1b749aa3277429bfb87153495110aa20672",
+      "price_days": 3229
     },
     "CAT": {
       "cik": 18230,
       "sic": 3531,
       "sec_sha256": "01ddc6ffa741f0a7da440e2949b2ed19cec14fab35435a398e3f3d0100019715",
-      "price_sha256": "04681116fc1a6c502f252e4952fabe572ce27106e2a14b3ddfe2c7e25159f977",
-      "price_days": 3207
+      "price_sha256": "1f6188d372ea6952cab4f1e24eee6cc7ab16a376dba12264302be412f74ddeaf",
+      "price_days": 3229
     },
     "DE": {
       "cik": 315189,
       "sic": 3523,
       "sec_sha256": "b845478ca3e2c2a83471cfb92524b33d83ec47fd3c1c68614f3f2487f1606b6c",
-      "price_sha256": "31733bab15976fdd5d1ae6ea1a6f8d692117151f24c853c601914d1382067e4c",
-      "price_days": 3207
+      "price_sha256": "5bf54ef102c821fdd11edda95c52c013798ee98042ad426140255d36660b002e",
+      "price_days": 3229
     },
     "DOW": {
       "cik": 1751788,
       "sic": 2821,
-      "sec_sha256": "ff212d1e276fc1525ccac4101dadeadea5bb44ba5237a584a53d06d89535b823",
-      "price_sha256": "c0b110b872a0b0ef56809716b9457a95a6dfcb931fb9960fd929d50efb6408df",
-      "price_days": 1896
+      "sec_sha256": "1c64351d4eafc2c9595fbef8317df11583f0fb0271763186cf6eb1f2ce92195f",
+      "price_sha256": "d6a8fbedfb0c81c0c8c6033c4725bacf3ea66577ad1f428ba37ec4d36b382c74",
+      "price_days": 1918
     },
     "NUE": {
       "cik": 73309,
       "sic": 3312,
       "sec_sha256": "9265f148393edf83f2797761e24c52bc061277a636d7df476b888ffaf6c74f3a",
-      "price_sha256": "0dde5b7cce64d93b27edc773bef49dc99fa86f1600b92ae531f6f4deec2179fb",
-      "price_days": 3207
+      "price_sha256": "e1e0ee442d9b634fc2f00e62de89edccfbf793a0b9f91387a25871e5aa6e9508",
+      "price_days": 3229
     },
     "FCX": {
       "cik": 831259,
       "sic": 1000,
       "sec_sha256": "9e88803b7e6f52764f09394cef2c020aa7f8fa50a494c551471a448c1c943d11",
-      "price_sha256": "c4afc4713185efd1b5fce4dcdd5d05edf7cd13aba3debe61fec16a2a2ecd522b",
-      "price_days": 3207
+      "price_sha256": "f7fef0a087e2c8262aa219111bc576953ac89a35429f9f4d435e8159048a0a5c",
+      "price_days": 3229
     },
     "XOM": {
       "cik": 34088,
       "sic": 2911,
       "sec_sha256": "9b95535419e5662e3deed01de803e83deead477a4c81316e1c45186368fdd8b8",
-      "price_sha256": "83cbb67fca0ec6bfe4484a57a65ff9d97cfe81691f55c2489841a99dc4e60562",
-      "price_days": 3207
+      "price_sha256": "801b109075c32c0a8daa30a22b7ab109c89a6ed9732a7494ea7a6614e9c9b9fa",
+      "price_days": 3229
     },
     "CVX": {
       "cik": 93410,
       "sic": 2911,
       "sec_sha256": "c09b160603412cb45acf1bb9bf3732e531dedfb548afa0e275fd8aefd7ab397e",
-      "price_sha256": "315ae4c1e61f742ee7ec58fb7263565d1135cee091e59f313103bd9aacd584d0",
-      "price_days": 3207
+      "price_sha256": "0cee1a2476d0b3a897de9601e3868806fed88d76fcaa61564902384442004353",
+      "price_days": 3229
     },
     "F": {
       "cik": 37996,
       "sic": 3711,
-      "sec_sha256": "db9621054cffb365bcb65cde1f53e4161fb26ac56ebf8a95b9066b3d2375203e",
-      "price_sha256": "999d826b3ea7d5e71f0ba98ef393bbb08d461783f722d350baeab80bfd763f93",
-      "price_days": 3207
+      "sec_sha256": "a572be781d554ea39f47c7b478d31b137f91b87d769f044ce2cb922ac7d36189",
+      "price_sha256": "d92c1e4221ab01eb34404a434b6a6a8694ff5547bf94f91473d4a57b8903d5df",
+      "price_days": 3229
     },
     "GM": {
       "cik": 1467858,
       "sic": 3711,
-      "sec_sha256": "0aadbfd12c0d97ba9743acec6b3ad5b0b6082fab7fbc8f1edbbb7d38fe050e38",
-      "price_sha256": "da20e545f171d256bfb756543cc37657f36ae59469830aea2c8c562030d581bd",
-      "price_days": 3207
+      "sec_sha256": "e62161d8f058c3b37c42fd90f779e6bf9945a54c71e384e3e6a3ddab68fc6c49",
+      "price_sha256": "8b0850d0143eb32c26a676dd6612f9ad21e7f697cf0996836429dcd5a35d4295",
+      "price_days": 3229
     },
     "AMAT": {
       "cik": 6951,
       "sic": 3674,
       "sec_sha256": "65ecfedd5bfd3768d30286b52badee080c655cc8d1077524bdb6ca8928380fa7",
-      "price_sha256": "1ae88150450d160171b3fb3e82988f789549528701cf4a9c53a45bb520a909bb",
-      "price_days": 3207
+      "price_sha256": "ade2214eebb6477432ed9bff8b0337656460a5ec233e7ee8b991189fcf72f88c",
+      "price_days": 3229
     },
     "LRCX": {
       "cik": 707549,
       "sic": 3559,
-      "sec_sha256": "7ba34e55ee4bb0512afd14805895a554951f4d948ee28e2db41b44f44ad0b1dc",
-      "price_sha256": "9554fb076efa2f1361e67dd742d029240a7cba29320d160839cff84efe2bc959",
-      "price_days": 3207
+      "sec_sha256": "46289dd93caeb9cf61ad8a0884f51999549c8179f17ad7b0ef9bdadfe9aff626",
+      "price_sha256": "202740bd2ae36176a531f91a1c45f7e30139cc5d1675e68a6c1462131f8ede64",
+      "price_days": 3229
     },
     "KLAC": {
       "cik": 319201,
       "sic": 3827,
-      "sec_sha256": "2198d006cb99f6983557cb6747cbcc7802b6c72eef9eacd482840607d97995df",
-      "price_sha256": "078bb94745b9a5299b992b47472f1df13ef35a871337776cba8075a373b0912e",
-      "price_days": 3207
+      "sec_sha256": "a79d64d8d151a8fc5256b5df1993c6ad7055a26b6ec93a5565ab9e76a9e43e1f",
+      "price_sha256": "cbeeb73ff740a8c2ff8bff7dabdf7a86df554fe82ba717c1b274e43e1f1b7a5e",
+      "price_days": 3229
     },
     "AMD": {
       "cik": 2488,
       "sic": 3674,
       "sec_sha256": "21a29c75076d90fced568785d855fc427a15c7458bc0bb153a9dedd88ad3349e",
-      "price_sha256": "e1861a7e90e00284b9de86ac5e08ba7ef9b71729690eabe3f6cbad372fdca4c9",
-      "price_days": 3207
+      "price_sha256": "3667828d4f93d968252642f62da11b06964d254aba8455ad9ac2ad412aed5918",
+      "price_days": 3229
     },
     "LYB": {
       "cik": 1489393,
       "sic": 2860,
-      "sec_sha256": "27ee253a4417f5bbb0d9ed46ca8570aa39ac15267850cd2b7cf39f4cb7524c92",
-      "price_sha256": "5a58e61ba39a3fb7f69ceb21ead11fc5e8795dbaa3f9ef43c07137d383e2846c",
-      "price_days": 3207
+      "sec_sha256": "a7dccdac1a57250e0f11f25532bee770d3e726c838b056337e6e385d8fc32cc5",
+      "price_sha256": "deca0b51c316de7cab244a32b18090c6796589e1fe4929e164e4c647d7bab34c",
+      "price_days": 3229
     },
     "STLD": {
       "cik": 1022671,
       "sic": 3312,
-      "sec_sha256": "05faeb3700549a72e77fc8cdb107ba5bc36b73512de61c7a9a9c0e305a5d5943",
-      "price_sha256": "f019b3b2ef9b0b3488523783666012bb5de158ba4913ff46d27e77dba320bee7",
-      "price_days": 3207
+      "sec_sha256": "7189ceb2a99f88caa8e5491d1a158fc26d01ba10a79db6a0f3ba5d578f57a9ef",
+      "price_sha256": "6b2eefd302f5b30916f8975240fda76b490bfd5354ebb8b954b4eed2618143a0",
+      "price_days": 3229
     },
     "CLF": {
       "cik": 764065,
       "sic": 1000,
-      "sec_sha256": "6ac4f4ac47ed70babca129141a29e7aa6021bdac5bddcb0da437d1547a71c400",
-      "price_sha256": "a45c3d64936b546c1442b14f8fe387c679fe9227a5c05ece6eab93f675da9806",
-      "price_days": 3207
+      "sec_sha256": "32d8ebee3800e6c9de0ee45d262312465699bfd05fb92423d9167f4f4a7a44ab",
+      "price_sha256": "6e75fbb7c38c880cab27ffecaf9940672ba6fba8c16b95f62bd704e400abd5db",
+      "price_days": 3229
     },
     "COP": {
       "cik": 1163165,
       "sic": 2911,
       "sec_sha256": "cccc8afe3602880e8f2909266e778aa195b42e745da669a801925c593720d2fc",
-      "price_sha256": "e69484791609ffc4fcc0dead8177ec9649202ad78a8d16b0ac05f76fb4981612",
-      "price_days": 3207
+      "price_sha256": "be176d035b033d0fa6ea5b85dcfc2a915050f48895f6c3fe02aaae23ac2c6b5f",
+      "price_days": 3229
     },
     "EOG": {
       "cik": 821189,
       "sic": 1311,
       "sec_sha256": "79f3107794b95507caaecb0a0817c98eca48a6cf6986fa1e01879c164c7b3da3",
-      "price_sha256": "3941d43d565f39ea3d935b73e925366ec709b8508f528bee809f9b935dab8cd1",
-      "price_days": 3207
+      "price_sha256": "4166201f7267d0e0e0279099e66de31e04c1889ac18438bbc720f08782529790",
+      "price_days": 3229
     },
     "OXY": {
       "cik": 797468,
       "sic": 1311,
       "sec_sha256": "4b911cbb64fe1b78f022a147470bd4376ebf25ec71897240d6ed85654d8bd410",
-      "price_sha256": "72b70c9a1a490bfd52d3b9e84aecc5b7a36d677c1248ba71a2697839697aff3a",
-      "price_days": 3207
+      "price_sha256": "1088ab83864e5015b02bda6e8e26403d6fa2f0bbc4930f0dd8feed1beddf1e4b",
+      "price_days": 3229
     },
     "SLB": {
       "cik": 87347,
       "sic": 1389,
-      "sec_sha256": "8ae73ad4b096441afa9626e414020b112e1b1f3434938b01d26ea0aae504a822",
-      "price_sha256": "733ffb421d31ac3b12765f6023e876511f27d4f5a43c617b1961a4aa6c3ff78c",
-      "price_days": 3207
+      "sec_sha256": "d5b4b3ed52883c18109b18edb7c44e71cd2e963b7fd6b8e1a6ccdd09e8a306f6",
+      "price_sha256": "167b94d4ba55d7d00e22599a4162e10f3330b5b41c33b899cd28673f43f02a36",
+      "price_days": 3229
     },
     "HAL": {
       "cik": 45012,
       "sic": 1389,
-      "sec_sha256": "586e132869fe199342468488d1d9d9cd61b51b292dab063b5dd5d11ac70d79c5",
-      "price_sha256": "024038362f05473361dde29895bbe9ebc052852d040863980604966b2c9e51ac",
-      "price_days": 3207
+      "sec_sha256": "ab1e3695455db5eff9863c3bc49deb01932753b1ddec1d00cbacd4d129f0f13e",
+      "price_sha256": "8ad90e84db0c0ed66109060bbfbec416b150a1ddca83288aceef71117555e13e",
+      "price_days": 3229
     },
     "MPC": {
       "cik": 1510295,
       "sic": 2911,
       "sec_sha256": "959e8816abb188a8475cc8bdaca0862c7fbe5e3bba650152fcb4f83ea821d849",
-      "price_sha256": "47f46a5f176dfdadbb090258bdad46d9557a81e5645453a64cd620fb7fda63b4",
-      "price_days": 3207
+      "price_sha256": "765138f46c348e399c18e76f998720b71adbd0bc749055a1f46d8dfad00d9d82",
+      "price_days": 3229
     },
     "VLO": {
       "cik": 1035002,
       "sic": 2911,
-      "sec_sha256": "d58ab6797025bd0f4e03b03c90f34905c2234e9f28749500726ec867d5443eb5",
-      "price_sha256": "feb4b8ba45f2c545817015e89774ecf7422d585682a2080fa86bb1a030fc2229",
-      "price_days": 3207
+      "sec_sha256": "ba9baadcf9568df5228d6340a7308e4c5d9252d5a98542b2f4302927c97a9e6a",
+      "price_sha256": "3822af3a0b21c991fc536c2570ef2781b0b0406196154931964fcfaac5621cb1",
+      "price_days": 3229
     },
     "WHR": {
       "cik": 106640,
       "sic": 3630,
-      "sec_sha256": "16ddb67390ae21ae266b630bd7f87f02c7209dffb05e2e93587536a3cc4885e1",
-      "price_sha256": "ae67f38e4a9df26a27b6e1c65a43793ecda368a6a900547686aeedfe72e3f1e4",
-      "price_days": 3207
+      "sec_sha256": "769c2ff1cc3e244253386fff21bb762714d62199bf733e775037531990c4431e",
+      "price_sha256": "8e9977ee9391ae164ca283aa9953b86b8057944ea67d5e14070fe56b531baa83",
+      "price_days": 3229
     },
     "LEN": {
       "cik": 920760,
       "sic": 1520,
       "sec_sha256": "91a7d0faa8e12a36a3fe382149ef599e14da99ab91ef7af12ae2bafc86b7aa8a",
-      "price_sha256": "160b5adffc1af8da0974c38c7b9f8299c1061214c7566f846e0a99c9b73c8c30",
-      "price_days": 3207
+      "price_sha256": "7882ff8d90112634355607681b8bf52f4a1a27283a32ed11dd3b008837349bc4",
+      "price_days": 3229
     },
     "DHI": {
       "cik": 882184,
       "sic": 1531,
       "sec_sha256": "d354326179bcea875450e68de79204f60b14ba93a6fb679d0ed9c8b70e3322f7",
-      "price_sha256": "0a9f999e9cb39f6868911df51dbdc2336e0aa791b5aa09cd0009b30296238d5f",
-      "price_days": 3207
+      "price_sha256": "82581c95388c88a1c9eae84f1400e63f13a55e80cc99ec93448ba939ce400912",
+      "price_days": 3229
     },
     "PHM": {
       "cik": 822416,
       "sic": 1531,
-      "sec_sha256": "270f1d3f97ce3e72b5ca00c5416d1544ef9cdd72c09fcee63497c8e3e173dc14",
-      "price_sha256": "395b5021050ba48b1728bb214fd79426253d4652bfa5df17e412a9056c8f9a59",
-      "price_days": 3207
+      "sec_sha256": "17025e7329aa829a6e793d63006b00178e179b40e818afd2934a8e68f4a2c063",
+      "price_sha256": "eda0f79b7015a7f2d6ab2663ceb94a099e97d23feb94ca50b10d6106297455f2",
+      "price_days": 3229
     },
     "NEM": {
       "cik": 1164727,
       "sic": 1040,
-      "sec_sha256": "ea025dc937baa0c5647ad84941e423225c6c59485d9b7b27c4f1d87305739e77",
-      "price_sha256": "9fb678b49091a5e928243d525f2bfc1ea5c79c73878de300ad45bc3594b69f15",
-      "price_days": 3207
+      "sec_sha256": "26775f107d7e26532edfb2fee083de83a64de460b2a7490699253eef02f2e69a",
+      "price_sha256": "167f31e15981460d138768d29018cb891bf1f5ab154481ca8746bd8f5aa88b45",
+      "price_days": 3229
     },
     "IBM": {
       "cik": 51143,
       "sic": 3570,
-      "sec_sha256": "1660477fa5713e5749c3038cf22b3c776414acfc6e1e721d1772c91101dc5e5c",
-      "price_sha256": "9907e0ceca98dacea4a886ae3a4a289e208b86905dc83ab6e24a19a96339aa7c",
-      "price_days": 3207
+      "sec_sha256": "10fa1fafa25440b2159e2054dfe47628ba4ed353a258f526704cf9beda432bb8",
+      "price_sha256": "e00e3e44c367063b9690e84d2fed49f92a89e231c6fd0f77fa6fdde22bb54a20",
+      "price_days": 3229
     },
     "T": {
       "cik": 732717,
       "sic": 4813,
-      "sec_sha256": "483db761a498797a4ba14df701a0404a8cc8d21b7409984eb1e722cb089f3dbb",
-      "price_sha256": "7dae65e7b3bbf5ba01247faaab52ea1b7b4b979ee5f9c74fe86c6b4cd0b8ea10",
-      "price_days": 3207
+      "sec_sha256": "438d1c67733ab15339da5b9b964e209f8a496c484c62246af68d726c0b78285f",
+      "price_sha256": "83c2ca5b68aa0c33c372f4e901e8ccd55c9321832bb463ce08717d65930e357a",
+      "price_days": 3229
     },
     "VZ": {
       "cik": 732712,
       "sic": 4813,
-      "sec_sha256": "e319d31a81cf3f17423edbb3e18d129653b348cfd8c902034e5a329bf2bf0624",
-      "price_sha256": "9a43ad83d83858ceaf31bfffbf9bc24f4b18b2310fbe3b931655aeb759c63c86",
-      "price_days": 3207
+      "sec_sha256": "2c96d7090f7f3461177ad2d2dc84806d057380b1efe87a3129e1de9a845b6422",
+      "price_sha256": "522f65db302747cf2b9a07aa913c49986d7291f8c7d3669f105cd85747e9b1cd",
+      "price_days": 3229
     },
     "PFE": {
       "cik": 78003,
       "sic": 2834,
-      "sec_sha256": "bd072131f9dcf001f22e843fded5910c2c7fc178e2a739ce0c58b1934e84d566",
-      "price_sha256": "c9d6d9b4e807881f14425227b0863ad42293e6d56ed9da3b00cce2ccedbf3990",
-      "price_days": 3207
+      "sec_sha256": "8f379293683cf844f7305fbf11e15716090a9cfe2a2af9cc0ef35bb4d77c6bce",
+      "price_sha256": "fe5b611a330a03e7ac8d554cc3015b9f40038c8d6c90d99a8e1bd1013b28a7ee",
+      "price_days": 3229
     },
     "MMM": {
       "cik": 66740,
       "sic": 3841,
-      "sec_sha256": "571391ded2a92e8cb1e7be5c22f3ac192f7fe9d4cada2dbdb985261297e6ecd4",
-      "price_sha256": "ad45df707afdb9b587d3425e5ae63cda02b67d4819656c349da87601218ab590",
-      "price_days": 3207
+      "sec_sha256": "f386e2155c94359b4e3f3a688c4b1d008d8082be0f87279cea40c15d6a04d209",
+      "price_sha256": "9e34df603352fdfd1c650ccecfce6e0c75cded144791d1f89458ce761c95a18f",
+      "price_days": 3229
     },
     "BA": {
       "cik": 12927,
       "sic": 3721,
-      "sec_sha256": "0c63f1ae7cc10b3c27e0c94f2add0c461e6293036dd4e52e52ae6dbb6f206e15",
-      "price_sha256": "8ea27432d9d55a37e7c8ef539e463229fb768522ba6c7cbfd3003ef70f2bb7c9",
-      "price_days": 3207
+      "sec_sha256": "794d5fb4c83e163b258afbc6828a6d9ce6657f3dae28d5fce0c29623619a957d",
+      "price_sha256": "8c7f66e690c40395b032e084eee31a9ed479b5059daa5de35a3ce81ed461d455",
+      "price_days": 3229
     },
     "NKE": {
       "cik": 320187,
       "sic": 3021,
       "sec_sha256": "d7aeceae21e6649e163d195729849349b27d909ab1a6eb4630a7c0c227acd890",
-      "price_sha256": "2a9e44c469d53d9762606cd4e45f365c17dc16167cb6b5d6d179eb434200242b",
-      "price_days": 3207
+      "price_sha256": "3d1e26f3c2f90fcdce1f3b8a1c10be4e0cc90706c5a3fe838639ef9a4993f455",
+      "price_days": 3229
     },
     "KHC": {
       "cik": 1637459,
       "sic": 2030,
       "sec_sha256": "8fad66c16e535f7749f19126a986a9f43a087ca2472d063fa7742106196d88ac",
-      "price_sha256": "eefc354453874ecc5c26a408652143a2f4969693149b33327ee1331fb0677342",
-      "price_days": 2829
+      "price_sha256": "5af05c862db9252a7df4137f11ef658713cb91cbcb5d739adac882c816609ddf",
+      "price_days": 2851
     },
     "CVS": {
       "cik": 64803,
       "sic": 5912,
       "sec_sha256": "5c08d55a669ee073f26bb7dc68826076bf640f0a2b5ac5b2161408f67f96e3ff",
-      "price_sha256": "cff782eea9b5de31beb718b37cd65baefa8e8e62da0dda4b8f6411eb96bd725c",
-      "price_days": 3207
+      "price_sha256": "b89a3d96f62d4deffb570036c6c9d6e466627981d5819bc282ef68992b78d981",
+      "price_days": 3229
     },
     "DIS": {
       "cik": 1744489,
       "sic": 7990,
       "sec_sha256": "f737e2272b6fb76cda801a8a5d493621a917ad4f73e0752b4ab14ffda694a57b",
-      "price_sha256": "90cbe656e8c9c5c67359de6d95992db233318a8590f791b81b317312c5825cca",
-      "price_days": 3207
+      "price_sha256": "d91dfa5d9a7521de1a4f791c7f90f0084464667fff10c6bdbd474f5350e5e282",
+      "price_days": 3229
     },
     "TSLA": {
       "cik": 1318605,
       "sic": 3711,
-      "sec_sha256": "d0c2b9288d027a6d735039a6fe874a348b65a7fdbc6c133130666c777c885204",
-      "price_sha256": "44cb78982af620b352c4cc0c326b78ab84408561668d27ce9bab0b761a43d80d",
-      "price_days": 3207
+      "sec_sha256": "c951e0ae2402dd8cf8f39319928adccc4196b997941fe40b0d4d6b8060802db1",
+      "price_sha256": "97315c1eb3216de0857b919a7106b011fc8cc73cc39026559eb56bfcc45deedd",
+      "price_days": 3229
     },
     "UBER": {
       "cik": 1543151,
       "sic": 7389,
       "sec_sha256": "98e804db35b92010096d3eccc692cf3bda5082ca8648bbf2f55d0b7be0f3830f",
-      "price_sha256": "8dc5c80a8b246ff211191e4104af71e1128d064429dc5bc61f362071ae0183f2",
-      "price_days": 1860
+      "price_sha256": "b3c28c56ff5e8ad30749e9c7d98af20cdbee7869566adf8047709c2d059c829c",
+      "price_days": 1882
     },
     "EL": {
       "cik": 1001250,
       "sic": 2844,
-      "sec_sha256": "3b9b6c1c907236f2149207b3a223aa1674e5f72b044346fa8be0acad363661c0",
-      "price_sha256": "c1a8a8ffc13c884ff102e4a4d23410d1f7cb0a2b6e7bd4795134b0836ee4369d",
-      "price_days": 3207
+      "sec_sha256": "5d8ff3b5833547b39bb54e9bf9c0c2ebfeb93de52dacd4b90d1c3c93fb74316e",
+      "price_sha256": "1c1298518076359abd277c3cdb99f857d723e23a7a926beabb76cd1ad58082e8",
+      "price_days": 3229
     },
     "WBA": {
       "error": "ticker not in SEC mapping"
@@ -800,253 +800,253 @@
       "cik": 1596532,
       "sic": 3576,
       "sec_sha256": "e548756a238d794e61322ba2d70b913b5d2f925c161fba73236f54a13df85c2f",
-      "price_sha256": "3c37b3891eb1b5d3254433bb8bb99630989f9ad120986236f6e8a3d838c9e6e9",
-      "price_days": 3100
+      "price_sha256": "77fd50faf4037c2c6faf6fda6352774cfc1e05e1b7b354a4a66ac24cb27ab57b",
+      "price_days": 3122
     },
     "CDNS": {
       "cik": 813672,
       "sic": 7372,
-      "sec_sha256": "0bfb80dcfb082f1368b0f19c256ca5b35585e20bda411cea2163627b55f0955b",
-      "price_sha256": "2f89f986317c4b45c4808e9eb09c9ea92909dbb428de2dbe35422d307c3ca0af",
-      "price_days": 3207
+      "sec_sha256": "977d8d6f1e734ae36782942fe5dcd7a2428633ae81589c7777d1ea88af5b44da",
+      "price_sha256": "df3cf6459c94d7888fe01d5edf5daec8425d4d8b830fdd2294c6ce1d41ce268e",
+      "price_days": 3229
     },
     "SNPS": {
       "cik": 883241,
       "sic": 7372,
       "sec_sha256": "7e9b6e13ac2481586b56f1db93af14b9b014a1b7f92af2a09075d7cbd51526d4",
-      "price_sha256": "821ae2bd261e9c621414f8026de51bfb52e113c7aaf3c72f1821a7654e945df7",
-      "price_days": 3207
+      "price_sha256": "2d578d305e8274c209add896c04e6c63335d6d2549512a88a34717923bbdf87e",
+      "price_days": 3229
     },
     "FTNT": {
       "cik": 1262039,
       "sic": 3577,
-      "sec_sha256": "59391fcf61ddfa58093873acd02d39b714d88ff78987ce7e749fcc6a62f4c7f8",
-      "price_sha256": "47ef57352ce940d0f38415cb9dadffdc03ec84ed44e482befb1f87e382fa4c8b",
-      "price_days": 3207
+      "sec_sha256": "b29f9cfd9dc88b77b7ee4e957ac36599da40d1923ff1102ae0c82f3c2c78f1ae",
+      "price_sha256": "c3a01404880b219640e770e6d4d44e104d958ea74fc03760528c1ce61633023c",
+      "price_days": 3229
     },
     "PANW": {
       "cik": 1327567,
       "sic": 3577,
-      "sec_sha256": "0fce8129e237331262a97979fde517a19797896a44f4d4eeab2a0767aaa6029f",
-      "price_sha256": "eef1543be53b8b612e2711b32ff3fb7c6c33dbb8dbd4779eb1fc63dbcf973c69",
-      "price_days": 3207
+      "sec_sha256": "881c1ced47689b87bd0d5c5cad9c8365c90cd2ba4e167bcfe78ba7504e8b9896",
+      "price_sha256": "a7210585a6ef35270e410f8bca200fda3d83bf3193e2f733d1068c2d91fb0975",
+      "price_days": 3229
     },
     "ADSK": {
       "cik": 769397,
       "sic": 7372,
       "sec_sha256": "4ee4631abb3cf3cb502a212c2a96745aea77cf4ba857a702f6dd5d6f39d0c991",
-      "price_sha256": "a32c3cf63401ddbb01a2b2093749cb9a13d6a4e7da8b57a9f51131f9a106655c",
-      "price_days": 3207
+      "price_sha256": "9aa556a584925cd5172f9882ed511a2d4f0f213ecf68ed2dfe9b16fb3b44e0b5",
+      "price_days": 3229
     },
     "MCHP": {
       "cik": 827054,
       "sic": 3674,
       "sec_sha256": "e8f8817e99e806f3052c70002d235eaa3eeec2fa0eb661c137dcb7b8f337173a",
-      "price_sha256": "845caa53318ad6e3d3ffa77a33b8ce43e0a747b6f3c6668d0a06c847b7d77f37",
-      "price_days": 3207
+      "price_sha256": "d869ec8a19396e7cc479b22e498ff387bf724b13c672ca331b4577a8f4360be2",
+      "price_days": 3229
     },
     "NXPI": {
       "cik": 1413447,
       "sic": 3674,
-      "sec_sha256": "a069c3704f51d391209f1bf8c496dabfc6f8c86ac587da6b50cf255b79feedfc",
-      "price_sha256": "c36ee05c0e5ca2ed937bf62162594800d654dc650473e2c4d6dc09791c3fd293",
-      "price_days": 3207
+      "sec_sha256": "1993126ee402d59f6b21eaf43559a9b86dc6b62db080fc2d771542a89d0e4d86",
+      "price_sha256": "804bbd3a388c06a052e7f9ed85138aba8618d2d848b3c54a87d8a42b93ef18cc",
+      "price_days": 3229
     },
     "ON": {
       "cik": 1097864,
       "sic": 3674,
-      "sec_sha256": "d9996c2b958223c9b3342fe2733bfefa877d8afc22beb803742ae1ba050fd3dd",
-      "price_sha256": "ac70dc6955371fcfefe1e65c91558b5969fd6c9b7ddf51bd137194dfc1f1380e",
-      "price_days": 3207
+      "sec_sha256": "034ea39734b6dc0a8ec0d32e5356e54cb827a07e5c6fde67aca515c39a0b6881",
+      "price_sha256": "b7921920922f99209a2d690d201be7797e53aab1fbc07a96598fdf607bf52fe4",
+      "price_days": 3229
     },
     "MPWR": {
       "cik": 1280452,
       "sic": 3674,
       "sec_sha256": "d113f0b9ecf74dfae04a49933d00e71a4eafe0e40dfc94318f978ceace1d4e92",
-      "price_sha256": "0b3e2bacee743087cd4acdc9064883b15d8b7ec0c7d53589a322c734f1e029b8",
-      "price_days": 3207
+      "price_sha256": "37995d52f305abeb8b619c8feda51cdd66ed2526ad4c62d287d06e376a6a7f3f",
+      "price_days": 3229
     },
     "TER": {
       "cik": 97210,
       "sic": 3825,
-      "sec_sha256": "e63938f59166b737c6c5aec9f42095752ee968c24e9c7f8c2fd4053f51572e41",
-      "price_sha256": "0ac70687ced1ba1905713c0c18134b07cec88a7107cd85ac55711bf9d517a870",
-      "price_days": 3207
+      "sec_sha256": "2fd91361ee3902917c0a1e3d72dfae1c4113bc809c0f4f375a302b7a965119fb",
+      "price_sha256": "214e8c29cae64bae637caf8dcb550e46989706edf0639ddc2c726522433ac81b",
+      "price_days": 3229
     },
     "KEYS": {
       "cik": 1601046,
       "sic": 3823,
       "sec_sha256": "fc20f41fcc4d4de7f2e33ed60fcffa45e3da2e4f2222876522fbe5e9eed35b51",
-      "price_sha256": "99b646b9df26275b8e231d5c84a7cba9a13819d8dcd6c39923853c252bf74421",
-      "price_days": 3006
+      "price_sha256": "3441863846f61a8fcf242f28872168e43240ceecf08db42f779cb541053735c2",
+      "price_days": 3028
     },
     "ZBRA": {
       "cik": 877212,
       "sic": 3560,
       "sec_sha256": "088b7ddd8e1833b9c11a792460a164736754bd47928fbabf9917ae20d8ae064c",
-      "price_sha256": "8d24fc3a8c0351caf8e94a1879008d6f1dc8952ed4a26ecd246e04293a0882f1",
-      "price_days": 3207
+      "price_sha256": "fc0dd645dc4f5bde1ac28cce81da814429e50316831568212a52ee2ad314e0ca",
+      "price_days": 3229
     },
     "CDW": {
       "cik": 1402057,
       "sic": 5961,
       "sec_sha256": "ca3eb3622f3a1565073331430226b5cf0c5c0afcc01a4eb85e9152c7aa5105b8",
-      "price_sha256": "86ed5ca2ff5137071ae70a12c29a1344a1d87f1392097c887970685b93532cd4",
-      "price_days": 3207
+      "price_sha256": "6b425bd94d2d32149ef84ccead53fa5a5337adf6259b319ab81f11d1994ae63c",
+      "price_days": 3229
     },
     "IT": {
       "cik": 749251,
       "sic": 8741,
-      "sec_sha256": "0e02cc608a472e3a846f99505a6088cd7c6fd0eb39c6d03813d90697a7d35529",
-      "price_sha256": "83d491d95d6518994ab77466ffd9f57befde80f87c4e8f9e5fab067ceb28155e",
-      "price_days": 3207
+      "sec_sha256": "29dee6ddf7f9d827dc0f8cbc9867cabb6e1c346dd261fa5c85c448cbe811c0cf",
+      "price_sha256": "8d4a67b28b1fc9e6ad1f0ad165435c8ad1016c3f7566b019625ea494473db52c",
+      "price_days": 3229
     },
     "FICO": {
       "cik": 814547,
       "sic": 7389,
       "sec_sha256": "164900f63f418ba0aa023d98fc2088055279c33419ed413f5c17f48b380b97dc",
-      "price_sha256": "9f5488173fbcedf8d20c31b4060e97298688a1c9904e7fc4e63175bf0d5b2ce4",
-      "price_days": 3207
+      "price_sha256": "0be6813901e0ded9bf22b6cde4ccf16338fcff063173257c5d091262fb4831ea",
+      "price_days": 3229
     },
     "VRSN": {
       "cik": 1014473,
       "sic": 7371,
-      "sec_sha256": "0daf9f81f407ada0f94b564eddb47e9307f0c327426afef91d9cbfd4307af530",
-      "price_sha256": "a87f2f1e883d05f4572272345830c2de1fe8892d0378c26074d048ec7d6f043c",
-      "price_days": 3207
+      "sec_sha256": "05e685f8317fb5b3ada932917c10491ea152a49c34b18c87ecc807183c3925c6",
+      "price_sha256": "31120796f57f062e37bafb32218bf4c4ab829a70e2098a601efd88c274c11cf9",
+      "price_days": 3229
     },
     "AKAM": {
       "cik": 1086222,
       "sic": 7389,
       "sec_sha256": "c68c8db25a5b809ca1ae6dfafac44bd2bf2cd13a8c7bd86a985ef1baf236b641",
-      "price_sha256": "df6b528425c20a72bdc396053714eebc522a2b5a9c6ff9332fc5b8cfba670861",
-      "price_days": 3207
+      "price_sha256": "aef00d1d20855690276e9ed9a8fd62f5528f903c0e696934c68b0d77a55364dc",
+      "price_days": 3229
     },
     "HPQ": {
       "cik": 47217,
       "sic": 3570,
       "sec_sha256": "351d1874f2847fe331549968693423be2a4374a7731422f86687ac66da7af5f4",
-      "price_sha256": "9f88763bd7cabc547cb72d2e1e9d695562efca8ef4c53ede3dd5aa874564ea63",
-      "price_days": 3207
+      "price_sha256": "810e6d99cc92c13068d78c5166f9344e29c73016636866c2db9fa364cc4a8fc2",
+      "price_days": 3229
     },
     "NTAP": {
       "cik": 1002047,
       "sic": 3572,
       "sec_sha256": "544e1e648485597c97423e20161c693df3b6ee55c6a2d38a1e8e2539bedfbfdb",
-      "price_sha256": "d5b06ee64e462c138429a952aab99ee3475d8b0287978ce746800709894da699",
-      "price_days": 3207
+      "price_sha256": "039114656009fb3a06538f9cb75bb324649ccea6a4888c51e61619fa2f9be4c1",
+      "price_days": 3229
     },
     "WDC": {
       "cik": 106040,
       "sic": 3572,
-      "sec_sha256": "f8689b298d872df51bf0db3227551dcb459fe9d5577984397f6cb0f7a21dc5fc",
-      "price_sha256": "d30020d4c59e2c651d5cd02d3b375d1555569e5369a32103e855525df02a1269",
-      "price_days": 3207
+      "sec_sha256": "40160bdeb0eac939896bcb6a9f79b436fc467c41b473c17ef673e26fdccb80e7",
+      "price_sha256": "23ef8a472cf40c1ce775ee8a7bd5b0cb3154ce194570fd24ada7a5409f7bc4dd",
+      "price_days": 3229
     },
     "STX": {
       "cik": 1137789,
       "sic": 3572,
-      "sec_sha256": "4af11baa8aecbd802dbbd5d47709d7e94d89ad47876ca5ac62c1729e21f08a9d",
-      "price_sha256": "a50bcc0c3a632761f61bc7b3e50639eb169cd80d747de4358091706c3e1e00ac",
-      "price_days": 3207
+      "sec_sha256": "427554dd43058a9b743b8cfabff1e59f481448c3bd99927b100a87c403955829",
+      "price_sha256": "4b20b5cb7fe2aa52f76632daae7549f728134cc08b1d9ff00209fa4dcccbc160",
+      "price_days": 3229
     },
     "GLW": {
       "cik": 24741,
       "sic": 3357,
-      "sec_sha256": "487d70eef80b3fbb401d95db03a770afb80c6f733c3b509579fb070899792d39",
-      "price_sha256": "a77732bd2ea6202d93af4f9119f387984f8c36bae524fe0a14040a28180d9de3",
-      "price_days": 3207
+      "sec_sha256": "76e82ad0d8b2fcae3cd6b14cf5d75f950c0f5be54a6cb744127592faa8cc93fb",
+      "price_sha256": "0f822ebb77353fca44f2bd73c4fc292d9aef8481fe985c27d8c2aed5c4735f51",
+      "price_days": 3229
     },
     "APH": {
       "cik": 820313,
       "sic": 3678,
-      "sec_sha256": "eaa224da664e1fd6673c58a8b4dc3b4ca6bcf564591b967e057947f50bf46d23",
-      "price_sha256": "e52bb07a1565435ea737c5979ebdfef3dc7ed8b7f685268cc0869380bcf6a290",
-      "price_days": 3207
+      "sec_sha256": "e2f254c81670b79471a615be4fd7b602663d737f96164bfdca03d226353aff3c",
+      "price_sha256": "1b2d6d36815bddf047a3e7832491f8f4b55ccd478fb59bbb77837a2f069dfd0f",
+      "price_days": 3229
     },
     "CTSH": {
       "cik": 1058290,
       "sic": 7371,
-      "sec_sha256": "64a285f6a2f6c49fe7f4b138cfbeedab076c49a3f213ca8c5d53fdd1b43678fc",
-      "price_sha256": "de07041d9eb0a04818b446f2600478fffba9e64a0a3c47b80a3e9d62e964b50e",
-      "price_days": 3207
+      "sec_sha256": "832bc2e6327c8c9ed73ebbe3533623836b085231c7c2df6a1f41c1e9e87f4e16",
+      "price_sha256": "b8dcc01016bdec7a0c1272253f038187f2f6f2ba4dd9fd0261259883efbc4704",
+      "price_days": 3229
     },
     "REGN": {
       "cik": 872589,
       "sic": 2834,
-      "sec_sha256": "8ac8537cd8b5e571e7f527aae3e223c6a7cdab1260fd8035e278ac184b4901b4",
-      "price_sha256": "e6bb70ca424eeeb02c207a435c63e516b16da59cfe738dfbcc62a339020eaf4c",
-      "price_days": 3207
+      "sec_sha256": "15f402dcbc7d066a31ac9abcebbac6a09876f651b16e9f93398f16d4b95c5832",
+      "price_sha256": "307c13ced9d0ea97463d13683539311732fc021643fd26c24fccf5bfba3125bb",
+      "price_days": 3229
     },
     "VRTX": {
       "cik": 875320,
       "sic": 2834,
       "sec_sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8",
-      "price_sha256": "1ffd40c9687dc0170f6df0293ceda993dc957e0bd02de1c15b47774877303f8d",
-      "price_days": 3207
+      "price_sha256": "9ae26139c8c6601f6418286b42450604f05019e2d72cb459f1ea0b5a5caf5e86",
+      "price_days": 3229
     },
     "BIIB": {
       "cik": 875045,
       "sic": 2836,
-      "sec_sha256": "e49b5a3bbf14de0fb7d239cc7824bd2fd0df6e7d76ccea2ef08421f0f26763e0",
-      "price_sha256": "587ecebdea71ec3e523eafb0621b92f2bf78d394d4a8a3decf5a7c69d7682ab0",
-      "price_days": 3207
+      "sec_sha256": "61389e4963242629c5440129978761851e52624625fecff6fa504cf852b1fc5e",
+      "price_sha256": "14a35bcdb224e92a75d758d34a13397b99f3120a03d72537b3857b8d106efa30",
+      "price_days": 3229
     },
     "ILMN": {
       "cik": 1110803,
       "sic": 3826,
-      "sec_sha256": "82178ff1416d5bfc93713c949da8e5c1b5f3abae2f34a3db4e98a04b87f82592",
-      "price_sha256": "62f42043195a0e282c6c6661c4efb6c748a56c9ad275a603470467787ad865d6",
-      "price_days": 3207
+      "sec_sha256": "cf3644fa4d3398dbff32695db7b422a8ade2169b9442aeb9f9a0b368a5c8d47a",
+      "price_sha256": "4b97a569defecebe07a2fa86a2ba922342896bf0ac33b3a119b7e06e2db40f30",
+      "price_days": 3229
     },
     "IQV": {
       "cik": 1478242,
       "sic": 8731,
-      "sec_sha256": "70859cc9dcf4dfc30768c753d394b5f5bd69800d5e7753308315302240f9d56e",
-      "price_sha256": "844dc6b6a56ebc65924547346f9fb0c853f402ab42e76645ce87d9c9093c0362",
-      "price_days": 3207
+      "sec_sha256": "3b9e8281bf95caea639823eb1308ea0eaffa9262b5b0a1ddb2efd4824830bdb1",
+      "price_sha256": "a031b76f28786920128b0c987edb06b0ca80ca935239eb96ac547fe271a45e5f",
+      "price_days": 3229
     },
     "A": {
       "cik": 1090872,
       "sic": 3826,
       "sec_sha256": "c1dc449b186de4294c8dbdbb9e3b0f74eee3628c3fc5836652ff7ab8c2040ac9",
-      "price_sha256": "123d2b5ea2a24181596fad6cae12f2dee3c2f2619234d8534797393f1ca3969e",
-      "price_days": 3207
+      "price_sha256": "20d3ef8087d135f0498f925e2112a5b6eea4f060a60fffaf240b23110aedd271",
+      "price_days": 3229
     },
     "WAT": {
       "cik": 1000697,
       "sic": 3826,
       "sec_sha256": "f36772e3c932728e55fc7b158a25d0ab2189ad8ffc3a3e02408c7bfd3ae0b8ed",
-      "price_sha256": "332db4a518a1dc5cde896e4b32727f491f5372f1952d74fdef67022e984922d5",
-      "price_days": 3207
+      "price_sha256": "32bfc65c5cfceeb23e4bdc3d1aacb05fb63ae5a821ea76006985d137f91f2908",
+      "price_days": 3229
     },
     "MTD": {
       "cik": 1037646,
       "sic": 3826,
       "sec_sha256": "96802dbb20a5201bd0b672df752020b95041823f06bb80399a4ee58971f0933d",
-      "price_sha256": "3d5fbb7697b871f7ac0a6e5f61470c4230e1336d46debf6538f9d66eba0aa586",
-      "price_days": 3207
+      "price_sha256": "f814791c76c673cd157b631d9a8e799685925d14beb3c3a5d3e8957037e4fdc6",
+      "price_days": 3229
     },
     "RMD": {
       "cik": 943819,
       "sic": 3841,
-      "sec_sha256": "2664f0a1dbcfc0fb3f29346b16307f399581c30a040cf6bd5f70c53f3e93763d",
-      "price_sha256": "b0d012effe865def0c2b073ff661dd074823096721738c19c98493a520df55df",
-      "price_days": 3207
+      "sec_sha256": "df65211e9a4ea9289379502c66216d83781cea80bd3649a111e0637d998695c7",
+      "price_sha256": "99b96cf325c8bd1ea0c6d9122933c0860009a54941cd4d7bc5d6def1de3ae94a",
+      "price_days": 3229
     },
     "BDX": {
       "cik": 10795,
       "sic": 3841,
       "sec_sha256": "2412ff584fd74aa61f919bc5813a0bb523fdf03f20d6104f3167cc19c3ba84b9",
-      "price_sha256": "36ebf30d5960cf7ec99ff1251e2df4f131f95698ddfedc4547db1ffd234363c0",
-      "price_days": 3207
+      "price_sha256": "b628382590c77be2ec9c774e03e4bd586ff5b92c82c9000cb27e74f0a848bea8",
+      "price_days": 3229
     },
     "BAX": {
       "cik": 10456,
       "sic": 3841,
-      "sec_sha256": "98f10c840740ee257cb08b485f7842d702890e9b7ef20df2e3673fca2bb12297",
-      "price_sha256": "ee1f99c0c010989652e7f5049d34370cc9a2908bfe46e4e7a0851f34eb48d33c",
-      "price_days": 3207
+      "sec_sha256": "85e24f003ab1700a62f81d0481b482becf2c74f1d6c56b26ee9561c274fd531c",
+      "price_sha256": "458212a9172019f0de1359186fca8693b92c4190851be17273028cd18ef49d15",
+      "price_days": 3229
     },
     "HOLX": {
       "error": "ticker not in SEC mapping"
@@ -1055,554 +1055,554 @@
       "cik": 1097149,
       "sic": 3842,
       "sec_sha256": "5ad933a808d717ac885a7e416d10b9cce8fc1b0abd920234d9695307ca2f832f",
-      "price_sha256": "92dd4fdbdbfc68de739931e10daa9d3f27e3acc3f6d1a1b71cd42b39e83c804c",
-      "price_days": 3207
+      "price_sha256": "0b2d755b52a0a6e954c5f6bfd54b8429aa9e080d389f3c861a2f4b66d45344a1",
+      "price_days": 3229
     },
     "DXCM": {
       "cik": 1093557,
       "sic": 3841,
-      "sec_sha256": "f0b2cf49d2b134e3515bb193a36e6dd32858eb179fe55c6b56af8f33873f3956",
-      "price_sha256": "8b245bf569224d4101525beff286f829f8d9699e28e92b18d9fed4d047a69e13",
-      "price_days": 3207
+      "sec_sha256": "df15465e89f092e6b10c1ef309d5c529b07c13961153a7319b3ac1d84e926472",
+      "price_sha256": "c8fd3ffe18edc9ba302ae846c171e8470ad499d23c8747a46a1e6ecde4ec4eb4",
+      "price_days": 3229
     },
     "STE": {
       "cik": 1757898,
       "sic": 3842,
       "sec_sha256": "1e7f3150c0cae1f0b976f5424b71c1ee51584399ee4162841d6db8063319b089",
-      "price_sha256": "5890c8992667bbfa867756e9f95c3eedfab2ae7cf7a486ce538140a9e6bcf4db",
-      "price_days": 3207
+      "price_sha256": "6218e301e80507f63fe734b912850e660c0c8d26f206ec6dd538b422039f2351",
+      "price_days": 3229
     },
     "LH": {
       "cik": 920148,
       "sic": 8071,
-      "sec_sha256": "870099f23ed7598e05f405c7b5db78de7f4e413de290bf898fe02180fd87bdd8",
-      "price_sha256": "e5fde79defad94df94a4352d41f55852d87a8b79335975e0956eefb68970f17e",
-      "price_days": 3207
+      "sec_sha256": "024c2cf75688e055ad5622fdc92a79e3bcd20a8dab40b5cfe8ede52c0e1cd73f",
+      "price_sha256": "6d243e4175826f4942e76d44f9ebf063b86b17ed60f51037f1a225cb26312863",
+      "price_days": 3229
     },
     "DGX": {
       "cik": 1022079,
       "sic": 8071,
-      "sec_sha256": "adbcd1ab76a0f4e97550d23fe491dd7925c24a4e382bdc83c78850bdff87d14f",
-      "price_sha256": "1d7e147e93c39180136add6cbe6064f322867d62c7e08bf2b89ec3ff7d1aa960",
-      "price_days": 3207
+      "sec_sha256": "09c4c56d1f8e8f97aee78bbd00f9c541df50228d673371597e4b01925dde28b9",
+      "price_sha256": "5a70d50e0ae18874296618e5a243282c77c9714eb14b27732dda3639a32ee187",
+      "price_days": 3229
     },
     "HCA": {
       "cik": 860730,
       "sic": 8062,
-      "sec_sha256": "1dd9e5ce23f330228b212385f04a44a5a303622fc026c82d9edda66092dcb49a",
-      "price_sha256": "a82644f5e0b12316a0d6098dc9222834e9390b0b9f7d0f3df83eb1f71f532a1c",
-      "price_days": 3207
+      "sec_sha256": "142dd900385ce86fc11006f4163bcd6e48046dcd95d8adf4ef709e54a8bb0bbc",
+      "price_sha256": "8ad7974abe02adbbebe0d657573763eb1d9548f2de43a2683ef2e8cdc3238635",
+      "price_days": 3229
     },
     "MCK": {
       "cik": 927653,
       "sic": 5122,
       "sec_sha256": "435891f1a2c1f818252726af1c515add6885f06b80cc11aceeffc620f32c103d",
-      "price_sha256": "bada61ee4616443f3ca45a19c3adb1c997e922f7a7f6c045dbbfed1780d83646",
-      "price_days": 3207
+      "price_sha256": "e9920ac4a8f3f03d8cb955681e9de31fcfc6a66b76547cf7d651f15523753a74",
+      "price_days": 3229
     },
     "ZBH": {
       "cik": 1136869,
       "sic": 3842,
       "sec_sha256": "b0d94fd0d04415e1186c4cd88ea979b5075083c5846391ee1ffe80f41319afd2",
-      "price_sha256": "c4946e9e69b814be5282c10c8ea1e6d5b3743e1bb2e3274994e07e656c56b642",
-      "price_days": 3207
+      "price_sha256": "0ac6d5ea2340ce2cdbcc4fa792c2a80696fccf89cc9954e37817362142ec04fc",
+      "price_days": 3229
     },
     "ORLY": {
       "cik": 898173,
       "sic": 5531,
       "sec_sha256": "29a5e7ccfb4acae0edb20b5c9f9bd6dd8c68ca08da883bb2ae34ad1c5e43ec77",
-      "price_sha256": "f5351880c87c1395363b0b2c8398038e03344f412cfbb5d28e2a50aecc6d8c4b",
-      "price_days": 3207
+      "price_sha256": "e67bbb3826057d8b6b0a2fa7a01e9bdb35683f0fe586c553b6b8c4f583418a79",
+      "price_days": 3229
     },
     "AZO": {
       "cik": 866787,
       "sic": 5531,
-      "sec_sha256": "0e652965cdc4fd7aa88190116e50474ffbf31ea6b4451b50b3b784af0eadc4d6",
-      "price_sha256": "830dac36d671876e9ee13b3097f6561d04885455b743875763cb1ff02647e8d6",
-      "price_days": 3207
+      "sec_sha256": "c6061b68ff1a580126db4831d3d7de364eccd57e9f8dc6b019b763b4bf441758",
+      "price_sha256": "f1d22916eb4a692fb492b266b58a75ae0aa7bf042654529e9159d7cb3c4f311e",
+      "price_days": 3229
     },
     "TSCO": {
       "cik": 916365,
       "sic": 5200,
       "sec_sha256": "800c0941fb0f475697aacc63f4d287b0cf89b57c556e2d717cbbb4e6d7975b6c",
-      "price_sha256": "be2dda05f0153910ff8a9970f89a6a481b8dcf4404dd672949680593f288b896",
-      "price_days": 3207
+      "price_sha256": "e380b163833c7a7aae6d0a5a11d600d366586501fb309779255964780efb7e71",
+      "price_days": 3229
     },
     "DG": {
       "cik": 29534,
       "sic": 5331,
       "sec_sha256": "16157a14c6c91f04a8b3e89ccedfc91ee0d5ea6978f8c6ed1d25d8cfe73541cf",
-      "price_sha256": "61d86d37090e787fabbd7121378e5e0709e251242630cc1567adb9984e2b8e24",
-      "price_days": 3207
+      "price_sha256": "abeb473571f5b46bbdbedb71acaf08e259d64f7fa0a2018a1bd87f17642fb151",
+      "price_days": 3229
     },
     "DLTR": {
       "cik": 935703,
       "sic": 5331,
       "sec_sha256": "e848ce86b0df51740450fc079721862fb958621c0c62a59a739af96ff8bdb5ab",
-      "price_sha256": "7fe830c8f2706697d527d4e1acd1d159ae2437902549a22ed86e078ab3f1335e",
-      "price_days": 3207
+      "price_sha256": "41b4055de06c85046330f194bdf7950f9e471e4ebc06bcf787fea1e32160d8d6",
+      "price_days": 3229
     },
     "BBY": {
       "cik": 764478,
       "sic": 5731,
       "sec_sha256": "c9cd833d8edc99921ff5d5fb26d6b5b7ef2a2109ebbba7107fb1a4127c3c7149",
-      "price_sha256": "7db3b7607c0ab4c27cfc29cd2265aa6a3721e6695ad8fe78d93afff910ea08f7",
-      "price_days": 3207
+      "price_sha256": "3a1809cf5d14e41ca167ba0a5f7200a67735b0ad99e31ddd0fc585d430ac2f64",
+      "price_days": 3229
     },
     "ULTA": {
       "cik": 1403568,
       "sic": 5990,
       "sec_sha256": "61331566ead1af34f46eabe3278cb4d986819bf8c6c06c60e41b11e80365c69f",
-      "price_sha256": "8af53df1f69dd1a8e67a2a6c953d9bce12aec66a10b85832cb5760b91f797877",
-      "price_days": 3207
+      "price_sha256": "4c808db744e9e3b0abe55b299fa9b8c7f1d7fe4fafb152373ecf9d535a2b74de",
+      "price_days": 3229
     },
     "DRI": {
       "cik": 940944,
       "sic": 5812,
       "sec_sha256": "2b3918ae3c88dafaaa29e36675a06ff6f460f720322ba549f29e6484d2f42211",
-      "price_sha256": "3fbba0ac22a149741854c3f03d6f2e8c7f10b3c195cd1a15774eaed661850aaf",
-      "price_days": 3207
+      "price_sha256": "1507bf34908a6a78b352a27a05fea85cd3a4f35dbcf93426b0f7c6ffe3459b18",
+      "price_days": 3229
     },
     "MAR": {
       "cik": 1048286,
       "sic": 7011,
-      "sec_sha256": "af2fea717f696acfa6f5f2436aa6e4175c3c56ab1628a2e3198964300f32422a",
-      "price_sha256": "c0bcdd73a7d21c391c287b71bb46e74a4a3a617123a1944525c1fadd7732e93e",
-      "price_days": 3207
+      "sec_sha256": "c616767908efc003b27a5d1cfc3695330effb981849fcf5fdb0daf99bf38a31c",
+      "price_sha256": "f99cdf628325377747f5fdb6647358f68387c6ee4a8e221761a15c837ab47353",
+      "price_days": 3229
     },
     "HLT": {
       "cik": 1585689,
       "sic": 7011,
-      "sec_sha256": "a7ea3c8478a4585a74b82cad81b3125472c10ae74ce54ec25d08e4de33007e9e",
-      "price_sha256": "08419ea55c304e9eb94c843517714ea2bb1513207ccadeb9d0448ab98300443f",
-      "price_days": 3207
+      "sec_sha256": "c27897718118767822c0a30ce049d6d8bdc207543270beb95df541b02bec3dd1",
+      "price_sha256": "69833bee0def37e059b836f9130b9469c79d76c8f52c6035de2236932f041564",
+      "price_days": 3229
     },
     "EXPE": {
       "cik": 1324424,
       "sic": 4700,
       "sec_sha256": "4af44d83f624debf00c30657f3e7753ec05806b108029432edbdcf291c18d163",
-      "price_sha256": "3d94a702d00cdf5112fa0e6b6d626114b3f82f37f99af8f3e7dea6efa885d604",
-      "price_days": 3207
+      "price_sha256": "0a8fa1f5a19c19310d2a3bdbd0e21db8cb5e77e466153bf79c038a7ca9752004",
+      "price_days": 3229
     },
     "POOL": {
       "cik": 945841,
       "sic": 5090,
-      "sec_sha256": "7b868b687bf03c0ec6e1c91e0b331cd90bb08b4ae5b6cb4731fc141f8eef6abb",
-      "price_sha256": "3285100c8e63a4cedf791126a902c0673d087d10150b352f3bf037be34ec1b6d",
-      "price_days": 3207
+      "sec_sha256": "a74c3ae2156edcf980a823c7af4ecf8ceee0ae8c0305b288987ecf5f6bd31700",
+      "price_sha256": "2b22e266d10fb5ebf86cdd75a650087f022f94f012dba8a7a9b48659c84a4a62",
+      "price_days": 3229
     },
     "GPC": {
       "cik": 40987,
       "sic": 5013,
-      "sec_sha256": "d683bb80d340a8e8e77d2b1069a5df9fb984ba0a77ccf31d3124d4952e597c8a",
-      "price_sha256": "2e1bb19534617249dbc3d76725527cf3e4c414f25aac98d5cf0e872f2eeb26ec",
-      "price_days": 3207
+      "sec_sha256": "956bf62f8f6a8b2b2d1a3728de57c5937a7ca28a5d2c7af95ec098e67fa11a0b",
+      "price_sha256": "2b1b6ecb3c5d248ca9a46930875e577a02d81bcca71a1f982c0fd7bf3c436036",
+      "price_days": 3229
     },
     "LULU": {
       "cik": 1397187,
       "sic": 2300,
       "sec_sha256": "89f7c4fd2ad8016bb521a2a2999da6515819d628d61ea81c773d838ba2addfaf",
-      "price_sha256": "68bbc7d874977cd1206e2007092bfb48bdb25c06f1fbbbb21f0c152055414c56",
-      "price_days": 3207
+      "price_sha256": "f24e459a1dda7cfbfd7c5332507f10020a916390bc4775160d19a4e13d47214a",
+      "price_days": 3229
     },
     "DECK": {
       "cik": 910521,
       "sic": 3021,
-      "sec_sha256": "4b5b5238bd4a48c7a7685ec5a86501fb7ae19943f2a8fc09843380076fd3dc1e",
-      "price_sha256": "f77ad2424ddf4a09c9b165679c787981d4da3c6736f5955a954ffac54e00980b",
-      "price_days": 3207
+      "sec_sha256": "1b12d2ca83a74f796726decba28a56bfaa31378a005d9216bbfda326baa701f0",
+      "price_sha256": "e825cff4811bc45ca81399b249f34216ecef22f19a1dad6d0a981ff3dbf0c5bf",
+      "price_days": 3229
     },
     "NVR": {
       "cik": 906163,
       "sic": 1531,
       "sec_sha256": "fd4d2725c8de5bbcb217563fbb81ece606eef0671a7f6931be44c1d01baad6e7",
-      "price_sha256": "4561bcf45b107d9b40f8a6e50d30f01c0e965d25e66f85ec04c1b2b6ed7b8784",
-      "price_days": 3207
+      "price_sha256": "8f27eb246a67193d4f5b1c5f4e361753657d8cd94411c14293beee7046090b09",
+      "price_days": 3229
     },
     "KR": {
       "cik": 56873,
       "sic": 5411,
       "sec_sha256": "f960cd5977a109fbba07f6fbb5da02280c3c4b71e4f89e01f7e46bd4610fe1a0",
-      "price_sha256": "afb1e47478427279932f35f667992c66e8d8ce88c3bdb2f065115984de58ad61",
-      "price_days": 3207
+      "price_sha256": "528bfdf692cc525317214ed941e947295381afccfb0a39499c4a4366113ce4ce",
+      "price_days": 3229
     },
     "SYY": {
       "cik": 96021,
       "sic": 5140,
       "sec_sha256": "7e1f5a09cbf7f2b6fdcae2845429574fa6b4f60ae7a5a955403b37a55d23dcf5",
-      "price_sha256": "0669c2525eae1cc0224b9eafc933fcf7dbecb0b610bfc0cf19b3fc236692ffa2",
-      "price_days": 3207
+      "price_sha256": "7228658c6c3c3e8620120ed4620dd5ad741834d48a507f6a975b9bf6bd4189db",
+      "price_days": 3229
     },
     "ADM": {
       "cik": 7084,
       "sic": 2070,
       "sec_sha256": "143a6bf88adeafcd9eeb218722dd5059584ff25dd15b7d056712930c735567ea",
-      "price_sha256": "f00ebe7a4267739242ad45dd6e2acbbec069e5f087de02b721688f007a26785b",
-      "price_days": 3207
+      "price_sha256": "74bba7cf2691d0e8442bb075146534c42ebe082a965b6245d2fd5096408ea000",
+      "price_days": 3229
     },
     "TSN": {
       "cik": 100493,
       "sic": 2015,
       "sec_sha256": "24a6a5c4789b2f7a7b07b229d2158838c030e4cccd2ff08f8158ec56c35b96b1",
-      "price_sha256": "ebdc0d694eef5315a7260581308468ea0ea0fa2b4442f0173c28d131ca740902",
-      "price_days": 3207
+      "price_sha256": "7eabfd3f0012143ec0880ef909b2c03ef04fd61d926e11121d237568f5ddaeb5",
+      "price_days": 3229
     },
     "HRL": {
       "cik": 48465,
       "sic": 2011,
       "sec_sha256": "bc5b56b2f0760d26b7c4c348e3ad6bad5f5fb9895066a0336d7ea47107c9a8cb",
-      "price_sha256": "ecc7d701de1bca220bcd1511b3d240f819dab8f6b98347fb7573805941e9ee8b",
-      "price_days": 3207
+      "price_sha256": "14beece491a35d5f9c76133ab9fd6f68bc326e67cd91f11dd8134273139aeeea",
+      "price_days": 3229
     },
     "CAG": {
       "cik": 23217,
       "sic": 2000,
       "sec_sha256": "900d101a9bcf39f363d19108a72eb39fdd309bd01c3a97e09410868b50c71331",
-      "price_sha256": "f8c466da274e13e9b60bdd61175234b4d917bab098d79268de46114db6b17b8b",
-      "price_days": 3207
+      "price_sha256": "1dda66b20acde4dd284b022058444081a252255310bbeb41ff70b0b022bb56fe",
+      "price_days": 3229
     },
     "MNST": {
       "cik": 865752,
       "sic": 2086,
       "sec_sha256": "64144475e8bf6500e75b335c46c775c2f1f9d1c8e708b9d71f43f1d6eb3eed07",
-      "price_sha256": "e92b1ac4a5944e7e3466187a71fd6c4a4d9247ca1904e6f65fe3e1192e2140d0",
-      "price_days": 3207
+      "price_sha256": "0de70b15f5be415065623e8dff75f06b776f2440a71ef8e8fb64ee3a7445c32a",
+      "price_days": 3229
     },
     "CHD": {
       "cik": 313927,
       "sic": 2840,
-      "sec_sha256": "0b84a4359cd88c00bd767e8d40c6cf2f80cc1097cf62ff278219c328e9b3e747",
-      "price_sha256": "483702e50c5ef070de2eb09aed3ddb6d1226ec20d965180ce2384e5a38afd1ad",
-      "price_days": 3207
+      "sec_sha256": "812667819bcd18f13c2f87b65548b882ad260044a1a84517771ec1b0083b9324",
+      "price_sha256": "62737a060a4df2ca37b09ee3dfa34abcee39f846acd7f01ad16e5fa68eaa7fce",
+      "price_days": 3229
     },
     "STZ": {
       "cik": 16918,
       "sic": 2080,
-      "sec_sha256": "d9d8d3d23f255afc4fc6c38eb72a4b3c83d0f51046cb9c6cb2f2cbdf26e2a35f",
-      "price_sha256": "267f71f1eeeaea6b23a37c44b5e58599ccd22d1dc7c28031118d3b564afd48db",
-      "price_days": 3207
+      "sec_sha256": "353e727136ceadadc684b9c5e2a2a452acd9ee01b6e0b6a48a6afe74f90d7a1c",
+      "price_sha256": "999fbbe8326f184c2a16bcfbd7944a6ec99597b3eec6631c7166f91aaa507368",
+      "price_days": 3229
     },
     "MO": {
       "cik": 764180,
       "sic": 2111,
-      "sec_sha256": "582b5eb5dbbe9b567af2d187a19d9a7d59f7d7dda6a37a5037ac7b6972262c3d",
-      "price_sha256": "3c9eaa9a5a2f025d6bc10146006dacbce6bb47978ef7a636841fd0f126380c63",
-      "price_days": 3207
+      "sec_sha256": "2c194634e0179023c99350e13ead15781d92091708f1886a3755f1eea70a01ad",
+      "price_sha256": "29c50d35c25dae648afd99d3a74324cdcf26dece08326448c33ae3ac15ff3d4c",
+      "price_days": 3229
     },
     "PM": {
       "cik": 1413329,
       "sic": 2111,
-      "sec_sha256": "5388c14226952dd9d1f0d193f5915164425afa76ff09b69203e3b66b609026bc",
-      "price_sha256": "a03fe4319132c0f02424952bfe9edc267c43000cb9488de350452b4baac4c193",
-      "price_days": 3207
+      "sec_sha256": "f58cd15a2dadd8202ce34e64dbba0b73ab8710032a0b52ea973cb241a6138709",
+      "price_sha256": "b9e9a0df5a4e2a69d1149ac144ca3b63d9ddff3764de4deac767ba9cc45e3d79",
+      "price_days": 3229
     },
     "ETN": {
       "cik": 1551182,
       "sic": 3590,
       "sec_sha256": "109482303c686ea9a3927143981559f7285115a0d15e7baa226d3c705c664e02",
-      "price_sha256": "43c0dbc36e764146004ba4f89d2677c51d6e042b10aaee72414e95cf2400fe4c",
-      "price_days": 3207
+      "price_sha256": "22437778d424e90502b732834bda227611075ea5562492d0076afc4b421bf3e8",
+      "price_days": 3229
     },
     "PH": {
       "cik": 76334,
       "sic": 3490,
       "sec_sha256": "68a9b3259484f47aa5f0c1556cb4446e0cd100821ad6c66be8064a1b7026df0e",
-      "price_sha256": "76757833ee26a19efabac65d585d3ed64aed7c6e79f12e1c61619258ecb013ac",
-      "price_days": 3207
+      "price_sha256": "8fa3701fd22a4f236eccd1809c114cbd54569d3018d0ebb17c4f0569f5777a0f",
+      "price_days": 3229
     },
     "ROK": {
       "cik": 1024478,
       "sic": 3829,
       "sec_sha256": "3a514cb5eea60c9984f6597cd4eafdc6500a57af0307461f00d4f2dccfaa1446",
-      "price_sha256": "f499769f49dcf5119b6afc195c6e44694c79457598047ec0323d504ebd5959f1",
-      "price_days": 3207
+      "price_sha256": "7329636cacfc63da36c18468be8a41b90a2b9462727fa6a3973d3f31e6383550",
+      "price_days": 3229
     },
     "DOV": {
       "cik": 29905,
       "sic": 3530,
-      "sec_sha256": "a91cc758b810966dc29303a97a401b26ab5a5467973cff6c8c61472536abdc4c",
-      "price_sha256": "7ac9590cb06af2775629c8d5edbbf33b0314d852caf97f164f4b6b92307d9819",
-      "price_days": 3207
+      "sec_sha256": "8390be6428f137ceedf65142a76a027053c178f806f7dec9ab88375404378cb2",
+      "price_sha256": "c609243ddbff54d215de076165cd46d47c4f32dfb36fa56fff292024956eebb8",
+      "price_days": 3229
     },
     "AME": {
       "cik": 1037868,
       "sic": 3823,
       "sec_sha256": "8a1f593d3101b4530831d0fb0f37784796810616d3d50a9047a60b80fea4761c",
-      "price_sha256": "4969254eb2b09c494713a18736631d9d78bbd60695aa9a6f777bacf1ae1c0978",
-      "price_days": 3207
+      "price_sha256": "415ff8e76f6112b0f98f14b75cb01265e91d89ee957c61cee2f595fd12b57153",
+      "price_days": 3229
     },
     "XYL": {
       "cik": 1524472,
       "sic": 3561,
-      "sec_sha256": "a43b8f8814be1c0925a7c05aafd782947b7432971c89c3f900d08f43e2c0af26",
-      "price_sha256": "4a8b1a7b416ebf096b870b60dbeb040d6011db540a05dbdec017abf1ba2945fc",
-      "price_days": 3207
+      "sec_sha256": "9c8d47831be36e140ebd9dc9e987f4dd3f1b81ef8668e4a01427338fc029df4b",
+      "price_sha256": "91c1d29eb3f493958420f0cac473e7abb66d9cd0528dcbe75a5dbc5348b02c15",
+      "price_days": 3229
     },
     "JCI": {
       "cik": 833444,
       "sic": 3585,
       "sec_sha256": "3c0ad147e5626029fe80ae5e25c85c43cb27a4b1f2d620a8e1b4e6e896fd910f",
-      "price_sha256": "faef5b53e14e169217978083d128716ad92fb0545e77cfb0655c3c4e13f6f65e",
-      "price_days": 3207
+      "price_sha256": "63d53a28d422aac8b066fb46bd8fcd2d660a5360f3fe7c3c20a0bd7e8ea7835e",
+      "price_days": 3229
     },
     "CMI": {
       "cik": 26172,
       "sic": 3510,
       "sec_sha256": "febe85c161aed592fcb06cca2a6f2446a3769ee07fc12eefec882dd3044db19e",
-      "price_sha256": "f82b607764b6300b9f9d2ec97587455a2ac8c30e3deb404eeeb7a231889a4061",
-      "price_days": 3207
+      "price_sha256": "503e0e9d19b8fd59f65073e4c6a394776b1f3881ea5fdeea24f81faca9a0fe53",
+      "price_days": 3229
     },
     "PCAR": {
       "cik": 75362,
       "sic": 3711,
-      "sec_sha256": "bdfaab49160ead388203df5f35ae036b2c1dd61fc73bde65b46ee07706a4c891",
-      "price_sha256": "981b0d955b9f08490502dd87e25697d36d947a54c1f519f3eb800349bc5cd0ab",
-      "price_days": 3207
+      "sec_sha256": "175b5d91142bbefcd93dde4e72eba7c09cad99aaadb2fdce31da70a4a91b87f0",
+      "price_sha256": "2be8ba3e92663a944fe74afe330d467d8a65316c7d4cdf351e7eba53f012e9c8",
+      "price_days": 3229
     },
     "ODFL": {
       "cik": 878927,
       "sic": 4213,
       "sec_sha256": "cfe7fd09a23eb4d6d7bb463f37abe15444151e095b394a457b7e41b69d6f3046",
-      "price_sha256": "7ae3c9809f5bff372a3b9f5df70b14d4c6ab61295918fdef1d34143ac842d1f0",
-      "price_days": 3207
+      "price_sha256": "9dd27c4765b9b5abfe1b6ac6cef4e160bcac19c438e58246b2c7f9d3c5d165b0",
+      "price_days": 3229
     },
     "JBHT": {
       "cik": 728535,
       "sic": 4213,
-      "sec_sha256": "eccf1a7b1d2d22679ccf882106106a1c5f28a54537256e4d13f32d6554b1f788",
-      "price_sha256": "7843f24ab34174f47e19c2ec540bda8f774f693fbfefc286a1a9cd45b16c80f8",
-      "price_days": 3207
+      "sec_sha256": "485ba42ec13e72c37aec5b7d83b50bfef69044f84aacf9c38f6da366fe800762",
+      "price_sha256": "fb8ba5d6701e10bc0a8724b8b5a8c7d374422f4748326e1f10b4cfb3ec8d8e49",
+      "price_days": 3229
     },
     "EXPD": {
       "cik": 746515,
       "sic": 4731,
       "sec_sha256": "19281891caa89fcfc469369498a89e7ff9ea37fa213a76e73c5a00d4c58c5b7d",
-      "price_sha256": "2a7a1593f6f9838d54e12d48f3a5350011a4fd8f55ea835ca410f09386b65127",
-      "price_days": 3207
+      "price_sha256": "51d6c30dbe0ce133c4ba5547a8ac20194a9a11569edcf07482e818143cf8cd39",
+      "price_days": 3229
     },
     "FAST": {
       "cik": 815556,
       "sic": 5200,
-      "sec_sha256": "d2fa9f1d63d2647f81b2e1c9c080efffd9b37c2c7e56f933502b6f6b2d724a6e",
-      "price_sha256": "85cf294b392c8e75fb3c23f01e1b90585fbb9b26defc11936570b3d0111b8fa0",
-      "price_days": 3207
+      "sec_sha256": "4b49d6f2199b5a4a558d808ddd14e97773606885631f81e1b6a5c8c93d9f75da",
+      "price_sha256": "9a29c5e73d0f2067a1434194e02b847ebd9fb35394781935fa339e9fe82325d6",
+      "price_days": 3229
     },
     "GWW": {
       "cik": 277135,
       "sic": 5000,
       "sec_sha256": "8d3ec595bc350ee93c25f411d8403337bf3535f81f761009d232be61774bb52b",
-      "price_sha256": "700226443d0f37e16c7ab3095023fd0f1488e0877e7ebeab6da74831c15ca07f",
-      "price_days": 3207
+      "price_sha256": "383da65eebcf916b738a78143244c6c62c770a2b6b46655ef8ebaf7a6b232054",
+      "price_days": 3229
     },
     "URI": {
       "cik": 1067701,
       "sic": 7359,
-      "sec_sha256": "5ddcf2df8f2e74caa52a12353f0481cab3474d4886857cc84e286855752a1d9a",
-      "price_sha256": "6e3c7bb22af53af095a9f71b27a3822e1f30815d6fef51278060d79d73193304",
-      "price_days": 3207
+      "sec_sha256": "79e2ce1d675e620c256486b2f00c9601f2ea80ee3943dc56cfe5ab6677794ccb",
+      "price_sha256": "3b1945a501734aa6796f7252278c50020d1c8faeaa5f6b3ee117ef8ad8fe6be8",
+      "price_days": 3229
     },
     "CTAS": {
       "cik": 723254,
       "sic": 2320,
-      "sec_sha256": "79129b8759529ee1a588dc5aa5fc43837af2eeab90dcec6388f22ce81a63c5c9",
-      "price_sha256": "226fef30c6bf588df1fbde8a574377c9291417270527860c4b184bd513eedfaf",
-      "price_days": 3207
+      "sec_sha256": "676c90f6d174ea10925855beffde187c19954cb8efec5116fafc7c309368b989",
+      "price_sha256": "8e2d9380262c9fa0eb19fccc732e53a0b5f2a7e28191166159e9d73a2e33913d",
+      "price_days": 3229
     },
     "RSG": {
       "cik": 1060391,
       "sic": 4953,
-      "sec_sha256": "f67b0cf72f216d6d4a76e78284d303c36c91131314eaf251b9c00627e8821f90",
-      "price_sha256": "c6c615548405767990bf90d68a427cb0136f11afc5e620c6132776a493260d92",
-      "price_days": 3207
+      "sec_sha256": "9496c83cf52613db5e8668ca4c0d01862df32e104d52a78bd2c180f046e23d5e",
+      "price_sha256": "9076fb0424873f4125f57d654043f67f644df6884bf22448e1fd7079f699e007",
+      "price_days": 3229
     },
     "CPRT": {
       "cik": 900075,
       "sic": 5500,
-      "sec_sha256": "0405d39c528ef0ccf8112e1e59a9323dec59b828b553bba91e528aa6fa8771dd",
-      "price_sha256": "7809742e8394b5d2a8693e5b46fa46f0e8c63cfecd6d77f5fd1adee1f4531c03",
-      "price_days": 3207
+      "sec_sha256": "d8c1f5ac87b382d000a16a94a38f90e45df83a739f56328bf6310362b86ce06f",
+      "price_sha256": "457a4be8591bca0ab8f0f6219bdacd3c359fc3f3ea01a5b27ed4e2e149a36d03",
+      "price_days": 3229
     },
     "LHX": {
       "cik": 202058,
       "sic": 3812,
-      "sec_sha256": "42fd17c34242f68b8fcd3bed7c20bd186d8d39249e8e4d915414899a805ec753",
-      "price_sha256": "884a60507cdbfee3812bf07f5a60c9f7ff558224b59a457b00fb52ac590b9737",
-      "price_days": 3207
+      "sec_sha256": "b08ec6a5ed85b9022b35eefcb41f71e747c706f0d371fa3cea1439c41ec196d4",
+      "price_sha256": "0c01c89679cd18a979bbf96be7a01f6bc840417f8304b3b821c1826098a7432a",
+      "price_days": 3229
     },
     "TXT": {
       "cik": 217346,
       "sic": 3720,
-      "sec_sha256": "75148505b22932b44af59187e898df45196a3a3fe59eb71c4c5f6818bf0810da",
-      "price_sha256": "49695dd3aff8edf448f311b37f041776eac5208b1f27e743c74772473478da53",
-      "price_days": 3207
+      "sec_sha256": "51c2c19a6c0804197ef72e964924ac3992672f3bf75477b9ad0cea0068c49f35",
+      "price_sha256": "5626934416904ebb9d25b333a1c76e9c5e0f432708065f083cd1c64e733ed17b",
+      "price_days": 3229
     },
     "TDG": {
       "cik": 1260221,
       "sic": 3728,
       "sec_sha256": "74a8d46bf913c5464b41d705af26fc749725d4375dec095885d3053603bdd9d9",
-      "price_sha256": "79a0ec012b67a1df0d25ca4b91ec5a0c268116c3c9796e61e8fde7ee3d4d6f1d",
-      "price_days": 3207
+      "price_sha256": "107931b01aa18290b73d1750d0e97f41cb856e278ba6a60bd5a6a6d6dda9d6fe",
+      "price_days": 3229
     },
     "SNA": {
       "cik": 91440,
       "sic": 3420,
-      "sec_sha256": "c8771eeadfa1e6d7568627e43bbefa431815e951d93c3fe4cf9b9d275483c9bc",
-      "price_sha256": "519031531f5259a3767bfa33a9341c153441ae84cd71be73b89ae01f4595a6dd",
-      "price_days": 3207
+      "sec_sha256": "a58d7ce09df62f8347063499fb4484e1f43d66f393882a7bfd0ca2664b3395f7",
+      "price_sha256": "c23eccf8c7ddcbfb220b91b695aebe22650cbe0517e699bdb0470ee00069ac7b",
+      "price_days": 3229
     },
     "SWK": {
       "cik": 93556,
       "sic": 3420,
       "sec_sha256": "63a55694d2d46597c3e460e71c41164115e3b96dd585af6150863b099611b476",
-      "price_sha256": "b9abebe9c7ca4bc8ccca0cd477327d3dddc747788a4a31652c0f2f99d0c0f377",
-      "price_days": 3207
+      "price_sha256": "ff0a173cd4a1d0bad53c126318ff15d153f9786e70c41cbbba2cb1f138d4759c",
+      "price_days": 3229
     },
     "FDX": {
       "cik": 1048911,
       "sic": 4513,
-      "sec_sha256": "58923c65a8c280db392ba069685c0fca42538dcece88cc22b8a6492f838923c2",
-      "price_sha256": "8cccb22c99231568babbee99d01ec9f7da409c4028391e55d727ec1505eecf21",
-      "price_days": 3207
+      "sec_sha256": "2d6033b0ba4434bb71d5eb31f4e118ebff1f1152e181694d4aac8efd258816b8",
+      "price_sha256": "c258d3626a54b4b0d8f51559240de3562ba33774dc00b4afb10a4c0afac5e873",
+      "price_days": 3229
     },
     "DAL": {
       "cik": 27904,
       "sic": 4512,
-      "sec_sha256": "9cee00021ec9032b910b0a1f69f66eb1a73bab9ca8427f8aae9030be3a0225b0",
-      "price_sha256": "eed206a6d4b0463638822764322e970eca5336f0df81d4928c3d0980c1b85d82",
-      "price_days": 3207
+      "sec_sha256": "1fc76c7cfaaf40573ff026475ec4e2565027fda09b7a405c2c126977cbd4efd3",
+      "price_sha256": "b0e6fe9562003c3e78b314af557286ec586d809811844a170502cf9c5ffa1b33",
+      "price_days": 3229
     },
     "UAL": {
       "cik": 100517,
       "sic": 4512,
-      "sec_sha256": "6621f43f61efe96e02f2aada43fbed7ea989332e4fad2c6c453f9abe139e6d32",
-      "price_sha256": "61c8dc0d1f1e0671d79458430b7152f4e4f80d09a2fde33bc59cfde731e145b5",
-      "price_days": 3207
+      "sec_sha256": "101840ea02f81817974e0ef31a52eb7ad0f28185ec8057063f9f103b5a9471e0",
+      "price_sha256": "935cc6826262ed939082912ee7328707de06e5205d6266e5aa0011aa556c91b3",
+      "price_days": 3229
     },
     "LUV": {
       "cik": 92380,
       "sic": 4512,
-      "sec_sha256": "7c2768fa2d6bfc2aee4a9f17ac6e0814434a45623283a8a8da8218ddc6cf678b",
-      "price_sha256": "16da15ac372b4d437f15c35e69bda010bfeefb9588817f29a1ed452859fa9bbc",
-      "price_days": 3207
+      "sec_sha256": "1d6503344364d624931047a53450e85a668b6f7f7b94295c24ee624320756033",
+      "price_sha256": "8336313a66c53ac21a416978c46b3704ea1142f5210fc02120f7c28750760cbe",
+      "price_days": 3229
     },
     "ECL": {
       "cik": 31462,
       "sic": 2840,
-      "sec_sha256": "d1bde94130ee5039309a29a510152a8ae865bac9075851449780c3c9fcd6c135",
-      "price_sha256": "2ea24c379e269ac939c7bd62edbc8d0b037dbc982d92c2d40b4a7f6f5836647c",
-      "price_days": 3207
+      "sec_sha256": "2e70dce750294cadaabba4ff96b04c9774d29050442107417aac334c83de4986",
+      "price_sha256": "0db318cb08defd74055939fc22835f7ca3e7820262b3be65cdb9d9bb114037f1",
+      "price_days": 3229
     },
     "PPG": {
       "cik": 79879,
       "sic": 2851,
-      "sec_sha256": "d2115215c7b5332e873631ef48ba58e08b126192b275c4f6043c31c439948a74",
-      "price_sha256": "c59d1e62f0180fdcbd994c49ec0e12403b2ec7e8df861b118c727842274a91fa",
-      "price_days": 3207
+      "sec_sha256": "b4630cc7bd7a453a39b4e2365dd217310c7f51458fc0f0d8f7afa77b861f4ac1",
+      "price_sha256": "5e4b8ebca8446e5ad6701eadc0e986a9275907d7aed371aad536a6a2bdeb54ef",
+      "price_days": 3229
     },
     "ALB": {
       "cik": 915913,
       "sic": 2821,
       "sec_sha256": "5cd3ca4cf5c31719acb1e076eff8056e414212076adbd68b05da1b6bd65b57d2",
-      "price_sha256": "e8ff2b28dafd7922cb8383cee167422c158810adbd820941c571a9c4b954c619",
-      "price_days": 3207
+      "price_sha256": "ac37eaff7e005b0ba81264b9cd170e87c88d59e4903e66f46f1f84ee8a19662f",
+      "price_days": 3229
     },
     "CF": {
       "cik": 1324404,
       "sic": 2870,
       "sec_sha256": "a17d78818af617b7046483b5e76f2a85e1bf6a960c21a6f598ba0ee8d33d48b2",
-      "price_sha256": "2c8b3814b4f5c3160ac792470ecb9651a5d4d6a5a8a758cb011e375d3a1ff533",
-      "price_days": 3207
+      "price_sha256": "190c2d89a1c90be5bfb1288a7cc55c30ce10edff177f279b52d8b1240d49eb66",
+      "price_days": 3229
     },
     "MOS": {
       "cik": 1285785,
       "sic": 2870,
       "sec_sha256": "81961120680bcecc68f72fdf37219002dfb1e69b1fab6f3063ef9ee375feee90",
-      "price_sha256": "01650a2b5f290bd21446be2a30483e10c61afd6309d6f2dbd7a8589e829385e4",
-      "price_days": 3207
+      "price_sha256": "408309c8e4e1eb1091e95db4715e63a4ed6d0aa66b44a6555c3e5ba064fbe4a8",
+      "price_days": 3229
     },
     "VMC": {
       "cik": 1396009,
       "sic": 1400,
-      "sec_sha256": "de76d44410d152213a10eacbbe63ef8cd32c330665614a88fe25ce432e1d4d01",
-      "price_sha256": "76a9b67a2d83820e04ada1b128f4b1a20b79d6c0f34ed6b2bcb26daab732b896",
-      "price_days": 3207
+      "sec_sha256": "f21a0a7b057ed607b28fca5394bcb8bbbad4d1c1b2e59d059f24c6dc8593e14c",
+      "price_sha256": "6627ab5b3d91f84c8cdbd1dce6bafd816f69c5f379ba0621cba8218445721919",
+      "price_days": 3229
     },
     "MLM": {
       "cik": 916076,
       "sic": 1400,
       "sec_sha256": "661148956ef2ebbd1186248565de5e7c432ac61be4b647bbd82f49b82f7917f3",
-      "price_sha256": "c0d8c71872b0baf4140666b70d5deff9ce1f3b3ac36252edf417bc205d56a429",
-      "price_days": 3207
+      "price_sha256": "6e8676737fe06fde8c903f82b380fe88bd06cd0fc6d40bf767adaf4c430d9aee",
+      "price_days": 3229
     },
     "IP": {
       "cik": 51434,
       "sic": 2621,
       "sec_sha256": "cf67a703e8b724e484e37109a20dac6c11705d2a7ec62c22f00ec42b5ab53107",
-      "price_sha256": "b2ff6c77005af552c40c6644af636cf1b224dafdfbf70568f798e33749b35b20",
-      "price_days": 3207
+      "price_sha256": "905e78513eef9142a65ccc9d85e43993ced0aa1a094a42499f955ef442f7d810",
+      "price_days": 3229
     },
     "PKG": {
       "cik": 75677,
       "sic": 2650,
       "sec_sha256": "38e773e6abd23b37c1b3a772902b2adb00173643d5fde1103fbc1c333ee938f7",
-      "price_sha256": "725f127935352925ba37678ec736cac2b79cb79e0a0875aa7d6568bb36aeba40",
-      "price_days": 3207
+      "price_sha256": "90c7903b99e9152c6d68dcbeec08f91be04b19d83b6e7e3f329b9fec441d5f3a",
+      "price_days": 3229
     },
     "AVY": {
       "cik": 8818,
       "sic": 2670,
       "sec_sha256": "6387595009294d51ddf0917bd6dfebe06523f55fc359bcc96f4776522b77fcbc",
-      "price_sha256": "5d11f0d3fad95611fd921dd07f0a04e43108abeb974595a4a6d8ec83652bdc3e",
-      "price_days": 3207
+      "price_sha256": "b5ef07c1ca11045a2cd265342cee30526afe893798ddcbf9f0f18df5b0be5f10",
+      "price_days": 3229
     },
     "EMN": {
       "cik": 915389,
       "sic": 2821,
-      "sec_sha256": "683d07157bc9a69e765ca966a5544eb96d90ace51a503175a874caf514e3b901",
-      "price_sha256": "d3266973d1df3ec6796daddd6423b56b61f15359d2274c275228f9443a1e275a",
-      "price_days": 3207
+      "sec_sha256": "c142de84bf4eb5762b6d089408255112ea4aaa2cab316f822209d09d229b8548",
+      "price_sha256": "c917957a1a0193e9a62a3ffa8d6bbf9025e5ea1f1f1c4b25c6ec5815f891931e",
+      "price_days": 3229
     },
     "PSX": {
       "cik": 1534701,
       "sic": 2911,
-      "sec_sha256": "3028219aae0a803439eec9cf0b3d541801320ce121e9d404858405ee31de09e6",
-      "price_sha256": "5b9d033c630c88f2fd009464d0d6d52ddae0d758a54bef241bfb183da7525535",
-      "price_days": 3207
+      "sec_sha256": "02eb06ab4e8ee39f1e46400ead103eeee7f158ca19a0ae956e749430498c97a8",
+      "price_sha256": "cd0004e88a22c8b14ea6bb717f6ab46a2bcc15977f038e760aca34235ca2d348",
+      "price_days": 3229
     },
     "DVN": {
       "cik": 1090012,
       "sic": 1311,
       "sec_sha256": "7ccaf0b7dc92d898ebca44247d00321a5af90be6df04208f46a9a7db977b9b20",
-      "price_sha256": "6ae3ac6d8b1380d9d8bd8a09af69fe3fd611d31993854f673caa21aa49d98f9f",
-      "price_days": 3207
+      "price_sha256": "e66b6cab2f7d115ab935a1acfdc1a6c0c1a1648d36c300cba6916063729a3839",
+      "price_days": 3229
     },
     "BKR": {
       "cik": 1701605,
       "sic": 3533,
-      "sec_sha256": "987c100407bbbfa22e4a753baf8a903b0e4820079a6502acd13b3aab48a36fd3",
-      "price_sha256": "3466e912aaf48b2396e6aaa9dd35b0fdd8c78f428a9c615a2bdb9a02d6e7f10f",
-      "price_days": 3207
+      "sec_sha256": "847066a66b2d2f5ae769dcb854315a70b9539c4075df62f4088bb29634572d19",
+      "price_sha256": "5fedacadca815e8e1d60f80ba635d5a9ed707867f6e9e20015e0fd1a42ae0ace",
+      "price_days": 3229
     },
     "CMCSA": {
       "cik": 1166691,
       "sic": 4841,
-      "sec_sha256": "4931cbdeb5c78061844fd07853321766ae28733a65d5aab5b39175943ce45dfc",
-      "price_sha256": "a2caaf16867da58f2fc9e964d42c98b8bd1da0292e8d858c6d8a067d191ee8b7",
-      "price_days": 3207
+      "sec_sha256": "15b8f34974b7b4ff6884981e4dceebab446c7db663a5fdfa9ee0075dc3decbb9",
+      "price_sha256": "4c524747d999c628a24c39d3a8f60b403350dfe9a252a2b96f3b1fc7045a84bd",
+      "price_days": 3229
     },
     "CHTR": {
       "cik": 1091667,
       "sic": 4841,
       "sec_sha256": "57117166ffdbd8ad488ad0dda5cc92a3645da7fc957c4e4365cadd123bce0421",
-      "price_sha256": "06179473fd92ecf519dc7ca5a916877e02042f7f535672ab8a6936812586acf3",
-      "price_days": 3207
+      "price_sha256": "d81fd6a5b885dd13b40aab1e25115ae75d333023d35411c4f233da8c5a7d167f",
+      "price_days": 3229
     },
     "TMUS": {
       "cik": 1283699,
       "sic": 4812,
-      "sec_sha256": "a215b5c2834cf16e8a065a5eb16bfe2c4ba2fb0f93422437b2215c8b371ec052",
-      "price_sha256": "cd067d5201a7c6ec40a1df506ff45d0c60bc855e2f412549c6244ed066510cbd",
-      "price_days": 3207
+      "sec_sha256": "37c19bd2a568588477360bbc93987a1e5e1f50a132c6e52c556c4003a0d60bc4",
+      "price_sha256": "2b725c4b6aa5a99de75798aafb517e4f2af12933e3fd805072d93a9d4ee1c230",
+      "price_days": 3229
     },
     "EA": {
       "error": "ticker not in SEC mapping"
@@ -1611,652 +1611,648 @@
       "cik": 946581,
       "sic": 7372,
       "sec_sha256": "e3358efb285aba62ca9e2c073849ca6411f9a0c04599048a118dde0ab2bb0e07",
-      "price_sha256": "a8ced6b34610f0bc6027efe717b8f76a4960d78fac83540e703e9aab655e525b",
-      "price_days": 3207
+      "price_sha256": "c879a52b11659cd978ec0ea5fc5bb6d88f3d5b6a897d982beddd59b0139d6b34",
+      "price_days": 3229
     },
     "LLY": {
       "cik": 59478,
       "sic": 2834,
-      "sec_sha256": "3fe29099e6efaef9acac95711c271de1a644602939ea18487e29708310985942",
-      "price_sha256": "52f06a1bd96007cfd4f4bebfe038fccae12ee4ffe4d051b5ae329ebde9789bcc",
-      "price_days": 3207
+      "sec_sha256": "72ec001637e16887021c76251eaf05056bdaaf9a4e68ef62316b9be99861dbdc",
+      "price_sha256": "226eae32461b47fac1c1d8f3114c925fd15f595520f368c6585c824280a6104c",
+      "price_days": 3229
     },
     "ABBV": {
       "cik": 1551152,
       "sic": 2834,
       "sec_sha256": "1fa00a2de3a0434fb2ebba8b1678cc379b16dc435a4f3e5c696efb7f9029698a",
-      "price_sha256": "af55b2a7d7e648ce9bb58cf5b2bc5dddc991f691f09f6a5eff763e6904b328ec",
-      "price_days": 3207
+      "price_sha256": "46fe493256f2cedfe7bd0da2ee676712775845095f7e7d16112ce8fc8aebf073",
+      "price_days": 3229
     },
     "MRK": {
       "cik": 310158,
       "sic": 2834,
       "sec_sha256": "de2e92301923703e6aee247c42c0cf2f1b741118ebca221fbaa5dc0e47644bd7",
-      "price_sha256": "0ccbad97953bb32f8f4e19c0234036787f3b007bdc2b206387607e404e0d659c",
-      "price_days": 3207
+      "price_sha256": "7c0c3ee4c200969fce1eca0b5e45bffbe0fcd805e5b1bac936fb2eac372d5488",
+      "price_days": 3229
     },
     "BMY": {
       "cik": 14272,
       "sic": 2834,
-      "sec_sha256": "a18ba88ed8f92b7f0cbc4d83a6db14b8fba95a5721f7f83a6306ca843ad40c2f",
-      "price_sha256": "1c7819a22874c0be5897f1986853c0dd8f6b5f775de49b1f7adac9fb98877b98",
-      "price_days": 3207
+      "sec_sha256": "6f5d8ef98f7142e3ee53f4559aa773a4265f795075575fb6fddc8bfb02168b90",
+      "price_sha256": "41cdea7e4b83e989f1d1e5cbbde2d7750a8206af540ede1e3adf49d560e2b45d",
+      "price_days": 3229
     },
     "RVTY": {
       "cik": 31791,
       "sic": 3826,
       "sec_sha256": "f45a596a61b554e66a7d360f5a1dc23d1b6e311b51445a0169ead135a00d3ab1",
-      "price_sha256": "cd399e1dbfc5c04c34cece7a1ac546266db7943ab1bd950cd55857a90f3b4fbb",
-      "price_days": 3207
+      "price_sha256": "7905df519f05b63c9a428e6f51a3b547d880a046358a0e124e6f7a643daa1a75",
+      "price_days": 3229
     },
     "TECH": {
       "cik": 842023,
       "sic": 2836,
-      "sec_sha256": "5f064cd631289049236c7ddafd76f1bc2824b0b55936587bf5e0bb2cc7a0f677",
-      "price_sha256": "a2f704d510469cd4ae0e357bfb76178f01292e859c09c44ba38bd3bcaeade554",
-      "price_days": 3207
+      "sec_sha256": "fb186297274487b25e9aa43d19b5fed006c5b777eb960bc8fb188ae47a9d1fee",
+      "price_sha256": "dec366184b107a547da36e217effdb2b23da8f9af8642669663a7920416ddf7d",
+      "price_days": 3229
     },
     "CRL": {
       "cik": 1100682,
       "sic": 8731,
       "sec_sha256": "22884da0d898a58bf99c4f5d4c2de6e1fe324d32bdaa4d1b1ffb0a2a61e1a4cd",
-      "price_sha256": "279219bda7037c245e81b68ca4b5665d88168db02a3788de091d851126e37be6",
-      "price_days": 3207
+      "price_sha256": "f02843d41ceea07e74d9deffe4ac04592f785bd5f52ad1407119150c962613cd",
+      "price_days": 3229
     },
     "WST": {
       "cik": 105770,
       "sic": 3841,
-      "sec_sha256": "c3a7f52d8bbdb9a06145973d83c1f4190a4d6619d572e4e3ede7677b74c530b5",
-      "price_sha256": "7e667602eafceb361ddc83511c0d488431129d9fdd2133dbff1bd25c707319ac",
-      "price_days": 3207
+      "sec_sha256": "0f0ccb5caf9038a68f85c6231ffd7b1583edef2f974f2e51c0d82d12491e2766",
+      "price_sha256": "f98ac96357e7146e8ca21d88396fdc5608f6110add7d5e6780bfed2450245ae6",
+      "price_days": 3229
     },
     "PODD": {
       "cik": 1145197,
       "sic": 3841,
       "sec_sha256": "6584a0c4ea0b5c1a6bd593893ae4b27b3d0ac6340c3e20d635b8488d32e2ebea",
-      "price_sha256": "65fff28445593661a789cd233245500786c72944e85eba612cdd5592e29bd747",
-      "price_days": 3207
+      "price_sha256": "423481e028f5062c14c3368e36f5d76136f81b6866a25698ef2a129c8f2c1555",
+      "price_days": 3229
     },
     "INCY": {
       "cik": 879169,
       "sic": 8731,
-      "sec_sha256": "9bbd2db86b80214c3617ff9f7074d096505585c04e7f1cb88ed756d013c45641",
-      "price_sha256": "0d57c1ab02e09bbe16e84c1194d546f23c6e31b923ebc1ee175a6c9ef1f06128",
-      "price_days": 3207
+      "sec_sha256": "80127d44b7d5d00650869f6b7f89d6622040dd95e916cd49b40a0a4de5f92140",
+      "price_sha256": "062c8cb721010eeb6a9af1be04f754e9a0fd26ab0c1a648aa50c526e42ee2ef9",
+      "price_days": 3229
     },
     "VTRS": {
       "cik": 1792044,
       "sic": 2834,
       "sec_sha256": "f571b7cae2539ee573b69694e8028858b328b92cb38cc4c27fc4a6082aba440a",
-      "price_sha256": "8a193192d0376461aa7c70f05984f65a719f401cd86141473ca84c6373fe93de",
-      "price_days": 3207
+      "price_sha256": "f7d5d741a74a1c39cfb79fcc8a21b75499afdb1469734857c27c0bd4b07188e8",
+      "price_days": 3229
     },
     "HSIC": {
       "cik": 1000228,
       "sic": 5047,
       "sec_sha256": "50148e36e397577fc93db58179bb339de4eb49591361390427b10df5e6e9c4e4",
-      "price_sha256": "0a9ac54d64bafc0e5342aebdff0f0a37ba084c8667ee379abd84d5c934d6909a",
-      "price_days": 3207
+      "price_sha256": "df6d744fe02eee0ae204f701bbcec677c4cb69240a335e478ee3a662e9eb9342",
+      "price_days": 3229
     },
     "DVA": {
       "cik": 927066,
       "sic": 8090,
-      "sec_sha256": "b07a8bd0a807cb92d1ace1e4d6f3b566bc65733dbd8322b4be82ad6cdf12867f",
-      "price_sha256": "f14e4fed5e18d44e14ef2b752fd8b8d0f5a62b6a91dd685516f9593e1680bd94",
-      "price_days": 3207
+      "sec_sha256": "d5869356de208fcbbbdedb3bd0fbdf7d1c6127ab62db147e33072ed1842182a2",
+      "price_sha256": "5bb6e579008480e0b9b922d0da5532f6beb538e286015e6ccbc0c959b21171e3",
+      "price_days": 3229
     },
     "UHS": {
       "cik": 352915,
       "sic": 8062,
       "sec_sha256": "28b3be74d323b7cd7c28559ef0b22713d4354cb39b348fd66abc292bc903b1de",
-      "price_sha256": "2ca4ab0c283e36a6766830592e8380e2dd4b38a4fe7168169fc9bd1a2b11e980",
-      "price_days": 3207
+      "price_sha256": "5a3f3f2d2ae9a381ea0b35e2500be2bbfdda97ea61ddb2b061baa996ac29c9b3",
+      "price_days": 3229
     },
     "CAH": {
       "cik": 721371,
       "sic": 5122,
       "sec_sha256": "194e5c99b43f403ca00a341eb7f330b5343e481f1d31148aa68f7f10bb6dec5d",
-      "price_sha256": "67c684374ccf217902cbbad5e2968aed3e4ae444f9c29a685e5039205ce3f511",
-      "price_days": 3207
+      "price_sha256": "ae5d098ddcf27f8d425ad3f34a9fc0049b58156ddb1ca7864de85f902a76e308",
+      "price_days": 3229
     },
     "WDAY": {
       "cik": 1327811,
       "sic": 7374,
-      "sec_sha256": "831819baad53b4b4f5b72b5d1f24144e90c5cd42ff9e6263eecdd0dff87c648d",
-      "price_sha256": "e6b5f02877b67ef665ce95a3e2dc44203a05c3b4822e4ac94056317abdd2f99d",
-      "price_days": 3207
+      "sec_sha256": "c953cbd3b65fdf9bab67f221d23190f77a9e8df6e1e14f38dce8c1d02380a71b",
+      "price_sha256": "11d945299d0a0b44c8268fc58e5faeb44c14793e8235274e22b6bbbb2e2481f9",
+      "price_days": 3229
     },
     "CRWD": {
       "cik": 1535527,
       "sic": 7372,
       "sec_sha256": "a71a92f1f11bd3032271ca55be7a7770a96a846ec809f925829ef952fd5f3fa1",
-      "price_sha256": "82b09a1b219d2f58dffc0c450002ce3db7962de470cbc0fade809272c1dfd0e9",
-      "price_days": 1838
+      "price_sha256": "7c286521d938fc2a89450b4c2cf3c6080cd181352097be3d6c7a75c86430ba0b",
+      "price_days": 1860
     },
     "DDOG": {
       "cik": 1561550,
       "sic": 7372,
       "sec_sha256": "d3c4561fd839e25b1cde245ff3ca1f821b2a70e70d34688c5ede40bbc0f600a2",
-      "price_sha256": "8f9a6912c4f280b821ea538bfdc0dcbeb7765f3926019f0af3e2adeb0fe85995",
-      "price_days": 1769
+      "price_sha256": "dca84403d259e72a389d69e33fafed1b766762e6d6f9e617bcef68522ef9c3f5",
+      "price_days": 1791
     },
     "SMCI": {
       "cik": 1375365,
       "sic": 3571,
       "sec_sha256": "039172a7eec0fe46077ce444eb12280a0e625f5cec313c058903ec7016d82794",
-      "price_sha256": "9fc920db019490c283db9930b6240dbb1d5eeb8ce6d8839147e82e5d3ee55524",
-      "price_days": 3207
+      "price_sha256": "0797836b7e4c77624fc89cf2088858c6185999c3c2a784a83d5251d5e475e7cb",
+      "price_days": 3229
     },
     "ENPH": {
       "cik": 1463101,
       "sic": 3674,
-      "sec_sha256": "ff43e841870f44069d6d009e39a56297c24e8ee277cd9c8a3789fcf9632fc6c3",
-      "price_sha256": "37f16c2ff45ed7ed805f19fe1096d0508ff0fa9778e0c3fc5103db60c8639a9b",
-      "price_days": 3207
+      "sec_sha256": "36ff47ed471f1b56691220f9b3e344cc42529058e2736490b7ed2ccdd008d1f4",
+      "price_sha256": "d3eb546b38419ec8e7f0c33847392555a7a75f2662eda45195f0541b85b21100",
+      "price_days": 3229
     },
     "FSLR": {
       "cik": 1274494,
       "sic": 3674,
-      "sec_sha256": "ad72f6f8be95cf5544d37eb78b0af9753ee93e5cabd1bd3f49e85a57db0daa2f",
-      "price_sha256": "247352159f799bd052e1e9e9edbb204b0966e8ded807cdd66dfe7d71b5eab7b7",
-      "price_days": 3207
+      "sec_sha256": "f06c3b11399700b05057db8a105b3417c4503c2a4db88d2f67e115f7f20d5244",
+      "price_sha256": "736d980581b1e0759f70900d80e03ada8986e7e604ab73fca2b537b2b701d8c0",
+      "price_days": 3229
     },
     "GEN": {
       "cik": 849399,
       "sic": 7372,
-      "sec_sha256": "1ab96531b9c9e367514ad0e1b6e81b0749f553760fe2b87e5a77f69bb29de44f",
-      "price_sha256": "97ead793dc1c9d825373f5ec951ad2bf31eac72d1bdbfde92552441417bed2b5",
-      "price_days": 3207
+      "sec_sha256": "55d27dd6328ee1bd8fabb9ced2458578d0a4628c285e26961348ac8c6bd4f335",
+      "price_sha256": "ecca53d516fdf137a0d4fb3aaf8209bbac8c00fa4ef3c8f65100df4e1472aaec",
+      "price_days": 3229
     },
     "JKHY": {
       "cik": 779152,
       "sic": 7373,
       "sec_sha256": "fa860ce85f05851552166bac54efec44c2ed2900b535b18c84b6bde3af3fc54c",
-      "price_sha256": "f2908d6f1e4a24ea5a611f6f3fafe6caafdb83790f5ac405296b6998a9260857",
-      "price_days": 3207
+      "price_sha256": "87f4ca16e0cd389ca05d7afa7fa25ebc0a31b50a88c07cc91f696ac80c9d087f",
+      "price_days": 3229
     },
     "BR": {
       "cik": 1383312,
       "sic": 7389,
       "sec_sha256": "578d04e135e12e49db7950c9c720062b477574a6d9e4fc069632c0b94a84a0ad",
-      "price_sha256": "c40d29d51e40bdddd26b334243cd6b3547fb6e44858811673e97917c373a64af",
-      "price_days": 3207
+      "price_sha256": "5e196a2d2efd636e1c66e039be3346b144811eb3fc49298123f12b05f84a01ca",
+      "price_days": 3229
     },
     "GPN": {
       "cik": 1123360,
       "sic": 7389,
       "sec_sha256": "dccb532d14d0be99767d5b58f18f91b0b6d6e79211e8dbe26bc6cd9ce7adbd7e",
-      "price_sha256": "a08ebe5e9ae2b7ca70d875270c748ea89535503e91f43b6f53bdeb20eb503a1e",
-      "price_days": 3207
+      "price_sha256": "14e87083ca9b5e7e32d009249e289197443f2328d400c7c97c8a632885f209cf",
+      "price_days": 3229
     },
     "CPAY": {
       "cik": 1175454,
       "sic": 7389,
       "sec_sha256": "0489e4601d317a5f7dd115e6517947abce1e06ae809cc551dd6438ff4e4ca11b",
-      "price_sha256": "11950f5b08d8c4f7279ccfabdcda3e6a89f91eb42f5cc105ce5238fcf4940d46",
-      "price_days": 3207
+      "price_sha256": "49af6daccebbf0b81a8db2ff469520ef3b5df6c1c7548991c2b5c1ec8bbc5e66",
+      "price_days": 3229
     },
     "TRMB": {
       "cik": 864749,
       "sic": 3829,
       "sec_sha256": "2778a19629bf5eba804ccf31ae4dd6cac95e303bfd5e007be968535a7133d2c5",
-      "price_sha256": "e0ef0d45602ad742fba4b20178476848a2c761248c42a704d652b10835194d8c",
-      "price_days": 3207
+      "price_sha256": "0c83de0f9be6cfb222d5f216706246664c9f94d2ec7444aa33de2d23e0be0be7",
+      "price_days": 3229
     },
     "TYL": {
       "cik": 860731,
       "sic": 7372,
-      "sec_sha256": "2a4ec793c0bf7f9da9d3133f93327d4f328746f361fc9ef0a3c52acc4b9ae922",
-      "price_sha256": "760b4c65ada284e052e5875871cc5ab91fb48ddb3ed7b6cd794c03f2c59b0a9b",
-      "price_days": 3207
+      "sec_sha256": "a6869f8b01dfd86de5bcb8490d37d86432b278eb81b8ea990f4132a9de6e2aec",
+      "price_sha256": "60e3769c3f56adbb6317e5ac9a1db0a686b090f79810e84b5337eda10128a8a1",
+      "price_days": 3229
     },
     "PTC": {
       "cik": 857005,
       "sic": 7372,
       "sec_sha256": "35d7f8001e1873d67862c9a42bc8b8683fc38fb7f88e9202f3a63a51575013ed",
-      "price_sha256": "03a4275921f9f56b8f684dd4912814a9ce8036fa9512b3d9f792c44f9d53957d",
-      "price_days": 3207
+      "price_sha256": "07dac11bb5c8bee81ff8ef480397a9e466a5687e3243fc671d693bf2d50f1f11",
+      "price_days": 3229
     },
     "ROP": {
       "cik": 882835,
       "sic": 3823,
-      "sec_sha256": "052fc6e4bef90d7703fc3ae1485b31f5a849e72ff2d6feaedecf8811f41ef339",
-      "price_sha256": "4144e855790929de5b4fd826943fb114b08d44cb3650a70e56aff806b6029d18",
-      "price_days": 3207
+      "sec_sha256": "ece9f67c61024d8355401cb9145e7f787215cb5d7d7f765b11c25e2c27b61121",
+      "price_sha256": "a2e61d71cb5e5fdab613d8bb145f0cb269fb4d9709d5f2031f0a6b6d41681e63",
+      "price_days": 3229
     },
     "GRMN": {
       "cik": 1121788,
       "sic": 3812,
-      "sec_sha256": "f132e5d872392f477b3b4f7e7f3e558fd35c4f5bb10547a94ed208bd01156dd5",
-      "price_sha256": "67d9c3437bf1b53d0fdf3dedc855717daa345aa48d73628103366e65db3bc537",
-      "price_days": 3207
+      "sec_sha256": "567204c4d80bc5faa014f1f2b9c5c89b0b2caa81943bea46678c5b72d4854171",
+      "price_sha256": "2212be812700f56d52f7ac06372c9f718e950f214ac39d6dbba42dd96d77e16b",
+      "price_days": 3229
     },
     "TEL": {
       "cik": 1385157,
       "sic": 5065,
       "sec_sha256": "1797fe441ae96b35b5c39c78cdbe7668e293f52cf332cf9b15086a29ed6c67bc",
-      "price_sha256": "365d15ce1f61af836b6981611519ee96469c7a60bf9e8735b5a3ebd945588938",
-      "price_days": 3207
+      "price_sha256": "981af976c153ee953ace76c15d81342dac19cb095500a134ca06c007cf1360ce",
+      "price_days": 3229
     },
     "JBL": {
       "cik": 898293,
       "sic": 3672,
-      "sec_sha256": "7cca1f8abe8ecb3e3055922f1fbfc8e148b559c07efe695f0efe5de33aa0d3fb",
-      "price_sha256": "2d19efde5943f729c6920538e0eabdb79c96ec293d72c95f2cb90eff680bffd5",
-      "price_days": 3207
+      "sec_sha256": "5d5a27e3c27c45ba7012d9b885949ac94aa2c4aa58435c60c7ccc068cfba5ef1",
+      "price_sha256": "73d698045e4f0badb3e79dd025994ca0400e5fe0909fca97928b90de6e789a8a",
+      "price_days": 3229
     },
     "SWKS": {
       "cik": 4127,
       "sic": 3674,
       "sec_sha256": "fe97017d523d23be63ebcc6d002d596ff7e1e00e89944976731ca27b8303c1b8",
-      "price_sha256": "a64429ccbcd821c6979f604a5896d0dcedae6d0348c70e526b3131c874a0b28e",
-      "price_days": 3207
+      "price_sha256": "98c19167761ad3d3c05c826482dafeb97b57a0dd6af61aecc43b9a182bcb382a",
+      "price_days": 3229
     },
     "QRVO": {
-      "cik": 1604778,
-      "sic": 3674,
-      "sec_sha256": "077161694facd4d21a7f526a97360591e1a5139f3e8779eb0354e51110c459e8",
-      "price_sha256": "373cc948d1119b38cc4853e859151033f5b44b89cc205e63c84916d69395b512",
-      "price_days": 2955
+      "error": "ticker not in SEC mapping"
     },
     "EPAM": {
       "cik": 1352010,
       "sic": 7371,
       "sec_sha256": "a44c750a1468b1e7b44893101e967e06b57bea9d39dfa8e7d8f56f19e856a7af",
-      "price_sha256": "f1df032ed66532ed4cc5cc40bb126b40f5fc187347c9e355e1f510ec9e0f2359",
-      "price_days": 3207
+      "price_sha256": "403884fedf675f436b4f17b13a36c775dac4b5da22761af262e8aaee7bcd6a36",
+      "price_days": 3229
     },
     "FFIV": {
       "cik": 1048695,
       "sic": 3576,
       "sec_sha256": "9cc393aa5c19a2d23f818bb88f381d7437acaeb5863409226daf44a2d60b9a92",
-      "price_sha256": "491f04fabc746980671d48c96fe3d4c774b7d0105303a5560ac6dce5f50770d7",
-      "price_days": 3207
+      "price_sha256": "4f4695c5ccdc169fa3bdd36930e8b4e1c548cd690c414f9e294d4e7ed0061da4",
+      "price_days": 3229
     },
     "TPR": {
       "cik": 1116132,
       "sic": 3100,
       "sec_sha256": "f778dc6d6092b7f14f730475c9e1f06dd25e4947852b457f0a5fbdbecb6197e9",
-      "price_sha256": "e3050c4f4637112a2bcccc63683312c9e7b8d71b10a349da4b6653e0972f8fd9",
-      "price_days": 3207
+      "price_sha256": "529d71e190273e9fda4bac592b247b3803f6ce3aebd50753be9f555e8b1999d3",
+      "price_days": 3229
     },
     "RL": {
       "cik": 1037038,
       "sic": 2320,
       "sec_sha256": "9941afcadb20bb4ecf7958fe71a236ff4491ffe74a659b55b7c6737d81217e31",
-      "price_sha256": "5cb27af293d0cdcdb4c5ae1cd312b45bf6bd1ecd1d0159b60b4a26a9c8c10eb1",
-      "price_days": 3207
+      "price_sha256": "0baf3a7fd973e4c2d4edf6f26b200ac36129c88844a32dc48ee80de3ad33118e",
+      "price_days": 3229
     },
     "HAS": {
       "cik": 46080,
       "sic": 3944,
-      "sec_sha256": "5c712cfd038f396393133b7e3f452ac48209eadad07769d05e760457eafe3207",
-      "price_sha256": "8a160e6654c5a53b85e69f5de00372c7c0b651f92db7aedb16a14f0bcb4bcb10",
-      "price_days": 3207
+      "sec_sha256": "30d3e0f50432c374da4aa0c841c67dd8689f4eb9c8d9d165fc618b36cc1ceeb0",
+      "price_sha256": "0bf81c9cd129d8f4fd63693d40c55f137e82611faf5ec8454d4dda61c07f8b71",
+      "price_days": 3229
     },
     "LVS": {
       "cik": 1300514,
       "sic": 7011,
-      "sec_sha256": "e358569f68f3e18106d3d7fdb181edd9f7ec8216760e734bf0365e8f5b709883",
-      "price_sha256": "3166d0afdda48fe9cad73640ea7e8a533a22d88330f0397ea4e18a4dce8420e9",
-      "price_days": 3207
+      "sec_sha256": "5e45ac89ecb53e33ce49402bb12249cd8d3b52c2f415722ef9c5e548e0f7636f",
+      "price_sha256": "e702251c6d69108df1e7da8d41d93c136985d95da278e94a1f6d7d8c707cacbc",
+      "price_days": 3229
     },
     "WYNN": {
       "cik": 1174922,
       "sic": 7011,
       "sec_sha256": "b7a92484f985e9cf0a17139221148ecb3d48c14c1c2c07d6b919b3951e496786",
-      "price_sha256": "f96b06df7fcbfeaa9b10b43d4f5f7168c0965b5cb9c835c313194ee474e89587",
-      "price_days": 3207
+      "price_sha256": "e07251623f79116e433d57b095742ea0f429c06faac7588b6218b74b587b711e",
+      "price_days": 3229
     },
     "MGM": {
       "cik": 789570,
       "sic": 7011,
-      "sec_sha256": "747e845ac11195975d04f811c36604ce2d4eec32f1b8a948dd222884c182d2a8",
-      "price_sha256": "58a7af74f68980637fac12ee6265434d93469f6a8c9eebeb09f35acbcedefbb4",
-      "price_days": 3207
+      "sec_sha256": "e58b883e06b1112114ea8614f09b0761534f5b4e08f181972aa489103ec2cefe",
+      "price_sha256": "ffcd513d7789b6a86ba4e04d565da01e86458256d9e29c600efa76fbad3c9956",
+      "price_days": 3229
     },
     "CCL": {
       "cik": 815097,
       "sic": 4400,
       "sec_sha256": "c207466469f69d3af50817c174fb9dc501bb65e4d2f64fdd51f2b3a3b9f3e5c9",
-      "price_sha256": "f30c763032c096a9e14974712763551930d7203794628e95f0cd86a43f013690",
-      "price_days": 3207
+      "price_sha256": "9d36fbb7ec7aa4e01c0a09d8ee54d9379fc380c8cbc769a7cc118cd8d1e89007",
+      "price_days": 3229
     },
     "RCL": {
       "cik": 884887,
       "sic": 4400,
-      "sec_sha256": "7df0620aeda2dcd04b8d5f91a7c865d48f5f826094280b1e09b9d894e5a8a0cb",
-      "price_sha256": "a56995043ccb748b47c208d7d1176e9ce2e8930930eec4d075a46f62cf03ff2c",
-      "price_days": 3207
+      "sec_sha256": "deb91409d270b8cb379468e4067bdaf7407618e406237a092fcd36e27ce60720",
+      "price_sha256": "1d08b73d77a75f3d13cef9b6e430eff477213569f42c2787c4ee63d25ff32e20",
+      "price_days": 3229
     },
     "NCLH": {
       "cik": 1513761,
       "sic": 4400,
-      "sec_sha256": "bf46a67bdc1d634accdb56ba95c405c1674985d10d3be5b8314633b290d4bd0d",
-      "price_sha256": "f3a6ceb26d5258def37acd72f6c97bade983497b2422b0bb10a85ff72cd7c603",
-      "price_days": 3207
+      "sec_sha256": "1f27ce5be4f0a30dd72a3a2865f022a1a92f585cc512ad533544224b3f3b0fbf",
+      "price_sha256": "a2ef0c438139d012f9313e71ab58cceb2303111b9d3524c271658b0986e7a6a2",
+      "price_days": 3229
     },
     "DPZ": {
       "cik": 1286681,
       "sic": 5140,
-      "sec_sha256": "69ca22ba2b925d469a31bdf914596abe060e4e9eeb53da9a9a15a7750c5bfc24",
-      "price_sha256": "16ef4e03a78a35b272e3b1959eab50f7ac97c04d17aa9725d6f96771f7b784dd",
-      "price_days": 3207
+      "sec_sha256": "e115762cca3f1ac00a9b1fcf7bd7ee7c1cf80343e230647936431c783dc1c8aa",
+      "price_sha256": "6e833f425eabadb4d11c878012dc18444aa80eb8c5a89d4aea3a441f8f934919",
+      "price_days": 3229
     },
     "MHK": {
       "cik": 851968,
       "sic": 2273,
-      "sec_sha256": "3832f6211aa4baf6a1f154b195a612db99935e0d4d8bb1229a4768b07167e30f",
-      "price_sha256": "9acd0a376cb6ac04eedb7a3f43d3c16e3496f1479e3d8d27f0c69bc83624b899",
-      "price_days": 3207
+      "sec_sha256": "f39ef51acd193f95ef51b1dda39eb1b9c168f2f8fb9eff0a722fed98669a9e95",
+      "price_sha256": "5effccd6c52d30d985aec516b764ce9824e0ca610e60d57b43ee2813e83eec1f",
+      "price_days": 3229
     },
     "KMX": {
       "cik": 1170010,
       "sic": 5500,
       "sec_sha256": "ff3932e7e99787ed492d175706853d9d359dc59a32c31af87ed1c5dafde6642d",
-      "price_sha256": "65c237b2a2322210071c2a3dd7ca13829eb6370478e3d669dce77e808ce08766",
-      "price_days": 3207
+      "price_sha256": "b94e36c568638c393029833368aa927ed64aacb0652db5ab6c3e8ba5c2762ad1",
+      "price_days": 3229
     },
     "EBAY": {
       "cik": 1065088,
       "sic": 7389,
-      "sec_sha256": "2a70f5a1a257f32a897035c25960fe09faf96940ad51d65515203c8709e362ff",
-      "price_sha256": "0b95f4c97b8fd0b35a615e4208be561af6312c1f43b2a55eb71854249b8504f7",
-      "price_days": 3207
+      "sec_sha256": "371b87340f99c6a666c5a1cb6d74fe332cbbf779e7f1809af0e433ced1572a9a",
+      "price_sha256": "6d592153b1a251521c240ace86eaac4f14af925d436e7b103ca973cb5dc3fc39",
+      "price_days": 3229
     },
     "KDP": {
       "cik": 1418135,
       "sic": 2080,
       "sec_sha256": "ada095aed6af778d3862b9fdfb75376ff216af33de7a7bf7f78f2b0fdd4d4416",
-      "price_sha256": "2e231fcd5bce5bdec88fbe01265a9c63e63ceddf85095f2bbea82ff1c5d0455a",
-      "price_days": 3207
+      "price_sha256": "71ea072c8ed8c69ac62fe8edd674adb48f61a6e1c034f692000d1c7296b0d5ec",
+      "price_days": 3229
     },
     "TAP": {
       "cik": 24545,
       "sic": 2082,
       "sec_sha256": "b05913f55a8a8be2fa236fecd7a816edf05c6211ffe9569eb812d2e7f791da46",
-      "price_sha256": "231e52eb306ddb4284a9fecbf443fc0be3a400e2839796437822952d54955a14",
-      "price_days": 3207
+      "price_sha256": "7c08b8e71f3987d2d3b9864bd1e6409e6c3b13e372118199e7d0dae8bc7e71f4",
+      "price_days": 3229
     },
     "BG": {
       "cik": 1996862,
       "sic": 2070,
-      "sec_sha256": "cee7c90b69f2443b108661eccdfe914dfa7b9a80f04f59802590ad6292f556e9",
-      "price_sha256": "b67f349927d6b8f9a21d57ac9f9c10b2f722cd58e9a7faa99676eb02578d39d1",
-      "price_days": 3207
+      "sec_sha256": "b7cb9530f0308a00f633c18b8ebc9b5e333a08a5e51fe86bc9b346eb995c023e",
+      "price_sha256": "f5f7154d07a48115038c69760016553a8c45bf991c2718a872ca8593bd545c3e",
+      "price_days": 3229
     },
     "SJM": {
       "cik": 91419,
       "sic": 2033,
       "sec_sha256": "61d6e06730d187ecb04ff6f4645810dc5bef6b6df0dca9754bc3afcd664503ab",
-      "price_sha256": "5c9d142dd1b9a4c1a772c0f73ce36337b2c89f62e34e68a36736cb7faeaa8a29",
-      "price_days": 3207
+      "price_sha256": "103a97a683baf1b0deb54ee2b66a8f59335e2d871ab878582c8fb9c6e18f8505",
+      "price_days": 3229
     },
     "MKC": {
       "cik": 63754,
       "sic": 2090,
       "sec_sha256": "4512b6af93c37526ee245f356c5867ef2822a185a8bacf8e487f6a954dd6b308",
-      "price_sha256": "e2a3d9b882731ec4c541f29c499884237669f744bd09c74a07f7db3f75609ad3",
-      "price_days": 3207
+      "price_sha256": "4b95762081958ffdf763bab8d49035ac1c3c5d33057786f12d393a6951aad2ad",
+      "price_days": 3229
     },
     "CPB": {
       "cik": 16732,
       "sic": 2000,
-      "sec_sha256": "5ae5d7248a2e3cc4955eb6fe1c1bfca24a9a7d2f77a277ab1f5b4cb95fedadaa",
-      "price_sha256": "fea2549e05957fae7e6067f3907a3215c41f19c0843d40cb13f960a759aca208",
-      "price_days": 3207
+      "sec_sha256": "7fe30aa1d0907099e195b1a37f491261e5ed59d466e4174f53215b5f1c345bb4",
+      "price_sha256": "403fd4c407205019ac1920b5d72cb4dd4dcba0f4c5ec0b52a10f44c7135fa0b0",
+      "price_days": 3229
     },
     "LW": {
       "cik": 1679273,
       "sic": 2030,
-      "sec_sha256": "458440b213f7356d48044c8bed2bfef6cf8eb77e14f111f62e7e43eaf7067141",
-      "price_sha256": "efd8cc38d8684427ed730fac70b9211e134e1de14df99ab45603313816274a88",
-      "price_days": 2486
+      "sec_sha256": "035e2696163c810feaf0d0481d75723992a2c64d4ce19cc17ca8ed053f45c9d6",
+      "price_sha256": "5b397fe56bdc9ea168fe56f580c960d1e1a8e2dbc0e30ccc6eaad6e35e06e79b",
+      "price_days": 2508
     },
     "WSM": {
       "cik": 719955,
       "sic": 5700,
       "sec_sha256": "16afd59c6d21ea7be1f7cbaa84e26fbc0ab5d9ea9a4938decf2f3f7077618d5c",
-      "price_sha256": "d09d8d1eb093d079a5b343689f00a1d1480558f9051813d259c6b2e5231963a1",
-      "price_days": 3207
+      "price_sha256": "b524b47c4e678f045ff6d422a978cbf101d4055fa095b48705d942fde0e7ce48",
+      "price_days": 3229
     },
     "LKQ": {
       "cik": 1065696,
       "sic": 5010,
-      "sec_sha256": "20197bee7a0ab736845ee0728084b3b041282d5b4f56619bc3ed7f9c662eec4d",
-      "price_sha256": "9e3e00377426aaf4431cd511f930919e360b01188c341b1264c896b2e7be81ea",
-      "price_days": 3207
+      "sec_sha256": "7e127df758014aa7380ad064d7339f6a92b8c6b75d9a1a70bd54f41f020e886e",
+      "price_sha256": "25d0cc9028567d964643f390a0552b9bfb6843958c03327fe01eca3bb176c765",
+      "price_days": 3229
     },
     "GE": {
       "cik": 40545,
       "sic": 3600,
-      "sec_sha256": "8c18acb17bbe0760fae6205c5df75b805480c58d4d1dbbabeba206d9ca36e1e3",
-      "price_sha256": "683845723ddb47adcf3331ee725592910f0b0b61c372804006871a7416180e50",
-      "price_days": 3207
+      "sec_sha256": "95ed2ee4383e17c8c50ea84b475a90b8172dc9d1728a330787ec0b7fada60216",
+      "price_sha256": "fa9d805542d450561ff03a35616c4c4d7f8ba4b11d52573399b08ecbb3ba6884",
+      "price_days": 3229
     },
     "RTX": {
       "cik": 101829,
       "sic": 3724,
-      "sec_sha256": "6d08f320c9fff931eb211602c6025869e4353fa548d495d8814b4c4842d26f8a",
-      "price_sha256": "eb8ece8e5d5d8e4eacde6a5fce2e1699deaf6b7965d59059ace4589b2af41899",
-      "price_days": 3207
+      "sec_sha256": "24494083f9c3c39826a9fe6ce29da4dcd4777701e72c59b507e8e2dd15d15ed5",
+      "price_sha256": "51633e7de63cb01ac38d0c04c176e472d15e862b91d7e3948c3c4563c6f4d026",
+      "price_days": 3229
     },
     "HWM": {
       "cik": 4281,
       "sic": 3350,
-      "sec_sha256": "6492e3d33c64f39adc48757ccf5feff27df9c0e708b37bb641b251e9ff12eb59",
-      "price_sha256": "29e7cfbb4079ba0842c9a97e1b1a95a5ef8b64e66e6a264734a79cca7d9fe4fa",
-      "price_days": 2493
+      "sec_sha256": "efb7515e04b3b23ecffca457a089bee7d554020bd6bb4e6aad539b9637ba1ec5",
+      "price_sha256": "b4dfb9b5e177b2900cb593a316bbaee88e64deec6d78cddb2f333f8bbba9bfc9",
+      "price_days": 2515
     },
     "ALLE": {
       "cik": 1579241,
       "sic": 7381,
-      "sec_sha256": "838a936033f9e2ceb5a60bbb42a6e41e4d4977a2cd263d0a55e2327b0094b80c",
-      "price_sha256": "eea691d5075234e663cc5a8d0a2e81e2ababf1718a9796bcead0fdf3cc627486",
-      "price_days": 3207
+      "sec_sha256": "c20f19d1f86a5b090d2b6aaea7535d73d798313b49a695deafd630e85d2cc704",
+      "price_sha256": "b5df381636c0da87fff0478e6d685ee15cd6b5fb250f58e2a880e497feecc66c",
+      "price_days": 3229
     },
     "AOS": {
       "cik": 91142,
       "sic": 3630,
-      "sec_sha256": "e6130945e25a2456a70a69b153838628bd31a5f19f389aa9412e9f3960c80ed8",
-      "price_sha256": "15a070395151addfa94c27ad6bf91c70fce7fa11f790066f45977e2af73a4b0c",
-      "price_days": 3207
+      "sec_sha256": "a58dd019da32e0aaa23572a3ccdcd48bf625533ef33d74c1de7d440142d43f86",
+      "price_sha256": "afab0f0b33b5c4f0cb18bc8ee3fff5d0378839a98d6193e43ff4636ec872d3e7",
+      "price_days": 3229
     },
     "BLDR": {
       "cik": 1316835,
       "sic": 5211,
-      "sec_sha256": "a5c351f2c90435b2687e704fa0062d81bfb13f358da57d86bdbb8e12f3c5b1d0",
-      "price_sha256": "e4e736ac030a851f7a90992c4f1a55cebf51fcd51d89e4b9e6505238e41c258f",
-      "price_days": 3207
+      "sec_sha256": "ae5b12c9c15e4b1094188854d29a01e3dafbc1e9140fd7197ab568461339547b",
+      "price_sha256": "8b30c001c526a686400d4cc6457269d16d7b98c1039235429d00afc520e31966",
+      "price_days": 3229
     },
     "CHRW": {
       "cik": 1043277,
       "sic": 4731,
-      "sec_sha256": "d4ed896e4ad7d80e907eb6aa1f11255b20fc0d744069677e6fa6546f880a215d",
-      "price_sha256": "34bb4398912b7f1b2a01db26e467f1b3088fc5ff25c4abb24b9ffd766e075321",
-      "price_days": 3207
+      "sec_sha256": "724c395e56039da1faf5ed15859f2df924a756c654abe07ff2c4192e9be1b6d7",
+      "price_sha256": "055193f88d51c5c0c216ea4e4e13e31b79523cff163201fb7d3583c38505b74c",
+      "price_days": 3229
     },
     "J": {
       "cik": 52988,
       "sic": 1600,
       "sec_sha256": "de8c69f98fd5a68a912ec3d765f1f4d086bb0e5ca1ebc9fef2b80358c9b28343",
-      "price_sha256": "e44aaa0e38101b7180d718119512a162020b1d4a43e8bac58bdaacc0c164dee4",
-      "price_days": 3207
+      "price_sha256": "d518397b0fe01d822d411425a1232209780194d3e3843da1b57038ebe9f59cb7",
+      "price_days": 3229
     },
     "LDOS": {
       "cik": 1336920,
       "sic": 7373,
       "sec_sha256": "26d258f25d20ba4a489c4ef0dcd8b311f5a10314c207e675cec67cd20c8d45af",
-      "price_sha256": "a18709995e891e11b94b228df1bb24b87ec4ed84bbe01b14a8a29c6a9f292895",
-      "price_days": 3207
+      "price_sha256": "f274081452cbed98920b92065dab1fc3d1bec110e6e4a4bd85d16f661daa0447",
+      "price_days": 3229
     },
     "PWR": {
       "cik": 1050915,
       "sic": 1731,
-      "sec_sha256": "0ade68a7b36cb1ef71104428122b0c3c43c98ac84b4f960a3c691c8ac29e4604",
-      "price_sha256": "9e1343abded09410177b8962fa43459cefa9d244653643b124fa94905417316b",
-      "price_days": 3207
+      "sec_sha256": "3209aeb6ae940090ef8f4908a9c1c057b4e2d1ed747f602207de61785878a868",
+      "price_sha256": "188bc0577221686001b349d5ffd901ba37512fb87888f8e6edfa879368dbd1b4",
+      "price_days": 3229
     },
     "GNRC": {
       "cik": 1474735,
       "sic": 3621,
       "sec_sha256": "781061845a296a528e3df9fdc72ff39ab0af04d208026052e842f480a5435cca",
-      "price_sha256": "04e1f68f90d64accc079c2b535dd13166668e39bbf8ed800c36c2328c4cbc623",
-      "price_days": 3207
+      "price_sha256": "6764d4642c98232e27d57226bcb494963a8f36ae1a5ed2f513cc19ddee3f2879",
+      "price_days": 3229
     },
     "IEX": {
       "cik": 832101,
       "sic": 3561,
-      "sec_sha256": "ab2e6f7015eab31153b1783a6d2594497c7c35579e2466fb5b7f1995c4afda96",
-      "price_sha256": "29d84e761bbb24b9521d8abb470839ab58fc3897509a8fb200219994ca55d2d8",
-      "price_days": 3207
+      "sec_sha256": "9e6a0ba7a9e03f23fc37937badab1fa02b1c00f4dc3574f8a99a12ea6c55774b",
+      "price_sha256": "327b0f9b6b8f8bce2e34f5889b8599f724dc9c75d149527547251d94e1400ec3",
+      "price_days": 3229
     },
     "PNR": {
       "cik": 77360,
       "sic": 3550,
-      "sec_sha256": "6e53bdf7b8d6c97ab74ccf05b0546ac311908ea094021bab8dd19bce2b336e1c",
-      "price_sha256": "2782e01477134877126379fb4792391cbd1d7a246489dcb54b02729c50c0c5e3",
-      "price_days": 3207
+      "sec_sha256": "718bdaaaa4dbb773f15f8beb0bbfb4ec85f7c58095a6688bb6ee80faa362dd5f",
+      "price_sha256": "f1414f95893b1ae456dcac329bc2b30aa02175a25664fc108c3fc16e09f32f71",
+      "price_days": 3229
     },
     "RHI": {
       "cik": 315213,
       "sic": 7363,
-      "sec_sha256": "1a3a2c95a1c800108742135f876d51b91d08e3fdc78714efb676efc767bc5b42",
-      "price_sha256": "e82cc989bca2ce9b2759c1d970d07ad9f7a9bc5b8bc23f033e3b82fe408a559f",
-      "price_days": 3207
+      "sec_sha256": "ec5d5e41f05b26c4971fc30671a1c1cb140a7e86af6b89a1bc1d63ca46aaba42",
+      "price_sha256": "e879c77562e4c405f15ac9e8522ada6299b5ed8618cc97218e759ba957150afc",
+      "price_days": 3229
     },
     "NDSN": {
       "cik": 72331,
       "sic": 3569,
       "sec_sha256": "9782d1eab6bdd78c49f6ab6de3749a577fe54cd33d3afd29bd105474f124eb2e",
-      "price_sha256": "2865cc74bc2b71e478d1ee85828167714b65d78489caa62b93b7b604ffa51972",
-      "price_days": 3207
+      "price_sha256": "8155ab37d2a98b093c19c22b5fe709ef4f3b49b9fa768a226f8a6b690b4e33fc",
+      "price_days": 3229
     },
     "ROL": {
       "cik": 84839,
       "sic": 7340,
-      "sec_sha256": "ae4b8c87e5f58268ddf496d1e7eef6e01c40e4c1f9a6a5ab970f46e2b018263e",
-      "price_sha256": "b1afc9a8c86c8a036836d2538273e1a56164422a3d5ef32296f87ebd3dc6e9de",
-      "price_days": 3207
+      "sec_sha256": "51d2c2a13616dc72cb7a0bb899210968f61b9febc70ff619b2cf97048abbcdd7",
+      "price_sha256": "15119ea3674ec7deaad19a4b8980a4476002fdb53ee0b25215ed09f139156aae",
+      "price_days": 3229
     },
     "VRSK": {
       "cik": 1442145,
       "sic": 7374,
       "sec_sha256": "7ff151fb537fe40bd72f3e304b894f10371a6edefbbb18e8ab97766dc9fa9e4a",
-      "price_sha256": "a3f14668d43a669248cfb9174fe2c4a4c3a3214da1aad621fa43990b16c5bbdd",
-      "price_days": 3207
+      "price_sha256": "17b1de1dd3fd6b4f65d8e57247b89383e7a199f66db08820119a6d5d4f397b7a",
+      "price_days": 3229
     },
     "WAB": {
       "cik": 943452,
       "sic": 3743,
-      "sec_sha256": "5804f76a2be77d3b70aaf2fd1d6576d7c14423657e3d5c4e426475baca4c07a2",
-      "price_sha256": "ce3b4743923a4dc5a8d69afa96f62c4b59c135d01928feaa1d3fa3bfdb6ab977",
-      "price_days": 3207
+      "sec_sha256": "0eb026df94883da614dc2dca61103a361bc47302f407a4eb5ca03f02c3c63fc6",
+      "price_sha256": "280948d564a13a3f3c92357097e79fd31b03cad79e9e5b2748a5da305bb819e4",
+      "price_days": 3229
     },
     "HUBB": {
       "cik": 48898,
       "sic": 3670,
-      "sec_sha256": "cbad7cc261333e5397faf635864ab61db830df38d6e5540afb19bc8e2b60cfc2",
-      "price_sha256": "705e7854163620a7e415621bf22b50b88c75eea0ae0a8977d0dd4167b7d2bfaf",
-      "price_days": 3207
+      "sec_sha256": "f000f6d6d946646ac30f474ba7936c0fe09f588082cdace8379a79ad15903e2f",
+      "price_sha256": "d43a3368ba3321cfbb76ff96782ce4ab0d5f98eb3842b4bcb1e04caab8e19cd0",
+      "price_days": 3229
     },
     "LII": {
       "cik": 1069202,
       "sic": 3585,
-      "sec_sha256": "f0291f411002ac66080e7ba074fa848d602589552e6e3d48f26e8ca7c431d4dc",
-      "price_sha256": "7f453257afc1f0c6f575856f931f53f71251bb5d95a1c8dfc559acd5034dae2d",
-      "price_days": 3207
+      "sec_sha256": "abc8d16c9593f72f2188411880a614a7a9abfbae98aab207f7f2cacf2f96b5d6",
+      "price_sha256": "3ab7d87694b15f9b3b51bf4a9033d2ea22312459ff98c4d4ebf7b7cd38608b5d",
+      "price_days": 3229
     },
     "TT": {
       "cik": 1466258,
       "sic": 3822,
-      "sec_sha256": "b514b24aaf89f3bb84f578aa9ce522656f011b8796723013a2c41faeec0490df",
-      "price_sha256": "8e89674022d63dff22c45354de195cf9623fe4fe3c62b3fb6398afe2e518f0b5",
-      "price_days": 3207
+      "sec_sha256": "de22dd94633abf600208e753e8143de51ee3c7f5962fec12b65a27171a2e2859",
+      "price_sha256": "071e560548eba88b35e8d8ab89ad6c53ab1c37c7ea27f5729b19671f3099389f",
+      "price_days": 3229
     },
     "IR": {
       "cik": 1699150,
       "sic": 3560,
-      "sec_sha256": "f7b73452870313d34b6a520556c5df5316828b47d4106b258b77ed73ca8b0932",
-      "price_sha256": "daea4205ef3fd50a97084de524780e42b5e858d6ff37cd42ca9769afe7a334ba",
-      "price_days": 2361
+      "sec_sha256": "5b52a2c88f1aae1e9d12cb551ede19f92fc59581267c82b30528a2c3141a0ba9",
+      "price_sha256": "5c323023170e01fd73f288359740fe177ceb769c482d12fa9eb3e67624c2512c",
+      "price_days": 2383
     },
     "EFX": {
       "cik": 33185,
       "sic": 7320,
-      "sec_sha256": "9d076a05576d41f09d86dd2b3a54843a67188bbd040442861b559b80c8c7558d",
-      "price_sha256": "08c1106122f80ae1be37fd89ca7ac3e7394ad6d5db5805d4f1a050523d116bea",
-      "price_days": 3207
+      "sec_sha256": "fa133e3ed2ee80a4aee1b4d0377dc8dfe7d245533c3b9a9fab2a71df6f5a43d7",
+      "price_sha256": "b3eecfda4a4783e03cfb01e2029b6315e8c0f1b708644e86b8d9b1355758425b",
+      "price_days": 3229
     },
     "AXON": {
       "cik": 1069183,
       "sic": 3480,
       "sec_sha256": "be850abfbd01dde516d129120f79c82e782240fdcd24df1f27234e36c35f4d06",
-      "price_sha256": "701195bd009c2314ad66deca8964451eb97fbafec00fd4f8a40f0cc7220d603f",
-      "price_days": 3207
+      "price_sha256": "ea5f565d1469be7fd60f14e2f46f24f17eb88361ddb046883ea4d3ff04e1f5d1",
+      "price_days": 3229
     },
     "PAYC": {
       "cik": 1590955,
       "sic": 7372,
       "sec_sha256": "588556b7e71a89bf4e8a6ac0b9fed255fc1e5c15953d5c5b77b35778fb5ea3dd",
-      "price_sha256": "8760d18c6415e60e580f39d58c131b2f791458628679ef0be93c665576415f58",
-      "price_days": 3136
+      "price_sha256": "ea1a4c49d4de09c3677a6bb11df55704bf08505972f48e719f5116e6c23fbf72",
+      "price_days": 3158
     },
     "LIN": {
       "cik": 1707925,
       "sic": 2810,
-      "sec_sha256": "282a7dea4f8fa3beffcf27b39d3d5a08424e7ae5bbd6f33f5b30c591395ff22a",
-      "price_sha256": "b9b0773397335e3efd9e1dec4d764008740a651f01bf5c0609b8ea34d9317905",
-      "price_days": 3207
+      "sec_sha256": "faeccf860ecf8f18af89c7f059191b0aa900d00645f1a0168b8511b1cbbe1b9f",
+      "price_sha256": "9ad82835663563a108e3ba93437ca037c73f94bb8b88d851fd70be88fa12bc5a",
+      "price_days": 3229
     },
     "DD": {
       "cik": 1666700,
       "sic": 2821,
       "sec_sha256": "496efa04b7364ec9f3869e58cdf53fd6fdfeb3d6f75234e3f09c2c408bf165dd",
-      "price_sha256": "59c6f587a89ce92d9cf7f812a6fcebd70d5d1edef0e5474a14f0e1b9f733c053",
-      "price_days": 3207
+      "price_sha256": "86be250636de8bcf40efa60ba639f3f7687768360c3269fe70b1fe65582c86df",
+      "price_days": 3229
     },
     "CE": {
       "cik": 1306830,
       "sic": 2820,
       "sec_sha256": "b7bfa5a79dd56e28f209fbf81201b4cbcdd428df74e5c4bfe76682848a9619d6",
-      "price_sha256": "f9ba315fe75917025d0ee9be5e83d7873594364334cb8ac603177df068ea743e",
-      "price_days": 3207
+      "price_sha256": "8aa8cde00133d79af6b5c5079aefdaee25e9d875e95128c535519b235fe5832a",
+      "price_days": 3229
     },
     "IFF": {
       "cik": 51253,
       "sic": 2860,
       "sec_sha256": "7a9abcdaa0a3ccb7149d851a37cca209a6c386c1eb081d6f1ee2e0e01641e534",
-      "price_sha256": "64aa3ec6aec7c66f908753e2d55205792a21f383f85d05d17289d7138c09de62",
-      "price_days": 3207
+      "price_sha256": "aadbcc3e72b7933361905ddf33a605d091c95bfbd6d546f802603a168e46b028",
+      "price_days": 3229
     },
     "BALL": {
       "cik": 9389,
       "sic": 3411,
       "sec_sha256": "75fe375c1c37418d1c4b81341fe67ef4e5c91b582b0accff37a6dcae05cd37a8",
-      "price_sha256": "ae46011c62091c58d19952970eeb48cda4f852a0894dadaeaa3b381099c2d36e",
-      "price_days": 3207
+      "price_sha256": "127fe7a0cf9f8f40e768c56f440f1551aad5937884647bd04b2bc69c3ff9de5a",
+      "price_days": 3229
     },
     "AMCR": {
       "cik": 1748790,
       "sic": 3990,
       "sec_sha256": "7542059b02b2a470e52127a273243f0f480885eacaa5c5033935d1b835e32c2f",
-      "price_sha256": "2fd2839b75ea59072c190eb2a5b12cac121ef557cf743a7c4ae05160ce815c13",
-      "price_days": 3207
+      "price_sha256": "8fd2b0809b4ec90a779c4646855dbe098715a3446baa0dc762634bb0744e2d0a",
+      "price_days": 3229
     },
     "RS": {
       "cik": 861884,
       "sic": 5051,
-      "sec_sha256": "908753ca12daacd8dd27ec2caa4535591adafc0e67772b6d51d7b196c39091fe",
-      "price_sha256": "dfafa790dd29ed75336d63f225444e70e8afa50b3427869e649261169edf726b",
-      "price_days": 3207
+      "sec_sha256": "a91cfd20ebf8ec6fed31fbbbaf66dd36106965b0b33497dfac01baf2559889c9",
+      "price_sha256": "7ddedfc0c30eb61ee39ef7207a5d92f9e75a1497fac3569ab550796b06d2637d",
+      "price_days": 3229
     },
     "APA": {
       "cik": 1841666,
       "sic": 1311,
       "sec_sha256": "8412d6f4a709414b9d4630e6f969080aa608f9baf5f409fc296cbe071b1b7772",
-      "price_sha256": "73f9333d4a253e3b08aeb66e59bdbf4657434ac4cad716fcd3cf80e1020e8577",
-      "price_days": 3207
+      "price_sha256": "0e4aae661424d88d8d2ade56b1364c29afb75958c83145e04e21d0c73a7a8847",
+      "price_days": 3229
     },
     "CTRA": {
       "error": "ticker not in SEC mapping"
@@ -2265,85 +2261,81 @@
       "cik": 1539838,
       "sic": 1311,
       "sec_sha256": "a64bad1abbe376b56b551d59104f8e7c88873a3e1f8b7f4433e88115d5efc999",
-      "price_sha256": "5e94b58da1f1d7afde1554dd298d0424cb5b218085806c89a65564a0a34e2b62",
-      "price_days": 3207
+      "price_sha256": "68dd045b1d5e37a6f957799ad286951eb953a8fcbc66e320e6d21f999d4bdb13",
+      "price_days": 3229
     },
     "EQT": {
       "cik": 33213,
       "sic": 1311,
-      "sec_sha256": "47cbea53d7e22ddf4866dcae819856c46fabe057a9646cc9b8f39b03b027f082",
-      "price_sha256": "f7b1522cbf2c3e8265f4df6a3682f951da8e0e5a60d95418d0d90fa3e7384a61",
-      "price_days": 3207
+      "sec_sha256": "b06f02151b263f2dca8ae6592eeafb378661ae79358f5d12328608edc7e91985",
+      "price_sha256": "88e3b806a89f533f96bd8922192e1064c4f4b95271f2e538b04f0c8c5e160a9d",
+      "price_days": 3229
     },
     "OKE": {
       "cik": 1039684,
       "sic": 4923,
-      "sec_sha256": "7836d924a1b1474511788058f753cfadea623f42c27c4e4c3526b6d6d0c3f515",
-      "price_sha256": "bf2bd30f295c76c289956afadf5656f801eca54f848f067f55a21ff25a0931a5",
-      "price_days": 3207
+      "sec_sha256": "d6d8401ab409287ad60d8a7ffe810a62c058121784a2146f45d627505d0e57ba",
+      "price_sha256": "4d4fec4c0f8d6229a8a3b314191c91f798a62130553e754f3dfc91311ea1592c",
+      "price_days": 3229
     },
     "KMI": {
       "cik": 1506307,
       "sic": 4922,
-      "sec_sha256": "1a60fc0f9776bfc713f1569c0d588be4a28901044e47de75c24e1a6a9b4369c7",
-      "price_sha256": "0a06b3e1c6885bffda3131c52d75fdb511597a03b1424e9e0eba742a2bf8f0b2",
-      "price_days": 3207
+      "sec_sha256": "5ed99f3559ea50200ac7c0d1302ee5e42c8e16a47be5839802df893577f475f3",
+      "price_sha256": "77e06be174baef213bf93132115f228faf2afe278280839106d18af4c101f09e",
+      "price_days": 3229
     },
     "WMB": {
       "cik": 107263,
       "sic": 4922,
-      "sec_sha256": "c23327d6da64caafaaf53b61b6b8262b7e5cd04703b13435f46054c17dec3503",
-      "price_sha256": "4949b78fc4d3aaf1508c183d6040b6947349f14f7b2ec508c225e2816e0d73cc",
-      "price_days": 3207
+      "sec_sha256": "a38b0b57b26ca66457650d6dd0aa6206cf92e4ccf57396303e4769f04f710a67",
+      "price_sha256": "0010d9a3ff90ccfa012a88bebc604382d095d120d41a10c23806f0a36161ed19",
+      "price_days": 3229
     },
     "TRGP": {
       "cik": 1389170,
       "sic": 4922,
       "sec_sha256": "7ab92281f74d9e9749a48348565ed1b2bd94ab5efa8aed92f91030f5a4f0437c",
-      "price_sha256": "7d7158ab3cc74ca32493a89867c2910479b567322fd88050e2ae40874236c086",
-      "price_days": 3207
+      "price_sha256": "d859248496f63d2c66e96026ff8edceb9bc83426726b7ee06a03e88777ffbc01",
+      "price_days": 3229
     },
     "FOXA": {
       "cik": 1754301,
       "sic": 4833,
-      "sec_sha256": "4a80ac8514d37da0a0ca8b01a090cf90c3eff2c3095b9b3602ac357627bf6589",
-      "price_sha256": "4f29033f17efca1f12177e215812eb6479e9c1d364aac138a2f0bde27fe97897",
-      "price_days": 1902
+      "sec_sha256": "1d6910cbc4bde8adcadff41e132fa51c8e319863e855410900fb9fc67f50c451",
+      "price_sha256": "e8d15a9e9add14e6ee61b776beeaf3f203933f672a9fbe7cbc6f6e20042f098e",
+      "price_days": 1924
     },
     "NWSA": {
       "cik": 1564708,
       "sic": 2711,
       "sec_sha256": "a93a5df01fd389bf264e65b6651d42b3e49e6549f68d79e6d37c7670e2dd4952",
-      "price_sha256": "5a683da8417e9c649d9e69a7731448020f118eac0998c61a32a69f954c5814a7",
-      "price_days": 3207
+      "price_sha256": "61cd4bc1d5946d8e66dba7032a0f62fdbc5a2a67e131b59c38ac1888630fd1bd",
+      "price_days": 3229
     },
     "WBD": {
-      "cik": 1437107,
-      "sic": 4841,
-      "sec_sha256": "44fd29e891ff91bbd424b5f7ea4aa49c5769ef1f223651a6e6b0f0325154472f",
-      "price_sha256": "9bfcb1e79340d0e67491847ab3e3224f3c8c7b9c18895a10f24efa4fdf936002",
-      "price_days": 3207
+      "error": "ticker not in SEC mapping"
     },
     "OMC": {
       "cik": 29989,
       "sic": 7311,
-      "sec_sha256": "cc26e81446aac32f6ead772b0fe8a783e2936fce7bb4c6f1c255878ba436acad",
-      "price_sha256": "db15be713f5e4a5f57cff9d659919bbf821f76c0fbf19622c61376f63844949b",
-      "price_days": 3207
+      "sec_sha256": "51cefbf639f8e8453b2cb0a1304bd4f17a61e3d078407f7630386fa6ed08c3ce",
+      "price_sha256": "c2cce4f39e4466e4959356771f63ee2e6cbdba5855ff99a2c38a7e7561c146cf",
+      "price_days": 3229
     },
     "LYV": {
       "cik": 1335258,
       "sic": 7900,
       "sec_sha256": "1f79733d82bfb9f1e2b845e0b64b9f57bc5f5a3c73186879dfa6d23067a379db",
-      "price_sha256": "7755f94379318cd81dc9905a7ccfc99c960be1322e042319a97a1324c5c2b2a7",
-      "price_days": 3207
+      "price_sha256": "055b3a1102ac1a90394b95db21d4f439832c2e86860081ab000044f6153a8a47",
+      "price_days": 3229
     },
     "MTCH": {
       "cik": 891103,
       "sic": 7370,
-      "sec_sha256": "1ea8326820c1722f60a807fc38c9cff3b5eb143d807d596a582bba71c8d6c7d6",
-      "price_sha256": "45e08580e7540c0ade5ef103c45d6b490b1a7a051fe5c6d5cc42fa8ee166fc9f",
-      "price_days": 3207
+      "sec_sha256": "27b375d231fb43a878a14bb04499f52c64a508aa44e82b51daef82c0ce165ef5",
+      "price_sha256": "101ad9444a3fe87efcb4d28a5783d1dd435f169c4ffe644207813e62f58df6c7",
+      "price_days": 3229
     },
     "IPG": {
       "error": "ticker not in SEC mapping"
@@ -2351,7 +2343,7 @@
   },
   "risk_free": {
     "symbol": "^TNX",
-    "sha256": "7b97cd8fc43820fa68db1c4b79a76867ca2fb3501fb4a87d44e8a9b7d50a3bf9",
-    "days": 3206
+    "sha256": "4b138f0359e2e51e8b45671a68b4afbaedee8128b73d44b221d515364225113f",
+    "days": 3228
   }
 }
