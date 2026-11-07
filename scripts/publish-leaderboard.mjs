@@ -1,6 +1,6 @@
 // LEADERBOARD-STATIC-1: write dist/data/leaderboard.json from the live leaderboard function for the Pages deployment.
-// A failed or implausible fetch publishes nothing (the app then reads the live function), never a partial file.
-import {mkdirSync, writeFileSync} from 'node:fs';
+// On export failure, preserve the reviewed dated public recovery export without retimestamping it.
+import {mkdirSync, writeFileSync, readFileSync} from 'node:fs';
 const url = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1';
 try {
   // Server-only export of the same already-public view. Never export account tables.
@@ -22,6 +22,15 @@ try {
   writeFileSync('dist/data/leaderboard.json', body);
   console.log(`Published ${rows.length} rows (${(body.length / 1e6).toFixed(2)} MB before compression)`);
 } catch (e) {
-  console.error(`leaderboard snapshot not published: ${e.message}`);
-  process.exitCode = 1;
+  // A reviewed public recovery export is allowed only with its original timestamp.
+  try {
+    const saved = JSON.parse(readFileSync('scripts/recovery/leaderboard.json', 'utf8'));
+    if (saved.recovery !== true || !Array.isArray(saved.rows) || saved.rows.length < 1000 || saved.rows.filter(r => r.asset_class === 'Equity').length < 900 || !Number.isFinite(Date.parse(saved.published_at)) || Date.parse(saved.published_at) > Date.now()) throw Error('no recovery snapshot');
+    mkdirSync('dist/data', {recursive: true});
+    writeFileSync('dist/data/leaderboard.json', JSON.stringify(saved));
+    console.log(`::warning::Using dated public recovery snapshot (${e.message}); source refresh remains unavailable`);
+  } catch {
+    console.error(`leaderboard snapshot not published: ${e.message}`);
+    process.exitCode = 1;
+  }
 }
