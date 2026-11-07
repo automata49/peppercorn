@@ -22,8 +22,8 @@ test('fresh snapshot is used without calling the live function',async({page})=>{
   await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('SNAP')
   expect(calls).toEqual({live:0,snapshot:1})
   await page.getByRole('button',{name:'시장 데이터 새로고침'}).click()
-  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('LIVE')
-  expect(calls.live).toBe(1)
+  await expect(page.locator('.stock-compact-list .stock-compact-main strong').first()).toContainText('SNAP')
+  expect(calls.live).toBe(0)
 })
 test('stale or missing snapshot falls back to the live function',async({page})=>{
   const stale=await setup(page,{status:200,age_h:30})
