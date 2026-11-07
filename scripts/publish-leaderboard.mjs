@@ -4,6 +4,12 @@ import {mkdirSync, writeFileSync, readFileSync} from 'node:fs';
 const url = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1';
 try {
   // Server-only export of the same already-public view. Never export account tables.
+  let payload;
+  if (process.env.PROD_SUPABASE_DB_URL) {
+    const {connectMarketDb, publicSnapshot} = await import('./market-db.mjs');
+    const db = await connectMarketDb();
+    try { payload = await publicSnapshot(db); } finally { await db.end(); }
+  } else {
   const token = process.env.SUPABASE_ACCESS_TOKEN;
   const res = token
     ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
@@ -13,7 +19,8 @@ try {
     : await fetch(url, {signal: AbortSignal.timeout(90_000)});
   if (!res.ok) throw new Error('HTTP ' + res.status);
   const result = await res.json();
-  const payload = token ? {rows: result} : result;
+  payload = token ? {rows: result} : result;
+  }
   const rows = Array.isArray(payload.rows) ? payload.rows : [];
   const equities = rows.filter(r => r.asset_class === 'Equity').length;
   if (rows.length < 1000 || equities < 900) throw new Error(`implausible payload: ${rows.length} rows, ${equities} equities`);
