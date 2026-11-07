@@ -845,7 +845,7 @@ export default function App(){
   useEffect(()=>{completeGoogleLogin().then(s=>{if(s)updateSession(s)}).catch(e=>{setAuthNotice(e instanceof Error?e.message:String(e));setAuthOpen(true)})},[]) // eslint-disable-line react-hooks/exhaustive-deps
   const sectorTableStyle={'--sector-name-width':`${sectorNameWidth}px`} as CSSProperties
 
-  // live=true skips the published snapshot (user-initiated refresh); scheduled reloads read the snapshot first.
+  // Manual refresh revalidates the public snapshot before requesting the live function.
   const refreshLeaderboard=async(live=false)=>{
     if(refreshingRef.current)return
     refreshingRef.current=true;setRefreshing(true)
