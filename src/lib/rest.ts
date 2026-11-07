@@ -77,13 +77,13 @@ const normalizeRows=(rows:unknown[])=>rows.map(normalizeRow)
 
 // LEADERBOARD-STATIC-1: after each scheduled recalculation the Pages deployment publishes the same payload as
 // data/leaderboard.json (served compressed from the GitHub Pages CDN, outside Supabase egress). Scheduled reloads read
-// it first; a missing, unreadable or stale (>20 h) snapshot and every user-initiated refresh go to the live function.
+// it first, including manual refresh; only a missing, unreadable or stale (>20 h) snapshot uses the live function.
 const SNAPSHOT_MAX_AGE_MS=20*3600_000
-async function loadSnapshot():Promise<LeaderRow[]|null>{
+async function loadSnapshot(live=false):Promise<LeaderRow[]|null>{
   const controller=new AbortController()
   const timeout=window.setTimeout(()=>controller.abort(),15_000)
   try{
-    const res=await fetch(import.meta.env.BASE_URL+'data/leaderboard.json',{signal:controller.signal,cache:'no-cache'})
+    const res=await fetch(import.meta.env.BASE_URL+'data/leaderboard.json',{signal:controller.signal,cache:live?'reload':'no-cache'})
     if(!res.ok)return null
     const payload=await res.json() as {rows?:unknown[];published_at?:string}
     const age=Date.now()-Date.parse(payload.published_at||'')
@@ -94,9 +94,14 @@ async function loadSnapshot():Promise<LeaderRow[]|null>{
 
 // error says why live data was not used, so a device without the header badge can report it.
 export async function loadLeaderboard({live=false}:{live?:boolean}={}): Promise<{rows:LeaderRow[];source:'supabase'|'demo';error?:string}> {
-  if(!live){
-    const snapshot=await loadSnapshot()
-    if(snapshot)return {rows:snapshot,source:'supabase'}
+  {
+    const snapshot=await loadSnapshot(live)
+    if(snapshot){
+      const dates=snapshot.map(row=>String(row.ibd_rs_as_of||'')).filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date)).sort()
+      const latest=dates.at(-1)
+      const stale=!latest||Date.now()-Date.parse(latest+'T00:00:00Z')>4*86400_000
+      return {rows:snapshot,source:'supabase',error:stale?`저장된 실제 데이터입니다. RS 기준일: ${latest||'확인 불가'} · 데이터 갱신 지연`:undefined}
+    }
   }
   const controller=new AbortController()
   // 25 s: the full leaderboard is ~2.6 MB before compression; slow mobile links exceeded the former 12 s.
