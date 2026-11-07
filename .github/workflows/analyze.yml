@@ -1,6 +1,11 @@
 name: Refresh market analysis
 
 on:
+  pull_request:
+    paths: ["scripts/refresh-market-direct*", "scripts/market-db.mjs", "analysis/market_sessions.py", ".github/workflows/analyze.yml"]
+  push:
+    branches: [main]
+    paths: ["scripts/refresh-market-direct.mjs", "scripts/market-db.mjs", "analysis/market_sessions.py", ".github/workflows/analyze.yml"]
   workflow_dispatch:
     inputs:
       market:
@@ -9,6 +14,8 @@ on:
         options: [ALL, KR, US]
         default: ALL
   schedule:
+    # Keep the 20-hour CDN publication gate valid across closed-market weekends.
+    - cron: '0 8,20 * * 0,6'
     # One hour before/after regular sessions; 14:00 ET covers NYSE early closes.
     - cron: '0 8 * * 1-5'
       timezone: Asia/Seoul
@@ -23,17 +30,35 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
-env:
-  FUNCTIONS_URL: https://mhbcchegrbakearqptdr.supabase.co/functions/v1
-  OIDC_AUDIENCE: peppercorn-supabase
+concurrency:
+  group: folio-market-refresh
+  cancel-in-progress: false
 
 jobs:
+  preflight:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts
+      - run: node --test scripts/refresh-market-direct.test.mjs
   refresh:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Select market and verify the exchange session
         id: route
         shell: bash
@@ -45,6 +70,12 @@ jobs:
           if [ -z "$SCHEDULE" ]; then
             echo "market=${MANUAL_MARKET:-ALL}" >> "$GITHUB_OUTPUT"
             echo 'run=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [ "$SCHEDULE" = '0 8,20 * * 0,6' ]; then
+            echo 'market=ALL' >> "$GITHUB_OUTPUT"
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+            echo 'export_only=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           case "$SCHEDULE" in
@@ -85,29 +116,28 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
               output.write(f'run={str(allowed).lower()}\n')
           PY
-      - name: Refresh selected market
+      - name: Install runner dependencies
         if: steps.route.outputs.run == 'true'
-        shell: bash
+        run: |
+          npm ci --ignore-scripts
+          python -m pip install --quiet 'exchange_calendars==4.13.2'
+      - name: Resolve latest completed exchange sessions
+        if: steps.route.outputs.run == 'true'
         env:
           TARGET_MARKET: ${{ steps.route.outputs.market }}
         run: |
-          set -euo pipefail
-          get_token() {
-            curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])'
-          }
-          for OFFSET in $(seq 0 120 6000); do
-            TOKEN=$(get_token); echo "::add-mask::$TOKEN"
-            PAYLOAD=$(printf '{"offset":%s,"limit":120,"market":"%s"}' "$OFFSET" "$TARGET_MARKET")
-            RESP=$(curl -fsS -X POST "$FUNCTIONS_URL/refresh-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" --data "$PAYLOAD")
-            echo "$RESP"
-            REQUESTED=$(printf '%s' "$RESP" | python -c 'import json,sys; print(json.load(sys.stdin).get("requested",0))')
-            [ "$REQUESTED" -eq 0 ] && break
-          done
-      - name: Recalculate RS and leadership
+          CLOSED_SESSIONS=$(python -m analysis.market_sessions --market "$TARGET_MARKET")
+          echo "CLOSED_SESSIONS=$CLOSED_SESSIONS" >> "$GITHUB_ENV"
+      - name: Collect daily bars and recalculate through Postgres
         if: steps.route.outputs.run == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          TOKEN=$(curl -fsS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE" | python -c 'import json,sys; print(json.load(sys.stdin)["value"])')
-          echo "::add-mask::$TOKEN"
-          curl -sS --fail-with-body -X POST "$FUNCTIONS_URL/recalculate-market" -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" -d '{}'
+        env:
+          PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+          EXPORT_ONLY: ${{ steps.route.outputs.export_only }}
+        run: node scripts/refresh-market-direct.mjs
+      - name: Save public refresh evidence
+        if: steps.route.outputs.run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-market-refresh
+          path: market-output/
+          retention-days: 7

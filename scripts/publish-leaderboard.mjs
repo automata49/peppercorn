@@ -4,16 +4,23 @@ import {mkdirSync, writeFileSync, readFileSync} from 'node:fs';
 const url = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1';
 try {
   // Server-only export of the same already-public view. Never export account tables.
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  const res = token
-    ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
-        method: 'POST', headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({query: 'select * from public.leaderboard_view order by rs_rank desc nulls last, market asc, ticker asc'}),
-        signal: AbortSignal.timeout(90_000)})
-    : await fetch(url, {signal: AbortSignal.timeout(90_000)});
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const result = await res.json();
-  const payload = token ? {rows: result} : result;
+  let payload;
+  if (process.env.PROD_SUPABASE_DB_URL) {
+    const {connectMarketDb, publicSnapshot} = await import('./market-db.mjs');
+    const db = await connectMarketDb();
+    try { payload = await publicSnapshot(db); } finally { await db.end(); }
+  } else {
+    const token = process.env.SUPABASE_ACCESS_TOKEN;
+    const res = token
+      ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
+          method: 'POST', headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
+          body: JSON.stringify({query: 'select * from public.leaderboard_view order by rs_rank desc nulls last, market asc, ticker asc'}),
+          signal: AbortSignal.timeout(90_000)})
+      : await fetch(url, {signal: AbortSignal.timeout(90_000)});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const result = await res.json();
+    payload = token ? {rows: result} : result;
+  }
   const rows = Array.isArray(payload.rows) ? payload.rows : [];
   const equities = rows.filter(r => r.asset_class === 'Equity').length;
   if (rows.length < 1000 || equities < 900) throw new Error(`implausible payload: ${rows.length} rows, ${equities} equities`);

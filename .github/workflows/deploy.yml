@@ -136,6 +136,7 @@ jobs:
           PY
       - name: Publish leaderboard snapshot
         env:
+          PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: node scripts/publish-leaderboard.mjs
       - name: Publish current leader research brief for Instinct
