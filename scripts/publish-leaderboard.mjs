@@ -1,5 +1,5 @@
 // LEADERBOARD-STATIC-1: write dist/data/leaderboard.json from the live leaderboard function for the Pages deployment.
-// A failed or implausible fetch publishes nothing (the app then reads the live function), never a partial file.
+// On export failure, preserve the reviewed dated public recovery export without retimestamping it.
 import {mkdirSync, writeFileSync, readFileSync} from 'node:fs';
 const url = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1';
 try {
@@ -24,8 +24,8 @@ try {
 } catch (e) {
   // A reviewed public recovery export is allowed only with its original timestamp.
   try {
-    const saved = JSON.parse(readFileSync('public/data/leaderboard.json', 'utf8'));
-    if (saved.recovery !== true || saved.rows?.length < 1000 || !Number.isFinite(Date.parse(saved.published_at))) throw Error('no recovery snapshot');
+    const saved = JSON.parse(readFileSync('scripts/recovery/leaderboard.json', 'utf8'));
+    if (saved.recovery !== true || !Array.isArray(saved.rows) || saved.rows.length < 1000 || saved.rows.filter(r => r.asset_class === 'Equity').length < 900 || !Number.isFinite(Date.parse(saved.published_at)) || Date.parse(saved.published_at) > Date.now()) throw Error('no recovery snapshot');
     mkdirSync('dist/data', {recursive: true});
     writeFileSync('dist/data/leaderboard.json', JSON.stringify(saved));
     console.log(`::warning::Using dated public recovery snapshot (${e.message}); source refresh remains unavailable`);

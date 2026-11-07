@@ -79,7 +79,7 @@ const normalizeRows=(rows:unknown[])=>rows.map(normalizeRow)
 // data/leaderboard.json (served compressed from the GitHub Pages CDN, outside Supabase egress). Scheduled reloads read
 // it first, including manual refresh; only a missing, unreadable or stale (>20 h) snapshot uses the live function.
 const SNAPSHOT_MAX_AGE_MS=20*3600_000
-async function loadSnapshot(live=false):Promise<LeaderRow[]|null>{
+async function loadSnapshot(live=false):Promise<{rows:LeaderRow[];recovery:boolean}|null>{
   const controller=new AbortController()
   const timeout=window.setTimeout(()=>controller.abort(),15_000)
   try{
@@ -88,7 +88,7 @@ async function loadSnapshot(live=false):Promise<LeaderRow[]|null>{
     const payload=await res.json() as {rows?:unknown[];published_at?:string;recovery?:boolean}
     const age=Date.now()-Date.parse(payload.published_at||'')
     if(!payload.rows?.length||!(age>=0&&(age<=SNAPSHOT_MAX_AGE_MS||payload.recovery===true)))return null
-    return normalizeRows(payload.rows)
+    return {rows:normalizeRows(payload.rows),recovery:payload.recovery===true}
   }catch{return null}finally{window.clearTimeout(timeout)}
 }
 
@@ -97,10 +97,10 @@ export async function loadLeaderboard({live=false}:{live?:boolean}={}): Promise<
   {
     const snapshot=await loadSnapshot(live)
     if(snapshot){
-      const dates=snapshot.map(row=>String(row.ibd_rs_as_of||'')).filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date)).sort()
+      const dates=snapshot.rows.map(row=>String(row.ibd_rs_as_of||'')).filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date)).sort()
       const latest=dates.at(-1)
-      const stale=!latest||Date.now()-Date.parse(latest+'T00:00:00Z')>4*86400_000
-      return {rows:snapshot,source:'supabase',error:stale?`저장된 실제 데이터입니다. RS 기준일: ${latest||'확인 불가'} · 데이터 갱신 지연`:undefined}
+      const stale=snapshot.recovery||!latest||Date.now()-Date.parse(latest+'T00:00:00Z')>4*86400_000
+      return {rows:snapshot.rows,source:'supabase',error:stale?`저장된 실제 데이터입니다. RS 기준일: ${latest||'확인 불가'} · 데이터 갱신 지연`:undefined}
     }
   }
   const controller=new AbortController()
