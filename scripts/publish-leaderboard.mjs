@@ -3,9 +3,17 @@
 import {mkdirSync, writeFileSync} from 'node:fs';
 const url = 'https://mhbcchegrbakearqptdr.supabase.co/functions/v1/leaderboard?client=peppercorn-public-read-v1';
 try {
-  const res = await fetch(url, {signal: AbortSignal.timeout(90_000)});
+  // Server-only export of the same already-public view. Never export account tables.
+  const token = process.env.SUPABASE_ACCESS_TOKEN;
+  const res = token
+    ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
+        method: 'POST', headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
+        body: JSON.stringify({query: 'select * from public.leaderboard_view order by rs_rank desc nulls last, market asc, ticker asc'}),
+        signal: AbortSignal.timeout(90_000)})
+    : await fetch(url, {signal: AbortSignal.timeout(90_000)});
   if (!res.ok) throw new Error('HTTP ' + res.status);
-  const payload = await res.json();
+  const result = await res.json();
+  const payload = token ? {rows: result} : result;
   const rows = Array.isArray(payload.rows) ? payload.rows : [];
   const equities = rows.filter(r => r.asset_class === 'Equity').length;
   if (rows.length < 1000 || equities < 900) throw new Error(`implausible payload: ${rows.length} rows, ${equities} equities`);
@@ -14,5 +22,6 @@ try {
   writeFileSync('dist/data/leaderboard.json', body);
   console.log(`Published ${rows.length} rows (${(body.length / 1e6).toFixed(2)} MB before compression)`);
 } catch (e) {
-  console.log(`::warning::leaderboard snapshot not published: ${e.message}`);
+  console.error(`leaderboard snapshot not published: ${e.message}`);
+  process.exitCode = 1;
 }

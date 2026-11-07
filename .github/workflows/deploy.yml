@@ -23,7 +23,7 @@ concurrency:
 jobs:
   build:
     if: >-
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+      (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion == 'success' || github.event.workflow_run.conclusion == 'failure') && github.event.workflow_run.head_branch == 'main')
       || (github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.actor != 'github-actions[bot]'))
     runs-on: ubuntu-24.04
     steps:
@@ -135,6 +135,8 @@ jobs:
           print(f"Created {len(aliases)} legacy aliases:", sorted(aliases))
           PY
       - name: Publish leaderboard snapshot
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: node scripts/publish-leaderboard.mjs
       - name: Publish current leader research brief for Instinct
         run: node scripts/instinct-research-brief.mjs
@@ -194,7 +196,7 @@ jobs:
           cp dist/sw.js sw.js
           cp dist/discovery-layout.json discovery-layout.json
           mkdir -p data
-          for feed in leader-insights premium-insights instinct-leader-news instinct-research-brief; do
+          for feed in leaderboard leader-insights premium-insights instinct-leader-news instinct-research-brief; do
             if [ -f "dist/data/$feed.json" ]; then
               cp "dist/data/$feed.json" "data/$feed.json"
             else
@@ -254,7 +256,7 @@ jobs:
           if [ -d data/news-assets ]; then
             git add -A -- data/news-assets
           fi
-          for feed in leader-insights premium-insights instinct-leader-news instinct-research-brief; do
+          for feed in leaderboard leader-insights premium-insights instinct-leader-news instinct-research-brief; do
             if [ -f "data/$feed.json" ] || git ls-files --error-unmatch "data/$feed.json" >/dev/null 2>&1; then
               git add -A -- "data/$feed.json"
             fi
