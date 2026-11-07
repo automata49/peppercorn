@@ -1,5 +1,7 @@
 // Server-side only. Never include this module or the connection string in browser assets.
 import pg from 'pg';
+import {readFileSync} from 'node:fs';
+import {rootCertificates} from 'node:tls';
 export async function connectMarketDb() {
   const connectionString = process.env.PROD_SUPABASE_DB_URL;
   if (!connectionString) throw Error('Repository secret PROD_SUPABASE_DB_URL is required');
@@ -10,8 +12,10 @@ export async function connectMarketDb() {
     throw Error('Database connection must target the existing Peppercorn production project');
   }
   if (url.searchParams.get('sslmode') === 'disable') throw Error('Database TLS is required');
-  if (!url.searchParams.has('sslmode')) url.searchParams.set('sslmode', 'require');
-  const client = new pg.Client({connectionString:url.toString(), connectionTimeoutMillis:15000,
+  // pg-connection-string can override explicit TLS options when sslmode is present.
+  for (const key of ['sslmode','sslrootcert','sslcert','sslkey','uselibpqcompat']) url.searchParams.delete(key);
+  const ca=readFileSync(new URL('./supabase-prod-ca-2021.crt',import.meta.url),'utf8');
+  const client = new pg.Client({connectionString:url.toString(), ssl:{rejectUnauthorized:true,ca:[...rootCertificates,ca]},connectionTimeoutMillis:15000,
     statement_timeout:120000, query_timeout:125000});
   try {await client.connect();} catch (e) {throw Error(`Database connection failed (${e.code || 'connection_error'}); check PROD_SUPABASE_DB_URL`);}
   return client;

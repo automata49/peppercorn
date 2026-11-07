@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {completedRows,checkCoverage} from './refresh-market-direct.mjs';
+import {completedRows,checkCoverage,saveBatch} from './refresh-market-direct.mjs';
 import {metrics,symbol} from '../supabase/functions/_shared/market-metrics.ts';
 
 test('shared metrics preserve daily return units, lookbacks and Wilder RSI',()=>{
@@ -31,4 +31,15 @@ test('coverage rejects provider-wide failures, stale data and missing benchmarks
   assert.throws(()=>checkCoverage(instruments,successes.slice(0,8),dates));
   assert.throws(()=>checkCoverage(instruments,successes.slice(1),dates));
   assert.throws(()=>checkCoverage(instruments,successes,{US:'2026-11-09'}));
+});
+
+test('bulk writes include all split-adjusted historical bars and original source dates',async()=>{
+  const calls=[];
+  const db={query:async(sql,params)=>calls.push({sql,rows:JSON.parse(params[0])})};
+  const prices=[{date:'2025-06-01',close:10},{date:'2026-11-06',close:20}];
+  await saveBatch(db,[{instrument:{id:'public-instrument-id',last_date:'2026-10-27'},prices,metric:{as_of:'2026-11-06',price:20}}]);
+  assert.equal(calls.length,2);
+  assert.deepEqual(calls[0].rows.map(p=>p.trade_date),['2025-06-01','2026-11-06']);
+  assert.equal(calls[1].rows[0].as_of,'2026-11-06');
+  assert.equal(calls[1].rows[0].instrument_id,'public-instrument-id');
 });

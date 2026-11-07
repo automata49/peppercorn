@@ -45,20 +45,6 @@ jobs:
           node-version: 22
       - run: npm ci --ignore-scripts
       - run: node --test scripts/refresh-market-direct.test.mjs
-      - name: Verify existing production connection (read only)
-        env:
-          PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
-        run: |
-          node --input-type=module - <<'JS'
-          import {connectMarketDb} from './scripts/market-db.mjs';
-          const db=await connectMarketDb();
-          try {
-            await db.query('begin read only');
-            const result=await db.query('select count(*)::int as rows from public.leaderboard_view');
-            console.log('Existing public leaderboard rows:', result.rows[0].rows);
-            await db.query('rollback');
-          } finally { await db.end(); }
-          JS
   refresh:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest

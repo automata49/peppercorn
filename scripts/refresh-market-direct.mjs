@@ -44,21 +44,20 @@ async function fetchInstrument(instrument, lastSession) {
   throw failure;
 }
 
-async function saveInstrument(db, {instrument,prices,metric}) {
-  // Bound writes to the missing tail. Existing historical bars remain intact.
-  const cutoff=instrument.last_date ? new Date(new Date(instrument.last_date).getTime()-7*86400000).toISOString().slice(0,10) : '0000-01-01';
-  const tail=prices.filter(p=>p.date>=cutoff);
+export async function saveBatch(db, successes) {
+  // Yahoo may revise split-adjusted history. Persist all fetched bars, not just the missing tail.
+  const prices=successes.flatMap(({instrument,prices})=>prices.map(({date,...bar})=>({instrument_id:instrument.id,trade_date:date,...bar})));
   await db.query(`insert into public.price_daily(instrument_id,trade_date,open,high,low,close,volume)
-    select $1::uuid,x.date,x.open,x.high,x.low,x.close,x.volume from jsonb_to_recordset($2::jsonb)
-    as x(date date,open numeric,high numeric,low numeric,close numeric,volume bigint)
+    select x.instrument_id,x.trade_date,x.open,x.high,x.low,x.close,x.volume from jsonb_populate_recordset(null::public.price_daily,$1::jsonb) x
     on conflict(instrument_id,trade_date) do update set open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,volume=excluded.volume`,
-    [instrument.id,JSON.stringify(tail)]);
-  const columns=Object.keys(metric);
-  const values=columns.map(k=>metric[k]);
+    [JSON.stringify(prices)]);
+  const columns=Object.keys(successes[0].metric);
   // Column identifiers originate only in the shared metric function, never provider content.
   if(columns.some(k=>!/^[a-z][a-z0-9_]*$/.test(k)))throw Error('invalid_metric_column');
-  await db.query(`insert into public.market_metrics(instrument_id,${columns.join(',')}) values($1,${values.map((_,i)=>'$'+(i+2)).join(',')})
-    on conflict(instrument_id,as_of) do update set ${columns.filter(c=>c!=='as_of').map(c=>`${c}=excluded.${c}`).join(',')},updated_at=now()`,[instrument.id,...values]);
+  const rows=successes.map(({instrument,metric})=>({instrument_id:instrument.id,...metric}));
+  await db.query(`insert into public.market_metrics(instrument_id,${columns.join(',')})
+    select x.instrument_id,${columns.map(c=>'x.'+c).join(',')} from jsonb_populate_recordset(null::public.market_metrics,$1::jsonb) x
+    on conflict(instrument_id,as_of) do update set ${columns.filter(c=>c!=='as_of').map(c=>`${c}=excluded.${c}`).join(',')},updated_at=now()`,[JSON.stringify(rows)]);
 }
 
 export async function main() {
@@ -66,8 +65,7 @@ export async function main() {
   if(!Object.keys(dates).length || Object.entries(dates).some(([k,v])=>!['KR','US'].includes(k)||!/^\d{4}-\d{2}-\d{2}$/.test(v)))throw Error('Validated CLOSED_SESSIONS are required');
   const db=await connectMarketDb();
   try {
-    const {rows:instruments}=await db.query(`select i.id,i.market,i.ticker,i.exchange,
-      (select max(trade_date)::text from public.price_daily p where p.instrument_id=i.id) as last_date
+    const {rows:instruments}=await db.query(`select i.id,i.market,i.ticker,i.exchange
       from public.instruments i where i.active=true and i.market=any($1::text[]) order by i.market,i.ticker`,[Object.keys(dates)]);
     const successes=[],failures=[];
     for(let offset=0;offset<instruments.length;offset+=8) {
@@ -82,7 +80,7 @@ export async function main() {
     await db.query('begin');
     await db.query("select pg_advisory_xact_lock(hashtext('folio-market-refresh'))");
     try {
-      for(const success of successes)await saveInstrument(db,success);
+      for(let offset=0;offset<successes.length;offset+=40)await saveBatch(db,successes.slice(offset,offset+40));
       await db.query('select public.recalculate_market_leadership()');
       await db.query('select public.recalculate_etf_relative_strength()');
       await db.query('commit');

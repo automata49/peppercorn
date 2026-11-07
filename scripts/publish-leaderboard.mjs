@@ -10,16 +10,16 @@ try {
     const db = await connectMarketDb();
     try { payload = await publicSnapshot(db); } finally { await db.end(); }
   } else {
-  const token = process.env.SUPABASE_ACCESS_TOKEN;
-  const res = token
-    ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
-        method: 'POST', headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
-        body: JSON.stringify({query: 'select * from public.leaderboard_view order by rs_rank desc nulls last, market asc, ticker asc'}),
-        signal: AbortSignal.timeout(90_000)})
-    : await fetch(url, {signal: AbortSignal.timeout(90_000)});
-  if (!res.ok) throw new Error('HTTP ' + res.status);
-  const result = await res.json();
-  payload = token ? {rows: result} : result;
+    const token = process.env.SUPABASE_ACCESS_TOKEN;
+    const res = token
+      ? await fetch('https://api.supabase.com/v1/projects/mhbcchegrbakearqptdr/database/query', {
+          method: 'POST', headers: {Authorization: `Bearer ${token}`, 'Content-Type': 'application/json'},
+          body: JSON.stringify({query: 'select * from public.leaderboard_view order by rs_rank desc nulls last, market asc, ticker asc'}),
+          signal: AbortSignal.timeout(90_000)})
+      : await fetch(url, {signal: AbortSignal.timeout(90_000)});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const result = await res.json();
+    payload = token ? {rows: result} : result;
   }
   const rows = Array.isArray(payload.rows) ? payload.rows : [];
   const equities = rows.filter(r => r.asset_class === 'Equity').length;
