@@ -14,6 +14,8 @@ on:
         options: [ALL, KR, US]
         default: ALL
   schedule:
+    # Keep the 20-hour CDN publication gate valid across closed-market weekends.
+    - cron: '0 8,20 * * 0,6'
     # One hour before/after regular sessions; 14:00 ET covers NYSE early closes.
     - cron: '0 8 * * 1-5'
       timezone: Asia/Seoul
@@ -70,6 +72,12 @@ jobs:
             echo 'run=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          if [ "$SCHEDULE" = '0 8,20 * * 0,6' ]; then
+            echo 'market=ALL' >> "$GITHUB_OUTPUT"
+            echo 'run=true' >> "$GITHUB_OUTPUT"
+            echo 'export_only=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           case "$SCHEDULE" in
             '0 8 * * 1-5'|'30 16 * * 1-5') MARKET=KR; TIMEZONE=Asia/Seoul ;;
             '30 8 * * 1-5'|'0 14 * * 1-5'|'0 17 * * 1-5') MARKET=US; TIMEZONE=America/New_York ;;
@@ -124,6 +132,7 @@ jobs:
         if: steps.route.outputs.run == 'true'
         env:
           PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+          EXPORT_ONLY: ${{ steps.route.outputs.export_only }}
         run: node scripts/refresh-market-direct.mjs
       - name: Save public refresh evidence
         if: steps.route.outputs.run == 'true'

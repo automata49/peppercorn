@@ -49,7 +49,9 @@ export async function saveBatch(db, successes) {
   const prices=successes.flatMap(({instrument,prices})=>prices.map(({date,...bar})=>({instrument_id:instrument.id,trade_date:date,...bar})));
   await db.query(`insert into public.price_daily(instrument_id,trade_date,open,high,low,close,volume)
     select x.instrument_id,x.trade_date,x.open,x.high,x.low,x.close,x.volume from jsonb_populate_recordset(null::public.price_daily,$1::jsonb) x
-    on conflict(instrument_id,trade_date) do update set open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,volume=excluded.volume`,
+    on conflict(instrument_id,trade_date) do update set open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,volume=excluded.volume
+    where (price_daily.open,price_daily.high,price_daily.low,price_daily.close,price_daily.volume)
+      is distinct from (excluded.open,excluded.high,excluded.low,excluded.close,excluded.volume)`,
     [JSON.stringify(prices)]);
   const columns=Object.keys(successes[0].metric);
   // Column identifiers originate only in the shared metric function, never provider content.
@@ -65,6 +67,14 @@ export async function main() {
   if(!Object.keys(dates).length || Object.entries(dates).some(([k,v])=>!['KR','US'].includes(k)||!/^\d{4}-\d{2}-\d{2}$/.test(v)))throw Error('Validated CLOSED_SESSIONS are required');
   const db=await connectMarketDb();
   try {
+    if(process.env.EXPORT_ONLY==='true') {
+      const snapshot=await publicSnapshot(db);
+      mkdirSync('market-output',{recursive:true});
+      writeFileSync('market-output/leaderboard.json',JSON.stringify(snapshot));
+      writeFileSync('market-output/refresh-status.json',JSON.stringify({completed_at:snapshot.published_at,mode:'publication-only',expected_sessions:dates,exported:snapshot.rows.length}));
+      console.log('Weekend publication only; original trading dates and values preserved');
+      return;
+    }
     const {rows:instruments}=await db.query(`select i.id,i.market,i.ticker,i.exchange
       from public.instruments i where i.active=true and i.market=any($1::text[]) order by i.market,i.ticker`,[Object.keys(dates)]);
     const successes=[],failures=[];
