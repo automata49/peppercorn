@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {completedRows,checkCoverage,saveBatch} from './refresh-market-direct.mjs';
+import {completedRows,checkCoverage,saveBatch,splitTargets} from './refresh-market-direct.mjs';
 import {metrics,symbol} from '../supabase/functions/_shared/market-metrics.ts';
 
 test('shared metrics preserve daily return units, lookbacks and Wilder RSI',()=>{
@@ -14,6 +14,7 @@ test('shared metrics preserve daily return units, lookbacks and Wilder RSI',()=>
   assert.equal(m.volume_ratio,1);
   assert.equal(metrics(rows.slice(0,21)),null);
   assert.equal(symbol({ticker:'BFB',market:'US'}),'BF-B');
+  assert.equal(symbol({ticker:'BRK.A',market:'US'}),'BRK-A');
   assert.equal(symbol({ticker:'123456',market:'KR',exchange:'KOSDAQ'}),'123456.KQ');
 });
 test('incomplete, future and invalid daily bars never become the latest close',()=>{
@@ -42,4 +43,15 @@ test('bulk writes include all split-adjusted historical bars and original source
   assert.deepEqual(calls[0].rows.map(p=>p.trade_date),['2025-06-01','2026-11-06']);
   assert.equal(calls[1].rows[0].as_of,'2026-11-06');
   assert.equal(calls[1].rows[0].instrument_id,'public-instrument-id');
+});
+
+test('retry only fetches stale instruments and counts real existing dated rows for coverage',()=>{
+  const instruments=Array.from({length:10},(_,i)=>({market:'US',ticker:i?'T'+i:'SPY',last_as_of:i===9?'2026-10-23':'2026-11-06'}));
+  const dates={US:'2026-11-06'};
+  const {targets,existing}=splitTargets(instruments,dates);
+  assert.equal(targets.length,1);
+  assert.equal(targets[0].ticker,'T9');
+  assert.equal(existing.length,9);
+  assert.doesNotThrow(()=>checkCoverage(instruments,existing,dates));
+  assert.equal(splitTargets(instruments,{US:'2026-11-09'}).targets.length,10);
 });

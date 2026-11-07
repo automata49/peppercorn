@@ -25,12 +25,18 @@ export function checkCoverage(instruments, successes, dates) {
   }
 }
 
+export function splitTargets(instruments,dates) {
+  return {targets:instruments.filter(i=>i.last_as_of!==dates[i.market]),
+    existing:instruments.filter(i=>i.last_as_of===dates[i.market]).map(instrument=>({instrument,metric:{as_of:instrument.last_as_of}}))};
+}
+
 async function fetchInstrument(instrument, lastSession) {
   const ticker=symbol(instrument);
   let failure;
   for(let attempt=0;attempt<3;attempt++) {
     try {
-      const url=new URL('https://query1.finance.yahoo.com/v8/finance/chart/'+encodeURIComponent(ticker));
+      const host=attempt%2===0?'query1.finance.yahoo.com':'query2.finance.yahoo.com';
+      const url=new URL('https://'+host+'/v8/finance/chart/'+encodeURIComponent(ticker));
       url.search=new URLSearchParams({range:'18mo',interval:'1d',events:'history'});
       const response=await fetch(url,{headers:{'User-Agent':'Mozilla/5.0 PeppercornCapital/1.0'},signal:AbortSignal.timeout(25000)});
       if(!response.ok)throw Error('provider_http_'+response.status);
@@ -72,21 +78,26 @@ export async function main() {
       mkdirSync('market-output',{recursive:true});
       writeFileSync('market-output/leaderboard.json',JSON.stringify(snapshot));
       writeFileSync('market-output/refresh-status.json',JSON.stringify({completed_at:snapshot.published_at,mode:'publication-only',expected_sessions:dates,exported:snapshot.rows.length}));
-      console.log('Weekend publication only; original trading dates and values preserved');
+      console.log('Publication only; original trading dates and values preserved');
       return;
     }
-    const {rows:instruments}=await db.query(`select i.id,i.market,i.ticker,i.exchange
-      from public.instruments i where i.active=true and i.market=any($1::text[]) order by i.market,i.ticker`,[Object.keys(dates)]);
+    const {rows:instruments}=await db.query(`select i.id,i.market,i.ticker,i.exchange,
+      (select max(as_of)::text from public.market_metrics mm where mm.instrument_id=i.id) as last_as_of
+      from public.instruments i where i.active=true and i.asset_class in ('Equity','ETF')
+      and i.market=any($1::text[]) order by i.market,i.ticker`,[Object.keys(dates)]);
+    const {targets,existing}=splitTargets(instruments,dates);
     const successes=[],failures=[];
-    for(let offset=0;offset<instruments.length;offset+=8) {
-      await Promise.all(instruments.slice(offset,offset+8).map(async instrument=>{
+    for(let offset=0;offset<targets.length;offset+=4) {
+      await Promise.all(targets.slice(offset,offset+4).map(async instrument=>{
         try{successes.push(await fetchInstrument(instrument,dates[instrument.market]));}
-        catch{failures.push({market:instrument.market,ticker:instrument.ticker});}
+        catch(e){failures.push({market:instrument.market,ticker:instrument.ticker,reason:e.message});}
       }));
-      if(offset%80===0)console.log(`Collected ${Math.min(offset+8,instruments.length)}/${instruments.length}; fresh=${successes.length}; failed=${failures.length}`);
+      if(offset%80===0)console.log(`Collected ${Math.min(offset+4,targets.length)}/${targets.length}; fresh=${successes.length}; failed=${failures.length}`);
     }
-    checkCoverage(instruments,successes,dates);
+    checkCoverage(instruments,[...existing,...successes],dates);
+    if(failures.length)console.warn('Unrefreshed public instruments:',JSON.stringify(failures));
     // No partial new ranking is visible: prices, metrics and existing calculations commit together.
+    if(successes.length) {
     await db.query('begin');
     await db.query("select pg_advisory_xact_lock(hashtext('folio-market-refresh'))");
     try {
@@ -95,12 +106,13 @@ export async function main() {
       await db.query('select public.recalculate_etf_relative_strength()');
       await db.query('commit');
     } catch(e) {await db.query('rollback');throw e;}
+    }
     const snapshot=await publicSnapshot(db);
     mkdirSync('market-output',{recursive:true});
     writeFileSync('market-output/leaderboard.json',JSON.stringify(snapshot));
     writeFileSync('market-output/refresh-status.json',JSON.stringify({completed_at:snapshot.published_at,expected_sessions:dates,
-      requested:instruments.length,fresh:successes.length,failed:failures.length,failed_instruments:failures}));
-    console.log(JSON.stringify({expected_sessions:dates,requested:instruments.length,fresh:successes.length,failed:failures.length,exported:snapshot.rows.length}));
+      requested:targets.length,already_fresh:existing.length,fresh:successes.length,failed:failures.length,failed_instruments:failures}));
+    console.log(JSON.stringify({expected_sessions:dates,requested:targets.length,already_fresh:existing.length,fresh:successes.length,failed:failures.length,exported:snapshot.rows.length}));
   } finally {await db.end();}
 }
 if(process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(e=>{console.error(e.message);process.exitCode=1;});
