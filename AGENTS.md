@@ -1,3 +1,7 @@
+## FREE-PUBLIC-SNAPSHOT-20261107
+
+Public leaderboard exports use the existing server-only management token and only public.leaderboard_view; publish the identical file in the Pages artifact and branch-root mirror. Manual refresh also revalidates the snapshot before live fallback. Keep the 20-hour freshness gate, original trading dates and ranking; export failure fails publication instead of silently shipping a missing file. No billing changes or private record export. Existing quota restrictions on other APIs remain independent.
+
 ## LEADER-RESEARCH-COVERFLOW-20261026 — approved leader research and responsive reading
 
 - Publish `data/instinct-research-brief.json` after the existing leaderboard snapshot on every release/market refresh. Public equities only, existing displayed classes (correction overrides), exact market+ticker, class then RS order, max 20/market. Snapshot retrieval time is not the trading date. Missing/stale/future snapshot is unavailable with no invented targets. External Instinct must read this endpoint each run; Folio publication alone does not configure that task.
