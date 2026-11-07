@@ -85,9 +85,9 @@ async function loadSnapshot(live=false):Promise<LeaderRow[]|null>{
   try{
     const res=await fetch(import.meta.env.BASE_URL+'data/leaderboard.json',{signal:controller.signal,cache:live?'reload':'no-cache'})
     if(!res.ok)return null
-    const payload=await res.json() as {rows?:unknown[];published_at?:string}
+    const payload=await res.json() as {rows?:unknown[];published_at?:string;recovery?:boolean}
     const age=Date.now()-Date.parse(payload.published_at||'')
-    if(!payload.rows?.length||!(age>=0&&age<=SNAPSHOT_MAX_AGE_MS))return null
+    if(!payload.rows?.length||!(age>=0&&(age<=SNAPSHOT_MAX_AGE_MS||payload.recovery===true)))return null
     return normalizeRows(payload.rows)
   }catch{return null}finally{window.clearTimeout(timeout)}
 }
