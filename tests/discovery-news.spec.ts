@@ -141,3 +141,12 @@ test('source percentage typography preserves ranges, zero and market colours',as
  await expect(article.locator('.research-percent').last()).not.toHaveClass(/positive|negative/)
  await expect(article.locator('.news-stock-metrics')).toContainText('20D')
 })
+
+test('short Korean topics, long headlines and public HTTP original links remain readable',async({page})=>{
+ const item={...news[2],trend_topic:'로봇',headline:'공개 원문에서 확인된 산업 변화에 관한 긴 제목 '.repeat(6),source_url:'http://www.hansbiz.co.kr/news/articleView.html?idxno=876567'}
+ expect(parseInstinctNews({...feed,items:[item]},now)?.items).toHaveLength(1)
+ expect(parseInstinctNews({...feed,items:[{...item,source_url:'http://localhost/private'}]},now)?.items).toHaveLength(0)
+ await boot(page,[item])
+ await expect(page.locator('.discovery-news-story')).toContainText('로봇')
+ await expect(page.getByRole('link',{name:'원문 읽기 ↗'})).toHaveAttribute('href',item.source_url)
+})

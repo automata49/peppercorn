@@ -31,12 +31,12 @@ def utc(s):
     return dt.astimezone(timezone.utc)
 
 
-def url_ok(value):
+def url_ok(value, *, allow_http=False):
     if not isinstance(value, str) or len(value) > 2048:
         return False
     try:
         p = urllib.parse.urlsplit(value)
-        if p.scheme != "https" or not p.hostname or p.username or p.password or p.port not in (None, 443):
+        if p.scheme not in (("https", "http") if allow_http else ("https",)) or not p.hostname or p.username or p.password or p.port not in (None, 443 if p.scheme == "https" else 80):
             return False
     except ValueError:
         return False
@@ -62,7 +62,7 @@ def clean(raw, now):
         if market not in ("GLOBAL", "US", "KR"):
             return None
         topic = raw.get("trend_topic")
-        if not isinstance(topic, str) or not 3 <= len(topic.strip()) <= 80:
+        if not isinstance(topic, str) or not 1 <= len(topic.strip()) <= 80:
             return None
     else:
         ticker = raw.get("ticker")
@@ -70,11 +70,11 @@ def clean(raw, now):
             return None
         if not re.fullmatch(r"\d{6}" if market == "KR" else r"[A-Z][A-Z0-9.-]{0,11}", ticker):
             return None
-    for field, lo, hi in (("headline", 5, 120), ("summary", 10, 320), ("source_name", 2, 100)):
+    for field, lo, hi in (("headline", 5, 500), ("summary", 10, 320), ("source_name", 2, 100)):
         value = raw.get(field)
         if not isinstance(value, str) or not lo <= len(value.strip()) <= hi:
             return None
-    if not url_ok(raw.get("source_url")):
+    if not url_ok(raw.get("source_url"), allow_http=True):
         return None
     try:
         published = utc(raw["published_at"])

@@ -28,7 +28,7 @@ function publicArticleUrl(value:unknown){
  if(typeof value!=='string'||value.length>2048)return false
  try{
   const u=new URL(value)
-  if(u.protocol!=='https:'||u.username||u.password||u.port&&u.port!=='443')return false
+  if(!['https:','http:'].includes(u.protocol)||u.username||u.password||u.port&&u.port!==(u.protocol==='https:'?'443':'80'))return false
   const host=u.hostname.toLowerCase()
   return host.includes('.')&&!host.endsWith('.local')&&!host.endsWith('.internal')&&
    host!=='localhost'&&!/^(?:\d{1,3}\.){3}\d{1,3}$/.test(host)&&
@@ -44,7 +44,7 @@ export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed
  for(const raw of feed.items){
   if(!raw||typeof raw!=='object')continue
   const r=raw as Record<string,unknown>
-  if(!text(r.headline,5,120)||!text(r.summary,10,320)||!text(r.source_name,2,100)||!publicArticleUrl(r.source_url)||!validDate(r.published_at))continue
+  if(!text(r.headline,5,500)||!text(r.summary,10,320)||!text(r.source_name,2,100)||!publicArticleUrl(r.source_url)||!validDate(r.published_at))continue
   const age=now-Date.parse(r.published_at as string)
   if(age< -3600_000)continue
   const common={
@@ -55,7 +55,7 @@ export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed
   }
   let item:InstinctArticle
   if(r.type==='trend'){
-   if(!['KR','US','GLOBAL'].includes(String(r.market))||!text(r.trend_topic,3,80))continue
+   if(!['KR','US','GLOBAL'].includes(String(r.market))||!text(r.trend_topic,1,80))continue
    item={...common,type:'trend',market:r.market as TrendNews['market'],trend_topic:String(r.trend_topic)}
   }else{
    if(r.type!==undefined&&r.type!=='stock')continue
