@@ -21,6 +21,8 @@ test('explicit trend topics separate macro trends from industry; ticker and Engl
  const trend={...stock('AAPL',1),type:'trend' as const,market:'GLOBAL' as const,trend_topic:'시황·지정학'}
  expect(newsGroup(trend)).toBe('trend')
  expect(newsGroup({...trend,trend_topic:'로봇·반도체'})).toBe('industry')
+ for(const trend_topic of ['금융·매크로','AI·자금흐름','코스피 반도체 상승'])expect(newsGroup({...trend,trend_topic})).toBe('trend')
+ for(const trend_topic of ['미디어','기업 구조조정·헬스케어','자동차'])expect(newsGroup({...trend,trend_topic})).toBe('industry')
  expect(newsGroup(stock('AAPL',1))).toBe('stock')
  const ai={...latest,title:'AI',summary:[]} as SourceReport
  const result=prioritizeNews([stock('AMDQ',1,'Company said revenue grew'),stock('AMD',2)],{uid:'owner',latest:ai,detail:{...detail,links:[]}},now)
