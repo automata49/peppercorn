@@ -60,9 +60,9 @@ for(const theme of ['light','dark'])for(const [width,height] of [[390,844],[834,
  await expect(section).toContainText(news[3].headline)
  await expect(section).toContainText(news[4].headline)
  await expect(section).toContainText(news[1].headline)
- await expect(section.locator('.discovery-news-source').first()).toContainText('Reuters')
- await expect(section.getByRole('link',{name:'원문 읽기 ↗'}).first()).toHaveAttribute('href',news[0].source_url)
- await expect(section.locator('time').first()).toHaveAttribute('datetime',news[0].published_at)
+ await expect(section.getByRole('region',{name:'종목 뉴스'}).locator('.discovery-news-source').first()).toContainText('Reuters')
+ await expect(section.getByRole('region',{name:'종목 뉴스'}).getByRole('link',{name:'원문 읽기 ↗'}).first()).toHaveAttribute('href',news[0].source_url)
+ await expect(section.getByRole('region',{name:'종목 뉴스'}).locator('time').first()).toHaveAttribute('datetime',news[0].published_at)
  await expect(section).toContainText('Instinct AI 요약 · 원문 확인')
  await expect(section).toContainText('Folio 이미지 · 원문 사진 아님')
  await expect(section.locator('article').filter({hasText:news[3].headline}).getByRole('button',{name:'종목 보기 →'})).toHaveCount(0)
@@ -105,31 +105,26 @@ test('Instinct visual retains credit and falls back on image failure',async({pag
  await expect(page.locator('.hero-name')).toHaveText('Apple')
 })
 
-for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]])test(`Editorial news layout replaces Cover flow at ${width}`,async({page})=>{
+for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]])test(`Grouped editorial news without Cover flow at ${width}`,async({page})=>{
  await page.setViewportSize({width,height});await boot(page)
- const list=page.getByRole('list',{name:'뉴스와 리포트',exact:true})
- await expect(list).toHaveCSS('display','grid')
+ const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
+ await expect(section.locator('.news-priority-group>header h4')).toHaveText(['트렌드','산업','종목'])
  await expect(page.locator('.news-coverflow-controls')).toHaveCount(0)
- await expect(list.locator('article').first()).toHaveCSS('transform','none')
- const portrait=height>width
- await expect(list).toHaveCSS('overflow-x',portrait?'auto':'visible')
- if(!portrait){
-  const boxes=await list.locator('article').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().top))
-  expect(Math.abs(boxes[0]-boxes[3])).toBeLessThan(1)
-  expect(boxes[4]).toBeGreaterThan(boxes[0])
- }else{
-  await list.evaluate(el=>el.scrollLeft=el.scrollWidth)
-  await expect.poll(()=>list.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0)
- }
+ expect(await section.locator('.discovery-news-story:visible').count()).toBeLessThanOrEqual(6)
+ await expect(section.locator('article').first()).toHaveCSS('transform','none')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
 })
-test('all 125 supplied articles, including older news, render without paging or count limits',async({page})=>{
+test('125 supplied articles stay accessible with only two stock stories initially visible',async({page})=>{
  const items=Array.from({length:125},(_,i)=>({...news[0],headline:`Instinct 전체 뉴스 항목 ${i}`,source_url:`https://www.reuters.com/article/${i}`,published_at:stamp(-24*(i+1))}))
  expect(parseInstinctNews({...feed,items},now)?.items).toHaveLength(125)
  await boot(page,items)
  await expect(page.locator('.discovery-news-story')).toHaveCount(125)
+ await expect(page.locator('.discovery-news-story:visible')).toHaveCount(2)
+ await page.getByText('종목 뉴스 더 보기 · 123건',{exact:true}).click()
+ await expect(page.locator('.discovery-news-story:visible')).toHaveCount(125)
  await expect(page.locator('.discovery-news-story').last()).toContainText(items[124].headline)
- await expect(page.getByRole('button',{name:'뉴스 더 보기'})).toHaveCount(0)
+ await page.getByText('종목 뉴스 더 보기 · 123건',{exact:true}).click()
+ await expect(page.locator('.discovery-news-story:visible')).toHaveCount(2)
 })
 test('source percentage typography preserves ranges, zero and market colours',async({page})=>{
  await boot(page,[{...news[0],summary:'매출 +5.2%, 이익 -2.1%, 보합 +0%, 전망 10-20% 범위를 원문 그대로 표시합니다.'}])
