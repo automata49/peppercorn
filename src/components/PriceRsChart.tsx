@@ -80,6 +80,7 @@ export const PriceRsChart=memo(function PriceRsChart({row,rows}:{row:LeaderRow;r
   const isBench=row.ticker===ticker
   const bench=isBench?undefined:rows.find(r=>r.market===row.market&&r.ticker===ticker)
   const hist=usePriceHistory(bench?[row.id,bench.id]:[row.id],true)
+  const primaryError=hist.getError(row.id)
   const rawHistory=hist.get(row.id)
   const closeHistory=useMemo(()=>rawHistory?{dates:rawHistory.dates.slice(-CHART_SESSIONS[period]-1),closes:rawHistory.closes.slice(-CHART_SESSIONS[period]-1)}:undefined,[rawHistory,period])
   const data=priceRs(rawHistory,bench&&hist.get(bench.id),CHART_SESSIONS[period])
@@ -87,12 +88,12 @@ export const PriceRsChart=memo(function PriceRsChart({row,rows}:{row:LeaderRow;r
   return <div data-market={row.market} className="peer-line price-rs" title={PRICE_RS_VERSION}>
     <PeriodToggle label="가격 모멘텀" period={period} onPeriod={setPeriod}/>
     <div className="chart-view-switch" role="group" aria-label="차트 보기"><Button variant="ghost" aria-pressed={view==='relative'} onClick={()=>setView('relative')}>가격 · RS 비교</Button><Button variant="ghost" aria-pressed={view==='close'} onClick={()=>setView('close')}>종가 확대</Button></div>
-    {hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({hist.error}).</p>
+    {primaryError||hist.status==='error'?<p className="empty">일별 가격을 불러오지 못했습니다 ({primaryError||hist.error}).</p>
       :!data?<p className="empty">{hist.status==='loading'||hist.status==='idle'?'일별 가격을 불러오는 중…':'일별 가격 이력이 없습니다.'}</p>
       :<>
         {view==='close'&&closeHistory&&<Suspense fallback={<p>종가 차트 준비 중…</p>}><ClosePriceChart key={row.id+period} history={closeHistory} name={row.name} currency={row.market==='KR'?'KRW':'USD'}/></Suspense>}
         <div hidden={view!=='relative'} ref={ref} className="line-chart-plot">{width>0&&<PriceRsSvg key={row.id+period} data={data} width={width} benchTicker={ticker}/>}</div>
-        {view==='relative'&&<>{!data.rs&&<p className="empty price-rs-missing">{isBench?`이 종목이 ${row.market} 벤치마크(${ticker})라 RS 라인이 없습니다.`:!bench?`벤치마크(${ticker}) 가격이 없어 RS 라인을 그릴 수 없습니다.`:'벤치마크와 겹치는 일별 가격이 없어 RS 라인을 그릴 수 없습니다.'}</p>}
+        {view==='relative'&&<>{!data.rs&&<p className="empty price-rs-missing">{bench&&hist.getError(bench.id)?'벤치마크 가격을 불러오지 못해 RS 라인을 표시할 수 없습니다.':isBench?`이 종목이 ${row.market} 벤치마크(${ticker})라 RS 라인이 없습니다.`:!bench?`벤치마크(${ticker}) 가격이 없어 RS 라인을 그릴 수 없습니다.`:'벤치마크와 겹치는 일별 가격이 없어 RS 라인을 그릴 수 없습니다.'}</p>}
         <ul className="line-legend">
           {[{label:row.name,sub:`${row.ticker} · ${CHART_SESSIONS[period]}거래일`,c:PRICE_C,dash:false,v:data.price},
             ...(data.bench?[{label:ticker,sub:`벤치마크${bench?.name&&bench.name!==ticker?' · '+bench.name:''}`,c:BENCH_C,dash:true,v:data.bench}]:[]),

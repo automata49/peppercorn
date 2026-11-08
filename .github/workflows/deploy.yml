@@ -70,6 +70,7 @@ jobs:
         run: npm run test:universe-db
       - if: github.event_name != 'workflow_run'
         run: npm run test:temperature-db
+      - run: node --test scripts/public-price-history.test.mjs
       - run: npm run build
       # UI regressions run on PRs in Pepper harness/discovery gates.
       # Do not block approved automatic Pages releases on Chromium downloads.
@@ -139,6 +140,10 @@ jobs:
           PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: node scripts/publish-leaderboard.mjs
+      - name: Publish public daily chart files
+        env:
+          PROD_SUPABASE_DB_URL: ${{ secrets.PROD_SUPABASE_DB_URL }}
+        run: node scripts/publish-price-history.mjs
       - name: Publish current leader research brief for Instinct
         run: node scripts/instinct-research-brief.mjs
       - name: Collect source-backed leader cards
@@ -188,7 +193,6 @@ jobs:
           timeout 12m python analysis/stock_flags.py --out dist/data/stock-flags.new.json
           mv dist/data/stock-flags.new.json dist/data/stock-flags.json
       - name: Keep branch Pages source deployable
-        if: github.event_name != 'workflow_run'
         run: |
           cp dist/index.html index.html
           rm -rf assets
@@ -204,6 +208,9 @@ jobs:
               rm -f "data/$feed.json"
             fi
           done
+          # Public chart files must survive branch-root Pages rebuilds too.
+          rm -rf data/price-history
+          cp -R dist/data/price-history data/price-history
           # GitHub Pages may serve this root mirror, not only the artifact.
           if [ -d dist/data/news-assets ]; then
             mkdir -p data/news-assets
@@ -254,6 +261,7 @@ jobs:
             folio-brand-icon-black.webp folio-brand-icon-glossy.webp folio-brand-icon-light.webp \
             .nojekyll
           git add fonts
+          git add -A -- data/price-history
           if [ -d data/news-assets ]; then
             git add -A -- data/news-assets
           fi

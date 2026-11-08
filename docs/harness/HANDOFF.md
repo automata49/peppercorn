@@ -1,3 +1,7 @@
+## FREE-DAILY-CHART-20261108
+
+Daily price/RS charts read validated per-instrument public close files before the restricted price-history HTTP endpoint. Export only active public Equity/ETF instruments joined to leaderboard_view, with at most 253 positive finite closes from the last 420 days. Preserve actual trading dates, missing/short histories and existing chart/RS calculations. Files require version, exact UUID, original last trading date, sorted valid dates and a publication age within 20 hours; missing/invalid/stale files alone use the bounded live fallback. Preserve cache invalidation generation guards and fail publication on inadequate history/benchmark coverage. The existing release after market refresh and 12-hour publication jobs regenerate chart files; branch-root and Pages artifact both retain them. No private account data, browser secrets, invented prices or paid changes.
+
 ## MARKET-REFRESH-RETRY-20261107
 
 Repeat runs collect only public Equity/ETF instruments missing the expected completed session; count existing matching-date rows toward coverage. Private instruments are not quote requests. Preserve old dates for unresolved symbols, log bounded public error categories, and map US share-class dots to Yahoo dashes without changing stored ticker identity. Daily 08:00/20:00 UTC publication-only runs preserve original trading dates and keep the 20-hour snapshot gate valid through weekends and exchange holidays. This is publication, not a new market observation.
