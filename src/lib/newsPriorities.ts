@@ -16,11 +16,11 @@ const themes=[
  /금리|연준|통화정책|\b(?:interest rates?|federal reserve|inflation)\b/i,
  /관세|무역|지정학|\b(?:tariffs?|trade|geopolitic\w*)\b/i,
 ]
-const macro=/거시|시황|시장|증시|지수|정치|선거|전쟁|고용|정책|금리|연준|물가|관세|무역|지정학|외교|경제|환율|\b(?:macro|market|election|politics|employment|policy|rates?|inflation|tariffs?|trade|geopolitic\w*|economy)\b/i
+const macro=/거시|매크로|자금흐름|규제|코스피|코스닥|시황|시장|증시|지수|정치|선거|전쟁|고용|정책|금리|연준|물가|관세|무역|지정학|외교|경제|환율|\b(?:macro|market|election|politics|employment|policy|rates?|inflation|tariffs?|trade|geopolitic\w*|economy)\b/i
 export function newsGroup(item:InstinctArticle):NewsGroup{
  if(item.type!=='trend')return 'stock'
  if(macro.test(item.trend_topic))return 'trend'
- return themes.slice(0,9).some(t=>t.test(item.trend_topic))||/산업|공급망|인프라|\b(?:industry|supply chain|infrastructure)\b/i.test(item.trend_topic)?'industry':'trend'
+ return themes.slice(0,9).some(t=>t.test(item.trend_topic))||/산업|공급망|인프라|미디어|헬스케어|신제품|빅테크|소프트웨어|자동차|물류|운송|\b(?:industry|supply chain|infrastructure)\b/i.test(item.trend_topic)?'industry':'trend'
 }
 const canonical=(value:string)=>{try{const u=new URL(value);u.hash='';return u.href}catch{return value}}
 /** Account-owned report evidence affects display order only; never persist private signals. */
