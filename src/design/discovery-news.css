@@ -3,7 +3,7 @@
 .discovery-news-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
 .discovery-news-heading h3{margin:8px 0 0;font-size:clamp(22px,2.5vw,32px);font-weight:550;line-height:1.2;letter-spacing:-.035em}
 .discovery-news-heading>span{color:var(--folio-muted);font-size:12px;flex-shrink:0}
-.discovery-news-stories{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.discovery-news-stories{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
 .discovery-news-story{min-width:0;background:transparent}
 .discovery-news-story figure{margin:0 0 16px}
 .discovery-news-story figure>a,.discovery-news-cover{display:block;border-radius:16px;overflow:hidden;background:var(--folio-surface)}
@@ -18,14 +18,10 @@
 .discovery-news-actions{display:flex;flex-wrap:wrap;gap:4px 20px;margin-top:8px}
 html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:center;min-height:44px;padding:8px 0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--folio-ink);font:inherit;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
 .discovery-news :is(a,button):focus-visible{outline:2px solid var(--folio-ink);outline-offset:4px}
-@media(min-width:768px) and (max-width:1100px) and (orientation:landscape){.discovery-news-stories{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(orientation:portrait),(max-width:767px){
- .discovery-news-stories{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:min(78vw,340px);gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;padding:0 4px 12px;scroll-padding-inline:4px;overscroll-behavior-x:contain}
- .discovery-news-story{scroll-snap-align:start}
- .discovery-news-heading{align-items:start}.discovery-news-heading>span{max-width:90px;line-height:1.6;text-align:right}
- .discovery-news-copy h4{font-size:23px}
+@media(max-width:767px){
+ .discovery-news-stories{grid-template-columns:minmax(0,1fr)}
+ .discovery-news-heading{align-items:start}.discovery-news-heading>span{max-width:110px;line-height:1.6;text-align:right}
 }
-@media(orientation:landscape) and (max-height:600px){.discovery-news-story img{aspect-ratio:16/9}.discovery-news-stories{grid-auto-flow:initial;grid-auto-columns:initial;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}.discovery-news-copy h4{font-size:19px}.discovery-news-copy>p{font-size:13px}}
 
 /* Distinguish cross-market theme coverage without implying a leader classification. */
 .discovery-news-trend-tag{display:inline-block;margin-right:5px;font-size:10px;font-weight:700;letter-spacing:.11em;color:var(--folio-ink);border:1px solid currentColor;border-radius:3px;padding:1px 5px;vertical-align:baseline}
@@ -43,3 +39,27 @@ html body .discovery-news-actions :is(a,button){display:inline-flex;align-items:
 .research-percent{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .news-report-instruments>summary{min-height:44px;display:flex;align-items:center;font-size:13px;cursor:pointer}
+
+.news-report-lead>[data-kind="report"]{display:grid;grid-template-columns:minmax(0,2fr) minmax(180px,1fr);gap:28px;align-items:start;margin-bottom:32px}
+.news-report-lead .discovery-news-copy h4{font-size:clamp(24px,3vw,36px)}
+.news-report-lead .discovery-news-copy>p{font-size:16px;line-height:1.8}
+.news-priority-note{color:var(--folio-muted);font-size:12px;line-height:1.6;margin:24px 0}
+.news-priority-group{margin-block:28px;min-width:0}
+.news-priority-group>header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:16px}
+.news-priority-group>header h4{margin:0;font-size:22px;letter-spacing:-.025em;font-weight:550}
+.news-priority-group>header>span{font-size:12px;color:var(--folio-muted)}
+.news-priority-group .discovery-news-story{display:grid;grid-template-columns:110px minmax(0,1fr);gap:16px;align-items:start}
+.news-priority-group .discovery-news-copy h4{font-size:20px;margin-top:6px}
+.news-priority-group .discovery-news-story figure{margin:0}
+.news-report-reason{display:block;font-size:11px;font-weight:600;color:var(--folio-ink);margin-bottom:6px}
+.news-priority-more>summary{display:flex;align-items:center;min-height:44px;width:fit-content;cursor:pointer;color:var(--folio-ink);font-size:13px;text-decoration:underline;text-underline-offset:4px;margin-top:12px}
+.news-priority-more>summary::before{content:'+';margin-right:8px}.news-priority-more[open]>summary::before{content:'−'}
+.news-archive-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-block:20px}
+.news-priority-group [data-compact="true"]{display:block}
+@media(max-width:767px){
+ .news-report-lead>[data-kind="report"]{grid-template-columns:minmax(0,1fr);gap:12px}
+ .news-report-lead img{max-height:200px;aspect-ratio:16/9}
+ .news-priority-group .discovery-news-story{grid-template-columns:80px minmax(0,1fr);gap:12px}
+ .news-priority-group .discovery-news-copy h4{font-size:18px}
+ .news-archive-list{grid-template-columns:minmax(0,1fr)}
+}
