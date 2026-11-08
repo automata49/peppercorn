@@ -7,7 +7,6 @@ import type {LeaderRow} from '../types'
 import {NewsStockMetrics} from './NewsStockMetrics'
 import {ResearchText} from './ResearchText'
 import {splitReportShelf} from '../lib/reportPresentation'
-import type {NewsContext} from '../lib/newsPriorities'
 import './source-reports.css'
 
 function ReportImage({src,page,index}:{src:string;page:ReportPage;index:number}){
@@ -44,7 +43,7 @@ function ReportReader({report,controller,preloaded}:{report:ReportController['it
   {!!links.length&&<details><summary>리포트 출처 · {links.length}개</summary><ul>{links.map((l,i)=><li key={i}><a href={l.url} target="_blank" rel="noopener noreferrer">{l.label||l.url} ↗</a></li>)}</ul></details>}
  </div>
 }
-export function SourceReports({controller,news=false,children,rows=[],onSelect}:{controller:ReportController;news?:boolean;children?:ReactNode|((context:NewsContext)=>ReactNode);rows?:LeaderRow[];onSelect?:(row:LeaderRow)=>void}){
+export function SourceReports({controller,news=false,children,rows=[],onSelect}:{controller:ReportController;news?:boolean;children?:ReactNode;rows?:LeaderRow[];onSelect?:(row:LeaderRow)=>void}){
  const [open,setOpen]=useState<string|null>(null)
  const {photoStyle}=useVisualStyle()
  const {latest,history}=splitReportShelf(controller.uid?controller.items:[])
@@ -90,7 +89,7 @@ export function SourceReports({controller,news=false,children,rows=[],onSelect}:
    </article>}
   </div>
   {latest&&open===latest.drive_file_id&&<section id="report-news-reader" aria-label="리포트 전문 읽기"><h4>{latest.title}</h4><ReportReader key={controller.uid+latest.drive_file_id} report={latest} controller={controller} preloaded={preloaded}/></section>}
-  {typeof children==='function'?children({uid:controller.uid,latest,detail:preloaded}):children}
+  {children}
   {archive}
  </section>
  if(!controller.uid||(!latest&&!controller.error))return null
