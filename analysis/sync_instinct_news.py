@@ -21,7 +21,7 @@ FOLDER_ID = "1HdM3uXO3_cAnJS0igLlDIsCylch6KMey"
 NAME = re.compile(r"^Folio-News-(\d{4}-\d{2}-\d{2})\.json$")
 TARGET = Path("public/data/instinct-leader-news.json")
 MAX_FILE = 1_000_000
-MAX_ITEMS = 60
+MAX_FEED = 10_000_000
 
 
 def utc(s):
@@ -80,7 +80,7 @@ def clean(raw, now):
         published = utc(raw["published_at"])
     except (KeyError, TypeError, ValueError):
         return None
-    if not -timedelta(hours=1) <= now - published <= timedelta(days=7):
+    if now - published < -timedelta(hours=1):
         return None
     common = {k: raw[k].strip() for k in ("headline", "summary", "source_name", "source_url")}
     common.update(market=market, published_at=published.isoformat().replace("+00:00", "Z"))
@@ -113,8 +113,8 @@ def parse_file(data, now):
     if len(data) > MAX_FILE:
         raise ValueError("File exceeds limit")
     obj = json.loads(data)
-    if not isinstance(obj, dict) or obj.get("version") != 1 or not isinstance(obj.get("items"), list) or len(obj["items"]) > 100:
-        raise ValueError("Expected version 1 news object with <=100 items")
+    if not isinstance(obj, dict) or obj.get("version") != 1 or not isinstance(obj.get("items"), list):
+        raise ValueError("Expected version 1 news object")
     return [p for x in obj["items"] if (p := clean(x, now)) is not None]
 
 
@@ -166,7 +166,7 @@ def main():
             continue
         try:
             stamp = datetime.strptime(m.group(1), "%Y-%m-%d").replace(tzinfo=timezone.utc)
-            if not -timedelta(days=1) <= now - stamp <= timedelta(days=8):
+            if now - stamp < -timedelta(days=1):
                 continue
             fid = f["id"]
             if not re.fullmatch(r"[A-Za-z0-9_-]{10,100}", fid):
@@ -180,7 +180,10 @@ def main():
     for a in articles:
         key = (a.get("type", "stock"), a["market"], a.get("ticker", a.get("trend_topic")), a["source_url"])
         dedup[key] = a
-    selected = sorted(dedup.values(), key=lambda a: a["published_at"], reverse=True)[:MAX_ITEMS]
+    selected = sorted(dedup.values(), key=lambda a: a["published_at"], reverse=True)
+    # Fail visibly rather than silently truncating a valid news archive.
+    if len(json.dumps(selected, ensure_ascii=False).encode()) > MAX_FEED:
+        raise RuntimeError("Public news exceeds transport budget; publication was not truncated")
     previous = json.loads(TARGET.read_text()) if TARGET.exists() else None
     from analysis.instinct_images import ImageCollector
     collector = ImageCollector(assets=Path('public/data/news-assets'),
@@ -196,8 +199,11 @@ def main():
         print("Unchanged:", len(selected), "items")
         return
     TARGET.parent.mkdir(parents=True, exist_ok=True)
-    TARGET.write_text(json.dumps({"version": 1, "updated_at": now.isoformat().replace("+00:00", "Z"),
-                                  "items": selected}, ensure_ascii=False, indent=2) + "\n")
+    output = json.dumps({"version": 1, "updated_at": now.isoformat().replace("+00:00", "Z"),
+                         "items": selected}, ensure_ascii=False, indent=2) + "\n"
+    if len(output.encode()) > MAX_FEED:
+        raise RuntimeError("Public news exceeds transport budget; publication was not truncated")
+    TARGET.write_text(output)
     print("Published", len(selected), "public articles")
 
 

@@ -1,7 +1,11 @@
 import json
 import unittest
+import tempfile
+from pathlib import Path
+from unittest.mock import patch, Mock
 from datetime import datetime, timezone
 from analysis.sync_instinct_news import clean, parse_file
+from analysis import sync_instinct_news as sync
 
 NOW = datetime(2026, 10, 17, 5, tzinfo=timezone.utc)
 VALID = {
@@ -21,13 +25,38 @@ class NewsValidationTests(unittest.TestCase):
         item = clean({**VALID, "private_note": "never publish", "drive_file_id": "secret"}, NOW)
         self.assertNotIn("private_note", item)
         self.assertNotIn("drive_file_id", item)
-    def test_stale_article_refused(self):
-        self.assertIsNone(clean({**VALID, "published_at": "2026-09-01T00:00:00Z"}, NOW))
+    def test_older_article_keeps_original_date(self):
+        self.assertEqual(clean({**VALID, "published_at": "2026-09-01T00:00:00Z"}, NOW)["published_at"], "2026-09-01T00:00:00Z")
     def test_bounded_versioned_json(self):
         body = json.dumps({"version": 1, "items": [VALID]}).encode()
         self.assertEqual(len(parse_file(body, NOW)), 1)
         with self.assertRaises(ValueError):
             parse_file(json.dumps({"version": 2, "items": [VALID]}).encode(), NOW)
+    def test_more_than_100_articles_are_retained(self):
+        items = [{**VALID, "source_url": f"https://example.com/news/{i}"} for i in range(125)]
+        self.assertEqual(len(parse_file(json.dumps({"version": 1, "items": items}).encode(), NOW)), 125)
+
+    def test_sync_includes_old_files_and_more_than_60_articles(self):
+        articles = [{**VALID, "source_url": f"https://example.com/news/{i}",
+                     "published_at": "2026-09-01T00:00:00Z"} for i in range(125)]
+        def request(url, token):
+            if "alt=media" in url:
+                return json.dumps({"version": 1, "items": articles}).encode()
+            return {"files": [{"id": "old_news_file_123", "name": "Folio-News-2026-09-01.json",
+                               "mimeType": "application/json", "size": "50000"}]}
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "news.json"
+            with patch.object(sync, "TARGET", target), patch.object(sync, "get_token", return_value="test"), \
+                 patch.object(sync, "request_json", side_effect=request), \
+                 patch("analysis.instinct_images.ImageCollector", return_value=Mock()):
+                sync.main()
+            result = json.loads(target.read_text())
+            self.assertEqual(len(result["items"]), 125)
+            self.assertEqual(result["items"][-1]["published_at"], "2026-09-01T00:00:00Z")
+
+    def test_future_article_refused(self):
+        self.assertIsNone(clean({**VALID, "published_at": "2026-11-01T00:00:00Z"}, NOW))
+
     def test_independent_trend_without_ticker(self):
         trend = {k: v for k, v in VALID.items() if k != "ticker"}
         trend.update(type="trend", market="GLOBAL", trend_topic="AI Infrastructure")

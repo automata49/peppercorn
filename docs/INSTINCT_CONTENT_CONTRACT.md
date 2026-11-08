@@ -1,3 +1,7 @@
+## INSTINCT-ALL-NEWS-20261108 — current user authority
+
+Restore the pre-Cover-flow editorial presentation: landscape card grid, portrait native horizontal card list, no perspective transforms or previous/next controls. Latest private report remains in the same layout with its account-owned full-width reader/archive. Render all validated unique public Instinct articles immediately, regardless of age, count, market, leader status or catalogue membership. Remove four-card paging, seven-day expiry, dated-file window and 60/100-item truncation/rejection. Preserve original timestamps, summaries, diverse-source order, article URL deduplication, public URL/schema validation, image rights/fallback and private account boundaries. Keep per-input byte and aggregate transport budgets; fail oversized publication visibly instead of silently truncating. Future-dated content remains rejected. This supersedes older Cover flow, pagination and freshness rules for public news only. Validate 125+ older/mixed articles, empty/unsafe input, private reader and 390/834/1194/1440 Light/Dark geometry, then the existing release gates.
+
 # Instinct → Folio content contract v1 (2026-10-26)
 
 Instinct researches, writes JSON and finds image links. Folio validates, stores and
