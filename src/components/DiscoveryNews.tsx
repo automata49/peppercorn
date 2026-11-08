@@ -3,21 +3,24 @@ import {useEffect,useState} from 'react'
 import {NewsStockMetrics} from './NewsStockMetrics'
 import {ResearchText} from './ResearchText'
 import type {LeaderRow} from '../types'
-import {loadInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/instinctLeaderNews'
+import {loadInstinctNews,diverseInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/instinctLeaderNews'
 import {coverPhoto,useVisualStyle} from './VisualStyle'
 import {SourceReports} from './SourceReports'
 import type {ReportController} from '../lib/sourceReports'
-import {prioritizeNews,newsGroup,type NewsContext,type NewsGroup} from '../lib/newsPriorities'
+import {useNewsScraps,newsIdentity} from '../lib/newsScraps'
 
 type NewsStory={
  id:string;market:'KR'|'US'|'GLOBAL';ticker?:string;trend_topic?:string;headline:string;summary:string;
  published_at:string;publisher:string;url:string;visual?:InstinctVisual;images?:InstinctImage[];
- kind:'stock'|'trend';group:NewsGroup;row?:LeaderRow;label:string
+ kind:'stock'|'trend';row?:LeaderRow;label:string
 }
 /** Public story coverage is independent of leader scoring; trend news never gets a made-up ticker. */
 export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
+ const scraps=useNewsScraps(reports.uid||'guest')
+ const [mode,setMode]=useState<'all'|'saved'>('all')
+ useEffect(()=>setMode('all'),[reports.uid])
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
@@ -28,27 +31,13 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
    ...(!isTrend?{ticker:item.ticker}:{trend_topic:item.trend_topic}),
    headline:item.headline,summary:item.summary,published_at:item.published_at,
    publisher:item.source_name,url:item.source_url,visual:item.visual,images:item.images,
-   kind:isTrend?'trend' as const:'stock' as const,group:newsGroup(item),row,
+   kind:isTrend?'trend' as const:'stock' as const,row,
    label:isTrend?item.trend_topic:(item.market==='KR'?row?.name||item.ticker:item.ticker)
   }
  }
- const groupLabels:Record<NewsGroup,string>={trend:'트렌드',industry:'산업',stock:'종목'}
- const renderGroups=(context:NewsContext)=>{
-  if(!instinct.length)return null
-  const groups=prioritizeNews(instinct,context)
-  return <div className="news-priority-groups" key={context.uid+'/'+context.latest?.content_hash}>
-   <p className="news-priority-note">{context.latest?'리포트 연결 뉴스 우선 · 분야별 핵심 2건':'분야별 최신 핵심 2건 · 나머지는 펼쳐보기'}</p>
-   {(['trend','industry','stock'] as const).map(group=>{
-    const items=groups[group]
-    if(!items.length)return null
-    return <section className="news-priority-group" aria-label={groupLabels[group]+' 뉴스'} key={group}>
-     <header><h4>{groupLabels[group]}</h4><span>{items.length}건</span></header>
-     <div className="discovery-news-stories" role="list" aria-label={groupLabels[group]+' 핵심 뉴스'}>{items.slice(0,2).map(({item,reason},i)=>renderStory(story(item,i),reason))}</div>
-     {items.length>2&&<details className="news-priority-more"><summary>{groupLabels[group]} 뉴스 더 보기 · {items.length-2}건</summary><div className="news-archive-list" role="list" aria-label={groupLabels[group]+' 추가 뉴스'}>{items.slice(2).map(({item,reason},i)=>renderStory(story(item,i+2),reason,true))}</div></details>}
-    </section>
-   })}
-  </div>
- }
+ const articles=diverseInstinctNews(mode==='saved'?scraps.items:instinct)
+ const saved=new Set(scraps.items.map(item=>newsIdentity(item.source_url)))
+ const originals=new Map(articles.map(item=>[newsIdentity(item.source_url),item]))
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  const renderStory=(item:NewsStory,reason:string,compact=false)=>{
    const linked=item.images?.find(v=>!failed.has(v.url))
@@ -59,19 +48,27 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
     </figure>}
     <div className="discovery-news-copy">
      {reason&&<span className="news-report-reason">{reason}</span>}
-     <span className="discovery-news-instrument">{item.kind==='trend'?<><span className="discovery-news-trend-tag">{item.group==='industry'?'INDUSTRY':'TREND'}</span> {item.label} · {item.market==='GLOBAL'?'GLOBAL':item.market}</>:<>{item.label} · {item.row?.industry||item.row?.sector||item.market}</>}</span>
+     <span className="discovery-news-instrument">{item.kind==='trend'?<><span className="discovery-news-trend-tag">TREND</span> {item.label} · {item.market==='GLOBAL'?'GLOBAL':item.market}</>:<>{item.label} · {item.row?.industry||item.row?.sector||item.market}</>}</span>
      {!compact&&item.row&&<NewsStockMetrics row={item.row}/>}
      <h4><a href={item.url} target="_blank" rel="noopener noreferrer">{item.headline}</a></h4>
      {item.summary&&<p><ResearchText text={item.summary} market={item.market}/></p>}
      <div className="discovery-news-source"><span>{item.publisher}</span><time dateTime={item.published_at}>{date(item.published_at)} KST</time><span>{now-Date.parse(item.published_at)>3*86400_000?'이전 소식 · ':''}Instinct AI 요약 · 원문 확인</span></div>
-     <div className="discovery-news-actions"><a href={item.url} target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a>{item.row&&<button type="button" onClick={()=>onSelect(item.row!)}>종목 보기 →</button>}</div>
+     <div className="discovery-news-actions"><button type="button" aria-pressed={saved.has(newsIdentity(item.url))} aria-label={(saved.has(newsIdentity(item.url))?'스크랩 해제 ':'스크랩 ')+item.headline} onClick={()=>void scraps.toggle(originals.get(newsIdentity(item.url))!)}>{saved.has(newsIdentity(item.url))?'스크랩됨':'스크랩'}</button><a href={item.url} target="_blank" rel="noopener noreferrer">원문 읽기 ↗</a>{item.row&&<button type="button" onClick={()=>onSelect(item.row!)}>종목 보기 →</button>}</div>
     </div>
    </article>
  }
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
-  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>리포트 · 트렌드 · 산업 · 종목</span></header>
+  <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>뉴스 · 리포트 요약</span></header>
   {!reports.uid&&<p className="discovery-news-empty" role="status">로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.</p>}
-  {!instinct.length&&<p className="discovery-news-empty" role="status">Instinct 뉴스가 없습니다.</p>}
-  <SourceReports controller={reports} news rows={rows} onSelect={onSelect}>{renderGroups}</SourceReports>
+  {mode==='all'&&!instinct.length&&<p className="discovery-news-empty" role="status">Instinct 뉴스가 없습니다.</p>}
+  <SourceReports controller={reports} news rows={rows} onSelect={onSelect}>
+   <div className="news-scrap-toolbar" role="group" aria-label="뉴스 보기">
+    <button type="button" aria-pressed={mode==='all'} onClick={()=>setMode('all')}>전체 뉴스</button>
+    <button type="button" aria-pressed={mode==='saved'} onClick={()=>setMode('saved')}>스크랩 · {scraps.items.length}</button><span>스크랩은 이 기기에 저장</span>
+   </div>
+   {scraps.error&&<p role="status">{scraps.error}</p>}
+   {mode==='saved'&&!articles.length&&<p role="status">스크랩한 뉴스가 없습니다.</p>}
+   <div className="discovery-news-stories" role="list" aria-label="Instinct 뉴스 카드" tabIndex={0} key={mode+'/'+reports.uid}>{articles.map((item,i)=>renderStory(story(item,i),''))}</div>
+  </SourceReports>
  </section>
 }

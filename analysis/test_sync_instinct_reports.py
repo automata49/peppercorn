@@ -184,3 +184,21 @@ class ImageValidationMigrationTests(unittest.TestCase):
         self.assertEqual(len(writes),1)
         self.assertIn('data:image/webp;base64,',writes[0])
         self.assertIn('"image_validation_version":3',writes[0].replace(' ',''))
+
+class StructuredFactsTests(unittest.TestCase):
+    def test_structured_daily_facts_keep_evidence_and_analysis_separate(self):
+        report={k:v for k,v in REPORT.items() if k not in ('version','type','summary','sections','sources')}
+        report.update(summaries={'market':'원문 시장 요약입니다.'},disclaimer='원문 유의사항입니다.',
+            sources=[{'title':'원문 제목','url':'https://issuer.example/news'}],sections=[{
+            'name':'시장 분석','summary':'원문 섹션 요약입니다.','facts':[{'key':'매출','value':'100억원','as_of':'2026-10-25','source_ref':'원문 발표','confidence':'높음'}],
+            'pqc':{'P':'원문 P','Q':'원문 Q','C':'원문 C'},'opinion':'확인되지 않은 원문 전망입니다.',
+            'sources':[{'title':'섹션 근거','url':'https://issuer.example/section','note':'원문 주석'}],'images':[]}])
+        result=convert(report)
+        body=result['pages'][0]['text']
+        for value in ['100억원','2026-10-25','원문 발표','높음','원문 P','원문 Q','원문 C','원문 유의사항입니다.']:
+            self.assertIn(value,body)
+        self.assertLess(body.index('전망 · 미확정'),body.index('원문 P'))
+        self.assertEqual(result['pages'][0]['heading'],'시장 분석')
+        self.assertEqual(len(result['links']),2)
+        malformed=copy.deepcopy(report);malformed['sections'][0]['facts'][0]['value']={'invalid':'object'}
+        with self.assertRaises(ValueError):convert(malformed)

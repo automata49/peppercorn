@@ -57,6 +57,30 @@ def adapt_report(raw):
         isinstance(section, dict) and ('facts' in section or 'outlook' in section) for section in raw['sections'])
     if not legacy and (raw.get('version') != 1 or raw.get('type') != 'report'):
         raise ValueError('Expected version 1 report')
+    # Structured facts export keeps evidence metadata and source-authored analysis verbatim.
+    structured = legacy and all(isinstance(section.get('name'), str) and isinstance(section.get('facts'), list)
+        and all(isinstance(fact, dict) and set(fact) == {'key', 'value', 'as_of', 'source_ref', 'confidence'}
+                for fact in section['facts']) for section in raw['sections'])
+    if structured:
+        converted = []
+        citations = list(raw.get('sources', []))
+        for section in raw['sections']:
+            facts = [text(fact['key'], hi=3000) + ': ' + text(fact['value'], hi=3000) + ' · 기준: ' + text(fact['as_of'], hi=3000) + ' · 출처: ' + text(fact['source_ref'], hi=3000) + ' · 확신: ' + text(fact['confidence'], hi=3000)
+                     for fact in section['facts']]
+            blocks = [text(section.get('summary'), hi=5000)]
+            if facts:
+                blocks.append('확인된 사실\n' + '\n'.join('• ' + line for line in facts))
+            pqc = section.get('pqc', {})
+            if not isinstance(pqc, dict) or set(pqc) - {'P', 'Q', 'C'}:
+                raise ValueError('Invalid section')
+            if pqc:
+                blocks.append('전망 · 미확정\n' + '\n'.join(k + ': ' + text(v, hi=5000) for k, v in pqc.items()))
+            if section.get('opinion'):
+                blocks.append('전망 · 미확정\n' + text(section['opinion'], hi=5000))
+            converted.append({**section, 'heading': text(section['name'], hi=250), 'body': '\n\n'.join(blocks)})
+            citations.extend(section.get('sources', []))
+        raw = {**raw, 'sections': converted, 'sources': [{'label': text(c.get('label', c.get('title')), hi=400)
+                + (' · ' + text(c['note'], hi=90) if c.get('note') else ''), 'url': c['url']} for c in citations]}
     result = {**raw, 'version': 1, 'type': 'report'}
     if 'summary' not in raw and legacy:
         summaries = raw['summaries']
