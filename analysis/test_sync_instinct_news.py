@@ -15,6 +15,15 @@ VALID = {
     "published_at": "2026-10-16T11:00:00Z"
 }
 class NewsValidationTests(unittest.TestCase):
+    def test_short_korean_topic_long_headline_and_public_http_article(self):
+        item = {**VALID, "type": "trend", "trend_topic": "로봇", "market": "GLOBAL",
+                "headline": "긴 제목 " * 30, "source_url": "http://www.hansbiz.co.kr/news/articleView.html?idxno=876567"}
+        parsed = clean(item, NOW)
+        self.assertEqual(parsed["trend_topic"], "로봇")
+        self.assertEqual(parsed["headline"], item["headline"].strip())
+        self.assertTrue(parsed["source_url"].startswith("http://"))
+        self.assertIsNone(clean({**item, "source_url": "http://localhost/private"}, NOW))
+
     def test_valid(self):
         self.assertEqual(clean(VALID, NOW)["ticker"], "NVDA")
     def test_private_drive_link_refused(self):
@@ -71,7 +80,7 @@ class NewsValidationTests(unittest.TestCase):
         trend.update(type="trend", market="GLOBAL", trend_topic="AI Infrastructure")
         self.assertIsNone(clean({**trend, "trend_topic":""}, NOW))
         self.assertIsNone(clean({**trend, "market":"INVALID"}, NOW))
-        self.assertIsNone(clean({**trend, "source_url":"http://example.com/private"}, NOW))
+        self.assertIsNone(clean({**trend, "source_url":"http://localhost/private"}, NOW))
 
 if __name__ == "__main__":
     unittest.main()
