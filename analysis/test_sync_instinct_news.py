@@ -84,3 +84,14 @@ class NewsValidationTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class OAuthDiagnosticsTests(unittest.TestCase):
+    def test_expired_grant_is_actionable_without_exposing_provider_body(self):
+        import io, urllib.error
+        from analysis.sync_instinct_news import get_token
+        error=urllib.error.HTTPError('https://oauth2.googleapis.com/token',400,'bad',{},io.BytesIO(b'{"error":"invalid_grant","error_description":"SECRET MUST NEVER BE LOGGED"}'))
+        with patch.dict('os.environ',{'GOOGLE_DRIVE_CLIENT_ID':'test','GOOGLE_DRIVE_CLIENT_SECRET':'test','GOOGLE_DRIVE_REFRESH_TOKEN':'test'}), patch('urllib.request.urlopen',side_effect=error):
+            with self.assertRaises(RuntimeError) as result:get_token()
+        self.assertIn('invalid_grant',str(result.exception))
+        self.assertIn('GOOGLE_DRIVE_REFRESH_TOKEN',str(result.exception))
+        self.assertNotIn('SECRET',str(result.exception))
