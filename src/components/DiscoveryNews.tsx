@@ -7,12 +7,12 @@ import {loadInstinctNews,type InstinctArticle,type InstinctVisual} from '../lib/
 import {coverPhoto,useVisualStyle} from './VisualStyle'
 import {SourceReports} from './SourceReports'
 import type {ReportController} from '../lib/sourceReports'
-import {prioritizeNews,type NewsContext,type NewsGroup} from '../lib/newsPriorities'
+import {prioritizeNews,newsGroup,type NewsContext,type NewsGroup} from '../lib/newsPriorities'
 
 type NewsStory={
  id:string;market:'KR'|'US'|'GLOBAL';ticker?:string;trend_topic?:string;headline:string;summary:string;
  published_at:string;publisher:string;url:string;visual?:InstinctVisual;images?:InstinctImage[];
- kind:'stock'|'trend';row?:LeaderRow;label:string
+ kind:'stock'|'trend';group:NewsGroup;row?:LeaderRow;label:string
 }
 /** Public story coverage is independent of leader scoring; trend news never gets a made-up ticker. */
 export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
@@ -28,7 +28,7 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
    ...(!isTrend?{ticker:item.ticker}:{trend_topic:item.trend_topic}),
    headline:item.headline,summary:item.summary,published_at:item.published_at,
    publisher:item.source_name,url:item.source_url,visual:item.visual,images:item.images,
-   kind:isTrend?'trend' as const:'stock' as const,row,
+   kind:isTrend?'trend' as const:'stock' as const,group:newsGroup(item),row,
    label:isTrend?item.trend_topic:(item.market==='KR'?row?.name||item.ticker:item.ticker)
   }
  }
@@ -59,7 +59,7 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
     </figure>}
     <div className="discovery-news-copy">
      {reason&&<span className="news-report-reason">{reason}</span>}
-     <span className="discovery-news-instrument">{item.kind==='trend'?<><span className="discovery-news-trend-tag">TREND</span> {item.label} · {item.market==='GLOBAL'?'GLOBAL':item.market}</>:<>{item.label} · {item.row?.industry||item.row?.sector||item.market}</>}</span>
+     <span className="discovery-news-instrument">{item.kind==='trend'?<><span className="discovery-news-trend-tag">{item.group==='industry'?'INDUSTRY':'TREND'}</span> {item.label} · {item.market==='GLOBAL'?'GLOBAL':item.market}</>:<>{item.label} · {item.row?.industry||item.row?.sector||item.market}</>}</span>
      {!compact&&item.row&&<NewsStockMetrics row={item.row}/>}
      <h4><a href={item.url} target="_blank" rel="noopener noreferrer">{item.headline}</a></h4>
      {item.summary&&<p><ResearchText text={item.summary} market={item.market}/></p>}
