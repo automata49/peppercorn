@@ -17,7 +17,6 @@ type NewsStory={
 export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;rows:LeaderRow[];onSelect:(row:LeaderRow)=>void}){
  const {photoStyle}=useVisualStyle()
  const [failed,setFailed]=useState<Set<string>>(()=>new Set())
- const [visibleCount,setVisibleCount]=useState(4)
  const [instinct,setInstinct]=useState<InstinctArticle[]>([])
  useEffect(()=>{let active=true;void loadInstinctNews().then(items=>{if(active)setInstinct(items)});return()=>{active=false}},[])
  const now=Date.now(),lookup=new Map(rows.map(r=>[r.market+':'+r.ticker,r]))
@@ -32,14 +31,13 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
    label:isTrend?item.trend_topic:(item.market==='KR'?row?.name||item.ticker:item.ticker)
   }
  })
- const stories=fromDrive.slice(0,visibleCount)
  // Public news remains visible; private summaries are supplied only by the account controller.
  const date=(value:string)=>new Date(value).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Seoul'})
  return <section className="discovery-news" aria-label="시장과 종목의 최신 뉴스">
   <header className="discovery-news-heading"><div><span className="journey-kicker">MARKET & COMPANIES</span><h3>시장과 기업의 새 소식</h3></div><span>뉴스 · 리포트 요약</span></header>
   {!reports.uid&&<p className="discovery-news-empty" role="status">로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.</p>}
-  {!stories.length&&<p className="discovery-news-empty" role="status">최근 7일의 Instinct 뉴스가 없습니다.</p>}
-  <SourceReports controller={reports} news rows={rows} onSelect={onSelect}>{stories.map(item=>{
+  {!fromDrive.length&&<p className="discovery-news-empty" role="status">Instinct 뉴스가 없습니다.</p>}
+  <SourceReports controller={reports} news rows={rows} onSelect={onSelect}>{fromDrive.map(item=>{
    const linked=item.images?.find(v=>!failed.has(v.url))
    const visual=item.visual&&!failed.has(item.visual.url)?item.visual:undefined
    return <article className="discovery-news-story" role="listitem" key={item.id} data-market={item.market} data-kind={item.kind} data-image-kind={linked?.kind}>
@@ -56,6 +54,5 @@ export function DiscoveryNews({reports,rows,onSelect}:{reports:ReportController;
     </div>
    </article>
   })}</SourceReports>
-  {visibleCount<fromDrive.length&&<div className="discovery-news-actions"><button type="button" onClick={()=>setVisibleCount(count=>count+4)}>뉴스 더 보기</button></div>}
  </section>
 }

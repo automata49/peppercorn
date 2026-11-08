@@ -38,7 +38,7 @@ async function boot(page:Page,items:unknown=news){
  await page.goto('/peppercorn/');await openNewsPage(page)
 }
 
-test('publisher diversity preserves summaries, deduplicates articles and excludes stale/unsafe input',()=>{
+test('publisher diversity preserves summaries and older articles while deduplicating safe sources',()=>{
  const duplicate={...news[0],source_url:news[0].source_url+'#top'}
  const stale={...news[2],published_at:stamp(-200)}
  const unsafe={...news[3],source_url:'https://drive.google.com/private'}
@@ -47,7 +47,8 @@ test('publisher diversity preserves summaries, deduplicates articles and exclude
  expect(ordered.map(i=>i.source_name)).toEqual(['Reuters','AP','Bloomberg','연합뉴스','Reuters'])
  expect(ordered.find(i=>i.headline===news[3].headline)?.summary).toBe(news[3].summary)
  expect(news[1].source_name).toBe('Reuters')
- expect(diverseInstinctNews(parsed.items,now+8*86400_000)).toEqual([])
+ expect(diverseInstinctNews(parsed.items,now+8*86400_000)).toHaveLength(5)
+ expect(parseInstinctNews({...feed,items:[stale]},now)?.items).toHaveLength(1)
 })
 for(const theme of ['light','dark'])for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]])test(`Instinct multi-source news without wheels ${theme} ${width}px`,async({page})=>{
  await page.setViewportSize({width,height})
@@ -55,17 +56,17 @@ for(const theme of ['light','dark'])for(const [width,height] of [[390,844],[834,
  await boot(page)
  const section=page.getByRole('region',{name:'시장과 종목의 최신 뉴스'})
  await expect(section.locator('[data-wheel]')).toHaveCount(0)
- await expect(section.locator('.discovery-news-story')).toHaveCount(4)
+ await expect(section.locator('.discovery-news-story')).toHaveCount(5)
  await expect(section).toContainText(news[3].headline)
  await expect(section).toContainText(news[4].headline)
- await expect(section).not.toContainText(news[1].headline)
+ await expect(section).toContainText(news[1].headline)
  await expect(section.locator('.discovery-news-source').first()).toContainText('Reuters')
  await expect(section.getByRole('link',{name:'원문 읽기 ↗'}).first()).toHaveAttribute('href',news[0].source_url)
  await expect(section.locator('time').first()).toHaveAttribute('datetime',news[0].published_at)
  await expect(section).toContainText('Instinct AI 요약 · 원문 확인')
  await expect(section).toContainText('Folio 이미지 · 원문 사진 아님')
  await expect(section.locator('article').filter({hasText:news[3].headline}).getByRole('button',{name:'종목 보기 →'})).toHaveCount(0)
- await section.getByRole('button',{name:'뉴스 더 보기'}).click()
+ await expect(section.getByRole('button',{name:'뉴스 더 보기'})).toHaveCount(0)
  await expect(section.locator('.discovery-news-story')).toHaveCount(5)
  await expect(section).toContainText(news[1].headline)
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
@@ -87,7 +88,7 @@ test('missing Instinct feed stays empty without company RSS fallback',async({pag
  await page.route('**/data/leader-insights.json*',r=>r.fulfill({json:issuerFeed}))
  await page.reload();await openNewsPage(page)
  await expect(section.locator('article')).toHaveCount(0)
- await expect(section).toContainText('최근 7일의 Instinct 뉴스가 없습니다.')
+ await expect(section).toContainText('Instinct 뉴스가 없습니다.')
  await expect(section).not.toContainText(issuer.headline)
  await expect(section.locator('[data-wheel]')).toHaveCount(0)
  await expect(section).toContainText('로그인 후 리포트 요약과 전문도 함께 볼 수 있습니다.')
@@ -104,24 +105,31 @@ test('Instinct visual retains credit and falls back on image failure',async({pag
  await expect(page.locator('.hero-name')).toHaveText('Apple')
 })
 
-for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]])test(`Cover flow buttons and keyboard center articles at ${width}`,async({page})=>{
+for(const [width,height] of [[390,844],[834,1194],[1194,834],[1440,900]])test(`Editorial news layout replaces Cover flow at ${width}`,async({page})=>{
  await page.setViewportSize({width,height});await boot(page)
- const rail=page.getByRole('list',{name:'뉴스와 리포트 Cover flow'})
- await rail.scrollIntoViewIfNeeded()
- await expect(rail).toHaveCSS('overflow-x','auto')
- const next=page.getByRole('button',{name:'다음 기사',exact:true})
- await next.click()
- await expect.poll(()=>rail.evaluate(el=>{
-  const a=el.children[1].getBoundingClientRect(),r=el.getBoundingClientRect()
-  return Math.abs((a.left+a.right)/2-(r.left+r.right)/2)
- })).toBeLessThan(3)
- await expect(page.locator('.news-coverflow-controls')).toContainText('2 / 4')
- await rail.focus();await page.keyboard.press('End')
- await expect(page.locator('.news-coverflow-controls')).toContainText('4 / 4')
- await expect(next).toBeDisabled()
- await page.keyboard.press('Home')
- await expect(page.locator('.news-coverflow-controls')).toContainText('1 / 4')
+ const list=page.getByRole('list',{name:'뉴스와 리포트',exact:true})
+ await expect(list).toHaveCSS('display','grid')
+ await expect(page.locator('.news-coverflow-controls')).toHaveCount(0)
+ await expect(list.locator('article').first()).toHaveCSS('transform','none')
+ const portrait=height>width
+ await expect(list).toHaveCSS('overflow-x',portrait?'auto':'visible')
+ if(!portrait){
+  const boxes=await list.locator('article').evaluateAll(nodes=>nodes.map(n=>n.getBoundingClientRect().top))
+  expect(Math.abs(boxes[0]-boxes[3])).toBeLessThan(1)
+  expect(boxes[4]).toBeGreaterThan(boxes[0])
+ }else{
+  await list.evaluate(el=>el.scrollLeft=el.scrollWidth)
+  await expect.poll(()=>list.evaluate(el=>el.scrollLeft)).toBeGreaterThan(0)
+ }
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true)
+})
+test('all 125 supplied articles, including older news, render without paging or count limits',async({page})=>{
+ const items=Array.from({length:125},(_,i)=>({...news[0],headline:`Instinct 전체 뉴스 항목 ${i}`,source_url:`https://www.reuters.com/article/${i}`,published_at:stamp(-24*(i+1))}))
+ expect(parseInstinctNews({...feed,items},now)?.items).toHaveLength(125)
+ await boot(page,items)
+ await expect(page.locator('.discovery-news-story')).toHaveCount(125)
+ await expect(page.locator('.discovery-news-story').last()).toContainText(items[124].headline)
+ await expect(page.getByRole('button',{name:'뉴스 더 보기'})).toHaveCount(0)
 })
 test('source percentage typography preserves ranges, zero and market colours',async({page})=>{
  await boot(page,[{...news[0],summary:'매출 +5.2%, 이익 -2.1%, 보합 +0%, 전망 10-20% 범위를 원문 그대로 표시합니다.'}])

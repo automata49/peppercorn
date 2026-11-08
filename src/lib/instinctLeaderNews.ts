@@ -13,7 +13,6 @@ export type TrendNews = Common & {type:'trend';market:'KR'|'US'|'GLOBAL';trend_t
 export type InstinctArticle = StockNews|TrendNews
 export type InstinctNewsFeed={version:1;updated_at:string;items:InstinctArticle[]}
 const topics=new Set(['semiconductor','ai','energy','industry','finance','health','other'])
-const limitAge=7*86400_000
 const validDate=(v:unknown)=>typeof v==='string'&&/(Z|[+-]\d{2}:\d{2})$/.test(v)&&Number.isFinite(Date.parse(v))
 const text=(v:unknown,min:number,max:number)=>typeof v==='string'&&v.trim().length>=min&&v.trim().length<=max
 function readVisual(input:unknown):InstinctVisual|undefined{
@@ -39,7 +38,7 @@ function publicArticleUrl(value:unknown){
 export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed|null{
  if(!value||typeof value!=='object')return null
  const feed=value as Record<string,unknown>
- if(feed.version!==1||!validDate(feed.updated_at)||!Array.isArray(feed.items)||feed.items.length>60)return null
+ if(feed.version!==1||!validDate(feed.updated_at)||!Array.isArray(feed.items))return null
  const items:InstinctArticle[]=[]
  const seen=new Set<string>()
  for(const raw of feed.items){
@@ -47,7 +46,7 @@ export function parseInstinctNews(value:unknown,now=Date.now()):InstinctNewsFeed
   const r=raw as Record<string,unknown>
   if(!text(r.headline,5,120)||!text(r.summary,10,320)||!text(r.source_name,2,100)||!publicArticleUrl(r.source_url)||!validDate(r.published_at))continue
   const age=now-Date.parse(r.published_at as string)
-  if(age< -3600_000||age>limitAge)continue
+  if(age< -3600_000)continue
   const common={
    headline:String(r.headline),summary:String(r.summary),source_name:String(r.source_name),
    source_url:String(r.source_url),published_at:String(r.published_at),
@@ -75,7 +74,7 @@ export function diverseInstinctNews(items:InstinctArticle[],now=Date.now()):Inst
  const sources=new Map<string,InstinctArticle[]>(),seen=new Set<string>()
  for(const item of [...items].sort((a,b)=>Date.parse(b.published_at)-Date.parse(a.published_at))){
   const age=now-Date.parse(item.published_at)
-  if(!Number.isFinite(age)||age< -3600_000||age>limitAge)continue
+  if(!Number.isFinite(age)||age< -3600_000)continue
   const url=new URL(item.source_url);url.hash=''
   if(seen.has(url.href))continue
   seen.add(url.href)
@@ -94,8 +93,8 @@ export async function loadInstinctNews():Promise<InstinctArticle[]>{
  const controller=new AbortController(),timer=window.setTimeout(()=>controller.abort(),8000)
  try{
   const response=await fetch(import.meta.env.BASE_URL+'data/instinct-leader-news.json',{signal:controller.signal,cache:'no-cache'})
-  if(!response.ok||Number(response.headers.get('content-length')||0)>1_000_000)return []
+  if(!response.ok||Number(response.headers.get('content-length')||0)>10_000_000)return []
   const body=await response.text()
-  return body.length<=1_000_000?(parseInstinctNews(JSON.parse(body))?.items||[]):[]
+  return body.length<=10_000_000?(parseInstinctNews(JSON.parse(body))?.items||[]):[]
  }catch{return []}finally{window.clearTimeout(timer)}
 }
