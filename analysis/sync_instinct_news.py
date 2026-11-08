@@ -137,8 +137,21 @@ def get_token():
     }).encode()
     req = urllib.request.Request("https://oauth2.googleapis.com/token", data=payload,
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
-    with urllib.request.urlopen(req, timeout=20) as r:
-        response = json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            response = json.load(r)
+    except urllib.error.HTTPError as error:
+        # Log only allowlisted OAuth codes, never provider bodies or credentials.
+        code = 'unknown'
+        try:
+            value = json.loads(error.read(8192)).get('error')
+            if value in ('invalid_grant', 'invalid_client', 'unauthorized_client', 'invalid_scope'):
+                code = value
+        except (ValueError, AttributeError):
+            pass
+        action = ('Google Drive consent must be renewed and GOOGLE_DRIVE_REFRESH_TOKEN replaced'
+                  if code == 'invalid_grant' else 'Check the existing Google Drive OAuth client and readonly scope')
+        raise RuntimeError(f'Drive OAuth HTTP {error.code} ({code}): {action}. No content was refreshed.') from None
     return response["access_token"]
 
 

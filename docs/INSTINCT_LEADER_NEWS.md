@@ -127,3 +127,7 @@ or speculative price predictions. Cite a direct dated article and clearly
 distinguish confirmed facts from forecasts. Keep factual summary under
 320 chars, title under 120, topic 3–80 chars, last seven days only.
 Never include private research or copyright-protected full text.
+
+## OAuth recovery
+
+A token exchange error is a failed refresh; keep the last approved content and its original dates. `invalid_grant` requires the folder owner to renew the same Drive readonly consent and replace the GitHub Actions `GOOGLE_DRIVE_REFRESH_TOKEN` secret. Use the existing client; confirm its consent-screen publishing status before renewing, since testing grants may expire. Do not paste tokens into chat, commit them, expand scopes or publish the folder. After the owner updates the secret, run the existing Instinct Drive workflow and verify both public-news and private-report jobs succeed. Other allowlisted errors identify client/scope configuration problems. Provider response bodies are never logged.
