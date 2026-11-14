@@ -51,6 +51,9 @@ explicit unknown versions/types are rejected. Folio maps the summaries to labele
 bullets and preserves every fact, forecast and disclaimer, separating forecasts under
 `전망 · 미확정`. The Drive original remains unchanged; unknown extra summary categories
 or malformed lists fail closed. New exports should use the canonical shape below.
+Structured report exports can supply up to 1,190 UTF-16 code units per summary category.
+Folio splits a long category into two labeled items of at most 600 characters each.
+The combined report summary must still fit within five items.
 CI emits a safe rejection code (for example `report_version_or_type`) and ordinal,
 never the private title, body, URL or account ID.
 
