@@ -200,5 +200,20 @@ class StructuredFactsTests(unittest.TestCase):
         self.assertLess(body.index('전망 · 미확정'),body.index('원문 P'))
         self.assertEqual(result['pages'][0]['heading'],'시장 분석')
         self.assertEqual(len(result['links']),2)
+
+        paragraph = ('원문 시장 요약입니다. ' * 55).strip()
+        report['summaries'] = {'market': paragraph, 'industry': '원문 산업 요약입니다.'}
+        result = convert(report)
+        market_items = result['summary'][:2]
+        self.assertTrue(all(item.startswith('[시장] ') and len(item) <= 600 for item in market_items))
+        self.assertEqual(' '.join(item.removeprefix('[시장] ') for item in market_items), paragraph)
+        self.assertEqual(result['summary'][2:], ['[산업] 원문 산업 요약입니다.'])
+
+        report['summaries'] = {'market': '📈' * 550}
+        result = convert(report)
+        self.assertEqual(len(result['summary']), 2)
+        self.assertTrue(all(len(item.encode('utf-16-le')) // 2 <= 600 for item in result['summary']))
+        self.assertEqual(''.join(item.removeprefix('[시장] ') for item in result['summary']), '📈' * 550)
+
         malformed=copy.deepcopy(report);malformed['sections'][0]['facts'][0]['value']={'invalid':'object'}
         with self.assertRaises(ValueError):convert(malformed)

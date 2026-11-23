@@ -9,6 +9,7 @@ import json
 import os
 import re
 import uuid
+from bisect import bisect_left, bisect_right
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
@@ -86,9 +87,28 @@ def adapt_report(raw):
         summaries = raw['summaries']
         if set(summaries) - {'market', 'industry', 'stocks'}:
             raise ValueError('Unsupported summary categories')
-        result['summary'] = ['[' + label + '] ' + text(summaries[key], hi=595)
-            for key, label in (('market', '시장'), ('industry', '산업'), ('stocks', '종목'))
-            if key in summaries and summaries[key] != '']
+        result['summary'] = []
+        for key, label in (('market', '시장'), ('industry', '산업'), ('stocks', '종목')):
+            if key not in summaries or summaries[key] == '':
+                continue
+            prefix = f'[{label}] '
+            limit = 600 - len(prefix)
+            summary = text(summaries[key], hi=2 * limit if structured else 595)
+            if structured:
+                # The reader measures JavaScript string length (UTF-16 code units).
+                units = [0]
+                for char in summary:
+                    units.append(units[-1] + (2 if ord(char) > 0xFFFF else 1))
+                if units[-1] > limit:
+                    last = bisect_right(units, limit) - 1
+                    first = bisect_left(units, units[-1] - limit)
+                    if first > last:
+                        raise ValueError('Invalid report text')
+                    space = summary.rfind(' ', max(0, first - 1), last + 1)
+                    boundary = space if space >= 0 else last
+                    result['summary'].append(prefix + summary[:boundary].rstrip())
+                    summary = summary[boundary:].lstrip()
+            result['summary'].append(prefix + summary)
     sections = raw.get('sections')
     if not isinstance(sections, list) or len(sections) > 60:
         raise ValueError('Expected bounded report sections')
